@@ -46,9 +46,9 @@ static DeviceData device;
 
 static void Main(string[] args)
 {
-	client = new AdvancedAdbClient();
-	client.Connect("127.0.0.1:62001");
-	device = client.GetDevices().FirstOrDefault();
+    client = new AdvancedAdbClient();
+    client.Connect("127.0.0.1:62001");
+    device = client.GetDevices().FirstOrDefault();
 }
 ```
 
@@ -64,10 +64,10 @@ static DeviceData device;
 
 static void Main(string[] args)
 {
-	client = new AdvancedAdbClient();
-	client.Connect("127.0.0.1:62001");
-	device = client.GetDevices().FirstOrDefault();
-	Element el = client.FindElement(device, "//node[@text='Login']");
+    client = new AdvancedAdbClient();
+    client.Connect("127.0.0.1:62001");
+    device = client.GetDevices().FirstOrDefault();
+    Element el = client.FindElement(device, "//node[@text='Login']");
 }
 ```
 
@@ -83,19 +83,21 @@ You can also find several elements
 Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
 
+
 ### Getting element attributes
 You can get all element attributes
 
 ```c#
 static void Main(string[] args)
 {
-	...
-	Element el = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
-	string eltext = el.attributes["text"];
-	string bounds = el.attributes["bounds"];
-	...
+    ...
+    Element el = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
+    string eltext = el.attributes["text"];
+    string bounds = el.attributes["bounds"];
+    ...
 }
 ```
+
 
 ### Clicking on an element
 To click on an element you need AdvancedAdbClient and DeviceData saved in the previous example
@@ -133,9 +135,10 @@ The Click() method returns true if the click was successful and false if it fail
 ```c#
 if (!el.Click())
 {
-	Console.WriteLine("Can't click on an element");
+    Console.WriteLine("Can't click on an element");
 }
 ```
+
 
 ### Swipe
 You can swipe from one element to another
@@ -147,7 +150,7 @@ static void Main(string[] args)
     Element first = client.FindElement(device, "//node[@text='Login']");
     Element second = client.FindElement(device, "//node[@text='Password']");
     client.Swipe(device, first, second, 100); // Swipe 100 ms
-	...
+    ...
 }
 ```
 
@@ -156,10 +159,10 @@ Or swipe by coordinates
 ```c#
 static void Main(string[] args)
 {
-	...
+    ...
     device = client.GetDevices().FirstOrDefault();
     client.Swipe(device, 600, 1000, 600, 500, 100); // Swipe from (600;1000) to (600;500) on 100 ms
-	...
+    ...
 }
 ```
 
@@ -168,9 +171,10 @@ The Swipe() method returns true if the click was successful and false if it fail
 ```c#
 if (!client.Swipe(device, 600, 1000, 600, 500, 100))
 {
-	Console.WriteLine("Can't swipe");
+    Console.WriteLine("Can't swipe");
 }
 ```
+
 
 ### Send text
 You can send any text except Cyrillic (Russian isn't supported by adb)
@@ -182,7 +186,7 @@ static void Main(string[] args)
 {
     ...
     client.SendText(device, "text"); // Send text to device
-	...
+    ...
 }
 ```
 
@@ -193,7 +197,7 @@ static void Main(string[] args)
 {
     ...
     client.FindElement(device, "//node[@resource-id='Login']").SendText("text"); // Send text to the element by xpath //node[@resource-id='Login']
-	...
+    ...
 }
 ```
 
@@ -202,9 +206,10 @@ The SendText() method returns true if the click was successful and false if it f
 ```c#
 if (!client.SendText(device, "text"))
 {
-	Console.WriteLine("Can't send text");
+    Console.WriteLine("Can't send text");
 }
 ```
+
 
 ### Clearing the input text
 
@@ -218,7 +223,7 @@ static void Main(string[] args)
 {
     ...
     client.ClearInput(device, 25); // The second argument is to specify the maximum number of characters to be erased
-	...
+    ...
 }
 ```
 
@@ -228,7 +233,7 @@ static void Main(string[] args)
 {
     ...
     client.FindElement(device, "//node[@resource-id='Login']").ClearInput(); // Get element text attribute and remove text length symbols
-	...
+    ...
 }
 ```
 
