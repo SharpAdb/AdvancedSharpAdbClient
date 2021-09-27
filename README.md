@@ -4,7 +4,8 @@ AdvancedSharpAdbClient is a .NET library that allows .NET applications to commun
 It provides a .NET implementation of the `adb` protocol, giving more flexibility to the developer than launching an 
 `adb.exe` process and parsing the console output.
 
-It's upgraded verion of 
+It's upgraded verion of [SharpAdbClient](https://github.com/quamotion/madb).
+Added important features.
 
 ## Installation
 To install AdvancedSharpAdbClient install the [AdvancedSharpAdbClient NuGetPackage](https://www.nuget.org/packages/AdvancedSharpAdbClient). If you're
@@ -51,6 +52,8 @@ static void Main(string[] args)
 }
 ```
 
+## Using AdvancedAdbClient library
+
 ### Finding element
 You can find the element on the screen by xpath
 
@@ -83,21 +86,14 @@ Element[] els = client.FindElements(device, "//node[@resource-id='Login']", Time
 ### Getting element attributes
 You can get all element attributes
 
-
 ```c#
-static AdvancedAdbClient client;
-
-static DeviceData device;
-
 static void Main(string[] args)
 {
-	client = new AdvancedAdbClient();
-	client.Connect("127.0.0.1:62001");
-	device = client.GetDevices().FirstOrDefault();
+	...
 	Element el = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
-	
 	string eltext = el.attributes["text"];
 	string bounds = el.attributes["bounds"];
+	...
 }
 ```
 
@@ -145,87 +141,97 @@ if (!el.Click())
 You can swipe from one element to another
 
 ```c#
-static AdvancedAdbClient client;
-
-static DeviceData device;
-
 static void Main(string[] args)
 {
-    client = new AdvancedAdbClient();
-    client.Connect("127.0.0.1:62001");
-    device = client.GetDevices().FirstOrDefault();
+    ...
     Element first = client.FindElement(device, "//node[@text='Login']");
     Element second = client.FindElement(device, "//node[@text='Password']");
     client.Swipe(device, first, second, 100); // Swipe 100 ms
+	...
 }
 ```
 
 Or swipe by coordinates
 
 ```c#
-static AdvancedAdbClient client;
-
-static DeviceData device;
-
 static void Main(string[] args)
 {
-    client = new AdvancedAdbClient();
-    client.Connect("127.0.0.1:62001");
+	...
     device = client.GetDevices().FirstOrDefault();
     client.Swipe(device, 600, 1000, 600, 500, 100); // Swipe from (600;1000) to (600;500) on 100 ms
+	...
+}
+```
+
+The Swipe() method returns true if the click was successful and false if it failed
+
+```c#
+if (!client.Swipe(device, 600, 1000, 600, 500, 100))
+{
+	Console.WriteLine("Can't swipe");
 }
 ```
 
 ### Send text
 You can send any text except Cyrillic (Russian isn't supported by adb)
 
+The text field should be in focus
+
 ```c#
-void DownloadFile()
+static void Main(string[] args)
 {
-    var device = AdbClient.Instance.GetDevices().First();
-    
-    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device))
-    using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
-    {
-        service.Pull("/data/local/tmp/MyFile.txt", stream, null, CancellationToken.None);
-    }
-}
-
-void UploadFile()
-{
-    var device = AdbClient.Instance.GetDevices().First();
-    
-    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device))
-    using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
-    {
-        service.Push(stream, "/data/local/tmp/MyFile.txt", 444, DateTime.Now, null, CancellationToken.None);
-    }
+    ...
+    client.SendText(device, "text"); // Send text to device
+	...
 }
 ```
 
-### Run shell commands
-To run shell commands on an Android device, you can use the `AdbClient.Instance.ExecuteRemoteCommand` method.
+You can also send text to the element (clicks on the element and sends the text)
 
-You need to pass a `DeviceData` object which specifies the device on which you want to run your command. You
-can get a `DeviceData` object by calling `AdbClient.Instance.GetDevices()`, which will run one `DeviceData`
-object for each device Android connected to your PC.
-
-You'll also need to pass an `IOutputReceiver` object. Output receivers are classes that receive and parse the data
-the device sends back. In this example, we'll use the standard `ConsoleOutputReceiver`, which reads all console
-output and allows you to retrieve it as a single string. You can also use other output receivers or create your own.
-
-```
-void EchoTest()
+```c#
+static void Main(string[] args)
 {
-    var device = AdbClient.Instance.GetDevices().First();
-    var receiver = new ConsoleOutputReceiver();
-
-    AdbClient.Instance.ExecuteRemoteCommand("echo Hello, World", device, receiver);
-
-    Console.WriteLine("The device responded:");
-    Console.WriteLine(receiver.ToString());
+    ...
+    client.FindElement(device, "//node[@resource-id='Login']").SendText("text"); // Send text to the element by xpath //node[@resource-id='Login']
+	...
 }
 ```
+
+The SendText() method returns true if the click was successful and false if it failed
+
+```c#
+if (!client.SendText(device, "text"))
+{
+	Console.WriteLine("Can't send text");
+}
+```
+
+### Clearing the input text
+
+You can clear text input
+
+The text field should be in focus
+
+Recommended
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.ClearInput(device, 25); // The second argument is to specify the maximum number of characters to be erased
+	...
+}
+```
+
+It may work unstable
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.FindElement(device, "//node[@resource-id='Login']").ClearInput(); // Get element text attribute and remove text length symbols
+	...
+}
+```
+
 
 ## Consulting, Training and Support
 This repository is maintained by [Quamotion](http://quamotion.mobi). Quamotion develops test software for iOS and 
