@@ -77,7 +77,7 @@ You can also specify the waiting time for the element
 Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(5));
 ```
 
-You can also find several elements
+And you can find several elements
 
 ```
 Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
@@ -100,8 +100,6 @@ static void Main(string[] args)
 
 
 ### Clicking on an element
-To click on an element you need AdvancedAdbClient and DeviceData saved in the previous example
-
 You can click on the x and y coordinates
 
 ```c#
@@ -212,7 +210,7 @@ You can clear text input
 
 The text field should be in focus
 
-Recommended
+**Recommended**
 ```c#
 static void Main(string[] args)
 {
@@ -222,7 +220,7 @@ static void Main(string[] args)
 }
 ```
 
-It may work unstable
+**It may work unstable**
 ```c#
 static void Main(string[] args)
 {
@@ -234,7 +232,7 @@ static void Main(string[] args)
 
 ### Sending keyevents
 
-You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent
+You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent#constants
 
 ```c#
 static void Main(string[] args)
@@ -350,14 +348,13 @@ static async void Main(string[] args)
 ```
 
 ## Consulting and Support
-Please open an `issue` on if you have suggestions or problems.
+Please open an **issue** on if you have suggestions or problems.
 
 ## History
 AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the 
 [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).
 
 Credits:
-https://github.com/camalot
-https://github.com/quamotion
+https://github.com/camalot, https://github.com/quamotion
 
 
