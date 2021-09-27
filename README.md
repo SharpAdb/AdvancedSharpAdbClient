@@ -27,7 +27,7 @@ if (!AdbServer.Instance.GetStatus().IsRunning)
     StartServerResult result = server.StartServer(@"C:\adb\adb.exe", false);
     if (result != StartServerResult.Started)
     {
-		Console.WriteLine("Can't start adb server");
+        Console.WriteLine("Can't start adb server");
     }
 }
 ```
