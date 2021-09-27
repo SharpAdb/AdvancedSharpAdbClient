@@ -48,11 +48,11 @@ static void Main(string[] args)
 {
     client = new AdvancedAdbClient();
     client.Connect("127.0.0.1:62001");
-    device = client.GetDevices().FirstOrDefault();
+    device = client.GetDevices().FirstOrDefault(); // Get first connected device
 }
 ```
 
-## Using AdvancedAdbClient library
+## Device automation
 
 ### Finding element
 You can find the element on the screen by xpath
@@ -102,31 +102,26 @@ static void Main(string[] args)
 ### Clicking on an element
 To click on an element you need AdvancedAdbClient and DeviceData saved in the previous example
 
-You can click on the x and y coordinates, or on the element(need xpath)
+You can click on the x and y coordinates
 
 ```c#
-static AdvancedAdbClient client;
-
-static DeviceData device;
-
-static void ClickOnCoordinates()
-{
-    client.Click(device, 600, 600); // Click on the coordinates (600;600)
-}
-
-static void ClickOnElement()
-{
-    Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(3)); // Click on element by xpath //node[@text='Login']
-    el.Click();
-}
-
 static void Main(string[] args)
 {
-    client = new AdvancedAdbClient();
-    client.Connect("127.0.0.1:62001");
-    device = client.GetDevices().FirstOrDefault();
-    ClickOnCoordinates();
-    ClickOnElement();
+    ...
+    client.Click(device, 600, 600); // Click on the coordinates (600;600)
+    ...
+}
+```
+
+Or on the element(need xpath)
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(3));
+    el.Click();// Click on element by xpath //node[@text='Login']
+    ...
 }
 ```
 
@@ -237,16 +232,132 @@ static void Main(string[] args)
 }
 ```
 
+### Sending keyevents
 
-## Consulting, Training and Support
-This repository is maintained by [Quamotion](http://quamotion.mobi). Quamotion develops test software for iOS and 
-Android applications, based on the WebDriver protocol.
+You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent
 
-In certain cases, Quamotion also offers professional services - such as consulting, training and support - related
-to AdvancedSharpAdbClient. Contact us at [info@quamotion.mobi](mailto:info@quamotion.mobi) for more information.
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.SendKeyEvent(device, "KEYCODE_TAB");
+    ...
+}
+```
+
+### BACK and HOME buttons
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.BackBtn(device); // Click Back button
+    ...
+    client.HomeBtn(device); // Click Home button
+    ...
+}
+```
+
+## Device commands
+
+### Install and Uninstall applications
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    PackageManager manager = new PackageManager(client, device);
+    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk", reinstall: false);
+    manager.UninstallPackage("com.android.app");
+    ...
+}
+```
+
+### Start and stop applications
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.StartApp(device, "com.android.app");
+    client.StopApp(device, "com.android.app"); // force-stop
+    ...
+}
+```
+
+### Getting a screenshot
+
+```c#
+static async void Main(string[] args)
+{
+    ...
+    System.Drawing.Image img = client.GetFrameBufferAsync(device, CancellationToken.None).GetAwaiter().GetResult(); // synchronously
+    ...
+    System.Drawing.Image img = await client.GetFrameBufferAsync(device, CancellationToken.None); // asynchronously
+    ...
+}
+```
+
+### Getting screen xml hierarchy
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    XmlDocument screen = client.DumpScreen(device);
+    ...
+}
+```
+
+### Send or receive files
+
+```c#
+void DownloadFile()
+{
+    using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
+    {
+        using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+        {
+            service.Pull("/data/local/tmp/MyFile.txt", stream, null, CancellationToken.None);
+        }
+    }
+}
+
+void UploadFile()
+{
+    using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
+    {
+        using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+        {
+            service.Push(stream, "/data/local/tmp/MyFile.txt", 777 ,DateTimeOffset.Now, null ,CancellationToken.None);
+        }
+    }
+}
+```
+
+### Run shell commands
+
+```c#
+static async void Main(string[] args)
+{
+    ...
+    ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+    client.ExecuteRemoteCommand("echo Hello, World", device, receiver); // synchronously
+    ...
+    await client.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None); // asynchronously
+    ...
+}
+```
+
+## Consulting and Support
+Please open an `issue` on if you have suggestions or problems.
 
 ## History
-AdvancedSharpAdbClient is a fork of [madb](https://github.com/camalot/madb); which in itself is a .NET port of the 
-[ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/). Credits for porting 
-this library go to [Ryan Conrad](https://github.com/camalot).
+AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the 
+[ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).
+
+Credits:
+https://github.com/camalot
+https://github.com/quamotion
+
 
