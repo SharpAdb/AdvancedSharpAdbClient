@@ -347,6 +347,13 @@ static async void Main(string[] args)
 }
 ```
 
+### Encoding
+Default encoding is UTF8,if you want to change it, use
+
+```c#
+AdvancedAdbClient.SetEncoding(Encoding.ASCII);
+```
+
 ## Consulting and Support
 Please open an **issue** on if you have suggestions or problems.
 
