@@ -6,6 +6,7 @@ using AdvancedSharpAdbClient;
 using System.Threading;
 using System.Collections.Concurrent;
 
+// Multi-threading Example for Nox client
 namespace MultiThreading
 {
     class Program
@@ -57,10 +58,14 @@ namespace MultiThreading
                     return;
                 }
             }
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++) // You need to add 3 emulators to multi-drive
             {
                 new Thread(() =>
                 {
+                    Process process = new Process();
+                    process.StartInfo.FileName =  @"F:\Nox\bin\Nox.exe";
+                    process.StartInfo.Arguments = $"-clone:Nox_{i}"; // Start the i-th emulator
+                    process.Start();
                     AdvancedAdbClient client = new AdvancedAdbClient();
                     lock (locker)
                     {
