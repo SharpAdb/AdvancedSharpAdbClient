@@ -466,10 +466,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="cords"></param>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool Click(DeviceData device, Cords cords);
+        void Click(DeviceData device, Cords cords);
 
         /// <summary>
         /// Clicks on the specified coordinates
@@ -477,10 +474,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool Click(DeviceData device, int x, int y);
+        void Click(DeviceData device, int x, int y);
 
         /// <summary>
         /// Generates a swipe gesture from first element to second element
@@ -490,10 +484,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <param name="speed"></param>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool Swipe(DeviceData device, Element first, Element second, long speed);
+        void Swipe(DeviceData device, Element first, Element second, long speed);
 
         /// <summary>
         /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed
@@ -505,10 +496,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="speed"></param>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed);
+        void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed);
 
         /// <summary>
         /// Get element by xpath
@@ -540,19 +528,13 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="key"></param>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool SendKeyEvent(DeviceData device, string key);
+        void SendKeyEvent(DeviceData device, string key);
 
         /// <summary>
         /// Send text to device
         /// Doesn't support Russian
         /// </summary>
-        /// <returns>
-        /// True if successful and false if unsuccessful
-        /// </returns>
-        bool SendText(DeviceData device, string text);
+        void SendText(DeviceData device, string text);
 
         /// <summary>
         /// Clear the input text

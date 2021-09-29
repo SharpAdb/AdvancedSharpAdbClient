@@ -7,6 +7,15 @@ It provides a .NET implementation of the `adb` protocol, giving more flexibility
 It's upgraded verion of [SharpAdbClient](https://github.com/quamotion/madb).
 Added important features.
 
+## Changes
+
+### 2.5.1
++ Now Click, Swipe, SendKeyEvent and SendText no longer return values, they have become voids
++ Added ElementNotFoundException and InvalidKeyEventException
+
+### 2.5.0
++ First commit
+
 ## Installation
 To install AdvancedSharpAdbClient install the [AdvancedSharpAdbClient NuGetPackage](https://www.nuget.org/packages/AdvancedSharpAdbClient). If you're
 using Visual Studio, you can run the following command in the [Package Manager Console](http://docs.nuget.org/consume/package-manager-console):
@@ -123,12 +132,16 @@ static void Main(string[] args)
 }
 ```
 
-The Click() method returns true if the click was successful and false if it failed
+The Click() method throw ElementNotFoundException if the element is not found
 
 ```c#
-if (!el.Click())
+try
 {
-    Console.WriteLine("Can't click on an element");
+    el.Click();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Can't click on the element:{ex.Message}");
 }
 ```
 
@@ -159,12 +172,18 @@ static void Main(string[] args)
 }
 ```
 
-The Swipe() method returns true if the click was successful and false if it failed
+The Swipe() method throw ElementNotFoundException if the element is not found
 
 ```c#
-if (!client.Swipe(device, 600, 1000, 600, 500, 100))
+try
 {
-    Console.WriteLine("Can't swipe");
+    client.Swipe(device, 0x2232323, 0x954,0x9128,0x11111, 200);
+    ...
+    client.Swipe(device, first, second, 200);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Can't swipe:{ex.Message}");
 }
 ```
 
@@ -194,12 +213,16 @@ static void Main(string[] args)
 }
 ```
 
-The SendText() method returns true if the click was successful and false if it failed
+The SendText() method throw InvalidTextException if text is incorrect
 
 ```c#
-if (!client.SendText(device, "text"))
+try
 {
-    Console.WriteLine("Can't send text");
+    client.SendText(device, null);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Can't send text:{ex.Message}");
 }
 ```
 
@@ -240,6 +263,19 @@ static void Main(string[] args)
     ...
     client.SendKeyEvent(device, "KEYCODE_TAB");
     ...
+}
+```
+
+The SendKeyEvent method throw InvalidKeyEventException if keyevent is incorrect
+
+```c#
+try
+{
+    client.SendKeyEvent(device, null);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Can't send keyevent:{ex.Message}");
 }
 ```
 

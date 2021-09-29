@@ -642,7 +642,7 @@ namespace AdvancedSharpAdbClient
 
 
         /// <inheritdoc/>
-        public bool Click(DeviceData device, Cords cords)
+        public void Click(DeviceData device, Cords cords)
         {
             this.EnsureDevice(device);
 
@@ -653,17 +653,16 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR")) // error or ERROR
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR")) // error or ERROR
                     {
-                        return true;
+                        throw new ElementNotFoundException("Coordinates of element is invalid");
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>
-        public bool Click(DeviceData device, int x, int y)
+        public void Click(DeviceData device, int x, int y)
         {
             this.EnsureDevice(device);
 
@@ -674,17 +673,16 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR"))
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
                     {
-                        return true;
+                        throw new ElementNotFoundException("Coordinates of element is invalid");
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>
-        public bool Swipe(DeviceData device, Element first, Element second, long speed)
+        public void Swipe(DeviceData device, Element first, Element second, long speed)
         {
             this.EnsureDevice(device);
 
@@ -695,17 +693,16 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR"))
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
                     {
-                        return true;
+                        throw new ElementNotFoundException("Coordinates of element is invalid");
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>
-        public bool Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed)
+        public void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed)
         {
             this.EnsureDevice(device);
 
@@ -716,13 +713,12 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR"))
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
                     {
-                        return true;
+                        throw new ElementNotFoundException("Coordinates of element is invalid");
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>
@@ -803,7 +799,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public bool SendKeyEvent(DeviceData device , string key)
+        public void SendKeyEvent(DeviceData device , string key)
         {
             this.EnsureDevice(device);
 
@@ -814,17 +810,16 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR"))
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
                     {
-                        return true;
+                        throw new InvalidKeyEventException("KeyEvent is invalid");
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>
-        public bool SendText(DeviceData device, string text)
+        public void SendText(DeviceData device, string text)
         {
             this.EnsureDevice(device);
 
@@ -835,13 +830,12 @@ namespace AdvancedSharpAdbClient
                 var response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    if (!reader.ReadToEnd().ToUpper().Contains("ERROR"))
+                    if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
                     {
-                        return true;
+                        throw new InvalidTextException();
                     }
                 }
             }
-            return false;
         }
 
         /// <inheritdoc/>

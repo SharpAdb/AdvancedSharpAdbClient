@@ -4,7 +4,7 @@
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.It's improved version of SharpAdbClient.</Description>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>2.3.0</VersionPrefix>
+    <VersionPrefix>1.5.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>AdvancedSharpAdbClient</AssemblyName>
@@ -12,14 +12,19 @@
     <SignAssembly>false</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>AdvancedSharpAdbClient</PackageId>
-    <PackageTags>android;adb</PackageTags>
-    <PackageLicenseExpression>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</PackageLicenseExpression>
+    <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient;</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>https://github.com/quamotion/madb</Copyright>
+    <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
+    <Version>1.5.0</Version>
+    <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">

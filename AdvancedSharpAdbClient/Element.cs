@@ -43,15 +43,16 @@
         }
 
         /// <inheritdoc/>
-        public bool Click()
+        public void Click()
         {
-            return client.Click(device, cords);
+            client.Click(device, cords);
         }
 
         /// <inheritdoc/>
-        public bool SendText(string text)
+        public void SendText(string text)
         {
-            return Click() && client.SendText(device, text);
+            Click();
+            client.SendText(device, text);
         }
 
         /// <inheritdoc/>
