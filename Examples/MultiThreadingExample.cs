@@ -81,6 +81,7 @@ namespace MultiThreading
                     client.Click(device, 1000, 700); // Open first video
                 }).Start();
             }
+            Console.WriteLine("Started");
             Console.ReadLine();
         }
     }
