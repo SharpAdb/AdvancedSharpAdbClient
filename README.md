@@ -293,7 +293,7 @@ static void Main(string[] args)
 ```
 
 ## Device commands
-
+**Some commands require Root**
 ### Install and Uninstall applications
 
 ```c#
@@ -307,6 +307,16 @@ static void Main(string[] args)
 }
 ```
 
+Or you can use AdvancedAdbClient.Install
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.Install(device, File.OpenRead("Application.apk"));
+    ...
+}
+```
 ### Start and stop applications
 
 ```c#
