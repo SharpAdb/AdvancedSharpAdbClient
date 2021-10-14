@@ -28,11 +28,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
-    <DocumentationFile>C:\Users\aynur\Desktop\фан проекты\madb-master\AdvancedSharpAdbClient\AdvancedSharpAdbClient.xml</DocumentationFile>
+    <DocumentationFile>AdvancedSharpAdbClient.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
-    <DocumentationFile>C:\Users\aynur\Desktop\фан проекты\madb-master\AdvancedSharpAdbClient\AdvancedSharpAdbClient.xml</DocumentationFile>
+    <DocumentationFile>AdvancedSharpAdbClient.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
