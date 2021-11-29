@@ -27,7 +27,5 @@ namespace AdvancedSharpAdbClient
         /// bytes that contain information for this color are stored.
         /// </summary>
         public uint Offset { get; set; }
-
-        private int test { get; set; }
     }
 }
