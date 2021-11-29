@@ -56,8 +56,37 @@ namespace AdvancedSharpAdbClient
             // and convert to a TaskCancelledException - which is the exception we expect.
             var cancellationTokenRegistration = cancellationToken.Register(() => socket.Dispose());
 
-            ArraySegment<byte> array = new ArraySegment<byte>(buffer, offset, size);
-            return socket.ReceiveAsync(array, socketFlags);
+            TaskCompletionSource<int> taskCompletionSource = new TaskCompletionSource<int>(socket);
+
+            socket.BeginReceive(buffer, offset, size, socketFlags, delegate (IAsyncResult iar)
+            {
+                // this is the callback
+
+                TaskCompletionSource<int> taskCompletionSource2 = (TaskCompletionSource<int>)iar.AsyncState;
+                Socket socket2 = (Socket)taskCompletionSource2.Task.AsyncState;
+
+                try
+                {
+                    taskCompletionSource2.TrySetResult(socket2.EndReceive(iar));
+                }
+                catch (Exception ex)
+                {
+                    if (ex is ObjectDisposedException && cancellationToken.IsCancellationRequested)
+                    {
+                        taskCompletionSource2.TrySetCanceled();
+                    }
+                    else
+                    {
+                        taskCompletionSource2.TrySetException(ex);
+                    }
+                }
+                finally
+                {
+                    cancellationTokenRegistration.Dispose();
+                }
+            }, taskCompletionSource);
+
+            return taskCompletionSource.Task;
         }
     }
 }
