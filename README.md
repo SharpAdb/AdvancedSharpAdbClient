@@ -9,6 +9,9 @@ Added important features.
 
 ## Changes
 
+### 2.5.2
++ Memory leaks fix
+
 ### 2.5.1
 + Now Click, Swipe, SendKeyEvent and SendText no longer return values, they have become voids
 + Added ElementNotFoundException and InvalidKeyEventException
