@@ -374,7 +374,7 @@ void UploadFile()
 {
     using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
     {
-        using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+        using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
         {
             service.Push(stream, "/data/local/tmp/MyFile.txt", 777 ,DateTimeOffset.Now, null ,CancellationToken.None);
         }
