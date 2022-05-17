@@ -2083,6 +2083,36 @@
             <param name="serializationInfo">The serialization info.</param>
             <param name="context">The context.</param>
         </member>
+        <member name="T:AdvancedSharpAdbClient.Exceptions.ElementNotFoundException">
+            <summary>
+            Represents an exception with Element
+            </summary>
+        </member>
+        <member name="M:AdvancedSharpAdbClient.Exceptions.ElementNotFoundException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AdvancedSharpAdbClient.Exceptions.ElementNotFoundException"/> class.
+            </summary>
+        </member>
+        <member name="T:AdvancedSharpAdbClient.Exceptions.InvalidKeyEventException">
+            <summary>
+            Represents an exception with keyevent
+            </summary>
+        </member>
+        <member name="M:AdvancedSharpAdbClient.Exceptions.InvalidKeyEventException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AdvancedSharpAdbClient.Exceptions.InvalidKeyEventException"/> class.
+            </summary>
+        </member>
+        <member name="T:AdvancedSharpAdbClient.Exceptions.InvalidTextException">
+            <summary>
+            Represents an exception with Element
+            </summary>
+        </member>
+        <member name="M:AdvancedSharpAdbClient.Exceptions.InvalidTextException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AdvancedSharpAdbClient.Exceptions.InvalidTextException"/> class.
+            </summary>
+        </member>
         <member name="T:AdvancedSharpAdbClient.Exceptions.PermissionDeniedException">
             <summary>
             The exception that is thrown when the permission to a resource was denied.
@@ -3302,9 +3332,6 @@
             </summary>
             <param name="device"></param>
             <param name="cords"></param>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.Click(AdvancedSharpAdbClient.DeviceData,System.Int32,System.Int32)">
             <summary>
@@ -3313,9 +3340,6 @@
             <param name="device"></param>
             <param name="x"></param>
             <param name="y"></param>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.Swipe(AdvancedSharpAdbClient.DeviceData,AdvancedSharpAdbClient.Element,AdvancedSharpAdbClient.Element,System.Int64)">
             <summary>
@@ -3326,9 +3350,6 @@
             <param name="first"></param>
             <param name="second"></param>
             <param name="speed"></param>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.Swipe(AdvancedSharpAdbClient.DeviceData,System.Int32,System.Int32,System.Int32,System.Int32,System.Int64)">
             <summary>
@@ -3341,9 +3362,6 @@
             <param name="x2"></param>
             <param name="y2"></param>
             <param name="speed"></param>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.FindElement(AdvancedSharpAdbClient.DeviceData,System.String,System.TimeSpan)">
             <summary>
@@ -3376,18 +3394,12 @@
             </summary>
             <param name="device"></param>
             <param name="key"></param>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.SendText(AdvancedSharpAdbClient.DeviceData,System.String)">
             <summary>
             Send text to device
             Doesn't support Russian
             </summary>
-            <returns>
-            True if successful and false if unsuccessful
-            </returns>
         </member>
         <member name="M:AdvancedSharpAdbClient.IAdvancedAdbClient.ClearInput(AdvancedSharpAdbClient.DeviceData,System.Int32)">
             <summary>

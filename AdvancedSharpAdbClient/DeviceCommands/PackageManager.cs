@@ -173,7 +173,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
 
-            string cmd = $"pm install {reinstallSwitch}{remoteFilePath}";
+            string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
             this.client.ExecuteShellCommand(this.Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
