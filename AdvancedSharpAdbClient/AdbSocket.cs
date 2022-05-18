@@ -73,7 +73,7 @@ namespace AdvancedSharpAdbClient
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
-            this.logger = NullLogger<AdbSocket>.Instance;
+            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
         }
 
         /// <summary>

@@ -221,6 +221,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">
         /// The device on which to remove the reverse port forwarding
+        /// </param>
         /// <param name="remote">
         /// Specification of the remote that was forwarded
         /// </param>

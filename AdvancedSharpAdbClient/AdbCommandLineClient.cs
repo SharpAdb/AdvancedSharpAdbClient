@@ -14,6 +14,7 @@ namespace AdvancedSharpAdbClient
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
+    using AdvancedSharpAdbClient.Logs;
 
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.

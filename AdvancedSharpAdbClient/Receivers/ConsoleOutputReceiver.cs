@@ -4,6 +4,7 @@
 
 namespace AdvancedSharpAdbClient
 {
+    using AdvancedSharpAdbClient.Logs;
     using Exceptions;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
