@@ -188,9 +188,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Installs Android multiple application on device.
         /// </summary>
-        /// <param name="basePackageFilePath">absolute base app file path to package file on device</param>
-        /// <param name="splitPackageFilePaths">absolute split app file paths to package file on device</param>
-        public void InstallMultiplePackage(string basePackageFilePath, string[] splitPackageFilePaths)
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        public void InstallMultiplePackage(string basePackageFilePath, string[] splitPackageFilePaths, bool reinstall)
         {
             this.ValidateDevice();
 
@@ -202,7 +203,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 splitRemoteFilePaths[i] = this.SyncPackageToDevice(splitPackageFilePaths[i]);
             }
 
-            this.InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths);
+            this.InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, reinstall);
 
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
@@ -213,17 +214,76 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute packagename of the base app</param>
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        public void InstallMultiplePackage(string[] splitPackageFilePaths, string packageName, bool reinstall)
+        {
+            this.ValidateDevice();
+
+            string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
+            for (int i = 0; i < splitPackageFilePaths.Length; i++)
+            {
+                splitRemoteFilePaths[i] = this.SyncPackageToDevice(splitPackageFilePaths[i]);
+            }
+
+            this.InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, reinstall);
+
+            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
+            {
+                this.RemoveRemotePackage(splitRemoteFilePath);
+            }
+        }
+
+        /// <summary>
         /// Installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="baseRemoteFilePath">absolute base app file path to package file on device</param>
         /// <param name="splitRemoteFilePaths">absolute split app file paths to package file on device</param>
-        public void InstallMultipleRemotePackage(string baseRemoteFilePath, string[] splitRemoteFilePaths)
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        public void InstallMultipleRemotePackage(string baseRemoteFilePath, string[] splitRemoteFilePaths, bool reinstall)
         {
             this.ValidateDevice();
 
-            string session = CreateInstallSession();
+            string session = CreateInstallSession(reinstall);
 
             WriteInstallSession(session, "base", baseRemoteFilePath);
+
+            int i = 0;
+            foreach (var splitRemoteFilePath in splitRemoteFilePaths)
+            {
+                try
+                {
+                    WriteInstallSession(session, $"splitapp{i++}", splitRemoteFilePath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            InstallReceiver receiver = new InstallReceiver();
+            this.client.ExecuteShellCommand(this.Device, $"pm install-commit {session}", receiver);
+
+            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Installs the multiple application package that was pushed to a temporary location on the device.
+        /// </summary>
+        /// <param name="splitRemoteFilePaths">absolute split app file paths to package file on device</param>
+        /// <param name="packageName">absolute packagename of the base app</param>
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        public void InstallMultipleRemotePackage(string[] splitRemoteFilePaths, string packageName, bool reinstall)
+        {
+            this.ValidateDevice();
+
+            string session = CreateInstallSession(reinstall, packageName);
 
             int i = 0;
             foreach (var splitRemoteFilePath in splitRemoteFilePaths)
@@ -349,13 +409,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Like "install", but starts an install session.
         /// </summary>
+        /// <param name="packageName">absolute packagename of the base app</param>
         /// <returns>Session ID</returns>
-        private string CreateInstallSession()
+        /// <exception cref="PackageInstallationException"></exception>
+        private string CreateInstallSession(bool reinstall, string packageName = null)
         {
             this.ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            this.client.ExecuteShellCommand(this.Device, "pm install-create", receiver);
+            var reinstallSwitch = reinstall ? "-r " : string.Empty;
+            var addon = string.IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}";
+
+            string cmd = $"pm install-create {reinstallSwitch}{addon}";
+            this.client.ExecuteShellCommand(this.Device, cmd, receiver);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))
             {

@@ -447,9 +447,10 @@ namespace AdvancedSharpAdbClient
         /// Like "install", but starts an install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The packagename of the baseapk to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
         /// <returns>Session ID</returns>
-        string InstallCreated(DeviceData device, params string[] arguments);
+        string InstallCreated(DeviceData device, string packageName = null, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.

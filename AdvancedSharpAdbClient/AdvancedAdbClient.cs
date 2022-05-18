@@ -610,7 +610,7 @@ namespace AdvancedSharpAdbClient
                 read = socket.Read(buffer);
                 var value = Encoding.UTF8.GetString(buffer, 0, read);
 
-                if (!string.Equals(value, "Success\n"))
+                if (!value.Contains("Success"))
                 {
                     throw new AdbException(value);
                 }
@@ -618,12 +618,13 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string InstallCreated(DeviceData device, params string[] arguments)
+        public string InstallCreated(DeviceData device, string packageName = null, params string[] arguments)
         {
             this.EnsureDevice(device);
 
             StringBuilder requestBuilder = new StringBuilder();
             requestBuilder.Append("exec:cmd package 'install-create' ");
+            requestBuilder.Append(string.IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}");
 
             if (arguments != null)
             {
@@ -729,7 +730,7 @@ namespace AdvancedSharpAdbClient
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     var result = reader.ReadLine();
-                    if (!string.Equals(result, "Success\n"))
+                    if (!result.Contains("Success"))
                     {
                         throw new AdbException(reader.ReadToEnd());
                     }
@@ -758,14 +759,54 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(baseapk), "The apk stream must be a readable and seekable stream");
             }
 
-            string session = InstallCreated(device, arguments);
+            string session = InstallCreated(device, null, arguments);
 
             InstallWrite(device, baseapk, nameof(baseapk), session);
 
             int i = 0;
             foreach(var splitapk in splitapks)
             {
-                if (baseapk == null || !baseapk.CanRead || !baseapk.CanSeek)
+                if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
+                {
+                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
+                    continue;
+                }
+
+                try
+                {
+                    InstallWrite(device, splitapk, $"{nameof(splitapk)}{i++}", session);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            InstallCommit(device, session);
+        }
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
+        /// <param name="packageName">The packagename of the baseapk to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments)
+        {
+            this.EnsureDevice(device);
+
+            if (packageName == null)
+            {
+                throw new ArgumentNullException(nameof(packageName));
+            }
+
+            string session = InstallCreated(device, packageName, arguments);
+
+            int i = 0;
+            foreach (var splitapk in splitapks)
+            {
+                if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
                 {
                     Debug.WriteLine("The apk stream must be a readable and seekable stream");
                     continue;
