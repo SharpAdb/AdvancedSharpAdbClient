@@ -203,7 +203,11 @@ namespace AdvancedSharpAdbClient.Logs
         }
 
         /// <inheritdoc/>
-        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public
+#if !NET40
+            override
+#endif
+            async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (count == 0)
             {

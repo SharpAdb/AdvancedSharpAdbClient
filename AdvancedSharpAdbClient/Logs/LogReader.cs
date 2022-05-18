@@ -8,7 +8,6 @@ namespace AdvancedSharpAdbClient.Logs
     using System;
     using System.Collections.ObjectModel;
     using System.IO;
-    using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -121,7 +120,7 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-#if !NET452
+#if !NET40&&!NET452
             var timestamp = DateTimeOffset.FromUnixTimeSeconds(sec);
 #else
             var timestamp = new DateTimeOffset(((long)sec).ToDateTime());

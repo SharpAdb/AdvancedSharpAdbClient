@@ -23,7 +23,7 @@
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SignAssembly>false</SignAssembly>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TargetFrameworks>net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net4.0;net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
     <Version>1.5.0</Version>
     <VersionPrefix>1.5.0</VersionPrefix>
@@ -34,12 +34,18 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
   
+  <ItemGroup Condition="'$(TargetFramework)'=='net4.0'">
+    <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
+    <PackageReference Include="PolyfillsForOldDotNet.System.Buffers" Version="0.1.1" />
+    <PackageReference Include="PolyfillsForOldDotNet.System.Runtime.InteropServices.RuntimeInformation" Version="0.1.1" />
+  </ItemGroup>
+  
   <ItemGroup Condition="'$(TargetFramework)'=='net4.5.2'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)'!='net4.5.2'">
+  <ItemGroup Condition="'$(TargetFramework)'!='net4.0'And'$(TargetFramework)'!='net4.5.2'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
   

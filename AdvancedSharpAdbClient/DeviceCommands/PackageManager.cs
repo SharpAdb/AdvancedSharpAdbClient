@@ -4,16 +4,21 @@
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using AdvancedSharpAdbClient.Logs;
     using Exceptions;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
     using System.Threading;
+
+#if !NET40
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+#endif
+
+#if NET452
+    using AdvancedSharpAdbClient.Logs;
+#endif
 
     /// <summary>
     /// Allows you to get information about packages that are installed on a device.
@@ -35,10 +40,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string ListThirdPartyOnly = "pm list packages -f -3";
 
+#if !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<PackageManager> logger;
+#endif
 
         /// <summary>
         /// The <see cref="IAdvancedAdbClient"/> to use when communicating with the device.
@@ -76,7 +83,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="logger">
         /// The logger to use when logging.
         /// </param>
-        public PackageManager(IAdvancedAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager> logger = null)
+        public PackageManager(IAdvancedAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
+#if !NET40
+            , ILogger<PackageManager> logger = null
+#endif
+            )
         {
             if (device == null)
             {
@@ -102,7 +113,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 this.RefreshPackages();
             }
 
+#if !NET40
             this.logger = logger ?? NullLogger<PackageManager>.Instance;
+#endif
         }
 
         /// <summary>
@@ -367,12 +380,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
+#if !NET40
                 this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
+#endif
 
                 using (ISyncService sync = this.syncServiceFactory(this.client, this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
+#if !NET40
                     this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
+#endif
 
                     // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
@@ -382,7 +399,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
+#if !NET40
                 this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
+#endif
                 throw;
             }
         }
@@ -401,7 +420,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
+#if !NET40
                 this.logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
+#endif
                 throw;
             }
         }

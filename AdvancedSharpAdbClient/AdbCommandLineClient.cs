@@ -4,8 +4,6 @@
 
 namespace AdvancedSharpAdbClient
 {
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
     using AdvancedSharpAdbClient.Exceptions;
     using System;
     using System.Collections.Generic;
@@ -14,7 +12,17 @@ namespace AdvancedSharpAdbClient
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Text.RegularExpressions;
+
+#if !NET40
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+#else
+    using PolyfillsForOldDotNet.System.Runtime.InteropServices;
+#endif
+
+#if NET452
     using AdvancedSharpAdbClient.Logs;
+#endif
 
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
@@ -25,11 +33,13 @@ namespace AdvancedSharpAdbClient
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
-        
+
+#if !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<AdbCommandLineClient> logger;
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
@@ -40,7 +50,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">
         /// The logger to use when logging.
         /// </param>
-        public AdbCommandLineClient(string adbPath, ILogger<AdbCommandLineClient> logger = null)
+        public AdbCommandLineClient(string adbPath
+#if !NET40
+            , ILogger<AdbCommandLineClient> logger = null
+#endif
+            )
         {
             if (string.IsNullOrWhiteSpace(adbPath))
             {
@@ -72,7 +86,9 @@ namespace AdvancedSharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             this.AdbPath = adbPath;
+#if !NET40
             this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
+#endif
         }
 
         /// <summary>
@@ -108,7 +124,9 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 var ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+#if !NET40
                 this.logger.LogError(ex, ex.Message);
+#endif
                 throw ex;
             }
 

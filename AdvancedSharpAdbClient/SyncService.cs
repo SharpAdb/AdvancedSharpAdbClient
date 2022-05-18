@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient
             }
 
             // create the DONE message
-#if !NET452
+#if !NET40&&!NET452
             int time = (int)timestamp.ToUnixTimeSeconds();
 #else
             int time = (int)timestamp.DateTime.ToUnixEpoch();
@@ -372,7 +372,7 @@ namespace AdvancedSharpAdbClient
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-#if !NET452
+#if !NET40&&!NET452
             value.Time = DateTimeOffset.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
 #else
             var timestamp = new DateTimeOffset(((long)BitConverter.ToInt32(statResult, 8)).ToDateTime());

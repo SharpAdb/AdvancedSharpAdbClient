@@ -19,6 +19,10 @@ namespace AdvancedSharpAdbClient
     using System.Threading.Tasks;
     using System.Xml;
 
+#if NET40
+    using AdvancedSharpAdbClient.Extensions;
+#endif
+
     /// <summary>
     /// <para>
     ///     Implements the <see cref="IAdvancedAdbClient"/> interface, and allows you to interact with the
@@ -541,7 +545,11 @@ namespace AdvancedSharpAdbClient
                 {
                     // Give adbd some time to kill itself and come back up.
                     // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
+#if !NET40
                     Task.Delay(3000).GetAwaiter().GetResult();
+#else
+                    TaskHelper.Delay(3000).GetAwaiter().GetResult();
+#endif
                 }
             }
         }

@@ -4,15 +4,23 @@
 
 namespace AdvancedSharpAdbClient
 {
-    using AdvancedSharpAdbClient.Logs;
     using Exceptions;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
+#if !NET40
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+#else
+    using AdvancedSharpAdbClient.Extensions;
+#endif
+
+#if NET452
+    using AdvancedSharpAdbClient.Logs;
+#endif
 
     /// <summary>
     /// <para>
@@ -40,10 +48,12 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
+#if !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<DeviceMonitor> logger;
+#endif
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
@@ -76,7 +86,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">
         /// The logger to use when logging.
         /// </param>
-        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor> logger = null)
+        public DeviceMonitor(IAdbSocket socket
+#if !NET40
+            , ILogger<DeviceMonitor> logger = null
+#endif
+            )
         {
             if (socket == null)
             {
@@ -86,7 +100,9 @@ namespace AdvancedSharpAdbClient
             this.Socket = socket;
             this.devices = new List<DeviceData>();
             this.Devices = this.devices.AsReadOnly();
+#if !NET40
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
+#endif
         }
 
         /// <inheritdoc/>
@@ -99,7 +115,13 @@ namespace AdvancedSharpAdbClient
         public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
 
         /// <inheritdoc/>
-        public IReadOnlyCollection<DeviceData> Devices { get; private set; }
+        public
+#if !NET40
+            IReadOnlyCollection
+#else
+            IEnumerable
+#endif
+            <DeviceData> Devices { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
@@ -122,7 +144,12 @@ namespace AdvancedSharpAdbClient
             {
                 this.firstDeviceListParsed.Reset();
 
-                this.monitorTask = Task.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+                this.monitorTask =
+#if !NET40
+                    Task.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+#else
+                    TaskHelper.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+#endif
 
                 // Wait for the worker thread to have read the first list
                 // of devices.
@@ -228,7 +255,9 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
+#if !NET40
                         this.logger.LogError(ex, ex.Message);
+#endif
                         throw;
                     }
                 }
@@ -244,7 +273,9 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
+#if !NET40
                         this.logger.LogError(ex, ex.Message);
+#endif
                         throw;
                     }
                 }
@@ -265,7 +296,9 @@ namespace AdvancedSharpAdbClient
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
+#if !NET40
                     this.logger.LogError(ex, ex.Message);
+#endif
                     throw;
                 }
             }
