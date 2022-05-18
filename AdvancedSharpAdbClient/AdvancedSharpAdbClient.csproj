@@ -6,7 +6,7 @@
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
     <VersionPrefix>1.5.0</VersionPrefix>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net4.6.2;netstandard2.0</TargetFrameworks>
     <AssemblyName>AdvancedSharpAdbClient</AssemblyName>
     <AssemblyOriginatorKeyFile>AdvancedSharpAdbClient.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>false</SignAssembly>
@@ -27,11 +27,11 @@
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net461|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net4.6.2|AnyCPU'">
     <DocumentationFile>AdvancedSharpAdbClient.xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net461|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net4.6.2|AnyCPU'">
     <DocumentationFile>AdvancedSharpAdbClient.xml</DocumentationFile>
   </PropertyGroup>
 

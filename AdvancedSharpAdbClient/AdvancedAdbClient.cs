@@ -617,6 +617,172 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
+        public string InstallCreated(DeviceData device, params string[] arguments)
+        {
+            this.EnsureDevice(device);
+
+            StringBuilder requestBuilder = new StringBuilder();
+            requestBuilder.Append("exec:cmd package 'install-create' ");
+
+            if (arguments != null)
+            {
+                foreach (var argument in arguments)
+                {
+                    requestBuilder.Append(" ");
+                    requestBuilder.Append(argument);
+                }
+            }
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SetDevice(device);
+
+                socket.SendAdbRequest(requestBuilder.ToString());
+                var response = socket.ReadAdbResponse();
+
+                using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
+                {
+                    var result = reader.ReadLine();
+
+                    if (!result.Contains("Success"))
+                    {
+                        throw new AdbException(reader.ReadToEnd());
+                    }
+
+                    int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
+                    string session = result.Substring(result.IndexOf("[") + 1, arr);
+                    return session;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void InstallWrite(DeviceData device, Stream apk, string apkname, string session)
+        {
+            this.EnsureDevice(device);
+
+            if (apk == null)
+            {
+                throw new ArgumentNullException(nameof(apk));
+            }
+
+            if (!apk.CanRead || !apk.CanSeek)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
+            }
+
+            if (session == null)
+            {
+                throw new ArgumentNullException(nameof(session));
+            }
+
+            if (apkname == null)
+            {
+                throw new ArgumentNullException(nameof(apkname));
+            }
+
+            StringBuilder requestBuilder = new StringBuilder();
+            requestBuilder.Append($"exec:cmd package 'install-write' ");
+
+            // add size parameter [required for streaming installs]
+            // do last to override any user specified value
+            requestBuilder.Append($" -S {apk.Length}");
+
+            requestBuilder.Append($" {session} {apkname}.apk");
+
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SetDevice(device);
+
+                socket.SendAdbRequest(requestBuilder.ToString());
+                var response = socket.ReadAdbResponse();
+
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    socket.Send(buffer, read);
+                }
+
+                read = socket.Read(buffer);
+                var value = Encoding.UTF8.GetString(buffer, 0, read);
+
+                if (!value.Contains("Success"))
+                {
+                    throw new AdbException(value);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void InstallCommit(DeviceData device, string session)
+        {
+            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            {
+                socket.SetDevice(device);
+
+                socket.SendAdbRequest($"exec:cmd package 'install-commit' {session} ");
+                var response = socket.ReadAdbResponse();
+
+                using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
+                {
+                    var result = reader.ReadLine();
+                    if (!string.Equals(result, "Success\n"))
+                    {
+                        throw new AdbException(reader.ReadToEnd());
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseapk">A <see cref="Stream"/> which represents the baseapk to install.</param>
+        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        public void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments)
+        {
+            this.EnsureDevice(device);
+
+            if (baseapk == null)
+            {
+                throw new ArgumentNullException(nameof(baseapk));
+            }
+
+            if (!baseapk.CanRead || !baseapk.CanSeek)
+            {
+                throw new ArgumentOutOfRangeException(nameof(baseapk), "The apk stream must be a readable and seekable stream");
+            }
+
+            string session = InstallCreated(device, arguments);
+
+            InstallWrite(device, baseapk, nameof(baseapk), session);
+
+            int i = 0;
+            foreach(var splitapk in splitapks)
+            {
+                if (baseapk == null || !baseapk.CanRead || !baseapk.CanSeek)
+                {
+                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
+                    continue;
+                }
+
+                try
+                {
+                    InstallWrite(device, splitapk, $"{nameof(splitapk)}{i++}", session);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            InstallCommit(device, session);
+        }
 
         /// <inheritdoc/>
         public XmlDocument DumpScreen(DeviceData device)

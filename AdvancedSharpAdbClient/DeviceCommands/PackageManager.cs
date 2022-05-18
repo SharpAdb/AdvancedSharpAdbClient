@@ -10,6 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text;
     using System.Threading;
 
     /// <summary>
@@ -181,6 +182,69 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
+
+        //public void InstallMultiplePackage(string[] packageFilePaths, bool reinstall)
+        //{
+        //    this.ValidateDevice();
+
+        //    //string[] remoteFilePaths = new string[packageFilePaths.Length];
+        //    //for(int i = 0; i < packageFilePaths.Length; i++)
+        //    //{
+        //    //    remoteFilePaths[i] = this.SyncPackageToDevice(packageFilePaths[i]);
+        //    //}
+
+        //    //this.InstallMultipleRemotePackage(remoteFilePaths, reinstall);
+
+        //    //foreach (string remoteFilePath in remoteFilePaths)
+        //    //{
+        //    //    this.RemoveRemotePackage(remoteFilePath);
+        //    //}
+
+        //    InstallReceiver receiver = new InstallReceiver();
+        //    var reinstallSwitch = reinstall ? "-r" : string.Empty;
+
+        //    StringBuilder cmdBuilder = new StringBuilder();
+        //    cmdBuilder.Append($"pm install-multiple {reinstallSwitch}");
+
+        //    foreach (var remoteFilePath in packageFilePaths)
+        //    {
+        //        cmdBuilder.Append(" ");
+        //        cmdBuilder.Append($"\"{remoteFilePath}\"");
+        //    }
+
+        //    string cmd = cmdBuilder.ToString();
+        //    this.client.ExecuteShellCommand(this.Device, cmd, receiver);
+
+        //    if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+        //    {
+        //        throw new PackageInstallationException(receiver.ErrorMessage);
+        //    }
+        //}
+
+        //public void InstallMultipleRemotePackage(string[] remoteFilePaths, bool reinstall)
+        //{
+        //    this.ValidateDevice();
+
+        //    InstallReceiver receiver = new InstallReceiver();
+        //    var reinstallSwitch = reinstall ? "-r" : string.Empty;
+
+        //    StringBuilder cmdBuilder = new StringBuilder();
+        //    cmdBuilder.Append($"pm install-multiple {reinstallSwitch}");
+
+        //    foreach (var remoteFilePath in remoteFilePaths)
+        //    {
+        //        cmdBuilder.Append(" ");
+        //        cmdBuilder.Append($"\"{remoteFilePath}\"");
+        //    }
+
+        //    string cmd = cmdBuilder.ToString();
+        //    this.client.ExecuteShellCommand(this.Device, cmd, receiver);
+
+        //    if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+        //    {
+        //        throw new PackageInstallationException(receiver.ErrorMessage);
+        //    }
+        //}
 
         /// <summary>
         /// Uninstalls a package from the device.
