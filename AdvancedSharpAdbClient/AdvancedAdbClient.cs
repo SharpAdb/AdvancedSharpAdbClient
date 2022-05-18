@@ -723,7 +723,7 @@ namespace AdvancedSharpAdbClient
             {
                 socket.SetDevice(device);
 
-                socket.SendAdbRequest($"exec:cmd package 'install-commit' {session} ");
+                socket.SendAdbRequest($"exec:cmd package 'install-commit' {session}");
                 var response = socket.ReadAdbResponse();
 
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
