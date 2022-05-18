@@ -32,5 +32,7 @@ namespace AdvancedSharpAdbClient
             long epoch = (long)t.TotalSeconds;
             return epoch;
         }
+
+        public static DateTime ToDateTime(this long time) => Epoch.Add(new TimeSpan(time * 1000_0000));
     }
 }

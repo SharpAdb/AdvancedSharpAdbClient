@@ -6,8 +6,6 @@ namespace AdvancedSharpAdbClient
 {
     using Exceptions;
     using Logs;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Globalization;
     using System.IO;
@@ -16,6 +14,11 @@ namespace AdvancedSharpAdbClient
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
+#if !NET40
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
+#endif
 
     /// <summary>
     /// <para>
@@ -40,10 +43,12 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly ITcpSocket socket;
 
+#if !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<AdbSocket> logger;
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -55,12 +60,18 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">
         /// The logger to use when logging.
         /// </param>
-        public AdbSocket(EndPoint endPoint, ILogger<AdbSocket> logger = null)
+        public AdbSocket(EndPoint endPoint
+#if !NET40
+            , ILogger<AdbSocket> logger = null
+#endif
+            )
         {
             this.socket = new TcpSocket();
             this.socket.Connect(endPoint);
             this.socket.ReceiveBufferSize = ReceiveBufferSize;
+#if !NET40
             this.logger = logger ?? NullLogger<AdbSocket>.Instance;
+#endif
         }
 
         /// <summary>
@@ -73,7 +84,9 @@ namespace AdvancedSharpAdbClient
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
-            this.logger = NullLogger<AdbSocket>.Instance;
+#if !NET40
+            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
+#endif
         }
 
         /// <summary>
@@ -291,7 +304,9 @@ namespace AdvancedSharpAdbClient
             }
             catch (SocketException sex)
             {
+#if !NET40
                 this.logger.LogError(sex, sex.Message);
+#endif
                 throw;
             }
         }
@@ -330,12 +345,16 @@ namespace AdvancedSharpAdbClient
 
                     if (count < 0)
                     {
+#if !NET40
                         this.logger.LogError("read: channel EOF");
+#endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
+#if !NET40
                         this.logger.LogInformation("DONE with Read");
+#endif
                     }
                     else
                     {
@@ -369,12 +388,16 @@ namespace AdvancedSharpAdbClient
                     count = this.socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
+#if !NET40
                         this.logger.LogError("read: channel EOF");
+#endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
+#if !NET40
                         this.logger.LogInformation("DONE with Read");
+#endif
                     }
                     else
                     {
@@ -444,7 +467,9 @@ namespace AdvancedSharpAdbClient
             }
             catch (IOException e)
             {
+#if !NET40
                 this.logger.LogError(e, e.Message);
+#endif
                 return false;
             }
 
@@ -479,7 +504,9 @@ namespace AdvancedSharpAdbClient
             {
                 var message = this.ReadString();
                 resp.Message = message;
+#if !NET40
                 this.logger.LogError("Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+#endif
             }
 
             return resp;
@@ -503,7 +530,9 @@ namespace AdvancedSharpAdbClient
             }
             catch (DecoderFallbackException uee)
             {
+#if !NET40
                 this.logger.LogError(uee, uee.Message);
+#endif
                 result = string.Empty;
             }
 

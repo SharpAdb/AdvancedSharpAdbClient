@@ -23,6 +23,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string SuccessOutput = "Success";
 
         /// <summary>
+        /// A regular expression that matches output of the success.
+        /// </summary>
+        private const string SuccessPattern = @"Success:\s+(.*)?";
+
+        /// <summary>
         /// A regular expression that matches output that indicates a failure.
         /// </summary>
         private const string FailurePattern = @"Failure(?:\s+\[(.*)\])?";
@@ -31,6 +36,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
         public string ErrorMessage { get; private set; }
+
+        /// <summary>
+        /// Gets the success message if the install is successful.
+        /// </summary>
+        public string SuccessMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.
@@ -52,13 +62,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 {
                     if (line.StartsWith(SuccessOutput))
                     {
+                        var m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        this.SuccessMessage = SuccessOutput;
+
                         this.ErrorMessage = null;
+
+                        if(m.Success)
+                        {
+                            string msg = m.Groups[1].Value;
+                            this.SuccessMessage = string.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                        }
+
                         this.Success = true;
                     }
                     else
                     {
                         var m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         this.ErrorMessage = UnknownError;
+
+                        this.SuccessMessage = null;
 
                         if (m.Success)
                         {

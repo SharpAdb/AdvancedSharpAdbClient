@@ -221,6 +221,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">
         /// The device on which to remove the reverse port forwarding
+        /// </param>
         /// <param name="remote">
         /// Specification of the remote that was forwarded
         /// </param>
@@ -428,6 +429,7 @@ namespace AdvancedSharpAdbClient
         /// </param>
         void Unroot(DeviceData device);
 
+        /// <summary>
         /// Installs an Android application on an device.
         /// </summary>
         /// <param name="device">
@@ -440,6 +442,31 @@ namespace AdvancedSharpAdbClient
         /// The arguments to pass to <c>adb install</c>.
         /// </param>
         void Install(DeviceData device, Stream apk, params string[] arguments);
+
+        /// <summary>
+        /// Like "install", but starts an install session.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The packagename of the baseapk to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        /// <returns>Session ID</returns>
+        string InstallCreated(DeviceData device, string packageName = null, params string[] arguments);
+
+        /// <summary>
+        /// Write an apk into the given install session.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="apkname">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        void InstallWrite(DeviceData device, Stream apk, string apkname, string session);
+
+        /// <summary>
+        /// Commit the given active install session, installing the app.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        void InstallCommit(DeviceData device, string session);
 
         /// <summary>
         /// Lists all features supported by the current device.
