@@ -30,7 +30,7 @@ Added important features.
 - .NET Framework 4.6.2
 - .NET Framework 4.8
 - .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
-- .NET Core APP 3.1
+- .NET Core App 3.1
 - .NET 6.0
 
 ## Installation
