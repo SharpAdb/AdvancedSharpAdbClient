@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-#if !NET40&&!NET452
+#if !NET35 && !NET40 && !NET452
             var timestamp = DateTimeOffset.FromUnixTimeSeconds(sec);
 #else
             var timestamp = new DateTimeOffset(((long)sec).ToDateTime());
@@ -288,7 +288,13 @@ namespace AdvancedSharpAdbClient.Logs
 
             byte[] data = new byte[count];
 
-            while ((read = await this.stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)) > 0)
+            while ((read =
+#if !NET35
+                await this.stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
+#else
+                this.stream.Read(data, totalRead, count - totalRead)
+#endif
+                ) > 0)
             {
                 totalRead += read;
             }

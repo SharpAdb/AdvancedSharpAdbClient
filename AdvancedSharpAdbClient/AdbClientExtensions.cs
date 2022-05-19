@@ -10,6 +10,10 @@ namespace AdvancedSharpAdbClient
     using System.Text;
     using System.Threading;
 
+#if NET35
+    using AdvancedSharpAdbClient.Extensions;
+#endif
+
     /// <summary>
     /// Provides extension methods for the <see cref="IAdvancedAdbClient"/> interface. Provides overloads
     /// for commonly used funtions.

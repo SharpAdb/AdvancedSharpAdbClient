@@ -125,7 +125,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,
+#if !NET35
+            IProgress<int> progress,
+#endif
+            CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -193,15 +197,17 @@ namespace AdvancedSharpAdbClient
                 // now send the data to the device
                 this.Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 
+#if !NET35
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
                     progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
                 }
+#endif
             }
 
             // create the DONE message
-#if !NET40&&!NET452
+#if !NET35 && !NET40 && !NET452
             int time = (int)timestamp.ToUnixTimeSeconds();
 #else
             int time = (int)timestamp.DateTime.ToUnixEpoch();
@@ -225,7 +231,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream,
+#if !NET35
+            IProgress<int> progress,
+#endif
+            CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
             {
@@ -286,11 +296,13 @@ namespace AdvancedSharpAdbClient
                 stream.Write(buffer, 0, size);
                 totalBytesRead += size;
 
+#if !NET35
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
                     progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
                 }
+#endif
             }
         }
 
@@ -372,7 +384,7 @@ namespace AdvancedSharpAdbClient
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-#if !NET40&&!NET452
+#if !NET35 && !NET40 && !NET452
             value.Time = DateTimeOffset.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
 #else
             var timestamp = new DateTimeOffset(((long)BitConverter.ToInt32(statResult, 8)).ToDateTime());

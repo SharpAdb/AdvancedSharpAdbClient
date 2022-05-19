@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     using System.IO;
     using System.Threading;
 
-#if !NET40
+#if !NET35 && !NET40
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string ListThirdPartyOnly = "pm list packages -f -3";
 
-#if !NET40
+#if !NET35 && !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The logger to use when logging.
         /// </param>
         public PackageManager(IAdvancedAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
-#if !NET40
+#if !NET35 && !NET40
             , ILogger<PackageManager> logger = null
 #endif
             )
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 this.RefreshPackages();
             }
 
-#if !NET40
+#if !NET35 && !NET40
             this.logger = logger ?? NullLogger<PackageManager>.Instance;
 #endif
         }
@@ -380,26 +380,30 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-#if !NET40
+#if !NET35 && !NET40
                 this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 #endif
 
                 using (ISyncService sync = this.syncServiceFactory(this.client, this.Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
-#if !NET40
+#if !NET35 && !NET40
                     this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
 #endif
 
                     // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath),
+#if !NET35
+                        null,
+#endif
+                        CancellationToken.None);
                 }
 
                 return remoteFilePath;
             }
             catch (IOException e)
             {
-#if !NET40
+#if !NET40 && !NET35
                 this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
 #endif
                 throw;
@@ -420,7 +424,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-#if !NET40
+#if !NET40 && !NET35
                 this.logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
 #endif
                 throw;
@@ -439,7 +443,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
-            var addon = string.IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}";
+            var addon =
+#if !NET35
+                string
+#else
+                StringEx
+#endif
+                .IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}";
 
             string cmd = $"pm install-create {reinstallSwitch}{addon}";
             this.client.ExecuteShellCommand(this.Device, cmd, receiver);

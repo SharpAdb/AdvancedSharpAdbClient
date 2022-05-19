@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient.Logs
 
         /// <inheritdoc/>
         public
-#if !NET40
+#if !NET35 && !NET40
             override
 #endif
             async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
@@ -222,13 +222,23 @@ namespace AdvancedSharpAdbClient.Logs
             if (this.pendingByte != null)
             {
                 buffer[offset] = this.pendingByte.Value;
-                read = await this.Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
+                read =
+#if !NET35
+                    await this.Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
+#else
+                    this.Inner.Read(buffer, offset + 1, count - 1);
+#endif
                 read++;
                 this.pendingByte = null;
             }
             else
             {
-                read = await this.Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+                read =
+#if !NET35
+                    await this.Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+#else
+                    this.Inner.Read(buffer, offset, count);
+#endif
             }
 
             byte[] minibuffer = new byte[1];
@@ -261,7 +271,12 @@ namespace AdvancedSharpAdbClient.Logs
                         continue;
                     }
 
-                    int miniRead = await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                    int miniRead =
+#if !NET35
+                        await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+#else
+                        this.Inner.Read(minibuffer, 0, 1);
+#endif
 
                     if (miniRead == 0)
                     {
@@ -281,7 +296,12 @@ namespace AdvancedSharpAdbClient.Logs
             // we need to read one more byte from the inner stream.
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
-                int miniRead = await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                int miniRead =
+#if !NET35
+                    await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+#else
+                    this.Inner.Read(minibuffer, 0, 1);
+#endif
                 int nextByte = minibuffer[0];
 
                 if (nextByte == 0x0a)

@@ -7,6 +7,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     using System.Collections.Generic;
     using System.Text.RegularExpressions;
 
+#if NET35
+    using System;
+#endif
+
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
@@ -70,7 +74,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if(m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.SuccessMessage = string.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            this.SuccessMessage =
+#if !NET35
+                                string
+#else
+                                StringEx
+#endif
+                                .IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                         }
 
                         this.Success = true;
@@ -85,7 +95,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = string.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            this.ErrorMessage =
+#if !NET35
+                                string
+#else
+                                StringEx
+#endif
+                                .IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                         }
 
                         this.Success = false;

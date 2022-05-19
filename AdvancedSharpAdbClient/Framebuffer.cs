@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient
     using System.Threading;
     using System.Threading.Tasks;
 
-#if !NET40
+#if !NET35 && !NET40
     using System.Buffers;
 #else
     using PolyfillsForOldDotNet.System.Buffers;
@@ -148,7 +148,9 @@ namespace AdvancedSharpAdbClient
         {
             if (this.Data != null)
             {
+#if !NET35
                 ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
+#endif
             }
 
             this.headerData = null;
