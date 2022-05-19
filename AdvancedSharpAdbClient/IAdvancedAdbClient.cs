@@ -16,6 +16,10 @@ namespace AdvancedSharpAdbClient
     using System.Threading.Tasks;
     using System.Xml;
 
+#if NET35
+    using AdvancedSharpAdbClient.Extensions;
+#endif
+
     /// <summary>
     /// A common interface for any class that allows you to interact with the
     /// adb server and devices that are connected to that adb server.

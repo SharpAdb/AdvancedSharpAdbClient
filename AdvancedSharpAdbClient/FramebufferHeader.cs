@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
             // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
             using (MemoryStream stream = new MemoryStream(data))
             using (BinaryReader reader = new BinaryReader(stream, Encoding.ASCII
-#if !NET40
+#if !NET35 && !NET40
                 , leaveOpen: true
 #endif
                 ))

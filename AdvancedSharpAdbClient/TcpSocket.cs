@@ -11,6 +11,10 @@ namespace AdvancedSharpAdbClient
     using System.Threading;
     using System.Threading.Tasks;
 
+#if NET35
+    using AdvancedSharpAdbClient.Extensions;
+#endif
+
     /// <summary>
     /// Implements the <see cref="ITcpSocket" /> interface using the standard <see cref="Socket"/>
     /// class.
@@ -80,7 +84,11 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
+#if !NET35
             this.socket.Dispose();
+#else
+            this.socket.Close();
+#endif
         }
 
         /// <inheritdoc/>

@@ -1,0 +1,12 @@
+name: Help Wanted
+description: Want some helps
+title: "Help title"
+labels: [help wanted]
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: What can we do for you?
+      description: A clear and concise description what you want to help.
+      placeholder: Please why [...]

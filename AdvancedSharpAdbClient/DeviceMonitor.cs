@@ -11,11 +11,9 @@ namespace AdvancedSharpAdbClient
     using System.Threading;
     using System.Threading.Tasks;
 
-#if !NET40
+#if !NET35 && !NET40
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
-#else
-    using AdvancedSharpAdbClient.Extensions;
 #endif
 
 #if NET452
@@ -48,7 +46,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
-#if !NET40
+#if !NET35 && !NET40
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -87,7 +85,7 @@ namespace AdvancedSharpAdbClient
         /// The logger to use when logging.
         /// </param>
         public DeviceMonitor(IAdbSocket socket
-#if !NET40
+#if !NET35 && !NET40
             , ILogger<DeviceMonitor> logger = null
 #endif
             )
@@ -100,7 +98,7 @@ namespace AdvancedSharpAdbClient
             this.Socket = socket;
             this.devices = new List<DeviceData>();
             this.Devices = this.devices.AsReadOnly();
-#if !NET40
+#if !NET35 && !NET40
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
 #endif
         }
@@ -116,7 +114,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public
-#if !NET40
+#if !NET35 && !NET40
             IReadOnlyCollection
 #else
             IEnumerable
@@ -145,11 +143,12 @@ namespace AdvancedSharpAdbClient
                 this.firstDeviceListParsed.Reset();
 
                 this.monitorTask =
-#if !NET40
-                    Task.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+#if !NET35 && !NET40
+                    Task
 #else
-                    TaskHelper.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+                    TaskEx
 #endif
+                    .Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
 
                 // Wait for the worker thread to have read the first list
                 // of devices.
@@ -184,7 +183,11 @@ namespace AdvancedSharpAdbClient
                 this.Socket = null;
             }
 
+#if !NET35
             this.firstDeviceListParsed.Dispose();
+#else
+            this.firstDeviceListParsed.Close();
+#endif
             this.monitorTaskCancellationTokenSource.Dispose();
         }
 
@@ -255,7 +258,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET40
+#if !NET35 && !NET40
                         this.logger.LogError(ex, ex.Message);
 #endif
                         throw;
@@ -273,7 +276,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET40
+#if !NET35 && !NET40
                         this.logger.LogError(ex, ex.Message);
 #endif
                         throw;
@@ -296,7 +299,7 @@ namespace AdvancedSharpAdbClient
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
-#if !NET40
+#if !NET35 && !NET40
                     this.logger.LogError(ex, ex.Message);
 #endif
                     throw;

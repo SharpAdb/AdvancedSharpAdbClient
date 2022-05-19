@@ -1,0 +1,89 @@
+name: Bug report
+description: Create a report to help us improve
+title: "Bug title"
+labels: [bug]
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Describe the bug
+      description: Please enter a short, clear description of the bug.
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Steps to reproduce the bug
+      description: Please provide any required setup and steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: Please provide a description of what you expected to happen
+  - type: textarea
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots here to help explain your problem
+  - type: dropdown
+    attributes:
+      label: NuGet package version
+      description: Specify the version of AdvancedSharpAdbClient you're using.
+      options:
+        - "2.5.2"
+        - "2.5.1"
+        - "2.5.0"
+  - type: dropdown
+    attributes:
+      label: .NET Platform
+      description: Please specify the .NET Platform you're using when you encountered the issue.
+      multiple: true
+      options:
+        - ".NET Framework 3.5"
+        - ".NET Framework 4.0"
+        - ".NET Framework 4.5.x"
+        - ".NET Framework 4.6.x"
+        - ".NET Framework 4.7.x"
+        - ".NET Framework 4.8"
+        - ".NET Standard 2.0"
+        - ".NET Core App 1.x"
+        - ".NET Core App 2.x"
+        - ".NET Core App 3.x"
+        - ".NET 5"
+        - ".NET 6"
+        - ".NET 7"
+        - "Others"
+  - type: dropdown
+    attributes:
+      label: Platform type
+      description: Please specify the platform you're using when you encountered the issue.
+      multiple: true
+      options:
+        - "Windows"
+        - "Linux"
+        - "MacOS"
+        - "UWP"
+        - "Others"
+  - type: textarea
+    attributes:
+      label: System version
+      description: Which system versions did you see the issue on?
+  - type: dropdown
+    attributes:
+      label: IDE
+      description: Which IDE are you using?
+      multiple: true
+      options:
+        - "Visual Studio 2022-preview"
+        - "Visual Studio 2022"
+        - "Visual Studio 2019"
+        - "Visual Studio 2017"
+        - "Visual Studio 2015"
+        - "Visual Studio 2012"
+        - "Visual Studio 2010"
+        - "Other"
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Enter any other applicable info here

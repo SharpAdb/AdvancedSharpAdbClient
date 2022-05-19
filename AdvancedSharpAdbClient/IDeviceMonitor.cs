@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the devices that are currently connected to the Android Debug Bridge.
         /// </summary>
-#if !NET40
+#if !NET35 && !NET40
         IReadOnlyCollection
 #else
         IEnumerable

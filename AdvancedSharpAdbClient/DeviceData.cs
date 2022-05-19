@@ -168,7 +168,13 @@ namespace AdvancedSharpAdbClient
             else
             {
                 // Else, we try to match a value of the DeviceState enumeration.
-                if (!Enum.TryParse<DeviceState>(state, true, out value))
+                if (!
+#if !NET35
+                    Enum
+#else
+                    EnumEx
+#endif
+                    .TryParse<DeviceState>(state, true, out value))
                 {
                     value = DeviceState.Unknown;
                 }

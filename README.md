@@ -1,3 +1,7 @@
+| Issues | License | NuGet |
+|--------|---------|-------|
+[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![Github Issues](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/SharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/SharpAdbClient/)
+
 # A .NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)
 
 AdvancedSharpAdbClient is a .NET library that allows .NET applications to communicate with Android devices. 
@@ -19,11 +23,21 @@ Added important features.
 ### 2.5.0
 + First commit
 
+## Support Platform
+- .NET Framework 3.5 (Maybe unstable)
+- .NET Framework 4.0 (Need [Microsoft.Bcl.Async](https://www.nuget.org/packages/Microsoft.Bcl.Async))
+- .NET Framework 4.5.2
+- .NET Framework 4.6.2
+- .NET Framework 4.8
+- .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
+- .NET Core App 3.1
+- .NET 6.0
+
 ## Installation
 To install AdvancedSharpAdbClient install the [AdvancedSharpAdbClient NuGetPackage](https://www.nuget.org/packages/AdvancedSharpAdbClient). If you're
 using Visual Studio, you can run the following command in the [Package Manager Console](http://docs.nuget.org/consume/package-manager-console):
 
-```
+```ps
 PM> Install-Package AdvancedSharpAdbClient
 ```
 
@@ -91,7 +105,7 @@ Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSe
 
 And you can find several elements
 
-```
+```c#
 Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
 
@@ -317,6 +331,30 @@ static void Main(string[] args)
 {
     ...
     client.Install(device, File.OpenRead("Application.apk"));
+    ...
+}
+```
+### Install multiple applications
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    PackageManager manager = new PackageManager(client, device);
+    manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new string[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }, reinstall: false); // Install split app whith base app
+    manager.InstallMultiplePackage(new string[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app", reinstall: false); // Add split app to base app which packagename is 'com.android.app'
+    ...
+}
+```
+
+Or you can use AdvancedAdbClient.Install
+
+```c#
+static void Main(string[] args)
+{
+    ...
+    client.InstallMultiple(device, File.OpenRead("base.apk"), new Stream[] { File.OpenRead("split_1.apk"), File.OpenRead("split_2.apk") }); // Install split app whith base app
+    client.InstallMultiple(device, new Stream[] { File.OpenRead("split_3.apk"), File.OpenRead("split_4.apk") }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
 }
 ```
