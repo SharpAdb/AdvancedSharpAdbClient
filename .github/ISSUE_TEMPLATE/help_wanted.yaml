@@ -7,6 +7,6 @@ body:
     validations:
       required: true
     attributes:
-      label: What can we help you?
+      label: What can we do for you?
       description: A clear and concise description what you want to help.
       placeholder: Please why [...]
