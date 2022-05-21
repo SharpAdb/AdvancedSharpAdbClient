@@ -16,8 +16,6 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
-#else
-    using PolyfillsForOldDotNet.System.Runtime.InteropServices;
 #endif
 
 #if NET452

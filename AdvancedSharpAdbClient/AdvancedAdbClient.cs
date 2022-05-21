@@ -1069,11 +1069,13 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charcount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommandAsync("input keyevent " + string.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)
-#if NET35
-                .ToArray()
+            ExecuteRemoteCommandAsync("input keyevent " +
+#if !NET35
+                string
+#else
+                StringEx
 #endif
-                ),device,null, CancellationToken.None).Wait();
+                .Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, CancellationToken.None).Wait();
         }
 
         /// <inheritdoc/>
