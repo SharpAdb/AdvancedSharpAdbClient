@@ -5,15 +5,10 @@
 namespace AdvancedSharpAdbClient
 {
     using System;
+    using System.Buffers;
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
-
-#if !NET35 && !NET40
-    using System.Buffers;
-#else
-    using PolyfillsForOldDotNet.System.Buffers;
-#endif
 
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).
@@ -148,9 +143,7 @@ namespace AdvancedSharpAdbClient
         {
             if (this.Data != null)
             {
-#if !NET35
                 ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
-#endif
             }
 
             this.headerData = null;

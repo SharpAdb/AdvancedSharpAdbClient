@@ -392,11 +392,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
 
                     // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath),
-#if !NET35
-                        null,
-#endif
-                        CancellationToken.None);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
                 return remoteFilePath;
@@ -443,13 +439,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
-            var addon =
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}";
+            var addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}";
 
             string cmd = $"pm install-create {reinstallSwitch}{addon}";
             this.client.ExecuteShellCommand(this.Device, cmd, receiver);

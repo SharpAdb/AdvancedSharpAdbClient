@@ -11,10 +11,6 @@ namespace AdvancedSharpAdbClient
     using System.Threading;
     using System.Threading.Tasks;
 
-#if NET35
-    using AdvancedSharpAdbClient.Extensions;
-#endif
-
     /// <summary>
     /// Implements the <see cref="ITcpSocket" /> interface using the standard <see cref="Socket"/>
     /// class.

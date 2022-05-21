@@ -14,7 +14,7 @@
     <PackageId>AdvancedSharpAdbClient</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient;</PackageTags>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
@@ -22,34 +22,29 @@
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SignAssembly>false</SignAssembly>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TargetFrameworks>net3.5;net4.0;net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
     <Version>1.5.0</Version>
     <VersionPrefix>1.5.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.104" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net3.5'">
-    <Reference Include="PolyfillsForOldDotNet.System.Buffers">
-      <HintPath>..\Dlls\PolyfillsForOldDotNet.System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyfillsForOldDotNet.System.Threading">
-      <HintPath>..\Dlls\PolyfillsForOldDotNet.System.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="PolyfillsForOldDotNet.System.Runtime.InteropServices.RuntimeInformation">
-      <HintPath>..\Dlls\PolyfillsForOldDotNet.System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-    </Reference>
+  <ItemGroup Condition="'$(TargetFramework)'=='net3.5-client'">
     <PackageReference Include="AsyncBridge.Net35" Version="0.3.1" />
+    <PackageReference Include="mscorlib.Polyfill.NET35" Version="0.0.2" />
+    <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.2" />
+    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.2" />
   </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)'=='net4.0'">
+    <ItemGroup Condition="'$(TargetFramework)'=='net4.0-client'">
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
-    <PackageReference Include="PolyfillsForOldDotNet.System.Buffers" Version="0.1.1" />
-    <PackageReference Include="PolyfillsForOldDotNet.System.Runtime.InteropServices.RuntimeInformation" Version="0.1.1" />
+    <PackageReference Include="mscorlib.Polyfill.NET40" Version="0.0.1" />
+    <PackageReference Include="Polyfill.System.Buffers.NET40" Version="0.0.1" />
+    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET40" Version="0.0.1" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)'=='net4.5.2'">

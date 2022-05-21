@@ -120,11 +120,7 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-#if !NET35 && !NET40 && !NET452
-            var timestamp = DateTimeOffset.FromUnixTimeSeconds(sec);
-#else
-            var timestamp = new DateTimeOffset(((long)sec).ToDateTime());
-#endif
+            var timestamp = Utilities.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {

@@ -44,11 +44,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">
         /// A <see cref="CancellationToken"/> that can be used to cancel the task.
         /// </param>
-        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,
-#if !NET35
-            IProgress<int> progress,
-#endif
-            CancellationToken cancellationToken);
+        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -66,11 +62,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">
         /// A <see cref="CancellationToken"/> that can be used to cancel the task.
         /// </param>
-        void Pull(string remotePath, Stream stream,
-#if !NET35
-            IProgress<int> progress,
-#endif
-            CancellationToken cancellationToken);
+        void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns information about a file on the device.

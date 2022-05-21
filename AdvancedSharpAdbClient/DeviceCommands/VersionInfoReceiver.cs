@@ -69,13 +69,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             // We check whether the line is indented. If it's not, and it's not an empty line, we take it is
             // a section header line and update the data accordingly.
-            if (
-#if !NET35
-                                string
-#else
-                                StringEx
-#endif
-                                .IsNullOrWhiteSpace(line))
+            if (line.IsNullOrWhiteSpace())
             {
                 return;
             }

@@ -16,8 +16,6 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
-#else
-    using PolyfillsForOldDotNet.System.Runtime.InteropServices;
 #endif
 
 #if NET452
@@ -56,13 +54,7 @@ namespace AdvancedSharpAdbClient
 #endif
             )
         {
-            if (
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .IsNullOrWhiteSpace(adbPath))
+            if (adbPath.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }

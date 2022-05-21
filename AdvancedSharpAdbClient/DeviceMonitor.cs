@@ -142,13 +142,7 @@ namespace AdvancedSharpAdbClient
             {
                 this.firstDeviceListParsed.Reset();
 
-                this.monitorTask =
-#if !NET35 && !NET40
-                    Task
-#else
-                    TaskEx
-#endif
-                    .Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
+                this.monitorTask = Utilities.Run(() => this.DeviceMonitorLoopAsync(this.monitorTaskCancellationTokenSource.Token));
 
                 // Wait for the worker thread to have read the first list
                 // of devices.

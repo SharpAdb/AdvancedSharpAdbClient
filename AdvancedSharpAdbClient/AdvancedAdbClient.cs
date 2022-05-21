@@ -19,10 +19,6 @@ namespace AdvancedSharpAdbClient
     using System.Threading.Tasks;
     using System.Xml;
 
-#if NET35
-    using AdvancedSharpAdbClient.Extensions;
-#endif
-
     /// <summary>
     /// <para>
     ///     Implements the <see cref="IAdvancedAdbClient"/> interface, and allows you to interact with the
@@ -363,12 +359,7 @@ namespace AdvancedSharpAdbClient
                         // -- one of the integration test fetches output 1000 times and found no truncations.
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var line =
-#if !NET35
-                                await reader.ReadLineAsync().ConfigureAwait(false);
-#else
-                                reader.ReadLine();
-#endif
+                            var line = await reader.ReadLineEx();
 
                             if (line == null)
                             {
@@ -550,12 +541,7 @@ namespace AdvancedSharpAdbClient
                 {
                     // Give adbd some time to kill itself and come back up.
                     // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
-#if !NET35 && !NET40
-                    Task
-#else
-                    TaskEx
-#endif
-                        .Delay(3000).GetAwaiter().GetResult();
+                    Utilities.Delay(3000).GetAwaiter().GetResult();
                 }
             }
         }
@@ -638,13 +624,7 @@ namespace AdvancedSharpAdbClient
 
             StringBuilder requestBuilder = new StringBuilder();
             requestBuilder.Append("exec:cmd package 'install-create' ");
-            requestBuilder.Append(
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}");
+            requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}");
 
             if (arguments != null)
             {
@@ -1069,11 +1049,13 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charcount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommandAsync("input keyevent " + string.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)
-#if NET35
-                .ToArray()
+            ExecuteRemoteCommandAsync("input keyevent " +
+#if !NET35
+                string
+#else
+                StringEx
 #endif
-                ),device,null, CancellationToken.None).Wait();
+                .Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, CancellationToken.None).Wait();
         }
 
         /// <inheritdoc/>

@@ -74,13 +74,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if(m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.SuccessMessage =
-#if !NET35
-                                string
-#else
-                                StringEx
-#endif
-                                .IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            this.SuccessMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
                         }
 
                         this.Success = true;
@@ -95,13 +89,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage =
-#if !NET35
-                                string
-#else
-                                StringEx
-#endif
-                                .IsNullOrWhiteSpace(msg) ? UnknownError : msg;
+                            this.ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
                         }
 
                         this.Success = false;

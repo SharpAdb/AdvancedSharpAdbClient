@@ -220,11 +220,7 @@ fi".Replace("\r\n", "\n"), receiver);
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
                     client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-#if !NET35
                     catBuilder.Clear();
-#else
-                    catBuilder = new StringBuilder();
-#endif
                     catBuilder.Append("cat ");
                 }
             }
