@@ -439,13 +439,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallReceiver receiver = new InstallReceiver();
             var reinstallSwitch = reinstall ? "-r " : string.Empty;
-            var addon =
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .IsNullOrWhiteSpace(packageName) ? string.Empty : $"-p {packageName}";
+            var addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}";
 
             string cmd = $"pm install-create {reinstallSwitch}{addon}";
             this.client.ExecuteShellCommand(this.Device, cmd, receiver);

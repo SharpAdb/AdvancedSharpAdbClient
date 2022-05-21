@@ -201,11 +201,7 @@ namespace AdvancedSharpAdbClient
             }
 
             // create the DONE message
-#if !NET35 && !NET40 && !NET452
             int time = (int)timestamp.ToUnixTimeSeconds();
-#else
-            int time = (int)timestamp.DateTime.ToUnixEpoch();
-#endif
             this.Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints

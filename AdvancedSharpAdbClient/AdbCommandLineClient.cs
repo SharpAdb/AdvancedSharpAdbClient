@@ -54,13 +54,7 @@ namespace AdvancedSharpAdbClient
 #endif
             )
         {
-            if (
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .IsNullOrWhiteSpace(adbPath))
+            if (adbPath.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }
