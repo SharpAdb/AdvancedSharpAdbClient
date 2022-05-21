@@ -19,10 +19,6 @@ namespace AdvancedSharpAdbClient
     using System.Threading.Tasks;
     using System.Xml;
 
-#if NET35
-    using AdvancedSharpAdbClient.Extensions;
-#endif
-
     /// <summary>
     /// <para>
     ///     Implements the <see cref="IAdvancedAdbClient"/> interface, and allows you to interact with the

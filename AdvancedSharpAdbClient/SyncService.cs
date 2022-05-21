@@ -125,11 +125,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,
-#if !NET35
-            IProgress<int> progress,
-#endif
-            CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int> progress,            CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -197,13 +193,11 @@ namespace AdvancedSharpAdbClient
                 // now send the data to the device
                 this.Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 
-#if !NET35
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
                     progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
                 }
-#endif
             }
 
             // create the DONE message
@@ -231,11 +225,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream,
-#if !NET35
-            IProgress<int> progress,
-#endif
-            CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (remoteFilepath == null)
             {
@@ -296,13 +286,11 @@ namespace AdvancedSharpAdbClient
                 stream.Write(buffer, 0, size);
                 totalBytesRead += size;
 
-#if !NET35
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
                     progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
                 }
-#endif
             }
         }
 
