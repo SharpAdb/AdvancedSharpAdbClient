@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="AdvancedSharpAdbClient.SampleApp.ControlPages.ADBServerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AdvancedSharpAdbClient.SampleApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <StackPanel>
+        <local:ControlExample HeaderText="Check ADB Status">
+            <local:ControlExample.Example>
+                <Button Content="Check" Click="Button_Click"/>
+            </local:ControlExample.Example>
+            <local:ControlExample.Output>
+                <StackPanel>
+                    <TextBlock x:Name="Control1Output" FontFamily="Global User Interface"/>
+                    <TextBlock x:Name="Control2Output" FontFamily="Global User Interface"/>
+                </StackPanel>
+            </local:ControlExample.Output>
+        </local:ControlExample>
+    </StackPanel>
+</Page>
