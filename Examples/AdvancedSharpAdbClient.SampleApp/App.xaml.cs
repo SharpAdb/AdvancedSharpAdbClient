@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                 return;
             }
 
-            //Type targetPageType = typeof(NewControlsPage);
+            Type targetPageType = typeof(NewControlsPage);
             string targetPageArguments = string.Empty;
 
             if (args.Kind == ActivationKind.Launch)
@@ -109,32 +109,32 @@ namespace AdvancedSharpAdbClient.SampleApp
 
                 string targetId = string.Empty;
 
-                //switch (((ProtocolActivatedEventArgs)args).Uri?.AbsoluteUri)
-                //{
-                //    case string s when IsMatching(s, "(/*)category/(.*)"):
-                //        targetId = match.Groups[2]?.ToString();
-                //        if (targetId == "AllControls")
-                //        {
-                //            targetPageType = typeof(AllControlsPage);
-                //        }
-                //        else if (targetId == "NewControls")
-                //        {
-                //            targetPageType = typeof(NewControlsPage);
-                //        }
-                //        else if (ControlInfoDataSource.Instance.Groups.Any(g => g.UniqueId == targetId))
-                //        {
-                //            targetPageType = typeof(SectionPage);
-                //        }
-                //        break;
+                switch (((ProtocolActivatedEventArgs)args).Uri?.AbsoluteUri)
+                {
+                    case string s when IsMatching(s, "(/*)category/(.*)"):
+                        targetId = match.Groups[2]?.ToString();
+                        if (targetId == "AllControls")
+                        {
+                            targetPageType = typeof(AllControlsPage);
+                        }
+                        else if (targetId == "NewControls")
+                        {
+                            targetPageType = typeof(NewControlsPage);
+                        }
+                        else if (ControlInfoDataSource.Instance.Groups.Any(g => g.UniqueId == targetId))
+                        {
+                            targetPageType = typeof(SectionPage);
+                        }
+                        break;
 
-                //    case string s when IsMatching(s, "(/*)item/(.*)"):
-                //        targetId = match.Groups[2]?.ToString();
-                //        if (ControlInfoDataSource.Instance.Groups.Any(g => g.Items.Any(i => i.UniqueId == targetId)))
-                //        {
-                //            targetPageType = typeof(ItemPage);
-                //        }
-                //        break;
-                //}
+                    case string s when IsMatching(s, "(/*)item/(.*)"):
+                        targetId = match.Groups[2]?.ToString();
+                        if (ControlInfoDataSource.Instance.Groups.Any(g => g.Items.Any(i => i.UniqueId == targetId)))
+                        {
+                            targetPageType = typeof(ItemPage);
+                        }
+                        break;
+                }
 
                 targetPageArguments = targetId;
 
@@ -145,16 +145,16 @@ namespace AdvancedSharpAdbClient.SampleApp
                 }
             }
 
-            //rootFrame.Navigate(targetPageType, targetPageArguments);
+            rootFrame.Navigate(targetPageType, targetPageArguments);
 
-            //if (targetPageType == typeof(NewControlsPage))
-            //{
-            //    ((Microsoft.UI.Xaml.Controls.NavigationViewItem)((NavigationRootPage)Window.Current.Content).NavigationView.MenuItems[0]).IsSelected = true;
-            //}
-            //else if (targetPageType == typeof(ItemPage))
-            //{
-            //    NavigationRootPage.Current.EnsureNavigationSelection(targetPageArguments);
-            //}
+            if (targetPageType == typeof(NewControlsPage))
+            {
+                ((Microsoft.UI.Xaml.Controls.NavigationViewItem)((NavigationRootPage)Window.Current.Content).NavigationView.MenuItems[0]).IsSelected = true;
+            }
+            else if (targetPageType == typeof(ItemPage))
+            {
+                NavigationRootPage.Current.EnsureNavigationSelection(targetPageArguments);
+            }
 
             // Ensure the current window is active
             Window.Current.Activate();
@@ -162,18 +162,18 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private static void UpdateNavigationBasedOnSelectedPage(Frame rootFrame)
         {
-            //// Check if we brought back an ItemPage
-            //if (rootFrame.Content is ItemPage itemPage)
-            //{
-            //    // We did, so bring the selected item back into view
-            //    string name = itemPage.Item.Title;
-            //    if (Window.Current.Content is NavigationRootPage nav)
-            //    {
-            //        // Finally brings back into view the correct item.
-            //        // But first: Update page layout!
-            //        nav.EnsureItemIsVisibleInNavigation(name);
-            //    }
-            //}
+            // Check if we brought back an ItemPage
+            if (rootFrame.Content is ItemPage itemPage)
+            {
+                // We did, so bring the selected item back into view
+                string name = itemPage.Item.Title;
+                if (Window.Current.Content is NavigationRootPage nav)
+                {
+                    // Finally brings back into view the correct item.
+                    // But first: Update page layout!
+                    nav.EnsureItemIsVisibleInNavigation(name);
+                }
+            }
         }
 
         private Frame GetRootFrame()

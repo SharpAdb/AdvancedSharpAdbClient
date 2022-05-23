@@ -8,6 +8,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <local:ItemTemplates />
                 <controls:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
 
@@ -75,8 +76,8 @@
 
             <SolidColorBrush x:Key="GridViewHeaderItemDividerStroke" Color="Transparent" />
 
-            <x:String x:Key="AppTitleName">WinUI 2 Gallery</x:String>
-            <x:String x:Key="WinUIVersion">SDK 2.8</x:String>
+            <x:String x:Key="AppTitleName">ADB Client Sample</x:String>
+            <x:String x:Key="WinUIVersion">Version 2.5</x:String>
 
             <Style
                 x:Key="OutputTextBlockStyle"

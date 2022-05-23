@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AdvancedSharpAdbClient.SampleApp</RootNamespace>
     <AssemblyName>AdvancedSharpAdbClient.SampleApp</AssemblyName>
-    <DefaultLanguage>zh-CN</DefaultLanguage>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22000.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
@@ -116,6 +116,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AllControlsPage.xaml.cs">
+      <DependentUpon>AllControlsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -126,6 +129,9 @@
     <Compile Include="Common\NullableBooleanToBooleanConverter.cs" />
     <Compile Include="Common\NullToVisibilityConverter.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="ControlPages\ADBServerPage.xaml.cs">
+      <DependentUpon>ADBServerPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ControlExample.xaml.cs">
       <DependentUpon>ControlExample.xaml</DependentUpon>
     </Compile>
@@ -133,34 +139,54 @@
       <DependentUpon>SampleCodePresenter.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataModel\ControlInfoDataSource.cs" />
+    <Compile Include="HeaderTiles.xaml.cs">
+      <DependentUpon>HeaderTiles.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\NavigationHelper.cs" />
     <Compile Include="Helpers\NavigationOrientationHelper.cs" />
     <Compile Include="Helpers\ProtocolActivationClipboardHelper.cs" />
     <Compile Include="Helpers\ThemeHelper.cs" />
     <Compile Include="Helpers\UIHelper.cs" />
-    <Compile Include="ControlPages\ADBServerPage.xaml.cs">
-      <DependentUpon>ADBServerPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ItemPage.xaml.cs">
       <DependentUpon>ItemPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ItemsPageBase.cs" />
+    <Compile Include="ItemTemplates.xaml.cs">
+      <DependentUpon>ItemTemplates.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Navigation\NavigationRootPage.xaml.cs">
       <DependentUpon>NavigationRootPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NewControlsPage.xaml.cs">
+      <DependentUpon>NewControlsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="PageHeader.xaml.cs">
       <DependentUpon>PageHeader.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchResultsPage.xaml.cs">
+      <DependentUpon>SearchResultsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SectionPage.xaml.cs">
+      <DependentUpon>SectionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest">
-      <SubType>Designer</SubType>
-    </AppxManifest>
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="Assets\gettingStarted.png" />
+    <Content Include="Assets\githubTile.png" />
+    <Content Include="Assets\MainPage_Banner.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\style-1x.png" />
+    <Content Include="Assets\template_studio.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="ControlPagesSampleCode\ADBServer\ADBServerSample1_cs.txt" />
+    <Content Include="ControlPagesSampleCode\ADBServer\ADBServerSample2_cs.txt" />
+    <Content Include="DataModel\ControlInfoData.json" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -175,6 +201,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="AllControlsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\ControlExample.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -187,7 +217,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="HeaderTiles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ItemPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ItemTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -195,13 +233,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="NewControlsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PageHeader.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="SettingsPage.xaml">
+    <Page Include="SearchResultsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SectionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -237,10 +287,12 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DataModel\ControlInfoData.json" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
-    <PRIResource Include="Strings\en-US\Resources.resw" />
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

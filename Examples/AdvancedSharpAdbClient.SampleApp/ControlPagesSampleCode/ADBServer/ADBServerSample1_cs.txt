@@ -1,0 +1,9 @@
+﻿FileOpenPicker FileOpen = new FileOpenPicker();
+FileOpen.FileTypeFilter.Add(".exe");
+FileOpen.SuggestedStartLocation = PickerLocationId.ComputerFolder;
+StorageFile file = await FileOpen.PickSingleFileAsync();
+if (file != null)
+{
+    AdbServer server = new AdbServer();
+    StartServerResult result = server.StartServer(file.Path, false);
+}

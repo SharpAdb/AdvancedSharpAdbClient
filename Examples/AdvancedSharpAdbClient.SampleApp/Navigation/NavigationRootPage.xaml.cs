@@ -282,17 +282,17 @@ namespace AdvancedSharpAdbClient.SampleApp
 
                 if (selectedItem == _allControlsMenuItem)
                 {
-                    //if (rootFrame.CurrentSourcePageType != typeof(AllControlsPage))
-                    //{
-                    //    rootFrame.Navigate(typeof(AllControlsPage));
-                    //}
+                    if (rootFrame.CurrentSourcePageType != typeof(AllControlsPage))
+                    {
+                        rootFrame.Navigate(typeof(AllControlsPage));
+                    }
                 }
                 else if (selectedItem == _newControlsMenuItem)
                 {
-                    //if (rootFrame.CurrentSourcePageType != typeof(NewControlsPage))
-                    //{
-                    //    rootFrame.Navigate(typeof(NewControlsPage));
-                    //}
+                    if (rootFrame.CurrentSourcePageType != typeof(NewControlsPage))
+                    {
+                        rootFrame.Navigate(typeof(NewControlsPage));
+                    }
                 }
                 else
                 {
@@ -316,12 +316,12 @@ namespace AdvancedSharpAdbClient.SampleApp
             // Close any open teaching tips before navigation
             CloseTeachingTips();
 
-            //if (e.SourcePageType == typeof(AllControlsPage) ||
-            //    e.SourcePageType == typeof(NewControlsPage))
-            //{
-            //    NavigationViewControl.AlwaysShowHeader = false;
-            //}
-            //else
+            if (e.SourcePageType == typeof(AllControlsPage) ||
+                e.SourcePageType == typeof(NewControlsPage))
+            {
+                NavigationViewControl.AlwaysShowHeader = false;
+            }
+            else
             {
                 NavigationViewControl.AlwaysShowHeader = true;
             }
@@ -389,7 +389,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             }
             else if (!string.IsNullOrEmpty(args.QueryText))
             {
-                //NavigationRootPage.RootFrame.Navigate(typeof(SearchResultsPage), args.QueryText);
+                NavigationRootPage.RootFrame.Navigate(typeof(SearchResultsPage), args.QueryText);
             }
         }
 
