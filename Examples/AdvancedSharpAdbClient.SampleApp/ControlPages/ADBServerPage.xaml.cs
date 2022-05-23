@@ -27,10 +27,13 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
             FileOpenPicker FileOpen = new FileOpenPicker();
             FileOpen.FileTypeFilter.Add(".exe");
             FileOpen.SuggestedStartLocation = PickerLocationId.ComputerFolder;
+            Control1Output.Text = "Choose ADB ...";
             StorageFile file = await FileOpen.PickSingleFileAsync();
             if (file != null)
             {
                 await Launcher.LaunchUriAsync(new Uri($"adbsampledelegate:StartADB={file.Path}"));
+                Control1Output.Text = "Wait 5s ...";
+                await Task.Delay(5000);
             }
             AdbServerStatus status = await Task.Run(new AdbServer().GetStatus);
             Control1Output.Text = status.IsRunning ? "Succeed" : "Failed";

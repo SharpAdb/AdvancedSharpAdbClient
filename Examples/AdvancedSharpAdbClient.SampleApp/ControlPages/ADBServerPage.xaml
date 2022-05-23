@@ -11,7 +11,7 @@
         <local:ControlExample
             x:Name="Example1"
             CSharpSource="ADBServer/ADBServerSample1_cs.txt"
-            HeaderText="Start ADB">
+            HeaderText="Start ADB Server">
             <local:ControlExample.Example>
                 <StackPanel Orientation="Horizontal">
                     <Button
