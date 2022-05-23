@@ -4,10 +4,10 @@
     <AssemblyName>AdvancedSharpAdbClient</AssemblyName>
     <AssemblyOriginatorKeyFile>AdvancedSharpAdbClient.snk</AssemblyOriginatorKeyFile>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
     <Copyright>https://github.com/quamotion/madb</Copyright>
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices.It's improved version of SharpAdbClient.</Description>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
     <Nullable>Enable</Nullable>
@@ -24,8 +24,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <Version>1.5.0</Version>
-    <VersionPrefix>1.5.0</VersionPrefix>
+    <VersionPrefix>2.5.3</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

@@ -25,11 +25,11 @@ namespace AdvancedSharpAdbClient
 #endif
             .IsNullOrWhiteSpace(value);
 
-        public static async Task<string> ReadLineEx(this TextReader reader) =>
+        public static async Task<string?> ReadLineEx(this TextReader reader) =>
 #if NET35
             reader.ReadLine();
 #else
-            await reader.ReadLineAsync().ConfigureAwait(false);
+            await reader.ReadLineAsync();
 #endif
 
         public static Task Delay(int dueTime) =>

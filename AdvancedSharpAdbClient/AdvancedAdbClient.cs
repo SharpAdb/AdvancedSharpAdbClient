@@ -359,7 +359,12 @@ namespace AdvancedSharpAdbClient
                         // -- one of the integration test fetches output 1000 times and found no truncations.
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var line = await reader.ReadLineEx();
+                            var line =
+#if !NET35
+                                await reader.ReadLineAsync().ConfigureAwait(false);
+#else
+                                reader.ReadLine();
+#endif
 
                             if (line == null)
                             {
