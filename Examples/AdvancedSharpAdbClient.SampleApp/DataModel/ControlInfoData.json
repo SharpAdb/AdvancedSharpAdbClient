@@ -1,0 +1,44 @@
+{
+  "Groups": [
+    {
+      "UniqueId": "NewControls",
+      "Title": "Home",
+      "Subtitle": "",
+      "ImagePath": "",
+      "ImageIconPath": "",
+      "Description": "",
+      "Items": []
+    },
+    {
+      "UniqueId": "AllControls",
+      "Title": "All controls",
+      "Subtitle": "",
+      "ImagePath": "",
+      "ImageIconPath": "",
+      "Description": "",
+      "Items": []
+    },
+    {
+      "UniqueId": "Basic",
+      "Title": "Basic",
+      "Subtitle": "",
+      "ImagePath": "",
+      "ImageIconPath": "",
+      "Description": "",
+      "Items": [
+        {
+          "UniqueId": "ADBServer",
+          "Title": "ADB Server",
+          "Subtitle": "Provides methods for interacting with the adb server.",
+          "ImagePath": "",
+          "ImageIconPath": "",
+          "Description": "The adb server is a background process, that runs on the host machine. Its purpose if to sense the USB ports to know when devices are attached/removed, as well as when emulator instances start/stop. The ADB server is really one giant multiplexing loop whose purpose is to orchestrate the exchange of data between clients and devices.",
+          "Content": "",
+          "IsNew": false,
+          "Docs": [],
+          "RelatedControls": []
+        }
+      ]
+    }
+  ]
+}
