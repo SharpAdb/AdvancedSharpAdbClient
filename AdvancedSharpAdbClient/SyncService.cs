@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">
         /// A connection to an adb server.
         /// </param>
-        public void ReOpen(IAdvancedAdbClient client)
+        public void Reopen(IAdvancedAdbClient client)
         {
             if (this.Socket != null)
             {
@@ -148,7 +148,7 @@ namespace AdvancedSharpAdbClient
         /// A <see cref="IAdbSocket"/> that enables to connection with the
         /// adb server.
         /// </param>
-        public void ReOpen(IAdbSocket socket)
+        public void Reopen(IAdbSocket socket)
         {
             if (this.Socket != null)
             {
