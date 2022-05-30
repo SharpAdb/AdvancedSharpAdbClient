@@ -124,8 +124,43 @@ namespace AdvancedSharpAdbClient
             var resp = this.Socket.ReadAdbResponse();
         }
 
+        /// <summary>
+        /// Reopen this connection.
+        /// </summary>
+        /// <param name="client">
+        /// A connection to an adb server.
+        /// </param>
+        public void ReOpen(IAdvancedAdbClient client)
+        {
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
+            }
+            this.Socket = Factories.AdbSocketFactory(client.EndPoint);
+            Open();
+        }
+
+        /// <summary>
+        /// Reopen this connection.
+        /// </summary>
+        /// <param name="socket">
+        /// A <see cref="IAdbSocket"/> that enables to connection with the
+        /// adb server.
+        /// </param>
+        public void ReOpen(IAdbSocket socket)
+        {
+            if (this.Socket != null)
+            {
+                this.Socket.Dispose();
+                this.Socket = null;
+            }
+            this.Socket = socket;
+            Open();
+        }
+
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp,            IProgress<int> progress,            CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (stream == null)
             {
@@ -368,11 +403,7 @@ namespace AdvancedSharpAdbClient
 
             value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-#if !NET35 && !NET40 && !NET452
-            value.Time = DateTimeOffset.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
-#else
-            var timestamp = new DateTimeOffset(((long)BitConverter.ToInt32(statResult, 8)).ToDateTime());
-#endif
+            value.Time = Utilities.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
         }
     }
 }
