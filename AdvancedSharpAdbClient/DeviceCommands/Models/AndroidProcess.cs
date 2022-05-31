@@ -4,13 +4,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-
     /// <summary>
     /// Represents a process running on an Android device.
     /// </summary>
@@ -19,65 +17,37 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the Process ID number.
         /// </summary>
-        public int ProcessId
-        {
-            get;
-            set;
-        }
+        public int ProcessId { get; set; }
 
         /// <summary>
         /// Gets or sets the parent Process ID number.
         /// </summary>
-        public int ParentProcessId
-        {
-            get;
-            set;
-        }
+        public int ParentProcessId { get; set; }
 
         /// <summary>
         /// Gets or sets total VM size in bytes.
         /// </summary>
-        public ulong VirtualSize
-        {
-            get;
-            set;
-        }
+        public ulong VirtualSize { get; set; }
 
         /// <summary>
         /// Gets or sets the process resident set size.
         /// </summary>
-        public int ResidentSetSize
-        {
-            get;
-            set;
-        }
+        public int ResidentSetSize { get; set; }
 
         /// <summary>
         /// Gets or sets the memory address of the event the process is waiting for
         /// </summary>
-        public ulong WChan
-        {
-            get;
-            set;
-        }
+        public ulong WChan { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the process, including arguments, if any.
         /// </summary>
-        public string Name
-        {
-            get;
-            set;
-        }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the state of the process.
         /// </summary>
-        public AndroidProcessState State
-        {
-            get;
-            set;
-        }
+        public AndroidProcessState State { get; set; }
 
         /// <summary>
         /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.
@@ -106,8 +76,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The process name may contain spaces but is wrapped within parenteses, all other values (we know of) are
             // numeric.
             // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
-            var processNameStart = line.IndexOf('(');
-            var processNameEnd = line.LastIndexOf(')');
+            int processNameStart = line.IndexOf('(');
+            int processNameEnd = line.LastIndexOf(')');
 
             int pid = 0;
             string comm = string.Empty;
@@ -116,7 +86,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (cmdLinePrefix)
             {
-                var cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
+                string[]? cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
 
                 if (cmdLineParts.Length <= 1)
                 {
@@ -138,7 +108,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
             }
 
-            var parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[]? parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 35)
             {
@@ -147,41 +117,41 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             // Only fields in Linux 2.1.10 and earlier are listed here,
             // additional fields exist in newer versions of linux.
-            var state = parts[0];
-            var ppid = ParseInt(parts[1]);
-            var pgrp = ParseInt(parts[2]);
-            var session = ParseInt(parts[3]);
-            var tty_nr = ParseInt(parts[4]);
-            var tpgid = ParseInt(parts[5]);
-            var flags = ParseUInt(parts[6]);
-            var minflt = ParseULong(parts[7]);
-            var cminflt = ParseULong(parts[8]);
-            var majflt = ParseULong(parts[9]);
-            var cmajflt = ParseULong(parts[10]);
-            var utime = ParseULong(parts[11]);
-            var stime = ParseULong(parts[12]);
-            var cutime = ParseLong(parts[13]);
-            var cstime = ParseLong(parts[14]);
-            var priority = ParseLong(parts[15]);
-            var nice = ParseLong(parts[16]);
-            var num_threads = ParseLong(parts[17]);
-            var itrealvalue = ParseLong(parts[18]);
-            var starttime = ParseULong(parts[19]);
-            var vsize = ParseULong(parts[20]);
-            var rss = int.Parse(parts[21]);
-            var rsslim = ParseULong(parts[22]);
-            var startcode = ParseULong(parts[23]);
-            var endcode = ParseULong(parts[24]);
-            var startstack = ParseULong(parts[25]);
-            var kstkesp = ParseULong(parts[26]);
-            var kstkeip = ParseULong(parts[27]);
-            var signal = ParseULong(parts[28]);
-            var blocked = ParseULong(parts[29]);
-            var sigignore = ParseULong(parts[30]);
-            var sigcatch = ParseULong(parts[31]);
-            var wchan = ParseULong(parts[32]);
-            var nswap = ParseULong(parts[33]);
-            var cnswap = ParseULong(parts[34]);
+            string? state = parts[0];
+            int ppid = ParseInt(parts[1]);
+            int pgrp = ParseInt(parts[2]);
+            int session = ParseInt(parts[3]);
+            int tty_nr = ParseInt(parts[4]);
+            int tpgid = ParseInt(parts[5]);
+            uint flags = ParseUInt(parts[6]);
+            ulong minflt = ParseULong(parts[7]);
+            ulong cminflt = ParseULong(parts[8]);
+            ulong majflt = ParseULong(parts[9]);
+            ulong cmajflt = ParseULong(parts[10]);
+            ulong utime = ParseULong(parts[11]);
+            ulong stime = ParseULong(parts[12]);
+            long cutime = ParseLong(parts[13]);
+            long cstime = ParseLong(parts[14]);
+            long priority = ParseLong(parts[15]);
+            long nice = ParseLong(parts[16]);
+            long num_threads = ParseLong(parts[17]);
+            long itrealvalue = ParseLong(parts[18]);
+            ulong starttime = ParseULong(parts[19]);
+            ulong vsize = ParseULong(parts[20]);
+            int rss = int.Parse(parts[21]);
+            ulong rsslim = ParseULong(parts[22]);
+            ulong startcode = ParseULong(parts[23]);
+            ulong endcode = ParseULong(parts[24]);
+            ulong startstack = ParseULong(parts[25]);
+            ulong kstkesp = ParseULong(parts[26]);
+            ulong kstkeip = ParseULong(parts[27]);
+            ulong signal = ParseULong(parts[28]);
+            ulong blocked = ParseULong(parts[29]);
+            ulong sigignore = ParseULong(parts[30]);
+            ulong sigcatch = ParseULong(parts[31]);
+            ulong wchan = ParseULong(parts[32]);
+            ulong nswap = ParseULong(parts[33]);
+            ulong cnswap = ParseULong(parts[34]);
 
             return new AndroidProcess()
             {
@@ -204,7 +174,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </returns>
         public override string ToString()
         {
-            return $"{this.Name} ({this.ProcessId})";
+            return $"{Name} ({ProcessId})";
         }
 
         /// <summary>
@@ -222,7 +192,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </returns>
         private static int IndexOf(List<string> list, params string[] values)
         {
-            foreach (var value in values)
+            foreach (string? value in values)
             {
                 int index = list.IndexOf(value);
 

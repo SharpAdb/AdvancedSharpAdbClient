@@ -2,14 +2,14 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AdvancedSharpAdbClient
 {
-    using AdvancedSharpAdbClient.Exceptions;
-    using System;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Provides a common interface for any class that acts as a client for the
     /// Android Debug Bridge.

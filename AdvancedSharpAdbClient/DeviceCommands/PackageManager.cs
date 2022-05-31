@@ -2,14 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient.DeviceCommands
-{
-    using Exceptions;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Threading;
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading;
 
 #if !NET35 && !NET40
     using Microsoft.Extensions.Logging;
@@ -20,6 +18,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     using AdvancedSharpAdbClient.Logs;
 #endif
 
+namespace AdvancedSharpAdbClient.DeviceCommands
+{
     /// <summary>
     /// Allows you to get information about packages that are installed on a device.
     /// </summary>
@@ -89,28 +89,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
             )
         {
-            if (device == null)
-            {
-                throw new ArgumentNullException(nameof(device));
-            }
-
-            this.Device = device;
-            this.Packages = new Dictionary<string, string>();
-            this.ThirdPartyOnly = thirdPartyOnly;
+            Device = device ?? throw new ArgumentNullException(nameof(device));
+            Packages = new Dictionary<string, string>();
+            ThirdPartyOnly = thirdPartyOnly;
             this.client = client ?? throw new ArgumentNullException(nameof(client));
 
-            if (syncServiceFactory == null)
-            {
-                this.syncServiceFactory = Factories.SyncServiceFactory;
-            }
-            else
-            {
-                this.syncServiceFactory = syncServiceFactory;
-            }
+            this.syncServiceFactory = syncServiceFactory == null ? Factories.SyncServiceFactory : syncServiceFactory;
 
             if (!skipInit)
             {
-                this.RefreshPackages();
+                RefreshPackages();
             }
 
 #if !NET35 && !NET40
@@ -122,11 +110,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets a value indicating whether this package manager only lists third party
         /// applications, or also includes built-in applications.
         /// </summary>
-        public bool ThirdPartyOnly
-        {
-            get;
-            private set;
-        }
+        public bool ThirdPartyOnly { get; private set; }
 
         /// <summary>
         /// Gets the list of packages currently installed on the device. They key is the name of the
@@ -144,17 +128,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public void RefreshPackages()
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             PackageManagerReceiver pmr = new PackageManagerReceiver(this.Device, this);
 
-            if (this.ThirdPartyOnly)
+            if (ThirdPartyOnly)
             {
-                this.client.ExecuteShellCommand(this.Device, ListThirdPartyOnly, pmr);
+                client.ExecuteShellCommand(this.Device, ListThirdPartyOnly, pmr);
             }
             else
             {
-                this.client.ExecuteShellCommand(this.Device, ListFull, pmr);
+                client.ExecuteShellCommand(this.Device, ListFull, pmr);
             }
         }
 
@@ -170,11 +154,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </param>
         public void InstallPackage(string packageFilePath, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
-            string remoteFilePath = this.SyncPackageToDevice(packageFilePath);
-            this.InstallRemotePackage(remoteFilePath, reinstall);
-            this.RemoveRemotePackage(remoteFilePath);
+            string remoteFilePath = SyncPackageToDevice(packageFilePath);
+            InstallRemotePackage(remoteFilePath, reinstall);
+            RemoveRemotePackage(remoteFilePath);
         }
 
         /// <summary>
@@ -184,13 +168,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         public void InstallRemotePackage(string remoteFilePath, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            var reinstallSwitch = reinstall ? "-r " : string.Empty;
+            string? reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
-            this.client.ExecuteShellCommand(this.Device, cmd, receiver);
+            client.ExecuteShellCommand(Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -206,24 +190,24 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         public void InstallMultiplePackage(string basePackageFilePath, string[] splitPackageFilePaths, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
-            string baseRemoteFilePath = this.SyncPackageToDevice(basePackageFilePath);
+            string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath);
 
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
             for (int i = 0; i < splitPackageFilePaths.Length; i++)
             {
-                splitRemoteFilePaths[i] = this.SyncPackageToDevice(splitPackageFilePaths[i]);
+                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i]);
             }
 
-            this.InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, reinstall);
+            InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, reinstall);
 
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
-                this.RemoveRemotePackage(splitRemoteFilePath);
+                RemoveRemotePackage(splitRemoteFilePath);
             }
 
-            this.RemoveRemotePackage(baseRemoteFilePath);
+            RemoveRemotePackage(baseRemoteFilePath);
         }
 
         /// <summary>
@@ -234,19 +218,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         public void InstallMultiplePackage(string[] splitPackageFilePaths, string packageName, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
             for (int i = 0; i < splitPackageFilePaths.Length; i++)
             {
-                splitRemoteFilePaths[i] = this.SyncPackageToDevice(splitPackageFilePaths[i]);
+                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i]);
             }
 
-            this.InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, reinstall);
+            InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, reinstall);
 
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
-                this.RemoveRemotePackage(splitRemoteFilePath);
+                RemoveRemotePackage(splitRemoteFilePath);
             }
         }
 
@@ -258,14 +242,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         public void InstallMultipleRemotePackage(string baseRemoteFilePath, string[] splitRemoteFilePaths, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             string session = CreateInstallSession(reinstall);
 
             WriteInstallSession(session, "base", baseRemoteFilePath);
 
             int i = 0;
-            foreach (var splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -278,7 +262,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             InstallReceiver receiver = new InstallReceiver();
-            this.client.ExecuteShellCommand(this.Device, $"pm install-commit {session}", receiver);
+            client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -294,12 +278,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         public void InstallMultipleRemotePackage(string[] splitRemoteFilePaths, string packageName, bool reinstall)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             string session = CreateInstallSession(reinstall, packageName);
 
             int i = 0;
-            foreach (var splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -312,7 +296,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             InstallReceiver receiver = new InstallReceiver();
-            this.client.ExecuteShellCommand(this.Device, $"pm install-commit {session}", receiver);
+            client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -328,10 +312,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </param>
         public void UninstallPackage(string packageName)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            this.client.ExecuteShellCommand(this.Device, $"pm uninstall {packageName}", receiver);
+            client.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
@@ -346,16 +330,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </param>
         public VersionInfo GetVersionInfo(string packageName)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             VersionInfoReceiver receiver = new VersionInfoReceiver();
-            this.client.ExecuteShellCommand(this.Device, $"dumpsys package {packageName}", receiver);
+            client.ExecuteShellCommand(Device, $"dumpsys package {packageName}", receiver);
             return receiver.VersionInfo;
         }
 
         private void ValidateDevice()
         {
-            if (this.Device.State != DeviceState.Online)
+            if (Device.State != DeviceState.Online)
             {
                 throw new AdbException("Device is offline");
             }
@@ -384,7 +368,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
 #endif
 
-                using (ISyncService sync = this.syncServiceFactory(this.client, this.Device))
+                using (ISyncService sync = syncServiceFactory(client, Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
 #if !NET35 && !NET40
@@ -416,7 +400,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // now we delete the app we sync'ed
             try
             {
-                this.client.ExecuteShellCommand(this.Device, "rm " + remoteFilePath, null);
+                client.ExecuteShellCommand(Device, "rm " + remoteFilePath, null);
             }
             catch (IOException e)
             {
@@ -435,14 +419,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="PackageInstallationException"></exception>
         private string CreateInstallSession(bool reinstall, string packageName = null)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            var reinstallSwitch = reinstall ? "-r " : string.Empty;
-            var addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}";
+            string? reinstallSwitch = reinstall ? "-r " : string.Empty;
+            string? addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}";
 
             string cmd = $"pm install-create {reinstallSwitch}{addon}";
-            this.client.ExecuteShellCommand(this.Device, cmd, receiver);
+            client.ExecuteShellCommand(Device, cmd, receiver);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))
             {
@@ -464,10 +448,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">absolute file path to package file on device</param>
         private void WriteInstallSession(string session, string apkname, string path)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            this.client.ExecuteShellCommand(this.Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
+            client.ExecuteShellCommand(this.Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {

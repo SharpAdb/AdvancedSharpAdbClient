@@ -2,16 +2,16 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AdvancedSharpAdbClient.Logs
 {
-    using AdvancedSharpAdbClient.Exceptions;
-    using System;
-    using System.Collections.ObjectModel;
-    using System.IO;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Processes Android log files in binary format. You usually get the binary format by
     /// running <c>logcat -B</c>.
@@ -26,15 +26,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="stream">
         /// A <see cref="Stream"/> that contains the logcat data.
         /// </param>
-        public LogReader(Stream stream)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            this.stream = stream;
-        }
+        public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
@@ -49,24 +41,24 @@ namespace AdvancedSharpAdbClient.Logs
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
             // https://android.googlesource.com/platform/system/core/+/67d7eaf/include/log/logger.h
-            var payloadLengthValue = await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
-            var headerSizeValue = payloadLengthValue == null ? null : await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
-            var pidValue = headerSizeValue == null ? null : await this.ReadInt32Async(cancellationToken).ConfigureAwait(false);
-            var tidValue = pidValue == null ? null : await this.ReadInt32Async(cancellationToken).ConfigureAwait(false);
-            var secValue = tidValue == null ? null : await this.ReadInt32Async(cancellationToken).ConfigureAwait(false);
-            var nsecValue = secValue == null ? null : await this.ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            ushort? payloadLengthValue = await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
+            ushort? headerSizeValue = payloadLengthValue == null ? null : await ReadUInt16Async(cancellationToken).ConfigureAwait(false);
+            int? pidValue = headerSizeValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? tidValue = pidValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? secValue = tidValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? nsecValue = secValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
 
             if (nsecValue == null)
             {
                 return null;
             }
 
-            var payloadLength = payloadLengthValue.Value;
-            var headerSize = headerSizeValue.Value;
-            var pid = pidValue.Value;
-            var tid = tidValue.Value;
-            var sec = secValue.Value;
-            var nsec = nsecValue.Value;
+            ushort payloadLength = payloadLengthValue.Value;
+            ushort headerSize = headerSizeValue.Value;
+            int pid = pidValue.Value;
+            int tid = tidValue.Value;
+            int sec = secValue.Value;
+            int nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
             // In all cases, it appears that they always start with a two uint16's giving the
@@ -79,7 +71,7 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 if (headerSize >= 0x18)
                 {
-                    var idValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+                    uint? idValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
                     if (idValue == null)
                     {
@@ -91,7 +83,7 @@ namespace AdvancedSharpAdbClient.Logs
 
                 if (headerSize >= 0x1c)
                 {
-                    var uidValue = await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+                    uint? uidValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
                     if (uidValue == null)
                     {
@@ -104,7 +96,7 @@ namespace AdvancedSharpAdbClient.Logs
                 if (headerSize >= 0x20)
                 {
                     // Not sure what this is.
-                    await this.ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+                    _ = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
                 }
 
                 if (headerSize > 0x20)
@@ -113,14 +105,14 @@ namespace AdvancedSharpAdbClient.Logs
                 }
             }
 
-            byte[] data = await this.ReadBytesSafeAsync(payloadLength, cancellationToken).ConfigureAwait(false);
+            byte[] data = await ReadBytesSafeAsync(payloadLength, cancellationToken).ConfigureAwait(false);
 
             if (data == null)
             {
                 return null;
             }
 
-            var timestamp = Utilities.FromUnixTimeSeconds(sec);
+            DateTimeOffset timestamp = Utilities.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {
@@ -131,7 +123,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case LogId.System:
                     {
                         // format: <priority:1><tag:N>\0<message:N>\0
-                        var priority = data[0];
+                        byte priority = data[0];
 
                         // Find the first \0 byte in the array. This is the seperator
                         // between the tag and the actual message
@@ -162,7 +154,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case LogId.Events:
                     {
                         // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        var entry = new EventLogEntry()
+                        EventLogEntry? entry = new EventLogEntry()
                         {
                             Data = data,
                             ProcessId = pid,
@@ -175,13 +167,15 @@ namespace AdvancedSharpAdbClient.Logs
                         // if anything goes wrong parsing the data, we never go past
                         // the message boundary itself.
                         using (MemoryStream dataStream = new MemoryStream(data))
-                        using (BinaryReader reader = new BinaryReader(dataStream))
                         {
-                            var priority = reader.ReadInt32();
-
-                            while (dataStream.Position < dataStream.Length)
+                            using (BinaryReader reader = new BinaryReader(dataStream))
                             {
-                                this.ReadLogEntry(reader, entry.Values);
+                                int priority = reader.ReadInt32();
+
+                                while (dataStream.Position < dataStream.Length)
+                                {
+                                    ReadLogEntry(reader, entry.Values);
+                                }
                             }
                         }
 
@@ -202,7 +196,7 @@ namespace AdvancedSharpAdbClient.Logs
 
         private void ReadLogEntry(BinaryReader reader, Collection<object> parent)
         {
-            var type = (EventLogType)reader.ReadByte();
+            EventLogType type = (EventLogType)reader.ReadByte();
 
             switch (type)
             {
@@ -220,13 +214,13 @@ namespace AdvancedSharpAdbClient.Logs
                     break;
 
                 case EventLogType.List:
-                    var listLength = reader.ReadByte();
+                    byte listLength = reader.ReadByte();
 
                     Collection<object> list = new Collection<object>();
 
                     for (int i = 0; i < listLength; i++)
                     {
-                        this.ReadLogEntry(reader, list);
+                        ReadLogEntry(reader, list);
                     }
 
                     parent.Add(list);
@@ -243,38 +237,23 @@ namespace AdvancedSharpAdbClient.Logs
 
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken)
         {
-            byte[] data = await this.ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
+            byte[] data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
 
-            if (data == null)
-            {
-                return null;
-            }
-
-            return BitConverter.ToUInt16(data, 0);
+            return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
         private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken)
         {
-            byte[] data = await this.ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
+            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
-            if (data == null)
-            {
-                return null;
-            }
-
-            return BitConverter.ToUInt32(data, 0);
+            return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
         private async Task<int?> ReadInt32Async(CancellationToken cancellationToken)
         {
-            byte[] data = await this.ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
+            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
-            if (data == null)
-            {
-                return null;
-            }
-
-            return BitConverter.ToInt32(data, 0);
+            return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
         private async Task<byte[]> ReadBytesSafeAsync(int count, CancellationToken cancellationToken)
@@ -286,7 +265,7 @@ namespace AdvancedSharpAdbClient.Logs
 
             while ((read =
 #if !NET35
-                await this.stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
+                await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
 #else
                 this.stream.Read(data, totalRead, count - totalRead)
 #endif
@@ -295,12 +274,7 @@ namespace AdvancedSharpAdbClient.Logs
                 totalRead += read;
             }
 
-            if (totalRead < count)
-            {
-                return null;
-            }
-
-            return data;
+            return totalRead < count ? null : data;
         }
     }
 }

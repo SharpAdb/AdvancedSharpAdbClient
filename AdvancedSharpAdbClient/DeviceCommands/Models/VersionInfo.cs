@@ -16,26 +16,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="versionName">The version name of the application</param>
         public VersionInfo(int versionCode, string versionName)
         {
-            this.VersionCode = versionCode;
-            this.VersionName = versionName;
+            VersionCode = versionCode;
+            VersionName = versionName;
         }
 
         /// <summary>
         /// Gets or sets the version code of an Android application
         /// </summary>
-        public int VersionCode
-        {
-            get;
-            set;
-        }
+        public int VersionCode { get; set; }
 
         /// <summary>
         /// Gets or sets the version name of an Android application
         /// </summary>
-        public string VersionName
-        {
-            get;
-            set;
-        }
+        public string VersionName { get; set; }
     }
 }

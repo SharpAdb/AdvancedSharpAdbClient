@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Runtime.Serialization;
+
 namespace AdvancedSharpAdbClient.Exceptions
 {
-    using System;
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// The exception that is thrown when a shell command becomes unresponsive.
     /// </summary>
@@ -15,8 +15,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class.
         /// </summary>
-        public ShellCommandUnresponsiveException()
-            : base("The shell command has become unresponsive")
+        public ShellCommandUnresponsiveException() : base("The shell command has become unresponsive")
         {
         }
 
@@ -27,8 +26,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="message">
         /// The message that describes the error.
         /// </param>
-        public ShellCommandUnresponsiveException(string message)
-            : base(message)
+        public ShellCommandUnresponsiveException(string message) : base(message)
         {
         }
 
@@ -40,8 +38,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// The exception that is the cause of the current exception, or
         /// <see langword="null"/> if no inner exception is specified.
         /// </param>
-        public ShellCommandUnresponsiveException(Exception inner)
-            : base("The shell command has become unresponsive", inner)
+        public ShellCommandUnresponsiveException(Exception inner) : base("The shell command has become unresponsive", inner)
         {
         }
 
@@ -57,8 +54,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// The exception that is the cause of the current exception, or
         /// <see langword="null"/> if no inner exception is specified.
         /// </param>
-        public ShellCommandUnresponsiveException(string message, Exception inner)
-            : base(message, inner)
+        public ShellCommandUnresponsiveException(string message, Exception inner) : base(message, inner)
         {
         }
 
@@ -74,8 +70,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// The <see cref="StreamingContext"/> that contains contextual information about the
         /// source or destination.
         /// </param>
-        internal ShellCommandUnresponsiveException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
+        internal ShellCommandUnresponsiveException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

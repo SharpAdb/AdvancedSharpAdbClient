@@ -2,12 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of
     /// an Android device.
@@ -27,19 +26,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>
-        public EnvironmentVariablesReceiver()
-        {
-            this.EnvironmentVariables = new Dictionary<string, string>();
-        }
+        public EnvironmentVariablesReceiver() => EnvironmentVariables = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets the environment variables that are currently defined on the device.
         /// </summary>
-        public Dictionary<string, string> EnvironmentVariables
-        {
-            get;
-            private set;
-        }
+        public Dictionary<string, string> EnvironmentVariables { get; private set; }
 
         /// <summary>
         /// Processes the new lines.
@@ -62,13 +54,13 @@ namespace AdvancedSharpAdbClient
 
                     if (label.Length > 0)
                     {
-                        if (this.EnvironmentVariables.ContainsKey(label))
+                        if (EnvironmentVariables.ContainsKey(label))
                         {
-                            this.EnvironmentVariables[label] = value;
+                            EnvironmentVariables[label] = value;
                         }
                         else
                         {
-                            this.EnvironmentVariables.Add(label, value);
+                            EnvironmentVariables.Add(label, value);
                         }
                     }
                 }

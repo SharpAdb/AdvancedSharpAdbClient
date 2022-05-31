@@ -2,14 +2,14 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.Net;
+using System.Text;
+using System.Threading;
+
 namespace AdvancedSharpAdbClient
 {
-    using Exceptions;
-    using System;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
-
     /// <summary>
     /// Provides extension methods for the <see cref="IAdvancedAdbClient"/> interface. Provides overloads
     /// for commonly used funtions.

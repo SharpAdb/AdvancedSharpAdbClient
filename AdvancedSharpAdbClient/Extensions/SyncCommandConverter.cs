@@ -2,12 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     /// Converts <see cref="SyncCommand"/> values to their binary representation
     /// and vice versa.
@@ -80,14 +80,9 @@ namespace AdvancedSharpAdbClient
 
             string commandText = AdvancedAdbClient.Encoding.GetString(value);
 
-            var key = Values.Where(d => string.Equals(d.Value, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
+            SyncCommand? key = Values.Where(d => string.Equals(d.Value, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
 
-            if (key == null)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
-            }
-
-            return key.Value;
+            return key == null ? throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command") : key.Value;
         }
     }
 }

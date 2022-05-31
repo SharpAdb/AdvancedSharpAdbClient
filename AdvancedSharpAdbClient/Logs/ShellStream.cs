@@ -2,13 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AdvancedSharpAdbClient.Logs
 {
-    using System;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// <para>
     /// Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
@@ -45,67 +45,33 @@ namespace AdvancedSharpAdbClient.Logs
                 throw new ArgumentOutOfRangeException(nameof(inner));
             }
 
-            this.Inner = inner;
+            Inner = inner;
             this.closeStream = closeStream;
         }
 
         /// <summary>
         /// Gets the inner stream from which data is being read.
         /// </summary>
-        public Stream Inner
-        {
-            get;
-            private set;
-        }
+        public Stream Inner { get; private set; }
 
         /// <inheritdoc/>
-        public override bool CanRead
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool CanRead => true;
 
         /// <inheritdoc/>
-        public override bool CanSeek
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanSeek => false;
 
         /// <inheritdoc/>
-        public override bool CanWrite
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool CanWrite => false;
 
         /// <inheritdoc/>
-        public override long Length
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public override long Length => throw new NotImplementedException();
 
         /// <inheritdoc/>
         public override long Position
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => throw new NotImplementedException();
 
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set => throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -121,16 +87,16 @@ namespace AdvancedSharpAdbClient.Logs
             // consume it.
             int read = 0;
 
-            if (this.pendingByte != null)
+            if (pendingByte != null)
             {
-                buffer[offset] = this.pendingByte.Value;
-                read = this.Inner.Read(buffer, offset + 1, count - 1);
+                buffer[offset] = pendingByte.Value;
+                read = Inner.Read(buffer, offset + 1, count - 1);
                 read++;
-                this.pendingByte = null;
+                pendingByte = null;
             }
             else
             {
-                read = this.Inner.Read(buffer, offset, count);
+                read = Inner.Read(buffer, offset, count);
             }
 
             // Loop over the data, and find a LF (0x0d) character. If it is
@@ -162,7 +128,7 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                     byte[] minibuffer = new byte[1];
-                    int miniRead = this.Inner.Read(minibuffer, 0, 1);
+                    int miniRead = Inner.Read(minibuffer, 0, 1);
 
                     if (miniRead == 0)
                     {
@@ -182,7 +148,7 @@ namespace AdvancedSharpAdbClient.Logs
             // we need to read one more byte from the inner stream.
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
-                int nextByte = this.Inner.ReadByte();
+                int nextByte = Inner.ReadByte();
 
                 if (nextByte == 0x0a)
                 {
@@ -195,7 +161,7 @@ namespace AdvancedSharpAdbClient.Logs
                     // If the next byte was not 0x0a, store it as the 'pending byte' --
                     // the next read operation will fetch this byte. We can't do a Seek here,
                     // because e.g. the network stream doesn't support seeking.
-                    this.pendingByte = (byte)nextByte;
+                    pendingByte = (byte)nextByte;
                 }
             }
 
@@ -219,25 +185,25 @@ namespace AdvancedSharpAdbClient.Logs
             // consume it.
             int read = 0;
 
-            if (this.pendingByte != null)
+            if (pendingByte != null)
             {
-                buffer[offset] = this.pendingByte.Value;
+                buffer[offset] = pendingByte.Value;
                 read =
 #if !NET35
-                    await this.Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
+                    await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
-                    this.Inner.Read(buffer, offset + 1, count - 1);
+                    Inner.Read(buffer, offset + 1, count - 1);
 #endif
                 read++;
-                this.pendingByte = null;
+                pendingByte = null;
             }
             else
             {
                 read =
 #if !NET35
-                    await this.Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+                    await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
 #else
-                    this.Inner.Read(buffer, offset, count);
+                    Inner.Read(buffer, offset, count);
 #endif
             }
 
@@ -273,9 +239,9 @@ namespace AdvancedSharpAdbClient.Logs
 
                     int miniRead =
 #if !NET35
-                        await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                        await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                        this.Inner.Read(minibuffer, 0, 1);
+                        Inner.Read(minibuffer, 0, 1);
 #endif
 
                     if (miniRead == 0)
@@ -298,9 +264,9 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 int miniRead =
 #if !NET35
-                    await this.Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                    await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                    this.Inner.Read(minibuffer, 0, 1);
+                    Inner.Read(minibuffer, 0, 1);
 #endif
                 int nextByte = minibuffer[0];
 
@@ -315,7 +281,7 @@ namespace AdvancedSharpAdbClient.Logs
                     // If the next byte was not 0x0a, store it as the 'pending byte' --
                     // the next read operation will fetch this byte. We can't do a Seek here,
                     // because e.g. the network stream doesn't support seeking.
-                    this.pendingByte = (byte)nextByte;
+                    pendingByte = (byte)nextByte;
                 }
             }
 
@@ -323,36 +289,24 @@ namespace AdvancedSharpAdbClient.Logs
         }
 
         /// <inheritdoc/>
-        public override void Flush()
-        {
-            throw new NotImplementedException();
-        }
+        public override void Flush() => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public override void SetLength(long value)
-        {
-            throw new NotImplementedException();
-        }
+        public override void SetLength(long value) => throw new NotImplementedException();
 
         /// <inheritdoc/>
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
-            if (this.closeStream && this.Inner != null)
+            if (closeStream && Inner != null)
             {
-                this.Inner.Dispose();
-                this.Inner = null;
+                Inner.Dispose();
+                Inner = null;
             }
 
             base.Dispose(disposing);

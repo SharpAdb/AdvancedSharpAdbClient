@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Parses the output of the <c>getprop</c> command, which lists all properties of an
     /// Android device.
@@ -28,17 +28,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public GetPropReceiver()
         {
-            this.Properties = new Dictionary<string, string>();
+            Properties = new Dictionary<string, string>();
         }
 
         /// <summary>
         /// Gets the list of properties which have been retrieved.
         /// </summary>
-        public Dictionary<string, string> Properties
-        {
-            get;
-            private set;
-        }
+        public Dictionary<string, string> Properties { get; private set; }
 
         /// <summary>
         /// Processes the new lines.
@@ -59,7 +55,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     continue;
                 }
 
-                var m = Regex.Match(line, GetpropRegex, RegexOptions.Compiled);
+                Match? m = Regex.Match(line, GetpropRegex, RegexOptions.Compiled);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();
@@ -67,7 +63,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     if (label.Length > 0)
                     {
-                        this.Properties.Add(label, value);
+                        Properties.Add(label, value);
                     }
                 }
             }

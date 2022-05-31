@@ -2,12 +2,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Internal;
-    using System;
-
     /// <summary>
     /// ILogger extension methods for common scenarios.
     /// </summary>
@@ -388,7 +388,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void Log(this ILogger logger, LogLevel logLevel, EventId eventId, Exception? exception, string? message, params object?[] args)
         {
-            if(logger == null) { throw new ArgumentNullException(nameof(logger)); }
+            if (logger == null) { throw new ArgumentNullException(nameof(logger)); }
 
             logger.Log(logLevel, eventId, new FormattedLogValues(message, args), exception, _messageFormatter);
         }
@@ -412,9 +412,9 @@ namespace AdvancedSharpAdbClient
             string messageFormat,
             params object?[] args)
         {
-            if(logger == null) { throw new ArgumentNullException(nameof(logger)); }
-
-            return logger.BeginScope(new FormattedLogValues(messageFormat, args));
+            return logger == null
+                ? throw new ArgumentNullException(nameof(logger))
+                : logger.BeginScope(new FormattedLogValues(messageFormat, args));
         }
 
         //------------------------------------------HELPERS------------------------------------------//

@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient.Logs
 {
-    using System;
-
     /// <summary>
     /// The userspace structure for version 1 of the logger_entry ABI.
     /// This structure is returned to userspace by the kernel logger

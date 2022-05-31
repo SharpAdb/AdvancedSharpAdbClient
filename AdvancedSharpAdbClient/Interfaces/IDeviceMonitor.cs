@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
     /// Provides a common interface for any class that allows you to monitor the list of
     /// devices that are currently connected to the adb server.
@@ -36,7 +36,8 @@ namespace AdvancedSharpAdbClient
 #else
         IEnumerable
 #endif
-            <DeviceData> Devices { get; }
+            <DeviceData> Devices
+        { get; }
 
         /// <summary>
         /// Starts the monitoring.

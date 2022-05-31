@@ -5,10 +5,7 @@
 namespace AdvancedSharpAdbClient
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
-    using System.Text;
 
     /// <summary>
     /// Provides factory methods used by the various SharpAdbClient classes.

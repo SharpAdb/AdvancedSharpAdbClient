@@ -2,23 +2,23 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+
 namespace AdvancedSharpAdbClient
 {
-    using AdvancedSharpAdbClient.Exceptions;
-    using AdvancedSharpAdbClient.Logs;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Drawing;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Xml;
-
     /// <summary>
     /// <para>
     ///     Implements the <see cref="IAdvancedAdbClient"/> interface, and allows you to interact with the
@@ -48,13 +48,17 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public const int DefaultPort = 5555;
 
+        /// <summary>
+        /// Gets or sets the default instance of the <see cref="IAdvancedAdbClient"/> interface.
+        /// </summary>
+        public static IAdvancedAdbClient Instance => new AdvancedAdbClient();
+
         private Func<EndPoint, IAdbSocket> adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdvancedAdbClient"/> class.
         /// </summary>
-        public AdvancedAdbClient()
-            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+        public AdvancedAdbClient()            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
         {
         }
 
@@ -76,13 +80,8 @@ namespace AdvancedSharpAdbClient
                 throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
-            if (adbSocketFactory == null)
-            {
-                throw new ArgumentNullException(nameof(adbSocketFactory));
-            }
-
-            this.EndPoint = endPoint;
-            this.adbSocketFactory = adbSocketFactory;
+            EndPoint = endPoint;
+            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
         }
 
         /// <summary>
@@ -90,22 +89,12 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static Encoding Encoding = Encoding.UTF8;
 
-        public static EndPoint DefaultEndPoint
-        {
-            get
-            {
-                return new IPEndPoint(IPAddress.Loopback, DefaultPort);
-            }
-        }
+        public static EndPoint DefaultEndPoint => new IPEndPoint(IPAddress.Loopback, DefaultPort);
 
         /// <summary>
         /// Gets the <see cref="EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint
-        {
-            get;
-            private set;
-        }
+        public EndPoint EndPoint { get; private set; }
 
         /// <summary>
         /// Create an ASCII string preceded by four hex digits. The opening "####"
@@ -134,28 +123,18 @@ namespace AdvancedSharpAdbClient
         /// </returns>
         public static byte[] CreateAdbForwardRequest(string address, int port)
         {
-            string request;
-
-            if (address == null)
-            {
-                request = "tcp:" + port;
-            }
-            else
-            {
-                request = "tcp:" + port + ":" + address;
-            }
-
+            string request = address == null ? "tcp:" + port : "tcp:" + port + ":" + address;
             return FormAdbRequest(request);
         }
 
         /// <inheritdoc/>
         public int GetAdbVersion()
         {
-            using (var socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket? socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest("host:version");
-                var response = socket.ReadAdbResponse();
-                var version = socket.ReadString();
+                AdbResponse? response = socket.ReadAdbResponse();
+                string? version = socket.ReadString();
 
                 return int.Parse(version, NumberStyles.HexNumber);
             }
@@ -180,7 +159,7 @@ namespace AdvancedSharpAdbClient
             {
                 socket.SendAdbRequest("host:devices-l");
                 socket.ReadAdbResponse();
-                var reply = socket.ReadString();
+                string? reply = socket.ReadString();
 
                 string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -191,7 +170,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
@@ -200,112 +179,102 @@ namespace AdvancedSharpAdbClient
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
                 socket.SendAdbRequest($"reverse:forward:{rebind}{remote};{local}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
                 response = socket.ReadAdbResponse();
-                var portString = socket.ReadString();
+                string? portString = socket.ReadString();
 
-                if (portString != null && int.TryParse(portString, out int port))
-                {
-                    return port;
-                }
-
-                return 0;
+                return portString != null && int.TryParse(portString, out int port) ? port : 0;
             }
         }
 
         public void RemoveReverseForward(DeviceData device, string remote)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest($"reverse:killforward:{remote}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
         public void RemoveAllReverseForwards(DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest($"reverse:killforward-all");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
         /// <inheritdoc/>
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
-            
-            this.EnsureDevice(device);
+
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
                 socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
                 response = socket.ReadAdbResponse();
-                var portString = socket.ReadString();
+                string? portString = socket.ReadString();
 
-                if (portString != null && int.TryParse(portString, out int port))
-                {
-                    return port;
-                }
-
-                return 0;
+                return portString != null && int.TryParse(portString, out int port) ? port : 0;
             }
         }
 
         /// <inheritdoc/>
         public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind)
         {
-            return this.CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
+            return CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
         }
 
         /// <inheritdoc/>
         public void RemoveForward(DeviceData device, int localPort)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
         /// <inheritdoc/>
         public void RemoveAllForwards(DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
         /// <inheritdoc/>
         public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
-                var data = socket.ReadString();
+                string? data = socket.ReadString();
 
-                var parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[]? parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                 return parts.Select(p => ForwardData.FromString(p));
             }
@@ -313,18 +282,18 @@ namespace AdvancedSharpAdbClient
 
         public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest($"reverse:list-forward");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
-                var data = socket.ReadString();
+                string? data = socket.ReadString();
 
-                var parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[]? parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
                 return parts.Select(p => ForwardData.FromString(p));
             }
@@ -333,21 +302,21 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken)
         {
-            return this.ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
+            return ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
         }
 
         /// <inheritdoc/>
         public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 cancellationToken.Register(() => socket.Dispose());
 
                 socket.SetDevice(device);
                 socket.SendAdbRequest($"shell:{command}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 try
                 {
@@ -359,7 +328,7 @@ namespace AdvancedSharpAdbClient
                         // -- one of the integration test fetches output 1000 times and found no truncations.
                         while (!cancellationToken.IsCancellationRequested)
                         {
-                            var line =
+                            string? line =
 #if !NET35
                                 await reader.ReadLineAsync().ConfigureAwait(false);
 #else
@@ -401,7 +370,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Framebuffer CreateRefreshableFramebuffer(DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             return new Framebuffer(device, this);
         }
@@ -409,7 +378,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (Framebuffer framebuffer = this.CreateRefreshableFramebuffer(device))
             {
@@ -428,24 +397,24 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentException(nameof(messageSink));
             }
 
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
                 StringBuilder request = new StringBuilder();
                 request.Append("shell:logcat -B");
 
-                foreach (var logName in logNames)
+                foreach (LogId logName in logNames)
                 {
                     request.Append($" -b {logName.ToString().ToLowerInvariant()}");
                 }
 
                 socket.SendAdbRequest(request.ToString());
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 using (Stream stream = socket.GetShellStream())
                 {
@@ -480,15 +449,15 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Reboot(string into, DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            var request = $"reboot:{into}";
+            string? request = $"reboot:{into}";
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest(request);
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
@@ -503,38 +472,32 @@ namespace AdvancedSharpAdbClient
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 
         /// <inheritdoc/>
-        public void Root(DeviceData device)
-        {
-            this.Root("root:", device);
-        }
+        public void Root(DeviceData device) => Root("root:", device);
 
         /// <inheritdoc/>
-        public void Unroot(DeviceData device)
-        {
-            this.Root("unroot:", device);
-        }
+        public void Unroot(DeviceData device) => Root("unroot:", device);
 
         /// <inheritdoc/>
         protected void Root(string request, DeviceData device)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest(request);
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 // ADB will send some additional data
                 byte[] buffer = new byte[1024];
                 int read = socket.Read(buffer);
 
-                var responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
+                string? responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
 
                 // See https://android.googlesource.com/platform/system/core/+/master/adb/commandline.cpp#1026 (adb_root)
                 // for more information on how upstream does this.
@@ -554,14 +517,14 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public List<string> GetFeatureSet(DeviceData device)
         {
-            using (var socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket? socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:features");
 
-                var response = socket.ReadAdbResponse();
-                var features = socket.ReadString();
+                AdbResponse? response = socket.ReadAdbResponse();
+                string? features = socket.ReadString();
 
-                var featureList = features.Split(new char[] { '\n', ',' }).ToList();
+                List<string>? featureList = features.Split(new char[] { '\n', ',' }).ToList();
                 return featureList;
             }
         }
@@ -569,7 +532,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Install(DeviceData device, Stream apk, params string[] arguments)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             if (apk == null)
             {
@@ -586,7 +549,7 @@ namespace AdvancedSharpAdbClient
 
             if (arguments != null)
             {
-                foreach (var argument in arguments)
+                foreach (string? argument in arguments)
                 {
                     requestBuilder.Append(" ");
                     requestBuilder.Append(argument);
@@ -602,7 +565,7 @@ namespace AdvancedSharpAdbClient
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest(requestBuilder.ToString());
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 byte[] buffer = new byte[32 * 1024];
                 int read = 0;
@@ -613,7 +576,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 read = socket.Read(buffer);
-                var value = Encoding.UTF8.GetString(buffer, 0, read);
+                string? value = Encoding.UTF8.GetString(buffer, 0, read);
 
                 if (!value.Contains("Success"))
                 {
@@ -625,7 +588,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string InstallCreated(DeviceData device, string packageName = null, params string[] arguments)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             StringBuilder requestBuilder = new StringBuilder();
             requestBuilder.Append("exec:cmd package 'install-create' ");
@@ -633,23 +596,23 @@ namespace AdvancedSharpAdbClient
 
             if (arguments != null)
             {
-                foreach (var argument in arguments)
+                foreach (string? argument in arguments)
                 {
                     requestBuilder.Append(" ");
                     requestBuilder.Append(argument);
                 }
             }
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest(requestBuilder.ToString());
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    var result = reader.ReadLine();
+                    string? result = reader.ReadLine();
 
                     if (!result.Contains("Success"))
                     {
@@ -666,7 +629,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallWrite(DeviceData device, Stream apk, string apkname, string session)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             if (apk == null)
             {
@@ -697,12 +660,12 @@ namespace AdvancedSharpAdbClient
 
             requestBuilder.Append($" {session} {apkname}.apk");
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest(requestBuilder.ToString());
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 byte[] buffer = new byte[32 * 1024];
                 int read = 0;
@@ -713,7 +676,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 read = socket.Read(buffer);
-                var value = Encoding.UTF8.GetString(buffer, 0, read);
+                string? value = Encoding.UTF8.GetString(buffer, 0, read);
 
                 if (!value.Contains("Success"))
                 {
@@ -725,16 +688,16 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallCommit(DeviceData device, string session)
         {
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
                 socket.SendAdbRequest($"exec:cmd package 'install-commit' {session}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
 
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    var result = reader.ReadLine();
+                    string? result = reader.ReadLine();
                     if (!result.Contains("Success"))
                     {
                         throw new AdbException(reader.ReadToEnd());
@@ -752,7 +715,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
         public void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             if (baseapk == null)
             {
@@ -769,7 +732,7 @@ namespace AdvancedSharpAdbClient
             InstallWrite(device, baseapk, nameof(baseapk), session);
 
             int i = 0;
-            foreach(var splitapk in splitapks)
+            foreach (Stream? splitapk in splitapks)
             {
                 if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
                 {
@@ -799,7 +762,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
         public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
             if (packageName == null)
             {
@@ -809,7 +772,7 @@ namespace AdvancedSharpAdbClient
             string session = InstallCreated(device, packageName, arguments);
 
             int i = 0;
-            foreach (var splitapk in splitapks)
+            foreach (Stream? splitapk in splitapks)
             {
                 if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
                 {
@@ -834,11 +797,11 @@ namespace AdvancedSharpAdbClient
         public XmlDocument DumpScreen(DeviceData device)
         {
             XmlDocument doc = new XmlDocument();
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest("shell:uiautomator dump /dev/tty");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "");
@@ -856,13 +819,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Click(DeviceData device, Cords cords)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input tap {0} {1}", cords.x, cords.y));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input tap {0} {1}", cords.x, cords.y));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR")) // error or ERROR
@@ -876,13 +839,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Click(DeviceData device, int x, int y)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(this.EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input tap {0} {1}", x, y));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input tap {0} {1}", x, y));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
@@ -896,13 +859,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Swipe(DeviceData device, Element first, Element second, long speed)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input swipe {0} {1} {2} {3} {4}", first.cords.x, first.cords.y, second.cords.x, second.cords.y, speed));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input swipe {0} {1} {2} {3} {4}", first.cords.x, first.cords.y, second.cords.x, second.cords.y, speed));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
@@ -916,13 +879,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input swipe {0} {1} {2} {3} {4}", x1, y1, x2, y2, speed));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input swipe {0} {1} {2} {3} {4}", x1, y1, x2, y2, speed));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
@@ -951,17 +914,19 @@ namespace AdvancedSharpAdbClient
                         {
                             int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
                             Dictionary<string, string> attributes = new Dictionary<string, string>();
-                            foreach (XmlAttribute at in  xmlNode.Attributes)
+                            foreach (XmlAttribute at in xmlNode.Attributes)
                             {
                                 attributes.Add(at.Name, at.Value);
                             }
-                            Cords cord = new Cords(((cords[0] + cords[2]) / 2), ((cords[1] + cords[3]) / 2)); // Average x1, y1, x2, y2
+                            Cords cord = new Cords((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
                             return new Element(this, device, cord, attributes);
                         }
                     }
                 }
                 if (timeout == TimeSpan.Zero)
+                {
                     break;
+                }
             }
             return null;
         }
@@ -980,7 +945,7 @@ namespace AdvancedSharpAdbClient
                     if (xmlNodes != null)
                     {
                         Element[] elements = new Element[xmlNodes.Count];
-                        for(int i = 0;i < elements.Length;i++)
+                        for (int i = 0; i < elements.Length; i++)
                         {
                             string bounds = xmlNodes[i].Attributes["bounds"].Value;
                             if (bounds != null)
@@ -995,31 +960,27 @@ namespace AdvancedSharpAdbClient
                                 elements[i] = new Element(this, device, cord, attributes);
                             }
                         }
-                        if (elements.Length == 0)
-                        {
-                            return null;
-                        } else
-                        {
-                            return elements;
-                        }
+                        return elements.Length == 0 ? null : elements;
                     }
                 }
                 if (timeout == TimeSpan.Zero)
+                {
                     break;
+                }
             }
             return null;
         }
 
         /// <inheritdoc/>
-        public void SendKeyEvent(DeviceData device , string key)
+        public void SendKeyEvent(DeviceData device, string key)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input keyevent {0}", key));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input keyevent {0}", key));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
@@ -1033,13 +994,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void SendText(DeviceData device, string text)
         {
-            this.EnsureDevice(device);
+            EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
-                socket.SendAdbRequest(String.Format("shell:input text {0}", text));
-                var response = socket.ReadAdbResponse();
+                socket.SendAdbRequest(string.Format("shell:input text {0}", text));
+                AdbResponse? response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
                     if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
@@ -1064,37 +1025,22 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async void StartApp(DeviceData device, string packagename)
-        {
-            await ExecuteRemoteCommandAsync($"monkey -p {packagename} 1", device, null, CancellationToken.None);
-        }
+        public async void StartApp(DeviceData device, string packagename) => await ExecuteRemoteCommandAsync($"monkey -p {packagename} 1", device, null, CancellationToken.None);
 
         /// <inheritdoc/>
-        public async void StopApp(DeviceData device, string packagename)
-        {
-            await ExecuteRemoteCommandAsync($"am force-stop {packagename}", device, null, CancellationToken.None);
-        }
+        public async void StopApp(DeviceData device, string packagename) => await ExecuteRemoteCommandAsync($"am force-stop {packagename}", device, null, CancellationToken.None);
 
         /// <inheritdoc/>
-        public void BackBtn(DeviceData device)
-        {
-            SendKeyEvent(device, "KEYCODE_BACK");
-        }
+        public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
 
         /// <inheritdoc/>
-        public void HomeBtn(DeviceData device)
-        {
-            SendKeyEvent(device, "KEYCODE_HOME");
-        }
+        public void HomeBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_HOME");
 
         /// <summary>
         /// Sets default encoding (default - UTF8)
         /// </summary>
         /// <param name="encoding"></param>
-        public static void SetEncoding(Encoding encoding)
-        {
-            Encoding = encoding;
-        }
+        public static void SetEncoding(Encoding encoding) => Encoding = encoding;
 
         /// <inheritdoc/>
         public void Disconnect(DnsEndPoint endpoint)
@@ -1107,7 +1053,7 @@ namespace AdvancedSharpAdbClient
             using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
             {
                 socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
-                var response = socket.ReadAdbResponse();
+                AdbResponse? response = socket.ReadAdbResponse();
             }
         }
 

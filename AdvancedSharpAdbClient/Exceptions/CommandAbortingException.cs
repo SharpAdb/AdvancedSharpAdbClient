@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Runtime.Serialization;
+
 namespace AdvancedSharpAdbClient.Exceptions
 {
-    using System;
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// Thrown when an executed command identifies that it is being aborted.
     /// </summary>
@@ -15,8 +15,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
-        public CommandAbortingException()
-            : base("Permission to access the specified resource was denied.")
+        public CommandAbortingException() : base("Permission to access the specified resource was denied.")
         {
         }
 
@@ -24,8 +23,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public CommandAbortingException(string message)
-            : base(message)
+        public CommandAbortingException(string message) : base(message)
         {
         }
 
@@ -34,8 +32,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context)
-            : base(serializationInfo, context)
+        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
         }
 
@@ -44,8 +41,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public CommandAbortingException(string message, Exception innerException)
-            : base(message, innerException)
+        public CommandAbortingException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

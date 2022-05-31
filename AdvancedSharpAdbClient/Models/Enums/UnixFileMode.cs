@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-
     /// <summary>
     /// Describes the properties of a file on an Android device.
     /// </summary>

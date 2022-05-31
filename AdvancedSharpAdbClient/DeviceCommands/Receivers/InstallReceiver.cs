@@ -2,15 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
-#if NET35
-    using System;
-#endif
-
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
@@ -39,12 +35,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
-        public string ErrorMessage { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Gets the success message if the install is successful.
         /// </summary>
-        public string SuccessMessage { get; private set; }
+        public string? SuccessMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.
@@ -66,33 +62,33 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 {
                     if (line.StartsWith(SuccessOutput))
                     {
-                        var m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                        this.SuccessMessage = SuccessOutput;
+                        Match? m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        SuccessMessage = SuccessOutput;
 
-                        this.ErrorMessage = null;
-
-                        if(m.Success)
-                        {
-                            string msg = m.Groups[1].Value;
-                            this.SuccessMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
-                        }
-
-                        this.Success = true;
-                    }
-                    else
-                    {
-                        var m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                        this.ErrorMessage = UnknownError;
-
-                        this.SuccessMessage = null;
+                        ErrorMessage = null;
 
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            this.ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                            SuccessMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
                         }
 
-                        this.Success = false;
+                        Success = true;
+                    }
+                    else
+                    {
+                        Match? m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        ErrorMessage = UnknownError;
+
+                        SuccessMessage = null;
+
+                        if (m.Success)
+                        {
+                            string msg = m.Groups[1].Value;
+                            ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                        }
+
+                        Success = false;
                     }
                 }
             }

@@ -2,15 +2,15 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Drawing;
-    using System.Drawing.Imaging;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using System.Text;
-
     /// <summary>
     /// Whenever the <c>framebuffer:</c> service is invoked, the adb server responds with the contents
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
@@ -80,58 +80,60 @@ namespace AdvancedSharpAdbClient
         public static FramebufferHeader Read(byte[] data)
         {
             // as defined in https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp
-            FramebufferHeader header = default(FramebufferHeader);
+            FramebufferHeader header = default;
 
             // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
             using (MemoryStream stream = new MemoryStream(data))
-            using (BinaryReader reader = new BinaryReader(stream, Encoding.ASCII
+            {
+                using (BinaryReader reader = new BinaryReader(stream, Encoding.ASCII
 #if !NET35 && !NET40
                 , leaveOpen: true
 #endif
-                ))
-            {
-                header.Version = reader.ReadUInt32();
-
-                if (header.Version > 2)
+                    ))
                 {
-                    // Technically, 0 is not a supported version either; we assume version 0 indicates
-                    // an empty framebuffer.
-                    throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
+                    header.Version = reader.ReadUInt32();
+
+                    if (header.Version > 2)
+                    {
+                        // Technically, 0 is not a supported version either; we assume version 0 indicates
+                        // an empty framebuffer.
+                        throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
+                    }
+
+                    header.Bpp = reader.ReadUInt32();
+
+                    if (header.Version >= 2)
+                    {
+                        header.ColorSpace = reader.ReadUInt32();
+                    }
+
+                    header.Size = reader.ReadUInt32();
+                    header.Width = reader.ReadUInt32();
+                    header.Height = reader.ReadUInt32();
+                    header.Red = new ColorData
+                    {
+                        Offset = reader.ReadUInt32(),
+                        Length = reader.ReadUInt32()
+                    };
+
+                    header.Blue = new ColorData
+                    {
+                        Offset = reader.ReadUInt32(),
+                        Length = reader.ReadUInt32()
+                    };
+
+                    header.Green = new ColorData
+                    {
+                        Offset = reader.ReadUInt32(),
+                        Length = reader.ReadUInt32()
+                    };
+
+                    header.Alpha = new ColorData
+                    {
+                        Offset = reader.ReadUInt32(),
+                        Length = reader.ReadUInt32()
+                    };
                 }
-
-                header.Bpp = reader.ReadUInt32();
-
-                if (header.Version >= 2)
-                {
-                    header.ColorSpace = reader.ReadUInt32();
-                }
-
-                header.Size = reader.ReadUInt32();
-                header.Width = reader.ReadUInt32();
-                header.Height = reader.ReadUInt32();
-                header.Red = new ColorData()
-                {
-                    Offset = reader.ReadUInt32(),
-                    Length = reader.ReadUInt32()
-                };
-
-                header.Blue = new ColorData()
-                {
-                    Offset = reader.ReadUInt32(),
-                    Length = reader.ReadUInt32()
-                };
-
-                header.Green = new ColorData()
-                {
-                    Offset = reader.ReadUInt32(),
-                    Length = reader.ReadUInt32()
-                };
-
-                header.Alpha = new ColorData()
-                {
-                    Offset = reader.ReadUInt32(),
-                    Length = reader.ReadUInt32()
-                };
             }
 
             return header;
@@ -156,15 +158,15 @@ namespace AdvancedSharpAdbClient
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
-            if (this.Width == 0 || this.Height == 0 || this.Bpp == 0)
+            if (Width == 0 || Height == 0 || Bpp == 0)
             {
                 return null;
             }
 
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
-            var pixelFormat = this.StandardizePixelFormat(buffer);
+            PixelFormat pixelFormat = StandardizePixelFormat(buffer);
 
-            Bitmap bitmap = new Bitmap((int)this.Width, (int)this.Height, pixelFormat);
+            Bitmap bitmap = new Bitmap((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
             Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
             bitmap.UnlockBits(bitmapData);
@@ -192,40 +194,38 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            if (buffer.Length != this.Width * this.Height * (this.Bpp / 8))
+            if (buffer.Length != Width * Height * (Bpp / 8))
             {
                 throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} does not match the expected buffer " +
-                    $"length for a picture of width {this.Width}, height {this.Height} and pixel depth {this.Bpp}");
+                    $"length for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
             }
 
-            if (this.Width == 0 || this.Height == 0 || this.Bpp == 0)
+            if (Width == 0 || Height == 0 || Bpp == 0)
             {
                 throw new InvalidOperationException("Cannot caulcate the pixel format of an empty framebuffer");
             }
 
             // By far, the most common format is a 32-bit pixel format, which is either
             // RGB or RGBA, where each color has 1 byte.
-            if (this.Bpp == 32)
+            if (Bpp == 32)
             {
                 // Require at leat RGB to be present; and require them to be exactly one byte (8 bits) long.
-                if (this.Red.Length != 8
-                    || this.Blue.Length != 8
-                    || this.Green.Length != 8)
+                if (Red.Length != 8 || Blue.Length != 8 || Green.Length != 8)
                 {
-                    throw new ArgumentOutOfRangeException($"The pixel format with with RGB lengths of {this.Red.Length}:{this.Blue.Length}:{this.Green.Length} is not supported");
+                    throw new ArgumentOutOfRangeException($"The pixel format with with RGB lengths of {Red.Length}:{Blue.Length}:{Green.Length} is not supported");
                 }
 
                 // Alpha can be present or absent, but must be 8 bytes long
-                if (this.Alpha.Length != 0 && this.Alpha.Length != 8)
+                if (Alpha.Length != 0 && Alpha.Length != 8)
                 {
-                    throw new ArgumentOutOfRangeException($"The alpha length {this.Alpha.Length} is not supported");
+                    throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported");
                 }
 
                 // Get the index at which the red, bue, green and alpha values are stored.
-                uint redIndex = this.Red.Offset / 8;
-                uint blueIndex = this.Blue.Offset / 8;
-                uint greenIndex = this.Green.Offset / 8;
-                uint alphaIndex = this.Alpha.Offset / 8;
+                uint redIndex = Red.Offset / 8;
+                uint blueIndex = Blue.Offset / 8;
+                uint greenIndex = Green.Offset / 8;
+                uint alphaIndex = Alpha.Offset / 8;
 
                 // Loop over the array and re-order as required
                 for (int i = 0; i < buffer.Length; i += 4)
@@ -237,7 +237,7 @@ namespace AdvancedSharpAdbClient
 
                     // Convert to ARGB. Note, we're on a little endian system,
                     // so it's really BGRA. Confusing!
-                    if (this.Alpha.Length == 8)
+                    if (Alpha.Length == 8)
                     {
                         buffer[i + 3] = alpha;
                         buffer[i + 2] = red;
@@ -254,46 +254,39 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Return RGB or RGBA, function of the presence of an alpha channel.
-                if (this.Alpha.Length == 0)
-                {
-                    return PixelFormat.Format32bppRgb;
-                }
-                else
-                {
-                    return PixelFormat.Format32bppArgb;
-                }
+                return Alpha.Length == 0 ? PixelFormat.Format32bppRgb : PixelFormat.Format32bppArgb;
             }
-            else if (this.Bpp == 24)
+            else if (Bpp == 24)
             {
                 // For 24-bit image depths, we only support RGB.
-                if (this.Red.Offset == 0
-                    && this.Red.Length == 8
-                    && this.Green.Offset == 8
-                    && this.Green.Length == 8
-                    && this.Blue.Offset == 16
-                    && this.Blue.Length == 8
-                    && this.Alpha.Offset == 24
-                    && this.Alpha.Length == 0)
+                if (Red.Offset == 0
+                    && Red.Length == 8
+                    && Green.Offset == 8
+                    && Green.Length == 8
+                    && Blue.Offset == 16
+                    && Blue.Length == 8
+                    && Alpha.Offset == 24
+                    && Alpha.Length == 0)
                 {
                     return PixelFormat.Format24bppRgb;
                 }
             }
-            else if (this.Bpp == 16
-                     && this.Red.Offset == 11
-                     && this.Red.Length == 5
-                     && this.Green.Offset == 5
-                     && this.Green.Length == 6
-                     && this.Blue.Offset == 0
-                     && this.Blue.Length == 5
-                     && this.Alpha.Offset == 0
-                     && this.Alpha.Length == 0)
+            else if (Bpp == 16
+                     && Red.Offset == 11
+                     && Red.Length == 5
+                     && Green.Offset == 5
+                     && Green.Length == 6
+                     && Blue.Offset == 0
+                     && Blue.Length == 5
+                     && Alpha.Offset == 0
+                     && Alpha.Length == 0)
             {
                 // For 16-bit image depths, we only support Rgb565.
                 return PixelFormat.Format16bppRgb565;
             }
 
             // If not caught by any of the statements before, the format is not supported.
-            throw new NotSupportedException($"Pixel depths of {this.Bpp} are not supported");
+            throw new NotSupportedException($"Pixel depths of {Bpp} are not supported");
         }
     }
 }

@@ -5,7 +5,7 @@
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    ///
+    /// Shell Output Receiver
     /// </summary>
     public interface IShellOutputReceiver
     {

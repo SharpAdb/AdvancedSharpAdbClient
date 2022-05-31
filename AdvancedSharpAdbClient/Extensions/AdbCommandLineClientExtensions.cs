@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.IO;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.IO;
-
     /// <summary>
     /// Provides extension methods for the <see cref="IAdbCommandLineClient"/> class.
     /// </summary>

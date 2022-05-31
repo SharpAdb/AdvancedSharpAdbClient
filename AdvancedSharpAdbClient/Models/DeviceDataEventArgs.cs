@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-
     /// <summary>
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
@@ -15,10 +15,7 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="DeviceDataEventArgs"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public DeviceDataEventArgs(DeviceData device)
-        {
-            this.Device = device;
-        }
+        public DeviceDataEventArgs(DeviceData device) => Device = device;
 
         /// <summary>
         /// Gets the device.

@@ -2,13 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Net.Sockets;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Provides extension methods for the <see cref="Socket"/> class.
     /// </summary>
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
-            var cancellationTokenRegistration = cancellationToken.Register(() =>
+            CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(() =>
 #if !NET35
             socket.Dispose()
 #else

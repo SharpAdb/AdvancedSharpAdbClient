@@ -2,14 +2,14 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Buffers;
+using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Buffers;
-    using System.Drawing;
-    using System.Threading;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).
     /// </summary>
@@ -31,52 +31,30 @@ namespace AdvancedSharpAdbClient
         /// </param>
         public Framebuffer(DeviceData device, AdvancedAdbClient client)
         {
-            if (device == null)
-            {
-                throw new ArgumentNullException(nameof(device));
-            }
+            Device = device ?? throw new ArgumentNullException(nameof(device));
 
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            this.Device = device;
-
-            this.client = client;
+            this.client = client ?? throw new ArgumentNullException(nameof(client));
 
             // Initialize the headerData buffer
-            this.headerData = new byte[52];
+            headerData = new byte[52];
         }
 
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device
-        {
-            get;
-            private set;
-        }
+        public DeviceData Device { get; private set; }
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
         /// This property is set after you call <see cref="RefreshAsync(CancellationToken)"/>.
         /// </summary>
-        public FramebufferHeader Header
-        {
-            get;
-            private set;
-        }
+        public FramebufferHeader Header { get; private set; }
 
         /// <summary>
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
         /// This property is set after you call <see cref="RefreshAsync(CancellationToken)"/>.
         /// </summary>
-        public byte[] Data
-        {
-            get;
-            private set;
-        }
+        public byte[] Data { get; private set; }
 
         /// <summary>
         /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
@@ -90,33 +68,33 @@ namespace AdvancedSharpAdbClient
         /// </returns>
         public async Task RefreshAsync(CancellationToken cancellationToken)
         {
-            this.EnsureNotDisposed();
+            EnsureNotDisposed();
 
-            using (var socket = Factories.AdbSocketFactory(this.client.EndPoint))
+            using (IAdbSocket? socket = Factories.AdbSocketFactory(this.client.EndPoint))
             {
                 // Select the target device
-                socket.SetDevice(this.Device);
+                socket.SetDevice(Device);
 
                 // Send the framebuffer command
                 socket.SendAdbRequest("framebuffer:");
                 socket.ReadAdbResponse();
 
                 // The result first is a FramebufferHeader object,
-                await socket.ReadAsync(this.headerData, cancellationToken).ConfigureAwait(false);
+                await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
-                if (!this.headerInitialized)
+                if (!headerInitialized)
                 {
-                    this.Header = FramebufferHeader.Read(this.headerData);
-                    this.headerInitialized = true;
+                    Header = FramebufferHeader.Read(this.headerData);
+                    headerInitialized = true;
                 }
 
-                if (this.Data == null || this.Data.Length < this.Header.Size)
+                if (Data == null || Data.Length < Header.Size)
                 {
-                    this.Data = new byte[this.Header.Size];
+                    Data = new byte[Header.Size];
                 }
 
                 // followed by the actual framebuffer content
-                await socket.ReadAsync(this.Data, (int)this.Header.Size, cancellationToken).ConfigureAwait(false);
+                _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -128,27 +106,22 @@ namespace AdvancedSharpAdbClient
         /// </returns>
         public Image ToImage()
         {
-            this.EnsureNotDisposed();
+            EnsureNotDisposed();
 
-            if (this.Data == null)
-            {
-                throw new InvalidOperationException("Call RefreshAsync first");
-            }
-
-            return this.Header.ToImage(this.Data);
+            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : this.Header.ToImage(this.Data);
         }
 
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (this.Data != null)
+            if (Data != null)
             {
-                ArrayPool<byte>.Shared.Return(this.Data, clearArray: false);
+                ArrayPool<byte>.Shared.Return(Data, clearArray: false);
             }
 
-            this.headerData = null;
-            this.headerInitialized = false;
-            this.disposed = true;
+            headerData = null;
+            headerInitialized = false;
+            disposed = true;
         }
 
         /// <summary>
@@ -156,7 +129,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected void EnsureNotDisposed()
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(Framebuffer));
             }

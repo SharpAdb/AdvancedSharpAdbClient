@@ -2,13 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Just like System.IO.Path, except it is geared for Linux
     /// </summary>
@@ -146,7 +146,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     char ch = path[num2];
                     if (ch == DirectorySeparatorChar)
                     {
-                        return path.Substring(num2 + 1, (length - num2) - 1);
+                        return path.Substring(num2 + 1, length - num2 - 1);
                     }
                 }
             }
@@ -192,14 +192,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns></returns>
         public static string Quote(string path)
         {
-            if (path.Contains(" "))
-            {
-                return string.Format("\"{0}\"", path);
-            }
-            else
-            {
-                return path;
-            }
+            return path.Contains(" ") ? string.Format("\"{0}\"", path) : path;
         }
 
         /// <summary>

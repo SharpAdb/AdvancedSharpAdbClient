@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
@@ -50,7 +47,7 @@ namespace AdvancedSharpAdbClient
 
         public static DateTimeOffset FromUnixTimeSeconds(long seconds) =>
 #if NET35 || NET40 || NET452
-            new DateTimeOffset((seconds).ToDateTime());
+            new DateTimeOffset(seconds.ToDateTime());
 #else
             DateTimeOffset.FromUnixTimeSeconds(seconds);
 #endif

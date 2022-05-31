@@ -2,13 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Threading;
-
     /// <summary>
     /// Interface containing methods for file synchronisation.
     /// </summary>

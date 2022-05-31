@@ -198,7 +198,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
+            byte[]? reply = new byte[4];
             int read = this.Read(reply);
 
             if (read == 0)
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
+            byte[]? reply = new byte[4];
             this.Read(reply);
 
             if (!BitConverter.IsLittleEndian)
@@ -245,7 +245,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
+            byte[]? reply = new byte[4];
             await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
-            var response = this.ReadAdbResponseInner();
+            AdbResponse? response = this.ReadAdbResponseInner();
 
             if (!response.IOSuccess || !response.Okay)
             {
@@ -425,7 +425,7 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    var response = this.ReadAdbResponse();
+                    AdbResponse? response = this.ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {
@@ -444,7 +444,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Stream GetShellStream()
         {
-            var stream = this.socket.GetStream();
+            Stream? stream = this.socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -491,18 +491,11 @@ namespace AdvancedSharpAdbClient
 
             resp.IOSuccess = true;
 
-            if (IsOkay(reply))
-            {
-                resp.Okay = true;
-            }
-            else
-            {
-                resp.Okay = false;
-            }
+            resp.Okay = IsOkay(reply);
 
             if (!resp.Okay)
             {
-                var message = this.ReadString();
+                string? message = this.ReadString();
                 resp.Message = message;
 #if !NET35 && !NET40
                 this.logger.LogError("Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);

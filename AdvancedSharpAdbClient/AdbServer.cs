@@ -2,13 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.IO;
+using System.Net.Sockets;
+
 namespace AdvancedSharpAdbClient
 {
-    using AdvancedSharpAdbClient.Exceptions;
-    using System;
-    using System.IO;
-    using System.Net.Sockets;
-
     /// <summary>
     /// <para>
     /// Provides methods for interacting with the adb server. The adb server must be running for
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
-        private static string cachedAdbPath;
+        private static string? cachedAdbPath;
 
         private readonly IAdvancedAdbClient adbClient;
 
@@ -85,33 +85,22 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public AdbServer(IAdvancedAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
-            if (adbClient == null)
-            {
-                throw new ArgumentNullException(nameof(AdvancedAdbClient));
-            }
-
-            if (adbCommandLineClientFactory == null)
-            {
-                throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
-            }
-
-            this.adbCommandLineClientFactory = adbCommandLineClientFactory;
-            this.adbClient = adbClient;
+            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
+            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(AdvancedAdbClient));
         }
 
         /// <summary>
         /// Gets or sets the default instance of the <see cref="IAdbServer"/> interface.
         /// </summary>
-        public static IAdbServer Instance
-        { get; set; } = new AdbServer();
+        public static IAdbServer Instance { get; set; } = new AdbServer();
 
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
-            var serverStatus = this.GetStatus();
+            AdbServerStatus serverStatus = this.GetStatus();
             Version commandLineVersion = null;
 
-            var commandLineClient = this.adbCommandLineClientFactory(adbPath);
+            IAdbCommandLineClient? commandLineClient = adbCommandLineClientFactory(adbPath);
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
@@ -123,19 +112,11 @@ namespace AdvancedSharpAdbClient
             // version
             if (adbPath == null)
             {
-                if (!serverStatus.IsRunning)
-                {
-                    throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.");
-                }
-
-                if (serverStatus.Version >= RequiredAdbVersion)
-                {
-                    return StartServerResult.AlreadyRunning;
-                }
-                else
-                {
-                    throw new AdbException($"The adb deamon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
-                }
+                return !serverStatus.IsRunning
+                    ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
+                    : serverStatus.Version >= RequiredAdbVersion
+                    ? StartServerResult.AlreadyRunning
+                    : throw new AdbException($"The adb deamon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
             }
 
             if (serverStatus.IsRunning
@@ -147,7 +128,7 @@ namespace AdvancedSharpAdbClient
                     throw new ArgumentNullException(nameof(adbPath));
                 }
 
-                this.adbClient.KillAdb();
+                adbClient.KillAdb();
                 serverStatus.IsRunning = false;
                 serverStatus.Version = null;
 
@@ -180,7 +161,7 @@ namespace AdvancedSharpAdbClient
 
             lock (RestartLock)
             {
-                this.StartServer(cachedAdbPath, false);
+                _ = StartServer(cachedAdbPath, false);
             }
         }
 
@@ -190,7 +171,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = this.adbClient.GetAdbVersion();
+                int versionCode = adbClient.GetAdbVersion();
 
                 return new AdbServerStatus()
                 {

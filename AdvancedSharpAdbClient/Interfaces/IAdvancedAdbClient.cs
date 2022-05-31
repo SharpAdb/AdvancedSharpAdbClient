@@ -2,20 +2,20 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+
 namespace AdvancedSharpAdbClient
 {
-    using Logs;
-    using AdvancedSharpAdbClient.Exceptions;
-    using System;
-    using System.Collections.Generic;
-    using System.Drawing;
-    using System.IO;
-    using System.Net;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Xml;
-
     /// <summary>
     /// A common interface for any class that allows you to interact with the
     /// adb server and devices that are connected to that adb server.

@@ -2,16 +2,15 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Receivers;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using Receivers;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading;
-
     /// <summary>
     /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run
     /// commands directory against a <see cref="DeviceData"/> object.
@@ -75,7 +74,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </returns>
         public static Dictionary<string, string> GetProperties(this IAdvancedAdbClient client, DeviceData device)
         {
-            var receiver = new GetPropReceiver();
+            GetPropReceiver? receiver = new GetPropReceiver();
             client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
@@ -94,7 +93,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </returns>
         public static Dictionary<string, string> GetEnvironmentVariables(this IAdvancedAdbClient client, DeviceData device)
         {
-            var receiver = new EnvironmentVariablesReceiver();
+            EnvironmentVariablesReceiver? receiver = new EnvironmentVariablesReceiver();
             client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
@@ -185,7 +184,7 @@ fi".Replace("\r\n", "\n"), receiver);
 
             Collection<int> pids = new Collection<int>();
 
-            var output = receiver.ToString();
+            string? output = receiver.ToString();
             using (StringReader reader = new StringReader(output))
             {
                 while (reader.Peek() > 0)
@@ -197,7 +196,7 @@ fi".Replace("\r\n", "\n"), receiver);
                         continue;
                     }
 
-                    var pid = int.Parse(line);
+                    int pid = int.Parse(line);
 
                     pids.Add(pid);
                 }

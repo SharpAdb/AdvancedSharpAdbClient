@@ -2,16 +2,15 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading;
+
 namespace AdvancedSharpAdbClient
 {
-    using AdvancedSharpAdbClient.Interfaces;
-    using Exceptions;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.IO;
-    using System.Threading;
-
     /// <summary>
     /// <para>
     ///     Provides access to the sync service running on the Android device. Allows you to
@@ -62,8 +61,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">
         /// The device on which to interact with the files.
         /// </param>
-        public SyncService(IAdvancedAdbClient client, DeviceData device)
-            : this(Factories.AdbSocketFactory(client.EndPoint), device)
+        public SyncService(IAdvancedAdbClient client, DeviceData device)            : this(Factories.AdbSocketFactory(client.EndPoint), device)
         {
         }
 
@@ -79,10 +77,10 @@ namespace AdvancedSharpAdbClient
         /// </param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
-            this.Socket = socket;
-            this.Device = device;
+            Socket = socket;
+            Device = device;
 
-            this.Open();
+            Open();
         }
 
         /// <summary>
@@ -94,11 +92,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the device on which the file operations are being executed.
         /// </summary>
-        public DeviceData Device
-        {
-            get;
-            private set;
-        }
+        public DeviceData Device { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that enables the connection with the
@@ -107,39 +101,16 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket Socket { get; private set; }
 
         /// <inheritdoc/>
-        public bool IsOpen
-        {
-            get
-            {
-                return this.Socket != null && this.Socket.Connected;
-            }
-        }
+        public bool IsOpen => Socket != null && Socket.Connected;
 
         /// <inheritdoc/>
         public void Open()
         {
             // target a specific device
-            this.Socket.SetDevice(this.Device);
+            Socket.SetDevice(Device);
 
-            this.Socket.SendAdbRequest("sync:");
-            var resp = this.Socket.ReadAdbResponse();
-        }
-
-        /// <summary>
-        /// Reopen this connection.
-        /// </summary>
-        /// <param name="client">
-        /// A connection to an adb server.
-        /// </param>
-        public void Reopen(IAdvancedAdbClient client)
-        {
-            if (this.Socket != null)
-            {
-                this.Socket.Dispose();
-                this.Socket = null;
-            }
-            this.Socket = Factories.AdbSocketFactory(client.EndPoint);
-            Open();
+            Socket.SendAdbRequest("sync:");
+            _ = Socket.ReadAdbResponse();
         }
 
         /// <summary>
@@ -151,14 +122,22 @@ namespace AdvancedSharpAdbClient
         /// </param>
         public void Reopen(IAdbSocket socket)
         {
-            if (this.Socket != null)
+            if (Socket != null)
             {
-                this.Socket.Dispose();
-                this.Socket = null;
+                Socket.Dispose();
+                Socket = null;
             }
-            this.Socket = socket;
+            Socket = socket;
             Open();
         }
+
+        /// <summary>
+        /// Reopen this connection.
+        /// </summary>
+        /// <param name="client">
+        /// A connection to an adb server.
+        /// </param>
+        public void Reopen(IAdvancedAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
@@ -178,20 +157,20 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
             }
 
-            this.Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
+            Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
 
             // create the buffer used to read.
             // we read max SYNC_DATA_MAX.
-            byte[] buffer = new byte[this.MaxBufferSize];
+            byte[] buffer = new byte[MaxBufferSize];
 
             // We need 4 bytes of the buffer to send the 'DATA' command,
             // and an additional X bytes to inform how much data we are
             // sending.
             byte[] dataBytes = SyncCommandConverter.GetBytes(SyncCommand.DATA);
-            byte[] lengthBytes = BitConverter.GetBytes(this.MaxBufferSize);
+            byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
             int headerSize = dataBytes.Length + lengthBytes.Length;
             int reservedHeaderSize = headerSize;
-            int maxDataSize = this.MaxBufferSize - reservedHeaderSize;
+            int maxDataSize = MaxBufferSize - reservedHeaderSize;
             lengthBytes = BitConverter.GetBytes(maxDataSize);
 
             // Try to get the total amount of bytes to transfer. This is not always possible, for example,
@@ -227,7 +206,7 @@ namespace AdvancedSharpAdbClient
                 Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                 // now send the data to the device
-                this.Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
+                Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
@@ -238,15 +217,15 @@ namespace AdvancedSharpAdbClient
 
             // create the DONE message
             int time = (int)timestamp.ToUnixTimeSeconds();
-            this.Socket.SendSyncRequest(SyncCommand.DONE, time);
+            Socket.SendSyncRequest(SyncCommand.DONE, time);
 
             // read the result, in a byte array containing 2 ints
             // (id, size)
-            var result = this.Socket.ReadSyncResponse();
+            SyncCommand result = Socket.ReadSyncResponse();
 
             if (result == SyncCommand.FAIL)
             {
-                var message = this.Socket.ReadSyncString();
+                string? message = Socket.ReadSyncString();
 
                 throw new AdbException(message);
             }
@@ -270,17 +249,17 @@ namespace AdvancedSharpAdbClient
             }
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
-            var stat = this.Stat(remoteFilepath);
+            FileStatistics? stat = Stat(remoteFilepath);
             long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
-            byte[] buffer = new byte[this.MaxBufferSize];
+            byte[] buffer = new byte[MaxBufferSize];
 
-            this.Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
+            Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
 
             while (true)
             {
-                var response = this.Socket.ReadSyncResponse();
+                SyncCommand response = Socket.ReadSyncResponse();
                 cancellationToken.ThrowIfCancellationRequested();
 
                 if (response == SyncCommand.DONE)
@@ -289,7 +268,7 @@ namespace AdvancedSharpAdbClient
                 }
                 else if (response == SyncCommand.FAIL)
                 {
-                    var message = this.Socket.ReadSyncString();
+                    string? message = Socket.ReadSyncString();
                     throw new AdbException($"Failed to pull '{remoteFilepath}'. {message}");
                 }
                 else if (response != SyncCommand.DATA)
@@ -298,8 +277,8 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // The first 4 bytes contain the length of the data packet
-                var reply = new byte[4];
-                this.Socket.Read(reply);
+                byte[]? reply = new byte[4];
+                _ = Socket.Read(reply);
 
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -308,13 +287,13 @@ namespace AdvancedSharpAdbClient
 
                 int size = BitConverter.ToInt32(reply, 0);
 
-                if (size > this.MaxBufferSize)
+                if (size > MaxBufferSize)
                 {
                     throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {this.MaxBufferSize}");
                 }
 
                 // now read the length we received
-                this.Socket.Read(buffer, size);
+                _ = Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
                 totalBytesRead += size;
 
@@ -330,9 +309,9 @@ namespace AdvancedSharpAdbClient
         public FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
-            this.Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
+            Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
 
-            if (this.Socket.ReadSyncResponse() != SyncCommand.STAT)
+            if (Socket.ReadSyncResponse() != SyncCommand.STAT)
             {
                 throw new AdbException($"The server returned an invalid sync response.");
             }
@@ -342,7 +321,7 @@ namespace AdvancedSharpAdbClient
             FileStatistics value = new FileStatistics();
             value.Path = remotePath;
 
-            this.ReadStatistics(value);
+            ReadStatistics(value);
 
             return value;
         }
@@ -353,11 +332,11 @@ namespace AdvancedSharpAdbClient
             Collection<FileStatistics> value = new Collection<FileStatistics>();
 
             // create the stat request message.
-            this.Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
+            Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
 
             while (true)
             {
-                var response = this.Socket.ReadSyncResponse();
+                SyncCommand response = this.Socket.ReadSyncResponse();
 
                 if (response == SyncCommand.DONE)
                 {
@@ -369,8 +348,8 @@ namespace AdvancedSharpAdbClient
                 }
 
                 FileStatistics entry = new FileStatistics();
-                this.ReadStatistics(entry);
-                entry.Path = this.Socket.ReadSyncString();
+                ReadStatistics(entry);
+                entry.Path = Socket.ReadSyncString();
 
                 value.Add(entry);
             }
@@ -383,17 +362,17 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public void Dispose()
         {
-            if (this.Socket != null)
+            if (Socket != null)
             {
-                this.Socket.Dispose();
-                this.Socket = null;
+                Socket.Dispose();
+                Socket = null;
             }
         }
 
         private void ReadStatistics(FileStatistics value)
         {
             byte[] statResult = new byte[12];
-            this.Socket.Read(statResult);
+            _ = Socket.Read(statResult);
 
             if (!BitConverter.IsLittleEndian)
             {

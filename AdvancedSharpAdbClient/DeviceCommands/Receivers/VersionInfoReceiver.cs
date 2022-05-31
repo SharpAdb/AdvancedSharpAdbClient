@@ -4,12 +4,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Text.RegularExpressions;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using AdvancedSharpAdbClient;
-    using System;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
@@ -35,27 +34,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public VersionInfoReceiver()
         {
-            this.AddPropertyParser(versionCode, this.GetVersionCode);
-            this.AddPropertyParser(versionName, this.GetVersionName);
+            AddPropertyParser(versionCode, GetVersionCode);
+            AddPropertyParser(versionName, GetVersionName);
         }
 
         /// <summary>
         /// Gets the version code of the specified package
         /// </summary>
-        public VersionInfo VersionInfo
-        {
-            get
-            {
-                if (this.GetPropertyValue(versionCode) != null && this.GetPropertyValue(versionName) != null)
-                {
-                    return new VersionInfo((int)this.GetPropertyValue(versionCode), (string)this.GetPropertyValue(versionName));
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public VersionInfo? VersionInfo => GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
+                    ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
+                    : null;
 
         private void CheckPackagesSection(string line)
         {
@@ -79,7 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 return;
             }
 
-            this.inPackagesSection = string.Equals("Packages:", line, StringComparison.OrdinalIgnoreCase);
+            inPackagesSection = string.Equals("Packages:", line, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -87,23 +75,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version name.</returns>
-        internal object GetVersionName(string line)
+        internal object? GetVersionName(string line)
         {
-            this.CheckPackagesSection(line);
+            CheckPackagesSection(line);
 
-            if (!this.inPackagesSection)
-            {
-                return null;
-            }
-
-            if (line != null && line.Trim().StartsWith("versionName="))
-            {
-                return line.Trim().Substring(12).Trim();
-            }
-            else
-            {
-                return null;
-            }
+            return !inPackagesSection
+                ? null
+                : line != null && line.Trim().StartsWith("versionName=") ? line.Trim().Substring(12).Trim() : (object?)null;
         }
 
         /// <summary>
@@ -111,11 +89,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version code.</returns>
-        internal object GetVersionCode(string line)
+        internal object? GetVersionCode(string line)
         {
-            this.CheckPackagesSection(line);
+            CheckPackagesSection(line);
 
-            if (!this.inPackagesSection)
+            if (!inPackagesSection)
             {
                 return null;
             }
@@ -128,14 +106,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // versionCode=4 minSdk=9 targetSdk=22
             string versionCodeRegex = @"versionCode=(\d*)( minSdk=(\d*))?( targetSdk=(\d*))?$";
             Match match = Regex.Match(line, versionCodeRegex);
-            if (match.Success)
-            {
-                return int.Parse(match.Groups[1].Value.Trim());
-            }
-            else
-            {
-                return null;
-            }
+            return match.Success ? int.Parse(match.Groups[1].Value.Trim()) : null;
         }
     }
 }

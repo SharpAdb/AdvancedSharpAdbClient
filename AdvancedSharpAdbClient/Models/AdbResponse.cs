@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-
     /// <summary>
     /// An Adb Communication Response
     /// </summary>
@@ -14,16 +14,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> class.
         /// </summary>
-        public AdbResponse()
-        {
-            this.Message = string.Empty;
-        }
+        public AdbResponse() => Message = string.Empty;
 
         /// <summary>
         /// Gets a <see cref="AdbResponse"/> that represents the OK response sent by ADB.
         /// </summary>
-        public static AdbResponse OK
-        { get; } = new AdbResponse()
+        public static AdbResponse OK { get; } = new AdbResponse()
         {
             IOSuccess = true,
             Okay = true,
@@ -73,16 +69,13 @@ namespace AdvancedSharpAdbClient
         /// <returns>
         /// A new <see cref="AdbResponse"/> object that represents the error.
         /// </returns>
-        public static AdbResponse FromError(string message)
+        public static AdbResponse FromError(string message) => new AdbResponse()
         {
-            return new AdbResponse()
-            {
-                IOSuccess = true,
-                Message = message,
-                Okay = false,
-                Timeout = false
-            };
-        }
+            IOSuccess = true,
+            Message = message,
+            Okay = false,
+            Timeout = false
+        };
 
         /// <summary>
         /// Determines whether the specified <see cref="object"/> is equal to the current
@@ -97,17 +90,13 @@ namespace AdvancedSharpAdbClient
         /// </returns>
         public override bool Equals(object obj)
         {
-            var other = obj as AdbResponse;
+            AdbResponse? other = obj as AdbResponse;
 
-            if (other == null)
-            {
-                return false;
-            }
-
-            return other.IOSuccess == this.IOSuccess
-                && string.Equals(other.Message, this.Message, StringComparison.OrdinalIgnoreCase)
-                && other.Okay == this.Okay
-                && other.Timeout == this.Timeout;
+            return other != null
+                && other.IOSuccess == IOSuccess
+                && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
+                && other.Okay == Okay
+                && other.Timeout == Timeout;
         }
 
         /// <summary>
@@ -119,10 +108,10 @@ namespace AdvancedSharpAdbClient
         public override int GetHashCode()
         {
             int hash = 17;
-            hash = (hash * 23) + this.IOSuccess.GetHashCode();
-            hash = (hash * 23) + this.Message == null ? 0 : this.Message.GetHashCode();
-            hash = (hash * 23) + this.Okay.GetHashCode();
-            hash = (hash * 23) + this.Timeout.GetHashCode();
+            hash = (hash * 23) + IOSuccess.GetHashCode();
+            hash = (hash * 23) + Message == null ? 0 : this.Message.GetHashCode();
+            hash = (hash * 23) + Okay.GetHashCode();
+            hash = (hash * 23) + Timeout.GetHashCode();
 
             return hash;
         }
@@ -134,16 +123,6 @@ namespace AdvancedSharpAdbClient
         /// <c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the
         /// response indicates an error.
         /// </returns>
-        public override string ToString()
-        {
-            if (this.Equals(AdbResponse.OK))
-            {
-                return "OK";
-            }
-            else
-            {
-                return $"Error: {this.Message}";
-            }
-        }
+        public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
     }
 }

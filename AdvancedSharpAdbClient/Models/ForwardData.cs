@@ -13,51 +13,27 @@ namespace AdvancedSharpAdbClient
         /// Gets or sets the serial number of the device for which the port forwarding is
         /// configured.
         /// </summary>
-        public string SerialNumber
-        {
-            get;
-            set;
-        }
+        public string? SerialNumber { get; set; }
 
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the local (PC) endpoint.
         /// </summary>
-        public string Local
-        {
-            get;
-            set;
-        }
+        public string? Local { get; set; }
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the local (PC) endpoint.
         /// </summary>
-        public ForwardSpec LocalSpec
-        {
-            get
-            {
-                return ForwardSpec.Parse(this.Local);
-            }
-        }
+        public ForwardSpec LocalSpec => ForwardSpec.Parse(Local);
 
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the remote (device) endpoint.
         /// </summary>
-        public string Remote
-        {
-            get;
-            set;
-        }
+        public string? Remote { get; set; }
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the remote (device) endpoint.
         /// </summary>
-        public ForwardSpec RemoteSpec
-        {
-            get
-            {
-                return ForwardSpec.Parse(this.Remote);
-            }
-        }
+        public ForwardSpec RemoteSpec => ForwardSpec.Parse(Remote);
 
         /// <summary>
         /// Creates a new instance of the <seealso cref="ForwardData"/> class by parsing
@@ -87,9 +63,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"{this.SerialNumber} {this.Local} {this.Remote}";
-        }
+        public override string ToString() => $"{SerialNumber} {Local} {Remote}";
     }
 }

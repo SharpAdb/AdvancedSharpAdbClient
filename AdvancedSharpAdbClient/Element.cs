@@ -1,7 +1,7 @@
-﻿namespace AdvancedSharpAdbClient
+﻿using System.Collections.Generic;
+
+namespace AdvancedSharpAdbClient
 {
-    using System.Collections.Generic;
-    using System.Linq;
     /// <summary>
     /// Implement of screen element, likes Selenium
     /// </summary>
@@ -62,7 +62,8 @@
             if (charcount == 0)
             {
                 client.ClearInput(device, attributes["text"].Length);
-            } else
+            }
+            else
             {
                 client.ClearInput(device, charcount);
             }

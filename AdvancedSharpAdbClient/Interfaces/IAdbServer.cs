@@ -2,11 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
+
 namespace AdvancedSharpAdbClient
 {
-    using Exceptions;
-    using System.Net;
-
     /// <summary>
     /// Represents a common interface for any class that allows starting or stopping the Android Debug Bridge (adb)
     /// server/deamon.

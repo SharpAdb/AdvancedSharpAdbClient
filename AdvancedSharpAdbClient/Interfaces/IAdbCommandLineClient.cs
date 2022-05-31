@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-
     /// <summary>
     /// Provides a common interface for any class that provides access to the
     /// <c>adb.exe</c> executable.
@@ -25,9 +25,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
-        /// <param name="adbPath">
-        /// The path to validate.
-        /// </param>
+        /// <param name="adbPath">The path to validate.</param>
         bool IsValidAdbFile(string adbPath);
     }
 }
