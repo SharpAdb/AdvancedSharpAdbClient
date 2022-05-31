@@ -23,17 +23,13 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Initializes a new instance of the <see cref="LogReader"/> class.
         /// </summary>
-        /// <param name="stream">
-        /// A <see cref="Stream"/> that contains the logcat data.
-        /// </param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
         public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
-        /// <returns>
-        /// A new <see cref="LogEntry"/> object.
-        /// </returns>
+        /// <returns>A new <see cref="LogEntry"/> object.</returns>
         public async Task<LogEntry> ReadEntry(CancellationToken cancellationToken)
         {
             LogEntry value = new LogEntry();

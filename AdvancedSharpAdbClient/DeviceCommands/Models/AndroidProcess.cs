@@ -52,16 +52,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.
         /// </summary>
-        /// <param name="line">
-        /// A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.
-        /// </param>
-        /// <param name="cmdLinePrefix">
-        /// A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
-        /// Becuase <c>stat</c> does not contain the full process name, this can be useful.
-        /// </param>
-        /// <returns>
-        /// The equivalent <see cref="AndroidProcess"/>.
-        /// </returns>
+        /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
+        /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
+        /// Becuase <c>stat</c> does not contain the full process name, this can be useful.</param>
+        /// <returns>The equivalent <see cref="AndroidProcess"/>.</returns>
         public static AndroidProcess Parse(string line, bool cmdLinePrefix = false)
         {
             if (line == null)
@@ -169,9 +163,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets a <see cref="string"/> that represents this <see cref="AndroidProcess"/>,
         /// in the format of "<see cref="Name"/> (<see cref="ProcessId"/>)".
         /// </summary>
-        /// <returns>
-        /// A <see cref="string"/> that represents this <see cref="AndroidProcess"/>.
-        /// </returns>
+        /// <returns>A <see cref="string"/> that represents this <see cref="AndroidProcess"/>.</returns>
         public override string ToString()
         {
             return $"{Name} ({ProcessId})";
@@ -180,16 +172,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the index of the first value of a set of values that is part of a list.
         /// </summary>
-        /// <param name="list">
-        /// The list in which to search for the value.
-        /// </param>
-        /// <param name="values">
-        /// The values to search for.
-        /// </param>
-        /// <returns>
-        /// The index of the first element in <paramref name="values"/> that is present in the list, or
-        /// <c>-1</c>.
-        /// </returns>
+        /// <param name="list">The list in which to search for the value.</param>
+        /// <param name="values">The values to search for.</param>
+        /// <returns>The index of the first element in <paramref name="values"/> that is present in the list, or <c>-1</c>.</returns>
         private static int IndexOf(List<string> list, params string[] values)
         {
             foreach (string? value in values)

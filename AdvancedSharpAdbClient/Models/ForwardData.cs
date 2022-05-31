@@ -39,13 +39,8 @@ namespace AdvancedSharpAdbClient
         /// Creates a new instance of the <seealso cref="ForwardData"/> class by parsing
         /// a <see cref="string"/>.
         /// </summary>
-        /// <param name="value">
-        /// The <see cref="string"/> value to parse.
-        /// </param>
-        /// <returns>
-        /// A <see cref="ForwardData"/> object that represents the port forwarding information
-        /// contained in <paramref name="value"/>.
-        /// </returns>
+        /// <param name="value">The <see cref="string"/> value to parse.</param>
+        /// <returns>A <see cref="ForwardData"/> object that represents the port forwarding information contained in <paramref name="value"/>.</returns>
         public static ForwardData FromString(string value)
         {
             if (value == null)

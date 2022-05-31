@@ -54,12 +54,8 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.
         /// </summary>
-        /// <param name="value">
-        /// The value to convert.
-        /// </param>
-        /// <returns>
-        /// A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.
-        /// </returns>
+        /// <param name="value">The value to convert.</param>
+        /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.</returns>
         private static char FormatPriority(Priority value) => PriorityFormatters == null || !PriorityFormatters.ContainsKey(value) ? '?' : PriorityFormatters[value];
     }
 }

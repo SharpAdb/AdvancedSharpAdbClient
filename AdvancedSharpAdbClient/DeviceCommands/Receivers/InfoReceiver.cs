@@ -4,7 +4,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using AdvancedSharpAdbClient;
 using System;
 using System.Collections.Generic;
 

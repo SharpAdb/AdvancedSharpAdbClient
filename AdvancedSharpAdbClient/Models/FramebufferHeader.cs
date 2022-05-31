@@ -71,12 +71,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte arra which contains the data.
         /// </summary>
-        /// <param name="data">
-        /// The data that feeds the <see cref="FramebufferHeader"/> structure.
-        /// </param>
-        /// <returns>
-        /// A new <see cref="FramebufferHeader"/> object.
-        /// </returns>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> structure.</param>
+        /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
         public static FramebufferHeader Read(byte[] data)
         {
             // as defined in https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp
@@ -142,9 +138,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Image"/>.
         /// </summary>
-        /// <param name="buffer">
-        /// The buffer containing the image data.
-        /// </param>
+        /// <param name="buffer">The buffer containing the image data.</param>
         /// <returns>
         /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/> if the framebuffer
         /// does not contain any data. This can happen when DRM is enabled on the device.
@@ -180,12 +174,8 @@ namespace AdvancedSharpAdbClient
         /// formats supported by Android, this method also takes a <paramref name="buffer"/> and reorganizes the bytes in the buffer to
         /// match the return value of this function.
         /// </summary>
-        /// <param name="buffer">
-        /// A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.
-        /// </param>
-        /// <returns>
-        /// A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.
-        /// </returns>
+        /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
+        /// <returns>A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
         private PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.

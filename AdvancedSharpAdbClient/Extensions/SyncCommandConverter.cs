@@ -9,8 +9,7 @@ using System.Linq;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Converts <see cref="SyncCommand"/> values to their binary representation
-    /// and vice versa.
+    /// Converts <see cref="SyncCommand"/> values to their binary representation and vice versa.
     /// </summary>
     public static class SyncCommandConverter
     {
@@ -38,12 +37,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the byte array that represents the <see cref="SyncCommand"/>.
         /// </summary>
-        /// <param name="command">
-        /// The <see cref="SyncCommand"/> to convert.
-        /// </param>
-        /// <returns>
-        /// A byte array that represents the <see cref="SyncCommand"/>.
-        /// </returns>
+        /// <param name="command">The <see cref="SyncCommand"/> to convert.</param>
+        /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
         public static byte[] GetBytes(SyncCommand command)
         {
             if (!Values.ContainsKey(command))
@@ -60,12 +55,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Determines which <see cref="SyncCommand"/> is represented by this byte array.
         /// </summary>
-        /// <param name="value">
-        /// A byte array that represents a <see cref="SyncCommand"/>.
-        /// </param>
-        /// <returns>
-        /// The corresponding <see cref="SyncCommand"/>.
-        /// </returns>
+        /// <param name="value">A byte array that represents a <see cref="SyncCommand"/>.</param>
+        /// <returns>The corresponding <see cref="SyncCommand"/>.</returns>
         public static SyncCommand GetCommand(byte[] value)
         {
             if (value == null)

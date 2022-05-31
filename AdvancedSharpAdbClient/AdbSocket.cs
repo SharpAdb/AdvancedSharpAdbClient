@@ -53,13 +53,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> at which the Android Debug Bridge is listening
-        /// for clients.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(EndPoint endPoint
 #if !NET35 && !NET40
             , ILogger<AdbSocket> logger = null
@@ -77,10 +72,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        /// <param name="socket">
-        /// The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening
-        /// for clients.
-        /// </param>
+        /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
@@ -109,9 +101,7 @@ namespace AdvancedSharpAdbClient
         /// Determines whether the specified reply is okay.
         /// </summary>
         /// <param name="reply">The reply.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
         public static bool IsOkay(byte[] reply)
         {
             return AdvancedAdbClient.Encoding.GetString(reply).Equals("OKAY");
@@ -124,8 +114,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/>
-        /// class.
+        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         public virtual void Dispose()
         {
@@ -452,13 +441,8 @@ namespace AdvancedSharpAdbClient
         /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
         /// <param name="data">The data to send.</param>
-        /// <returns>
-        /// Returns <see langword="true"/> if all data was written; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
+        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
         protected bool Write(byte[] data)
         {
             try
@@ -479,9 +463,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reads the response from ADB after a command.
         /// </summary>
-        /// <returns>
-        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
-        /// </returns>
+        /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected AdbResponse ReadAdbResponseInner()
         {
             AdbResponse resp = new AdbResponse();
@@ -508,12 +490,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Converts an ADB reply to a string.
         /// </summary>
-        /// <param name="reply">
-        /// A <see cref="byte"/> array that represents the ADB reply.
-        /// </param>
-        /// <returns>
-        /// A <see cref="string"/> that represents the ADB reply.
-        /// </returns>
+        /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
+        /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
         protected string ReplyToString(byte[] reply)
         {
             string result;

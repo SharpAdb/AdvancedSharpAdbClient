@@ -23,12 +23,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
-        /// <param name="device">
-        /// The device for which to fetch the frame buffer.
-        /// </param>
-        /// <param name="client">
-        /// A <see cref="AdvancedAdbClient"/> which manages the connection with adb.
-        /// </param>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="client">A <see cref="AdvancedAdbClient"/> which manages the connection with adb.</param>
         public Framebuffer(DeviceData device, AdvancedAdbClient client)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
@@ -60,12 +56,8 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
-        /// <param name="cancellationToken">
-        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Task"/> which represents the asynchronous operation.
-        /// </returns>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public async Task RefreshAsync(CancellationToken cancellationToken)
         {
             EnsureNotDisposed();
@@ -101,9 +93,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Converts the framebuffer data to a <see cref="Image"/>.
         /// </summary>
-        /// <returns>
-        /// An <see cref="Image"/> which represents the framebuffer data.
-        /// </returns>
+        /// <returns>An <see cref="Image"/> which represents the framebuffer data.</returns>
         public Image ToImage()
         {
             EnsureNotDisposed();

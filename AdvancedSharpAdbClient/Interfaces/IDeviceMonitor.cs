@@ -8,8 +8,7 @@ using System.Collections.Generic;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Provides a common interface for any class that allows you to monitor the list of
-    /// devices that are currently connected to the adb server.
+    /// Provides a common interface for any class that allows you to monitor the list of devices that are currently connected to the adb server.
     /// </summary>
     public interface IDeviceMonitor : IDisposable
     {

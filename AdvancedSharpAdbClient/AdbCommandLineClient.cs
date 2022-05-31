@@ -42,12 +42,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
-        /// <param name="adbPath">
-        /// The path to the <c>adb.exe</c> executable.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public AdbCommandLineClient(string adbPath
 #if !NET35 && !NET40
             , ILogger<AdbCommandLineClient> logger = null
@@ -97,9 +93,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
-        /// <returns>
-        /// A <see cref="Version"/> object that contains the version number of the Android Command Line client.
-        /// </returns>
+        /// <returns>A <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
         public Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
@@ -176,13 +170,8 @@ namespace AdvancedSharpAdbClient
         /// Parses the output of the <c>adb.exe version</c> command and determines the
         /// adb version.
         /// </summary>
-        /// <param name="output">
-        /// The output of the <c>adb.exe version</c> command.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Version"/> object that represents the version of the adb command
-        /// line client.
-        /// </returns>
+        /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
+        /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
         internal static Version GetVersionFromOutput(List<string> output)
         {
             foreach (string? line in output)
@@ -211,9 +200,7 @@ namespace AdvancedSharpAdbClient
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="command">
-        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
-        /// </param>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
         /// <param name="errorOutput">
         /// A list in which to store the standard error output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard
@@ -247,9 +234,7 @@ namespace AdvancedSharpAdbClient
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="command">
-        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
-        /// </param>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
         /// <param name="errorOutput">
         /// A list in which to store the standard error output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard

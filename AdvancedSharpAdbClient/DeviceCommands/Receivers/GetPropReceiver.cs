@@ -8,8 +8,7 @@ using System.Text.RegularExpressions;
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
-    /// Parses the output of the <c>getprop</c> command, which lists all properties of an
-    /// Android device.
+    /// Parses the output of the <c>getprop</c> command, which lists all properties of an Android device.
     /// </summary>
     public sealed class GetPropReceiver : MultiLineReceiver
     {
@@ -39,9 +38,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Processes the new lines.
         /// </summary>
-        /// <param name="lines">
-        /// The lines to process.
-        /// </param>
+        /// <param name="lines">The lines to process.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             // We receive an array of lines. We're expecting

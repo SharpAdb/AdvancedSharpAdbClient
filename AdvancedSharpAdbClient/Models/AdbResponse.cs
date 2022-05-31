@@ -38,37 +38,27 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is okay.
         /// </summary>
-        /// <value>
-        ///   <see langword="true"/> if okay; otherwise, <see langword="false"/>.
-        /// </value>
+        /// <value><see langword="true"/> if okay; otherwise, <see langword="false"/>.</value>
         public bool Okay { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is timeout.
         /// </summary>
-        /// <value>
-        ///   <see langword="true"/> if timeout; otherwise, <see langword="false"/>.
-        /// </value>
+        /// <value><see langword="true"/> if timeout; otherwise, <see langword="false"/>.</value>
         public bool Timeout { get; set; }
 
         /// <summary>
         /// Gets or sets the message.
         /// </summary>
-        /// <value>
-        /// The message.
-        /// </value>
+        /// <value>The message.</value>
         public string Message { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="AdbResponse"/> class, based on an
         /// error message returned by adb.
         /// </summary>
-        /// <param name="message">
-        /// The error message returned by adb.
-        /// </param>
-        /// <returns>
-        /// A new <see cref="AdbResponse"/> object that represents the error.
-        /// </returns>
+        /// <param name="message">The error message returned by adb.</param>
+        /// <returns>A new <see cref="AdbResponse"/> object that represents the error.</returns>
         public static AdbResponse FromError(string message) => new AdbResponse()
         {
             IOSuccess = true,
@@ -81,13 +71,8 @@ namespace AdvancedSharpAdbClient
         /// Determines whether the specified <see cref="object"/> is equal to the current
         /// <see cref="AdbResponse"/> object.
         /// </summary>
-        /// <param name="obj">
-        /// The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if the specified object is equal to the current object;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
+        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object obj)
         {
             AdbResponse? other = obj as AdbResponse;
@@ -102,9 +87,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the hash code for the current <see cref="AdbResponse"/>.
         /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="AdbResponse"/>.
-        /// </returns>
+        /// <returns>A hash code for the current <see cref="AdbResponse"/>.</returns>
         public override int GetHashCode()
         {
             int hash = 17;
@@ -119,10 +102,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
         /// </summary>
-        /// <returns>
-        /// <c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the
-        /// response indicates an error.
-        /// </returns>
+        /// <returns><c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the response indicates an error.</returns>
         public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
     }
 }

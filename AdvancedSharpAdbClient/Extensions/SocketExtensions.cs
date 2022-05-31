@@ -17,32 +17,14 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously receives data from a connected socket.
         /// </summary>
-        /// <param name="socket">
-        /// The socket from which to read data.
-        /// </param>
-        /// <param name="buffer">
-        /// An array of type <see cref="byte"/> that is the storage location for
-        /// the received data.
-        /// </param>
-        /// <param name="offset">
-        /// The zero-based position in the <paramref name="buffer"/> parameter at which to
-        /// start storing data.
-        /// </param>
-        /// <param name="size">
-        /// The number of bytes to receive.
-        /// </param>
-        /// <param name="socketFlags">
-        /// A bitwise combination of the <see cref="SocketFlags"/> values.
-        /// </param>
-        /// <param name="cancellationToken">
-        /// A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.
-        /// </param>
-        /// <remarks>
-        /// Cancelling the task will also close the socket.
-        /// </remarks>
-        /// <returns>
-        /// The number of bytes received.
-        /// </returns>
+        /// <param name="socket">The socket from which to read data.</param>
+        /// <param name="buffer">An array of type <see cref="byte"/> that is the storage location for the received data.</param>
+        /// <param name="offset">The zero-based position in the <paramref name="buffer"/> parameter at which to start storing data.</param>
+        /// <param name="size">The number of bytes to receive.</param>
+        /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <remarks>Cancelling the task will also close the socket.</remarks>
+        /// <returns>The number of bytes received.</returns>
         public static Task<int> ReceiveAsync(
             this Socket socket,
             byte[] buffer,

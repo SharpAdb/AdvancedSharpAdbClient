@@ -78,12 +78,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
-        /// <param name="socket">
-        /// The <see cref="IAdbSocket"/> that manages the connection with the adb server.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public DeviceMonitor(IAdbSocket socket
 #if !NET35 && !NET40
             , ILogger<DeviceMonitor> logger = null
@@ -126,9 +122,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.
-        /// </value>
+        /// <value><see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.</value>
         public bool IsRunning { get; private set; }
 
         /// <inheritdoc/>

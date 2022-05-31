@@ -13,14 +13,12 @@ namespace AdvancedSharpAdbClient
     public class DeviceData
     {
         /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
+        /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
         internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
 
         /// <summary>
-        /// A regular expression that can be used to parse the device information that is returned
-        /// by the Android Debut Bridge.
+        /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
         private static readonly Regex Regex = new Regex(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -73,12 +71,8 @@ namespace AdvancedSharpAdbClient
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
-        /// <param name="data">
-        /// The data retrieved from the Android Debug Bridge that represents a device.
-        /// </param>
-        /// <returns>
-        /// A <see cref="DeviceData"/> object that represents the device.
-        /// </returns>
+        /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
+        /// <returns>A <see cref="DeviceData"/> object that represents the device.</returns>
         public static DeviceData CreateFromAdbData(string data)
         {
             Match m = Regex.Match(data);
@@ -105,7 +99,7 @@ namespace AdvancedSharpAdbClient
         /// Get the device state from the string value
         /// </summary>
         /// <param name="state">The device state string</param>
-        /// <returns></returns>
+        /// <returns>The device state</returns>
         internal static DeviceState GetStateFromString(string state)
         {
             // Default to the unknown state

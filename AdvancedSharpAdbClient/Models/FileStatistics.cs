@@ -34,9 +34,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="FileStatistics"/> object.
         /// </summary>
-        /// <returns>
-        /// The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.
-        /// </returns>
+        /// <returns>The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.</returns>
         public override string ToString() => Path;
     }
 }

@@ -58,16 +58,15 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdvancedAdbClient"/> class.
         /// </summary>
-        public AdvancedAdbClient()            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+        public AdvancedAdbClient() : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdvancedAdbClient"/> class.
         /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> at which the adb server is listening.
-        /// </param>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdvancedAdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
             if (endPoint == null)
@@ -89,10 +88,13 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static Encoding Encoding = Encoding.UTF8;
 
+        /// <summary>
+        /// The Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.
+        /// </summary>
         public static EndPoint DefaultEndPoint => new IPEndPoint(IPAddress.Loopback, DefaultPort);
 
         /// <summary>
-        /// Gets the <see cref="EndPoint"/> at which the adb server is listening.
+        /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
         public EndPoint EndPoint { get; private set; }
 
@@ -101,11 +103,8 @@ namespace AdvancedSharpAdbClient
         /// is the length of the rest of the string, encoded as ASCII hex(case
         /// doesn't matter).
         /// </summary>
-        /// <param name="req">The request to form.
-        /// </param>
-        /// <returns>
-        /// An array containing <c>####req</c>.
-        /// </returns>
+        /// <param name="req">The request to form.</param>
+        /// <returns>An array containing <c>####req</c>.</returns>
         public static byte[] FormAdbRequest(string req)
         {
             string resultStr = string.Format("{0}{1}", req.Length.ToString("X4"), req);
@@ -118,9 +117,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="address">The address.</param>
         /// <param name="port">The port.</param>
-        /// <returns>
-        /// This returns an array containing <c>"####tcp:{port}:{addStr}"</c>.
-        /// </returns>
+        /// <returns>This returns an array containing <c>"####tcp:{port}:{addStr}"</c>.</returns>
         public static byte[] CreateAdbForwardRequest(string address, int port)
         {
             string request = address == null ? "tcp:" + port : "tcp:" + port + ":" + address;
@@ -187,6 +184,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
         public void RemoveReverseForward(DeviceData device, string remote)
         {
             EnsureDevice(device);
@@ -200,6 +198,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
         public void RemoveAllReverseForwards(DeviceData device)
         {
             EnsureDevice(device);
@@ -280,6 +279,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
         {
             EnsureDevice(device);
@@ -1062,9 +1062,7 @@ namespace AdvancedSharpAdbClient
         /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
         /// if <paramref name="device"/> does not have a valid serial number.
         /// </summary>
-        /// <param name="device">
-        /// A <see cref="DeviceData"/> object to validate.
-        /// </param>
+        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
         protected void EnsureDevice(DeviceData device)
         {
             if (device == null)

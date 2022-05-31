@@ -25,14 +25,8 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Initializes a new instance of the <seealso cref="ShellStream"/> class.
         /// </summary>
-        /// <param name="inner">
-        /// The inner stream that contains the raw data retrieved from the shell. This stream
-        /// must be readable.
-        /// </param>
-        /// <param name="closeStream">
-        /// <see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/>
-        /// stream when closed; otherwise, <see langword="false"/>.
-        /// </param>
+        /// <param name="inner">The inner stream that contains the raw data retrieved from the shell. This stream must be readable.</param>
+        /// <param name="closeStream"><see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/> stream when closed; otherwise, <see langword="false"/>.</param>
         public ShellStream(Stream inner, bool closeStream)
         {
             if (inner == null)

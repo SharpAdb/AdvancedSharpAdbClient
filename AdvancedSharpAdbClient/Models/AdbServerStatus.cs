@@ -25,10 +25,7 @@ namespace AdvancedSharpAdbClient
         /// Gets a <see cref="string"/> that represents the current <see cref="AdbServerStatus"/>
         /// object.
         /// </summary>
-        /// <returns>
-        /// A <see cref="string"/> that represents the current <see cref="AdbServerStatus"/>
-        /// object.
-        /// </returns>
+        /// <returns>A <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.</returns>
         public override string ToString() => IsRunning ? $"Version {Version} of the adb daemon is running." : "The adb daemon is not running.";
     }
 }

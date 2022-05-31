@@ -56,12 +56,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Creates a <see cref="ForwardSpec"/> from its <see cref="string"/> representation.
         /// </summary>
-        /// <param name="spec">
-        /// A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.
-        /// </param>
-        /// <returns>
-        /// A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.
-        /// </returns>
+        /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
+        /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
         public static ForwardSpec Parse(string? spec)
         {
             if (spec == null)

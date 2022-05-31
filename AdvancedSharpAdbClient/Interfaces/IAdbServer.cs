@@ -7,8 +7,7 @@ using AdvancedSharpAdbClient.Exceptions;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Represents a common interface for any class that allows starting or stopping the Android Debug Bridge (adb)
-    /// server/deamon.
+    /// Represents a common interface for any class that allows starting or stopping the Android Debug Bridge (adb) server/deamon.
     /// </summary>
     public interface IAdbServer
     {

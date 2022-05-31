@@ -15,12 +15,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
-        /// <param name="client">
-        /// An instance of a class that implements the <see cref="IAdbCommandLineClient"/> interface.
-        /// </param>
-        /// <param name="adbPath">
-        /// The path to validate.
-        /// </param>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbCommandLineClient"/> interface.</param>
+        /// <param name="adbPath">The path to validate.</param>
         public static void EnsureIsValidAdbFile(this IAdbCommandLineClient client, string adbPath)
         {
             if (client == null)

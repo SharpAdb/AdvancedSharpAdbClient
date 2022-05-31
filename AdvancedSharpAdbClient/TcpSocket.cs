@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Implements the <see cref="ITcpSocket" /> interface using the standard <see cref="Socket"/>
-    /// class.
+    /// Implements the <see cref="ITcpSocket" /> interface using the standard <see cref="Socket"/> class.
     /// </summary>
     public class TcpSocket : ITcpSocket
     {

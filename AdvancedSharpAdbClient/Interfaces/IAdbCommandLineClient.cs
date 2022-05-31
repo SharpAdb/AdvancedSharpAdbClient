@@ -7,8 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Provides a common interface for any class that provides access to the
-    /// <c>adb.exe</c> executable.
+    /// Provides a common interface for any class that provides access to the <c>adb.exe</c> executable.
     /// </summary>
     public interface IAdbCommandLineClient
     {

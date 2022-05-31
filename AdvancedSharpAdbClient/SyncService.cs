@@ -55,26 +55,17 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
-        /// <param name="client">
-        /// A connection to an adb server.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to interact with the files.
-        /// </param>
-        public SyncService(IAdvancedAdbClient client, DeviceData device)            : this(Factories.AdbSocketFactory(client.EndPoint), device)
+        /// <param name="client">A connection to an adb server.</param>
+        /// <param name="device">The device on which to interact with the files.</param>
+        public SyncService(IAdvancedAdbClient client, DeviceData device) : this(Factories.AdbSocketFactory(client.EndPoint), device)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
-        /// <param name="socket">
-        /// A <see cref="IAdbSocket"/> that enables to connection with the
-        /// adb server.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to interact with the files.
-        /// </param>
+        /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
+        /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
             Socket = socket;
@@ -84,8 +75,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Gets or sets the maximum size of data to transfer between the device and the PC
-        /// in one block.
+        /// Gets or sets the maximum size of data to transfer between the device and the PC in one block.
         /// </summary>
         public int MaxBufferSize { get; set; } = 64 * 1024;
 
@@ -95,8 +85,7 @@ namespace AdvancedSharpAdbClient
         public DeviceData Device { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="IAdbSocket"/> that enables the connection with the
-        /// adb server.
+        /// Gets the <see cref="IAdbSocket"/> that enables the connection with the adb server.
         /// </summary>
         public IAdbSocket Socket { get; private set; }
 
@@ -116,10 +105,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reopen this connection.
         /// </summary>
-        /// <param name="socket">
-        /// A <see cref="IAdbSocket"/> that enables to connection with the
-        /// adb server.
-        /// </param>
+        /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
         public void Reopen(IAdbSocket socket)
         {
             if (Socket != null)
@@ -134,9 +120,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reopen this connection.
         /// </summary>
-        /// <param name="client">
-        /// A connection to an adb server.
-        /// </param>
+        /// <param name="client">A connection to an adb server.</param>
         public void Reopen(IAdvancedAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>

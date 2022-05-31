@@ -10,12 +10,12 @@ using System.IO;
 using System.Threading;
 
 #if !NET35 && !NET40
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
 #if NET452
-    using AdvancedSharpAdbClient.Logs;
+using AdvancedSharpAdbClient.Logs;
 #endif
 
 namespace AdvancedSharpAdbClient.DeviceCommands
@@ -62,27 +62,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="IAdvancedAdbClient"/> to use to communicate with the Android Debug Bridge.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to look for packages.
-        /// </param>
-        /// <param name="thirdPartyOnly">
-        /// <see langword="true"/> to only indicate third party applications;
-        /// <see langword="false"/> to also include built-in applications.
-        /// </param>
-        /// <param name="syncServiceFactory">
-        /// A function which returns a new instance of a class that implements the
-        /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
-        /// a given device.
-        /// </param>
-        /// <param name="skipInit">
-        /// A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="client">The <see cref="IAdvancedAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
+        /// <param name="device">The device on which to look for packages.</param>
+        /// <param name="thirdPartyOnly"><see langword="true"/> to only indicate third party applications; <see langword="false"/> to also include built-in applications.</param>
+        /// <param name="syncServiceFactory">A function which returns a new instance of a class that implements the <see cref="ISyncService"/> interface, that can be used to transfer files to and from a given device.</param>
+        /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public PackageManager(IAdvancedAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
 #if !NET35 && !NET40
             , ILogger<PackageManager> logger = null
@@ -145,13 +130,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Installs an Android application on device.
         /// </summary>
-        /// <param name="packageFilePath">
-        /// The absolute file system path to file on local host to install.
-        /// </param>
-        /// <param name="reinstall">
-        /// <see langword="true"/>if re-install of app should be performed; otherwise,
-        /// <see langword="false"/>.
-        /// </param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed; otherwise, <see langword="false"/>.</param>
         public void InstallPackage(string packageFilePath, bool reinstall)
         {
             ValidateDevice();
@@ -307,9 +287,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Uninstalls a package from the device.
         /// </summary>
-        /// <param name="packageName">
-        /// The name of the package to uninstall.
-        /// </param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
         public void UninstallPackage(string packageName)
         {
             ValidateDevice();
@@ -325,9 +303,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Requests the version information from the device.
         /// </summary>
-        /// <param name="packageName">
-        /// The name of the package from which to get the application version.
-        /// </param>
+        /// <param name="packageName">The name of the package from which to get the application version.</param>
         public VersionInfo GetVersionInfo(string packageName)
         {
             ValidateDevice();
@@ -414,9 +390,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Like "install", but starts an install session.
         /// </summary>
+        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
         /// <param name="packageName">absolute packagename of the base app</param>
         /// <returns>Session ID</returns>
-        /// <exception cref="PackageInstallationException"></exception>
         private string CreateInstallSession(bool reinstall, string packageName = null)
         {
             ValidateDevice();

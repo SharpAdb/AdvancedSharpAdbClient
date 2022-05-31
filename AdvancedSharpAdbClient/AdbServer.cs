@@ -75,8 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        public AdbServer()
-            : this(new AdvancedAdbClient(), Factories.AdbCommandLineClientFactory)
+        public AdbServer() : this(new AdvancedAdbClient(), Factories.AdbCommandLineClientFactory)
         {
         }
 
