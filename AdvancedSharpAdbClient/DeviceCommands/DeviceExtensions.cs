@@ -12,7 +12,8 @@ using System.Text;
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run commands directory against a <see cref="DeviceData"/> object.
+    /// Provides extension methods for the <see cref="DeviceData"/> class,
+    /// allowing you to run commands directory against a <see cref="DeviceData"/> object.
     /// </summary>
     public static class DeviceExtensions
     {
@@ -97,7 +98,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>
-        /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes that are currently running on the device.</returns>
+        /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
+        /// that are currently running on the device.</returns>
         public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
         {
             // There are a couple of gotcha's when listing processes on an Android device.

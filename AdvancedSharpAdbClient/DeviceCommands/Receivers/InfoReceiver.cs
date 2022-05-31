@@ -35,14 +35,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private Dictionary<string, Func<string, object>> PropertyParsers { get; set; }
 
         /// <summary>
-        /// Gets the value of the property out of the Properties dictionary. Returns null if the property is not present in the directory.
+        /// Gets the value of the property out of the Properties dictionary.
+        /// Returns null if the property is not present in the directory.
         /// </summary>
         /// <param name="propertyName">The name of the property</param>
         /// <returns>The received value</returns>
         public object? GetPropertyValue(string propertyName) => Properties.ContainsKey(propertyName) ? Properties[propertyName] : null;
 
         /// <summary>
-        /// Adds a new parser to this receiver. The parsers parses one received line and extracts the property value if possible.
+        /// Adds a new parser to this receiver.
+        /// The parsers parses one received line and extracts the property value if possible.
         /// The parser should return <c>null</c> if the property value cannot be found in the line.
         /// </summary>
         /// <param name="property">The property corresponding with the parser.</param>

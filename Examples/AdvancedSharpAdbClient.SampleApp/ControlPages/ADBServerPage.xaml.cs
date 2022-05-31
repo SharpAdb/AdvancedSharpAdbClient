@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
                 Control1Output.Text = "Wait 5s ...";
                 await Task.Delay(5000);
             }
-            AdbServerStatus status = await Task.Run(new AdbServer().GetStatus);
+            AdbServerStatus status = await Task.Run(AdbServer.Instance.GetStatus);
             Control1Output.Text = status.IsRunning ? "Succeed" : "Failed";
             Control1.Content = "Restart";
             Control1Progress.Visibility = Visibility.Collapsed;
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
         {
             Control2Progress.Visibility = Visibility.Visible;
             Control2.Content = "Checking";
-            AdbServerStatus status = await Task.Run(new AdbServer().GetStatus);
+            AdbServerStatus status = await Task.Run(AdbServer.Instance.GetStatus);
             Control2Output1.Text = $"Version: {status.Version}";
             Control2Output2.Text = $"IsRunning: {status.IsRunning}";
             Control2Output1.Visibility = status.IsRunning ? Visibility.Visible : Visibility.Collapsed;

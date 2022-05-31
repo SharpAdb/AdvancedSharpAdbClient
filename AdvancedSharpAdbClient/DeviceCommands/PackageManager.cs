@@ -53,9 +53,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private readonly IAdbClient client;
 
         /// <summary>
-        /// A function which returns a new instance of a class that implements the
-        /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
-        /// a given device.
+        /// A function which returns a new instance of a class
+        /// that implements the <see cref="ISyncService"/> interface,
+        /// that can be used to transfer files to and from a given device.
         /// </summary>
         private readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
 
@@ -64,9 +64,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
         /// <param name="device">The device on which to look for packages.</param>
-        /// <param name="thirdPartyOnly"><see langword="true"/> to only indicate third party applications; <see langword="false"/> to also include built-in applications.</param>
-        /// <param name="syncServiceFactory">A function which returns a new instance of a class that implements the <see cref="ISyncService"/> interface, that can be used to transfer files to and from a given device.</param>
-        /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.</param>
+        /// <param name="thirdPartyOnly"><see langword="true"/> to only indicate third party applications;
+        /// <see langword="false"/> to also include built-in applications.</param>
+        /// <param name="syncServiceFactory">A function which returns a new instance of a class
+        /// that implements the <see cref="ISyncService"/> interface,
+        /// that can be used to transfer files to and from a given device.</param>
+        /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not.
+        /// Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
 #if !NET35 && !NET40
@@ -92,14 +96,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets a value indicating whether this package manager only lists third party
-        /// applications, or also includes built-in applications.
+        /// Gets a value indicating whether this package manager only lists third party applications,
+        /// or also includes built-in applications.
         /// </summary>
         public bool ThirdPartyOnly { get; private set; }
 
         /// <summary>
-        /// Gets the list of packages currently installed on the device. They key is the name of the
-        /// package; the value the package path.
+        /// Gets the list of packages currently installed on the device. They key is the name of the package;
+        /// the value the package path.
         /// </summary>
         public Dictionary<string, string> Packages { get; private set; }
 
@@ -131,7 +135,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
-        /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed; otherwise, <see langword="false"/>.</param>
+        /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed;
+        /// otherwise, <see langword="false"/>.</param>
         public void InstallPackage(string packageFilePath, bool reinstall)
         {
             ValidateDevice();

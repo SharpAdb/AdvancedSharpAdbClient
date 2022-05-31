@@ -8,8 +8,7 @@ using System.Text.RegularExpressions;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of
-    /// an Android device.
+    /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.
     /// </summary>
     public sealed class EnvironmentVariablesReceiver : MultiLineReceiver
     {

@@ -96,11 +96,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return builder.ToString();
         }
 
-        /// <summary>Returns the directory information for the specified path string.</summary>
-        /// <returns>A <see cref="string"></see> containing directory information for path, or null if path denotes a root directory, is the empty string (""), or is null. Returns <see cref="string.Empty"></see> if path does not contain directory information.</returns>
+        /// <summary>
+        /// Returns the directory information for the specified path string.
+        /// </summary>
+        /// <returns>A <see cref="string"></see> containing directory information for path,
+        /// or null if path denotes a root directory, is the empty string (""), or is null.
+        /// Returns <see cref="string.Empty"></see> if path does not contain directory information.</returns>
         /// <param name="path">The path of a file or directory. </param>
-        /// <exception cref="ArgumentException">The path parameter contains invalid characters, is empty, or contains only white spaces, or contains a wildcard character. </exception>
-        /// <exception cref="System.IO.PathTooLongException">The path parameter is longer than the system-defined maximum length.</exception>
+        /// <exception cref="ArgumentException">The path parameter contains invalid characters, is empty,
+        /// or contains only white spaces, or contains a wildcard character. </exception>
+        /// <exception cref="System.IO.PathTooLongException">The path parameter is longer
+        /// than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
         public static string GetDirectoryName(string path)
         {
@@ -130,9 +136,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>Returns the file name and extension of the specified path string.</summary>
-        /// <returns>A <see cref="string"></see> consisting of the characters after the last directory character in path. If the last character of path is a directory or volume separator character, this method returns <see cref="string.Empty"></see>. If path is null, this method returns null.</returns>
+        /// <returns>A <see cref="string"></see> consisting of the characters after the last directory character in path.
+        /// If the last character of path is a directory or volume separator character,
+        /// this method returns <see cref="string.Empty"></see>. If path is null, this method returns null.</returns>
         /// <param name="path">The path string from which to obtain the file name and extension. </param>
-        /// <exception cref="ArgumentException">path contains one or more of the invalid characters defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
+        /// <exception cref="ArgumentException">path contains one or more of the invalid characters
+        /// defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
         public static string GetFileName(string path)
         {
@@ -154,10 +163,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return path;
         }
 
-        /// <summary>Gets a value indicating whether the specified path string contains absolute or relative path information.</summary>
+        /// <summary>
+        /// Gets a value indicating whether the specified path string contains absolute or relative path information.
+        /// </summary>
         /// <returns>true if path contains an absolute path; otherwise, false.</returns>
-        /// <param name="path">The path to test. </param>
-        /// <exception cref="ArgumentException">path contains one or more of the invalid characters defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
+        /// <param name="path">The path to test.</param>
+        /// <exception cref="ArgumentException">path contains one or more of the invalid characters
+        /// defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
         public static bool IsPathRooted(string path)
         {
