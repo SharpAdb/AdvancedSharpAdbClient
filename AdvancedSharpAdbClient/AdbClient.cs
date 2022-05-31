@@ -49,8 +49,9 @@ namespace AdvancedSharpAdbClient
         public const int DefaultPort = 5555;
 
         /// <summary>
-        /// Gets or sets the default instance of the <see cref="IAdbClient"/> interface.
+        /// Gets a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
+        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which functon is gets a new instance instead of gets or sets the default instance.")]
         public static IAdbClient Instance => new AdbClient();
 
         private Func<EndPoint, IAdbSocket> adbSocketFactory;
@@ -65,7 +66,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
@@ -127,7 +128,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int GetAdbVersion()
         {
-            using (IAdbSocket? socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket? socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest("host:version");
                 AdbResponse? response = socket.ReadAdbResponse();
@@ -140,7 +141,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void KillAdb()
         {
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest("host:kill");
 
@@ -152,7 +153,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public List<DeviceData> GetDevices()
         {
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest("host:devices-l");
                 socket.ReadAdbResponse();
@@ -169,7 +170,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
@@ -189,7 +190,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
@@ -203,7 +204,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
@@ -218,7 +219,7 @@ namespace AdvancedSharpAdbClient
 
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
@@ -242,7 +243,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
                 AdbResponse? response = socket.ReadAdbResponse();
@@ -254,7 +255,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
                 AdbResponse? response = socket.ReadAdbResponse();
@@ -266,7 +267,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
                 AdbResponse? response = socket.ReadAdbResponse();
@@ -284,7 +285,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 

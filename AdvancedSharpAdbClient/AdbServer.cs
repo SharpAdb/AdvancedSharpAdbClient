@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
-            AdbServerStatus serverStatus = this.GetStatus();
+            AdbServerStatus serverStatus = GetStatus();
             Version commandLineVersion = null;
 
             IAdbCommandLineClient? commandLineClient = adbCommandLineClientFactory(adbPath);
