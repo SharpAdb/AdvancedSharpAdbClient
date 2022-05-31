@@ -4,6 +4,7 @@
 
 namespace AdvancedSharpAdbClient
 {
+    using AdvancedSharpAdbClient.Interfaces;
     using Exceptions;
     using System;
     using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace AdvancedSharpAdbClient
     ///     }
     /// }
     ///
-    ///     void UploadFile()
+    /// void UploadFile()
     /// {
     ///     var device = AdbClient.Instance.GetDevices().First();
     ///
