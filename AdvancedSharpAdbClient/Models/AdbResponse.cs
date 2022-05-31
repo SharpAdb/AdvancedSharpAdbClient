@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient
         {
             int hash = 17;
             hash = (hash * 23) + IOSuccess.GetHashCode();
-            hash = (hash * 23) + Message == null ? 0 : this.Message.GetHashCode();
+            hash = (hash * 23) + Message == null ? 0 : Message.GetHashCode();
             hash = (hash * 23) + Okay.GetHashCode();
             hash = (hash * 23) + Timeout.GetHashCode();
 

@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient
 
             if (version == null)
             {
-                throw new AdbException($"The version of the adb executable at {this.AdbPath} could not be determined.");
+                throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
             }
 
             if (version < AdbServer.RequiredAdbVersion)

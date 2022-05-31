@@ -381,7 +381,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (Framebuffer framebuffer = this.CreateRefreshableFramebuffer(device))
+            using (Framebuffer framebuffer = CreateRefreshableFramebuffer(device))
             {
                 await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
 
@@ -454,7 +454,7 @@ namespace AdvancedSharpAdbClient
 
             string? request = $"reboot:{into}";
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest(request);
@@ -470,7 +470,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 AdbResponse? response = socket.ReadAdbResponse();
@@ -488,7 +488,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest(request);
@@ -518,7 +518,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public List<string> GetFeatureSet(DeviceData device)
         {
-            using (IAdbSocket? socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket? socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host-serial:{device.Serial}:features");
 
@@ -561,7 +561,7 @@ namespace AdvancedSharpAdbClient
             // do last to override any user specified value
             requestBuilder.Append($" -S {apk.Length}");
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
 
@@ -842,7 +842,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using (IAdbSocket socket = adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SetDevice(device);
                 socket.SendAdbRequest(string.Format("shell:input tap {0} {1}", x, y));
@@ -1051,7 +1051,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            using (IAdbSocket socket = this.adbSocketFactory(this.EndPoint))
+            using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
                 socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
                 AdbResponse? response = socket.ReadAdbResponse();

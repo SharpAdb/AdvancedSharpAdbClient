@@ -273,7 +273,7 @@ namespace AdvancedSharpAdbClient
 
                 if (size > MaxBufferSize)
                 {
-                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {this.MaxBufferSize}");
+                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
                 }
 
                 // now read the length we received
@@ -320,7 +320,7 @@ namespace AdvancedSharpAdbClient
 
             while (true)
             {
-                SyncCommand response = this.Socket.ReadSyncResponse();
+                SyncCommand response = Socket.ReadSyncResponse();
 
                 if (response == SyncCommand.DONE)
                 {

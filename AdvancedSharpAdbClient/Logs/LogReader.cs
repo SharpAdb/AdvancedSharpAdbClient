@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Logs
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
             // https://android.googlesource.com/platform/system/core/+/67d7eaf/include/log/logger.h
-            ushort? payloadLengthValue = await this.ReadUInt16Async(cancellationToken).ConfigureAwait(false);
+            ushort? payloadLengthValue = await ReadUInt16Async(cancellationToken).ConfigureAwait(false);
             ushort? headerSizeValue = payloadLengthValue == null ? null : await ReadUInt16Async(cancellationToken).ConfigureAwait(false);
             int? pidValue = headerSizeValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
             int? tidValue = pidValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
 #else
-                this.stream.Read(data, totalRead, count - totalRead)
+                stream.Read(data, totalRead, count - totalRead)
 #endif
                 ) > 0)
             {

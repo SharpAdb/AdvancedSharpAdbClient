@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureNotDisposed();
 
-            using (IAdbSocket? socket = Factories.AdbSocketFactory(this.client.EndPoint))
+            using (IAdbSocket? socket = Factories.AdbSocketFactory(client.EndPoint))
             {
                 // Select the target device
                 socket.SetDevice(Device);
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
 
                 if (!headerInitialized)
                 {
-                    Header = FramebufferHeader.Read(this.headerData);
+                    Header = FramebufferHeader.Read(headerData);
                     headerInitialized = true;
                 }
 
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureNotDisposed();
 
-            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : this.Header.ToImage(this.Data);
+            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToImage(Data);
         }
 
         /// <inheritdoc/>

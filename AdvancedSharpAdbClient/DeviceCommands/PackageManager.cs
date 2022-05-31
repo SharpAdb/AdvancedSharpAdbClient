@@ -119,15 +119,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            PackageManagerReceiver pmr = new PackageManagerReceiver(this.Device, this);
+            PackageManagerReceiver pmr = new PackageManagerReceiver(Device, this);
 
             if (ThirdPartyOnly)
             {
-                client.ExecuteShellCommand(this.Device, ListThirdPartyOnly, pmr);
+                client.ExecuteShellCommand(Device, ListThirdPartyOnly, pmr);
             }
             else
             {
-                client.ExecuteShellCommand(this.Device, ListFull, pmr);
+                client.ExecuteShellCommand(Device, ListFull, pmr);
             }
         }
 
@@ -334,7 +334,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
         private string SyncPackageToDevice(string localFilePath)
         {
-            this.ValidateDevice();
+            ValidateDevice();
 
             try
             {
@@ -346,14 +346,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
 #if !NET35 && !NET40
-                this.logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{this.Device.Serial}'");
+                logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{Device.Serial}'");
 #endif
 
                 using (ISyncService sync = syncServiceFactory(client, Device))
                 using (Stream stream = File.OpenRead(localFilePath))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogDebug($"Uploading file onto device '{this.Device.Serial}'");
+                    logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif
 
                     // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
@@ -365,7 +365,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             catch (IOException e)
             {
 #if !NET40 && !NET35
-                this.logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
+                logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
 #endif
                 throw;
             }
@@ -386,7 +386,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             catch (IOException e)
             {
 #if !NET40 && !NET35
-                this.logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
+                logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
 #endif
                 throw;
             }
@@ -432,7 +432,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            client.ExecuteShellCommand(this.Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
+            client.ExecuteShellCommand(Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
