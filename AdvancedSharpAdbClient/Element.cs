@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        private IAdvancedAdbClient client { get; set; }
+        private IAdbClient client { get; set; }
 
         /// <summary>
         /// The current device containing the element
@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="cords"></param>
         /// <param name="attributes"></param>
-        public Element(IAdvancedAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
+        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
         {
             this.client = client;
             this.device = device;

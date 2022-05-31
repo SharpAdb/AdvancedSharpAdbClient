@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private static string? cachedAdbPath;
 
-        private readonly IAdvancedAdbClient adbClient;
+        private readonly IAdbClient adbClient;
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
@@ -75,17 +75,17 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        public AdbServer() : this(new AdvancedAdbClient(), Factories.AdbCommandLineClientFactory)
+        public AdbServer() : this(new AdbClient(), Factories.AdbCommandLineClientFactory)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        public AdbServer(IAdvancedAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
+        public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
             this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
-            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(AdvancedAdbClient));
+            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(AdbClient));
         }
 
         /// <summary>

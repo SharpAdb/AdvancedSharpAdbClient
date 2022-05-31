@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient
             }
 
             string commandText = Values[command];
-            byte[] commandBytes = AdvancedAdbClient.Encoding.GetBytes(commandText);
+            byte[] commandBytes = AdbClient.Encoding.GetBytes(commandText);
 
             return commandBytes;
         }
@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
 
-            string commandText = AdvancedAdbClient.Encoding.GetString(value);
+            string commandText = AdbClient.Encoding.GetString(value);
 
             SyncCommand? key = Values.Where(d => string.Equals(d.Value, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
 

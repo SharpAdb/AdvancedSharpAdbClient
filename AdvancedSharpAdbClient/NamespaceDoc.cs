@@ -14,9 +14,9 @@ namespace AdvancedSharpAdbClient
     /// </para>
     ///
     /// <para>
-    ///     Most of the adb functionality is exposed through the <see cref="AdvancedAdbClient"/> class.
+    ///     Most of the adb functionality is exposed through the <see cref="AdbClient"/> class.
     ///     You can create your own instance of that class, or just use the instance we provide for you at
-    ///     <see cref="AdvancedAdbClient.Instance"/>
+    ///     <see cref="AdbClient.Instance"/>
     /// </para>
     ///
     /// <para>

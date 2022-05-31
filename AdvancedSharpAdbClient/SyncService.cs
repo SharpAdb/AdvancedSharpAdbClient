@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">A connection to an adb server.</param>
         /// <param name="device">The device on which to interact with the files.</param>
-        public SyncService(IAdvancedAdbClient client, DeviceData device) : this(Factories.AdbSocketFactory(client.EndPoint), device)
+        public SyncService(IAdbClient client, DeviceData device) : this(Factories.AdbSocketFactory(client.EndPoint), device)
         {
         }
 
@@ -121,7 +121,7 @@ namespace AdvancedSharpAdbClient
         /// Reopen this connection.
         /// </summary>
         /// <param name="client">A connection to an adb server.</param>
-        public void Reopen(IAdvancedAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
+        public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)

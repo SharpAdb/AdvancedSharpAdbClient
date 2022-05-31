@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient
     /// <para>
     /// The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
     /// sending and receiving messages. For interacting with the services the Android Debug
-    /// Bridge exposes, use the <see cref="AdvancedAdbClient"/>.
+    /// Bridge exposes, use the <see cref="AdbClient"/>.
     /// </para>
     /// <para>
     /// For more information about the protocol that is implemented here, see chapter
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient
         /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
         public static bool IsOkay(byte[] reply)
         {
-            return AdvancedAdbClient.Encoding.GetString(reply).Equals("OKAY");
+            return AdbClient.Encoding.GetString(reply).Equals("OKAY");
         }
 
         /// <inheritdoc/>
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient
 
             this.SendSyncRequest(command, path.Length);
 
-            byte[] pathBytes = AdvancedAdbClient.Encoding.GetBytes(path);
+            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             this.Write(pathBytes);
         }
 
@@ -197,14 +197,14 @@ namespace AdvancedSharpAdbClient
             }
 
             // Convert the bytes to a hex string
-            string lenHex = AdvancedAdbClient.Encoding.GetString(reply);
+            string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
             this.Read(reply);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -226,7 +226,7 @@ namespace AdvancedSharpAdbClient
             reply = new byte[len];
             this.Read(reply);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -238,14 +238,14 @@ namespace AdvancedSharpAdbClient
             await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
-            string lenHex = AdvancedAdbClient.Encoding.GetString(reply);
+            string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
             await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void SendAdbRequest(string request)
         {
-            byte[] data = AdvancedAdbClient.FormAdbRequest(request);
+            byte[] data = AdbClient.FormAdbRequest(request);
 
             if (!this.Write(data))
             {

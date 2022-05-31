@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public class Framebuffer : IDisposable
     {
-        private readonly AdvancedAdbClient client;
+        private readonly AdbClient client;
         private byte[] headerData;
         private bool headerInitialized;
         private bool disposed;
@@ -24,8 +24,8 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="client">A <see cref="AdvancedAdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, AdvancedAdbClient client)
+        /// <param name="client">A <see cref="AdbClient"/> which manages the connection with adb.</param>
+        public Framebuffer(DeviceData device, AdbClient client)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
 

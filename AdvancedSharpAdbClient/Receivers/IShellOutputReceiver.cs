@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
         ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
         /// </value>
         /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdvancedAdbClient"/>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
         bool ParsesErrors { get; }

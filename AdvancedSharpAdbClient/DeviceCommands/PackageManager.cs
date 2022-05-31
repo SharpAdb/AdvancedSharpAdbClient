@@ -48,27 +48,27 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
 
         /// <summary>
-        /// The <see cref="IAdvancedAdbClient"/> to use when communicating with the device.
+        /// The <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        private readonly IAdvancedAdbClient client;
+        private readonly IAdbClient client;
 
         /// <summary>
         /// A function which returns a new instance of a class that implements the
         /// <see cref="ISyncService"/> interface, that can be used to transfer files to and from
         /// a given device.
         /// </summary>
-        private readonly Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory;
+        private readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
-        /// <param name="client">The <see cref="IAdvancedAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
+        /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
         /// <param name="device">The device on which to look for packages.</param>
         /// <param name="thirdPartyOnly"><see langword="true"/> to only indicate third party applications; <see langword="false"/> to also include built-in applications.</param>
         /// <param name="syncServiceFactory">A function which returns a new instance of a class that implements the <see cref="ISyncService"/> interface, that can be used to transfer files to and from a given device.</param>
         /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not. Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public PackageManager(IAdvancedAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdvancedAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
 #if !NET35 && !NET40
             , ILogger<PackageManager> logger = null
 #endif

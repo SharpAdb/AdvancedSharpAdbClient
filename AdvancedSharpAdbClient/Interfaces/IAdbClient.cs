@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
     /// A common interface for any class that allows you to interact with the
     /// adb server and devices that are connected to that adb server.
     /// </summary>
-    public interface IAdvancedAdbClient
+    public interface IAdbClient
     {
         /// <summary>
         /// Gets the <see cref="EndPoint"/> at which the Android Debug Bridge server is listening.
@@ -484,5 +484,13 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         void HomeBtn(DeviceData device);
+    }
+
+    /// <summary>
+    /// See as the <see cref="IAdbClient"/> interface.
+    /// </summary>
+    [Obsolete("IAdvancedAdbClient is too long to remember. Please use IAdbClient instead.")]
+    public interface IAdvancedAdbClient : IAdbClient
+    {
     }
 }

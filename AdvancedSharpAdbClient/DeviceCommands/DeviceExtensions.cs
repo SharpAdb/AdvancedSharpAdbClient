@@ -19,11 +19,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Executes a shell command on the device.
         /// </summary>
-        /// <param name="client">The <see cref="IAdvancedAdbClient"/> to use when executing the command.</param>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteShellCommand(this IAdvancedAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
         {
             client.ExecuteRemoteCommand(command, device, receiver);
         }
@@ -31,11 +31,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the file statistics of a given file.
         /// </summary>
-        /// <param name="client">The <see cref="IAdvancedAdbClient"/> to use when executing the command.</param>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to look for the file.</param>
         /// <param name="path">The path to the file.</param>
         /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
-        public static FileStatistics Stat(this IAdvancedAdbClient client, DeviceData device, string path)
+        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
             using (ISyncService service = Factories.SyncServiceFactory(client, device))
             {
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the properties.</param>
         /// <returns>A dictionary containing the properties of the device, and their values.</returns>
-        public static Dictionary<string, string> GetProperties(this IAdvancedAdbClient client, DeviceData device)
+        public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
             GetPropReceiver? receiver = new GetPropReceiver();
             client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the environment variables.</param>
         /// <returns>A dictionary containing the environment variables of the device, and their values.</returns>
-        public static Dictionary<string, string> GetEnvironmentVariables(this IAdvancedAdbClient client, DeviceData device)
+        public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
             EnvironmentVariablesReceiver? receiver = new EnvironmentVariablesReceiver();
             client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
-        public static void UninstallPackage(this IAdvancedAdbClient client, DeviceData device, string packageName)
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
         {
             PackageManager manager = new PackageManager(client, device);
             manager.UninstallPackage(packageName);
@@ -86,7 +86,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
-        public static VersionInfo GetPackageVersion(this IAdvancedAdbClient client, DeviceData device, string packageName)
+        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
             PackageManager manager = new PackageManager(client, device);
             return manager.GetVersionInfo(packageName);
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>
         /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes that are currently running on the device.</returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this IAdvancedAdbClient client, DeviceData device)
+        public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
