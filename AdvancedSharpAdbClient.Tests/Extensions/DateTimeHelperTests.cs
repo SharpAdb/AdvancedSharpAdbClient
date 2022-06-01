@@ -6,7 +6,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="DateTimeHelper"/> class.
     /// </summary>
-    public class DateTimeHelperTest
+    public class DateTimeHelperTests
     {
         [Fact]
         public void ToUnixEpochTest()
@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void ToDateTime()
         {
             DateTime time = new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc);
-            Assert.Equal(time, ((long)1654085434).ToDateTime().ToUniversalTime());
+            Assert.Equal(time, ((long)1654085434).ToDateTime());
         }
     }
 }
