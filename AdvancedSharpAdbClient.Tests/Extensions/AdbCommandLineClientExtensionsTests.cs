@@ -5,6 +5,9 @@ using System.IO;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbCommandLineClientExtensions"/> class.
+    /// </summary>
     public class AdbCommandLineClientExtensionsTests
     {
         [Fact]

@@ -4,8 +4,9 @@ using System;
 using System.IO;
 using Moq;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
+
     public class PackageManagerTests
     {
         [Fact]
@@ -92,7 +93,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             PackageManager manager = new PackageManager(adbClient, device);
-            manager.InstallPackage("test.txt", false);
+            manager.InstallPackage("Assets/test.txt", false);
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
             Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
@@ -128,7 +129,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             DummyAdbClient client = new DummyAdbClient();
-            client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("gapps.txt"));
+            client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("Assets/gapps.txt"));
             PackageManager manager = new PackageManager(client, device, skipInit: true);
 
             var versionInfo = manager.GetVersionInfo("com.google.android.gms");

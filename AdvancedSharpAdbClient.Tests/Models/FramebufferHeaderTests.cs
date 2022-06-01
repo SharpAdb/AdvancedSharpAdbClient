@@ -5,12 +5,15 @@ using System.IO;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="FramebufferHeader"/> class.
+    /// </summary>
     public class FramebufferHeaderTests
     {
         [Fact]
         public void ReadFramebufferTest()
         {
-            var data = File.ReadAllBytes("framebufferheader.bin");
+            var data = File.ReadAllBytes("Assets/framebufferheader.bin");
 
             var header = FramebufferHeader.Read(data);
 
@@ -32,7 +35,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadFramebufferv2Test()
         {
-            var data = File.ReadAllBytes("framebufferheader-v2.bin");
+            var data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
 
             var header = FramebufferHeader.Read(data);
 
@@ -54,12 +57,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToImageTest()
         {
-            var data = File.ReadAllBytes("framebufferheader.bin");
+            var data = File.ReadAllBytes("Assets/framebufferheader.bin");
             var header = FramebufferHeader.Read(data);
             header.Width = 1;
             header.Height = 1;
 
-            var framebuffer = File.ReadAllBytes("framebuffer.bin");
+            var framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
             using (var image = (Bitmap)header.ToImage(framebuffer))
             {
                 Assert.NotNull(image);
@@ -79,7 +82,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToImageEmptyTest()
         {
-            var data = File.ReadAllBytes("framebufferheader-empty.bin");
+            var data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
             var header = FramebufferHeader.Read(data);
 
             var framebuffer = new byte[] { };

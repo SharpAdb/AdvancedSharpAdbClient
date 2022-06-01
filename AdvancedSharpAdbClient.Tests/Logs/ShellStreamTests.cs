@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Tests.Logs
 {
     public class ShellStreamTests
     {
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.Tests
             using (ShellStream shellStream = new ShellStream(stream, false))
             using (StreamReader reader = new StreamReader(shellStream))
             {
-                Assert.Equal((int)'\n', shellStream.ReadByte());
+                Assert.Equal('\n', shellStream.ReadByte());
 
                 stream.Position = 0;
                 byte[] buffer = new byte[2];
@@ -74,7 +74,7 @@ namespace AdvancedSharpAdbClient.Tests
             using (ShellStream shellStream = new ShellStream(stream, false))
             using (StreamReader reader = new StreamReader(shellStream))
             {
-                Assert.Equal((int)'\n', shellStream.ReadByte());
+                Assert.Equal('\n', shellStream.ReadByte());
 
                 stream.Position = 0;
                 byte[] buffer = new byte[100];
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient.Tests
             using (ShellStream shellStream = new ShellStream(stream, false))
             using (StreamReader reader = new StreamReader(shellStream))
             {
-                Assert.Equal((int)'\n', shellStream.ReadByte());
+                Assert.Equal('\n', shellStream.ReadByte());
 
                 stream.Position = 0;
                 byte[] buffer = new byte[2];
@@ -144,7 +144,7 @@ namespace AdvancedSharpAdbClient.Tests
             using (ShellStream shellStream = new ShellStream(stream, false))
             using (StreamReader reader = new StreamReader(shellStream))
             {
-                Assert.Equal((int)'\n', shellStream.ReadByte());
+                Assert.Equal('\n', shellStream.ReadByte());
 
                 stream.Position = 0;
                 byte[] buffer = new byte[100];

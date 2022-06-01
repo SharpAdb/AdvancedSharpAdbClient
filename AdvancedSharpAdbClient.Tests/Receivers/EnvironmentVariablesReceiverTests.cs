@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="EnvironmentVariablesReceiver"/> class.
+    /// </summary>
     public class EnvironmentVariablesReceiverTests
     {
         [Fact]

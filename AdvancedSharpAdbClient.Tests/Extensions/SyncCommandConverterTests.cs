@@ -3,6 +3,9 @@ using System;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="SyncCommandConverter"/> class.
+    /// </summary>
     public class SyncCommandConverterTests
     {
         [Fact]

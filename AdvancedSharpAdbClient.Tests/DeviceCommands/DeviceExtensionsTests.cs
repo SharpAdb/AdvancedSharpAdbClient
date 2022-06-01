@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
+    /// <summary>
+    /// Tests the <see cref="DeviceExtensions"/> class.
+    /// </summary>
     public class DeviceExtensionsTests
     {
         public DeviceExtensionsTests()

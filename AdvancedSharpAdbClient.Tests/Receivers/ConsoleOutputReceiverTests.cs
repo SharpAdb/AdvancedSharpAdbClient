@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="ConsoleOutputReceiver"/> class.
+    /// </summary>
     public class ConsoleOutputReceiverTests
     {
         [Fact]

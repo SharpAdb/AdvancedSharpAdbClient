@@ -9,6 +9,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbSocket"/> class.
+    /// </summary>
     public class AdbSocketTests
     {
         [Fact]

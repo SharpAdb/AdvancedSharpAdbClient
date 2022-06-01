@@ -2,10 +2,12 @@
 using System.Runtime.Serialization;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Tests.Exceptions
 {
-    internal static class ExceptionTester<T>
-        where T : Exception
+    /// <summary>
+    /// Tests the <see cref="Exception"/> class.
+    /// </summary>
+    internal static class ExceptionTester<T> where T : Exception
     {
         public static void TestEmptyConstructor(Func<T> constructor)
         {

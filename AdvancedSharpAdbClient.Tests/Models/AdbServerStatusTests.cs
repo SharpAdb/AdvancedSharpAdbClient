@@ -3,6 +3,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbServerStatus"/> class.
+    /// </summary>
     public class AdbServerStatusTests
     {
         [Fact]

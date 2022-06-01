@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <LangVersion>latest</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>AdvancedSharpAdbClient.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,37 +24,37 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="dumpsys_package.txt">
+    <None Update="Assets\dumpsys_package.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="framebuffer.bin">
+    <None Update="Assets\framebuffer.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="framebufferheader-empty.bin">
+    <None Update="Assets\framebufferheader-empty.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="framebufferheader-v2.bin">
+    <None Update="Assets\framebufferheader-v2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="framebufferheader.bin">
+    <None Update="Assets\framebufferheader.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="fstab.bin">
+    <None Update="Assets\fstab.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="gapps.txt">
+    <None Update="Assets\gapps.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="logcat.bin">
+    <None Update="Assets\logcat.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="logcatevents.bin">
+    <None Update="Assets\logcatevents.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="test.txt">
+    <None Update="Assets\test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="testapp.apk">
+    <None Update="Assets\testapp.apk">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>AdvancedSharpAdbClient</AssemblyName>
-    <AssemblyOriginatorKeyFile>AdvancedSharpAdbClient.snk</AssemblyOriginatorKeyFile>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
     <Copyright>https://github.com/quamotion/madb</Copyright>
@@ -11,16 +9,13 @@
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
     <Nullable>Enable</Nullable>
-    <PackageId>AdvancedSharpAdbClient</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient;</PackageTags>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
-    <SignAssembly>false</SignAssembly>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>

@@ -6,6 +6,9 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="DeviceMonitor"/> class.
+    /// </summary>
     public class DeviceMonitorTests : SocketBasedTests
     {
         // Toggle the integration test flag to true to run on an actual adb server

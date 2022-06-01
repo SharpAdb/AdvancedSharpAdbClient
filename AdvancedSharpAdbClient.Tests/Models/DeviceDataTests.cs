@@ -3,6 +3,9 @@ using System;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="DeviceData"/> class.
+    /// </summary>
     public class DeviceDataTests
     {
         [Fact]

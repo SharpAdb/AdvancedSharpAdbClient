@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="ForwardSpec"/> class.
+    /// </summary>
     public class ForwardSpecTests
     {
         [Fact]

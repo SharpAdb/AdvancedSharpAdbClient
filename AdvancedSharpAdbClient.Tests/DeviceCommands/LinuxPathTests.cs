@@ -2,8 +2,11 @@
 using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
+    /// <summary>
+    /// Tests the <see cref="LinuxPath"/> class.
+    /// </summary>
     public class LinuxPathTests
     {
         [Fact]

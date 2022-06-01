@@ -2,6 +2,9 @@
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="ForwardData"/> class.
+    /// </summary>
     public class ForwardDataTests
     {
         [Fact]

@@ -12,14 +12,16 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbClient"/> class.
+    /// </summary>
     public class AdbClientTests : SocketBasedTests
     {
         // Toggle the integration test flag to true to run on an actual adb server
         // (and to build/validate the test cases), set to false to use the mocked
         // adb sockets.
         // In release mode, this flag is ignored and the mocked adb sockets are always used.
-        public AdbClientTests()
-            : base(integrationTest: false, doDispose: false)
+        public AdbClientTests() : base(integrationTest: false, doDispose: false)
         {
             Factories.Reset();
         }
@@ -579,10 +581,10 @@ namespace AdvancedSharpAdbClient.Tests
 
             var receiver = new ConsoleOutputReceiver();
 
-            using (Stream stream = File.OpenRead("logcat.bin"))
+            using (Stream stream = File.OpenRead("Assets/logcat.bin"))
             using (ShellStream shellStream = new ShellStream(stream, false))
             {
-                Collection<Logs.LogEntry> logs = new Collection<LogEntry>();
+                Collection<LogEntry> logs = new Collection<LogEntry>();
                 Action<LogEntry> sink = (entry) => logs.Add(entry);
 
                 this.RunTest(
@@ -592,7 +594,7 @@ namespace AdvancedSharpAdbClient.Tests
                     shellStream,
                     () =>
                     {
-                        this.TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, Logs.LogId.System).Wait();
+                        this.TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, LogId.System).Wait();
                     });
 
                 Assert.Equal(3, logs.Count());
@@ -685,7 +687,7 @@ namespace AdvancedSharpAdbClient.Tests
             // The app data is sent in chunks of 32 kb
             Collection<byte[]> applicationDataChuncks = new Collection<byte[]>();
 
-            using (Stream stream = File.OpenRead("testapp.apk"))
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -706,7 +708,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success\n");
 
-            using (Stream stream = File.OpenRead("testapp.apk"))
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 this.RunTest(
                     new AdbResponse[]

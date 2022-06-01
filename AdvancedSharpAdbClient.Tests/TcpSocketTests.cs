@@ -6,6 +6,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="TcpSocket"/> class.
+    /// </summary>
     public class TcpSocketTests
     {
         [Fact]

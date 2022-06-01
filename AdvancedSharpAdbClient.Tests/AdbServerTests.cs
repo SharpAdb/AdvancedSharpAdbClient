@@ -8,6 +8,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbServer"/> class.
+    /// </summary>
     public class AdbServerTests
     {
         private Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;

@@ -7,6 +7,9 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="SyncService"/> class.
+    /// </summary>
     public class SyncServiceTests : SocketBasedTests
     {
         // Toggle the integration test flag to true to run on an actual adb server
@@ -123,7 +126,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             MemoryStream stream = new MemoryStream();
-            var content = File.ReadAllBytes("fstab.bin");
+            var content = File.ReadAllBytes("Assets/fstab.bin");
             var contentLength = BitConverter.GetBytes(content.Length);
 
             this.RunTest(
@@ -160,8 +163,8 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            Stream stream = File.OpenRead("fstab.bin");
-            var content = File.ReadAllBytes("fstab.bin");
+            Stream stream = File.OpenRead("Assets/fstab.bin");
+            var content = File.ReadAllBytes("Assets/fstab.bin");
             var contentMessage = new List<byte>();
             contentMessage.AddRange(SyncCommandConverter.GetBytes(SyncCommand.DATA));
             contentMessage.AddRange(BitConverter.GetBytes(content.Length));

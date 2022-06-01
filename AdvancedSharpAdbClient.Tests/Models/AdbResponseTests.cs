@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// Tests the <see cref="AdbResponse"/> class.
+    /// </summary>
     public class AdbResponseTests
     {
         [Fact]

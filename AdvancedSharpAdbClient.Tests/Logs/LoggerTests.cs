@@ -7,14 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Tests.Logs
 {
     public class LoggerTests
     {
         [Fact]
         public async Task ReadLogTests()
         {
-            using (Stream stream = File.OpenRead(@"logcat.bin"))
+            using (Stream stream = File.OpenRead(@"Assets/logcat.bin"))
             using (ShellStream shellStream = new ShellStream(stream, false))
             {
                 LogReader reader = new LogReader(shellStream);
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            using (Stream stream = File.OpenRead(@"logcatevents.bin"))
+            using (Stream stream = File.OpenRead(@"Assets/logcatevents.bin"))
             {
                 LogReader reader = new LogReader(stream);
                 var entry = await reader.ReadEntry(CancellationToken.None);

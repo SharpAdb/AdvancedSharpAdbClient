@@ -4,6 +4,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
+    /// <summary>
+    /// Tests the <see cref="AndroidProcess"/> class.
+    /// </summary>
     public class AndroidProcessTests
     {
         [Fact]
