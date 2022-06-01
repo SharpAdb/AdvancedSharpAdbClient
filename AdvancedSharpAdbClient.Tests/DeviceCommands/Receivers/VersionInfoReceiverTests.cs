@@ -4,7 +4,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
 using System;
 using System.IO;
@@ -41,7 +40,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 
             DeviceData device = new DeviceData();
 
-            var dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"Assets/dumpsys_package.txt"));
+            string dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"Assets/dumpsys_package.txt"));
             receiver = new VersionInfoReceiver();
 
             StringReader reader = new StringReader(dumpsys);

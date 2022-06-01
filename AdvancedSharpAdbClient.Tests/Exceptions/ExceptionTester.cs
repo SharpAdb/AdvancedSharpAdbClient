@@ -11,13 +11,13 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
     {
         public static void TestEmptyConstructor(Func<T> constructor)
         {
-            var ex = constructor();
+            T ex = constructor();
         }
 
         public static void TestMessageConstructor(Func<string, T> constructor)
         {
-            var message = "Hello, World";
-            var ex = constructor(message);
+            string message = "Hello, World";
+            T ex = constructor(message);
 
             Assert.Equal(message, ex.Message);
             Assert.Null(ex.InnerException);
@@ -25,9 +25,9 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
 
         public static void TestMessageAndInnerConstructor(Func<string, Exception, T> constructor)
         {
-            var message = "Hello, World";
-            var inner = new Exception();
-            var ex = constructor(message, inner);
+            string message = "Hello, World";
+            Exception inner = new Exception();
+            T ex = constructor(message, inner);
 
             Assert.Equal(message, ex.Message);
             Assert.Equal(inner, ex.InnerException);
@@ -36,8 +36,8 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
 #if !NETCOREAPP1_1
         public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
         {
-            var info = new SerializationInfo(typeof(T), new FormatterConverter());
-            var context = new StreamingContext();
+            SerializationInfo info = new SerializationInfo(typeof(T), new FormatterConverter());
+            StreamingContext context = new StreamingContext();
 
             info.AddValue("ClassName", string.Empty);
             info.AddValue("Message", string.Empty);
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
             info.AddValue("HResult", 1);
             info.AddValue("Source", string.Empty);
 
-            var ex = constructor(info, context);
+            T ex = constructor(info, context);
         }
 #endif
     }

@@ -25,13 +25,13 @@ namespace AdvancedSharpAdbClient
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                var tracingSocket = new TracingAdbSocket(this.EndPoint) { DoDispose = doDispose };
+                TracingAdbSocket tracingSocket = new TracingAdbSocket(this.EndPoint) { DoDispose = doDispose };
 
                 Factories.AdbSocketFactory = (endPoint) => tracingSocket;
             }
             else
             {
-                var socket = new DummyAdbSocket();
+                DummyAdbSocket socket = new DummyAdbSocket();
                 Factories.AdbSocketFactory = (endPoint) => socket;
             }
 
@@ -162,19 +162,19 @@ namespace AdvancedSharpAdbClient
             {
                 this.Socket.ShellStream = shellStream;
 
-                foreach (var response in responses)
+                foreach (AdbResponse response in responses)
                 {
                     this.Socket.Responses.Enqueue(response);
                 }
 
-                foreach (var responseMessage in responseMessages)
+                foreach (string responseMessage in responseMessages)
                 {
                     this.Socket.ResponseMessages.Enqueue(responseMessage);
                 }
 
                 if (syncResponses != null)
                 {
-                    foreach (var syncResponse in syncResponses)
+                    foreach (SyncCommand syncResponse in syncResponses)
                     {
                         this.Socket.SyncResponses.Enqueue(syncResponse);
                     }
@@ -182,7 +182,7 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataReceived != null)
                 {
-                    foreach (var syncDatum in syncDataReceived)
+                    foreach (byte[] syncDatum in syncDataReceived)
                     {
                         this.Socket.SyncDataReceived.Enqueue(syncDatum);
                     }

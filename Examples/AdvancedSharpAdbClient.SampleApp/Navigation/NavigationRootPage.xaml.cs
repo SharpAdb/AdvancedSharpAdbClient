@@ -112,11 +112,11 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void OnPaneDisplayModeChanged(DependencyObject sender, DependencyProperty dp)
         {
-            var navigationView = sender as muxc.NavigationView;
+            muxc.NavigationView navigationView = sender as muxc.NavigationView;
             NavigationRootPage.Current.AppTitleBar.Visibility = navigationView.PaneDisplayMode == muxc.NavigationViewPaneDisplayMode.Top ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        void UpdateAppTitle(CoreApplicationViewTitleBar coreTitleBar)
+        private void UpdateAppTitle(CoreApplicationViewTitleBar coreTitleBar)
         {
             //ensure the custom title bar does not overlap window caption controls
             Thickness currMargin = AppTitleBar.Margin;
@@ -158,21 +158,21 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void AddNavigationMenuItems()
         {
-            foreach (var group in ControlInfoDataSource.Instance.Groups.OrderBy(i => i.Title))
+            foreach (ControlInfoDataGroup group in ControlInfoDataSource.Instance.Groups.OrderBy(i => i.Title))
             {
-                var itemGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = group.Title, Tag = group.UniqueId, DataContext = group, Icon = GetIcon(group.ImageIconPath) };
+                muxc.NavigationViewItem itemGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = group.Title, Tag = group.UniqueId, DataContext = group, Icon = GetIcon(group.ImageIconPath) };
 
-                var groupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {group.Title} Samples", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = group };
+                MenuFlyoutItem groupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {group.Title} Samples", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = group };
                 groupMenuFlyoutItem.Click += this.OnMenuFlyoutItemClick;
                 itemGroup.ContextFlyout = new MenuFlyout() { Items = { groupMenuFlyoutItem } };
 
                 AutomationProperties.SetName(itemGroup, group.Title);
 
-                foreach (var item in group.Items)
+                foreach (ControlInfoDataItem item in group.Items)
                 {
-                    var itemInGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = item.Title, Tag = item.UniqueId, DataContext = item, Icon = GetIcon(item.ImageIconPath) };
+                    muxc.NavigationViewItem itemInGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = item.Title, Tag = item.UniqueId, DataContext = item, Icon = GetIcon(item.ImageIconPath) };
 
-                    var itemInGroupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {item.Title} Sample", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = item };
+                    MenuFlyoutItem itemInGroupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {item.Title} Sample", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = item };
                     itemInGroupMenuFlyoutItem.Click += this.OnMenuFlyoutItemClick;
                     itemInGroup.ContextFlyout = new MenuFlyout() { Items = { itemInGroupMenuFlyoutItem } };
 
@@ -220,17 +220,17 @@ namespace AdvancedSharpAdbClient.SampleApp
         private static IconElement GetIcon(string imagePath)
         {
             return imagePath.ToLowerInvariant().EndsWith(".png") ?
-                        (IconElement)new BitmapIcon() { UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute) , ShowAsMonochrome = false} :
+                        new BitmapIcon() { UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute), ShowAsMonochrome = false } :
                         (IconElement)new FontIcon()
                         {
-                           // FontFamily = new FontFamily("Segoe MDL2 Assets"),
+                            // FontFamily = new FontFamily("Segoe MDL2 Assets"),
                             Glyph = imagePath
                         };
         }
 
         private void SetDeviceFamily()
         {
-            var familyName = AnalyticsInfo.VersionInfo.DeviceFamily;
+            string familyName = AnalyticsInfo.VersionInfo.DeviceFamily;
 
             if (!Enum.TryParse(familyName.Replace("Windows.", string.Empty), out DeviceType parsedDeviceType))
             {
@@ -278,7 +278,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             }
             else
             {
-                var selectedItem = args.SelectedItemContainer;
+                muxc.NavigationViewItemBase selectedItem = args.SelectedItemContainer;
 
                 if (selectedItem == _allControlsMenuItem)
                 {
@@ -298,12 +298,12 @@ namespace AdvancedSharpAdbClient.SampleApp
                 {
                     if (selectedItem.DataContext is ControlInfoDataGroup)
                     {
-                        var itemId = ((ControlInfoDataGroup)selectedItem.DataContext).UniqueId;
+                        string itemId = ((ControlInfoDataGroup)selectedItem.DataContext).UniqueId;
                         //rootFrame.Navigate(typeof(SectionPage), itemId);
                     }
                     else if (selectedItem.DataContext is ControlInfoDataItem)
                     {
-                        var item = (ControlInfoDataItem)selectedItem.DataContext;
+                        ControlInfoDataItem item = (ControlInfoDataItem)selectedItem.DataContext;
                         rootFrame.Navigate(typeof(ItemPage), item.UniqueId);
                     }
 
@@ -316,15 +316,8 @@ namespace AdvancedSharpAdbClient.SampleApp
             // Close any open teaching tips before navigation
             CloseTeachingTips();
 
-            if (e.SourcePageType == typeof(AllControlsPage) ||
-                e.SourcePageType == typeof(NewControlsPage))
-            {
-                NavigationViewControl.AlwaysShowHeader = false;
-            }
-            else
-            {
-                NavigationViewControl.AlwaysShowHeader = true;
-            }
+            NavigationViewControl.AlwaysShowHeader = e.SourcePageType != typeof(AllControlsPage) &&
+                e.SourcePageType != typeof(NewControlsPage);
         }
         private void CloseTeachingTips()
         {
@@ -339,12 +332,12 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                var suggestions = new List<ControlInfoDataItem>();
+                List<ControlInfoDataItem> suggestions = new List<ControlInfoDataItem>();
 
-                var querySplit = sender.Text.Split(" ");
-                foreach (var group in ControlInfoDataSource.Instance.Groups)
+                string[] querySplit = sender.Text.Split(" ");
+                foreach (ControlInfoDataGroup group in ControlInfoDataSource.Instance.Groups)
                 {
-                    var matchingItems = group.Items.Where(
+                    IEnumerable<ControlInfoDataItem> matchingItems = group.Items.Where(
                         item =>
                         {
                             // Idea: check for every word entered (separated by space) if it is in the name, 
@@ -362,19 +355,14 @@ namespace AdvancedSharpAdbClient.SampleApp
                             }
                             return flag;
                         });
-                    foreach (var item in matchingItems)
+                    foreach (ControlInfoDataItem item in matchingItems)
                     {
                         suggestions.Add(item);
                     }
                 }
-                if (suggestions.Count > 0)
-                {
-                    controlsSearchBox.ItemsSource = suggestions.OrderByDescending(i => i.Title.StartsWith(sender.Text, StringComparison.CurrentCultureIgnoreCase)).ThenBy(i => i.Title);
-                }
-                else
-                {
-                    controlsSearchBox.ItemsSource = new string[] { "No results found" };
-                }
+                controlsSearchBox.ItemsSource = suggestions.Count > 0
+                    ? suggestions.OrderByDescending(i => i.Title.StartsWith(sender.Text, StringComparison.CurrentCultureIgnoreCase)).ThenBy(i => i.Title)
+                    : (object)(new string[] { "No results found" });
             }
         }
 
@@ -382,8 +370,8 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (args.ChosenSuggestion != null && args.ChosenSuggestion is ControlInfoDataItem)
             {
-                var infoDataItem = args.ChosenSuggestion as ControlInfoDataItem;
-                var itemId = infoDataItem.UniqueId;
+                ControlInfoDataItem infoDataItem = args.ChosenSuggestion as ControlInfoDataItem;
+                string itemId = infoDataItem.UniqueId;
                 EnsureItemIsVisibleInNavigation(infoDataItem.Title);
                 NavigationRootPage.RootFrame.Navigate(typeof(ItemPage), itemId);
             }
@@ -405,7 +393,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                     continue;
                 }
 
-                var item = rawItem as muxc.NavigationViewItem;
+                muxc.NavigationViewItem item = rawItem as muxc.NavigationViewItem;
 
                 // Check if we are this category
                 if ((string)item.Content == name)
@@ -472,15 +460,9 @@ namespace AdvancedSharpAdbClient.SampleApp
         private void NavigationViewControl_DisplayModeChanged(Microsoft.UI.Xaml.Controls.NavigationView sender, Microsoft.UI.Xaml.Controls.NavigationViewDisplayModeChangedEventArgs args)
         {
             Thickness currMargin = AppTitleBar.Margin;
-            if (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
-            {
-                AppTitleBar.Margin = new Thickness((sender.CompactPaneLength * 2), currMargin.Top, currMargin.Right, currMargin.Bottom);
-
-            }
-            else
-            {
-                AppTitleBar.Margin = new Thickness(sender.CompactPaneLength, currMargin.Top, currMargin.Right, currMargin.Bottom);
-            }
+            AppTitleBar.Margin = sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal
+                ? new Thickness(sender.CompactPaneLength * 2, currMargin.Top, currMargin.Right, currMargin.Bottom)
+                : new Thickness(sender.CompactPaneLength, currMargin.Top, currMargin.Right, currMargin.Bottom);
 
             UpdateAppTitleMargin(sender);
             UpdateHeaderMargin(sender);
@@ -494,29 +476,19 @@ namespace AdvancedSharpAdbClient.SampleApp
             {
                 AppTitle.TranslationTransition = new Vector3Transition();
 
-                if ((sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Expanded && sender.IsPaneOpen) ||
-                         sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
-                {
-                    AppTitle.Translation = new System.Numerics.Vector3(smallLeftIndent, 0, 0);
-                }
-                else
-                {
-                    AppTitle.Translation = new System.Numerics.Vector3(largeLeftIndent, 0, 0);
-                }
+                AppTitle.Translation = (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Expanded && sender.IsPaneOpen) ||
+                         sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal
+                    ? new System.Numerics.Vector3(smallLeftIndent, 0, 0)
+                    : new System.Numerics.Vector3(largeLeftIndent, 0, 0);
             }
             else
             {
                 Thickness currMargin = AppTitle.Margin;
 
-                if ((sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Expanded && sender.IsPaneOpen) ||
-                         sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
-                {
-                    AppTitle.Margin = new Thickness(smallLeftIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
-                }
-                else
-                {
-                    AppTitle.Margin = new Thickness(largeLeftIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
-                }
+                AppTitle.Margin = (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Expanded && sender.IsPaneOpen) ||
+                         sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal
+                    ? new Thickness(smallLeftIndent, currMargin.Top, currMargin.Right, currMargin.Bottom)
+                    : new Thickness(largeLeftIndent, currMargin.Top, currMargin.Right, currMargin.Bottom);
             }
         }
 
@@ -524,14 +496,9 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (PageHeader != null)
             {
-                if (sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal)
-                {
-                    Current.PageHeader.HeaderPadding = (Thickness)App.Current.Resources["PageHeaderMinimalPadding"];
-                }
-                else
-                {
-                    Current.PageHeader.HeaderPadding = (Thickness)App.Current.Resources["PageHeaderDefaultPadding"];
-                }
+                Current.PageHeader.HeaderPadding = sender.DisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode.Minimal
+                    ? (Thickness)App.Current.Resources["PageHeaderMinimalPadding"]
+                    : (Thickness)App.Current.Resources["PageHeaderDefaultPadding"];
             }
         }
 

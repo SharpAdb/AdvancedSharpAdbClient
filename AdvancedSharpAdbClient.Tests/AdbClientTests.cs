@@ -23,7 +23,10 @@ namespace AdvancedSharpAdbClient.Tests
         // In release mode, this flag is ignored and the mocked adb sockets are always used.
         public AdbClientTests() : base(integrationTest: false, doDispose: false)
         {
-            Factories.Reset();
+            lock (FactoriesTests.locker)
+            {
+                Factories.Reset();
+            }
         }
 
         [Fact]
@@ -41,12 +44,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ConstructorTest()
         {
-            var adbClient = new AdbClient();
+            AdbClient adbClient = new AdbClient();
             Assert.NotNull(adbClient);
             Assert.NotNull(adbClient.EndPoint);
             Assert.IsType<IPEndPoint>(adbClient.EndPoint);
 
-            var endPoint = (IPEndPoint)adbClient.EndPoint;
+            IPEndPoint endPoint = (IPEndPoint)adbClient.EndPoint;
 
             Assert.Equal(IPAddress.Loopback, endPoint.Address);
             Assert.Equal(AdbClient.AdbServerPort, endPoint.Port);
@@ -69,7 +72,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void KillAdbTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:kill"
             };
@@ -87,12 +90,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetAdbVersionTest()
         {
-            var responseMessages = new string[]
+            string[] responseMessages = new string[]
             {
                 "0020"
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:version"
             };
@@ -115,12 +118,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetDevicesTest()
         {
-            var responseMessages = new string[]
+            string[] responseMessages = new string[]
             {
                 "169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:devices-l"
             };
@@ -140,7 +143,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.NotNull(devices);
             Assert.Single(devices);
 
-            var device = devices.Single();
+            DeviceData device = devices.Single();
 
             Assert.Equal("169.254.109.177:5555", device.Serial);
             Assert.Equal(DeviceState.Online, device.State);
@@ -151,7 +154,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetDeviceTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555"
             };
@@ -169,7 +172,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetInvalidDeviceTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555"
             };
@@ -187,7 +190,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetDeviceOtherException()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555"
             };
@@ -205,7 +208,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RebootTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "reboot:"
@@ -224,21 +227,21 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ExecuteRemoteCommandTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK
             };
 
-            var responseMessages = new string[] { };
+            string[] responseMessages = new string[] { };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
@@ -247,7 +250,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
             MemoryStream shellStream = new MemoryStream(streamData);
 
-            var receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
 
             this.RunTest(
                 responses,
@@ -265,27 +268,27 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK
             };
 
-            var responseMessages = new string[] { };
+            string[] responseMessages = new string[] { };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
             };
 
-            var receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
 
             Assert.Throws<ShellCommandUnresponsiveException>(() => this.RunTest(
                 responses,
@@ -334,12 +337,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateDuplicateForwardTest()
         {
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.FromError("cannot rebind existing socket")
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
             };
@@ -357,11 +360,11 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ListForwardTest()
         {
-            var responseMessages = new string[] {
+            string[] responseMessages = new string[] {
                 "169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:list-forward"
             };
@@ -384,16 +387,16 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ListReverseForwardTest()
         {
-            var responseMessages = new string[] {
+            string[] responseMessages = new string[] {
                 "(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"
             };
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK,
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "reverse:list-forward"
@@ -417,7 +420,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveForwardTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:killforward:tcp:1"
             };
@@ -432,13 +435,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveReverseForwardTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward:localabstract:test"
             };
 
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK,
@@ -454,7 +457,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveAllForwardsTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:killforward-all"
             };
@@ -469,13 +472,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveAllReversesTest()
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward-all"
             };
 
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK,
@@ -529,7 +532,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ConnectDnsEndpointNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect((DnsEndPoint)null));
+            Assert.Throws<ArgumentNullException>(() => this.TestClient.Connect(null));
         }
 
         [Fact]
@@ -547,7 +550,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DisconnectTest()
         {
-            var requests = new string[] { "host:disconnect:localhost:5555" };
+            string[] requests = new string[] { "host:disconnect:localhost:5555" };
 
             this.RunTest(
                 OkResponse,
@@ -559,27 +562,27 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadLogTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 
-            var responses = new AdbResponse[]
+            AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
                 AdbResponse.OK
             };
 
-            var responseMessages = new string[] { };
+            string[] responseMessages = new string[] { };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 "shell:logcat -B -b system"
             };
 
-            var receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
 
             using (Stream stream = File.OpenRead("Assets/logcat.bin"))
             using (ShellStream shellStream = new ShellStream(stream, false))
@@ -604,13 +607,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RootTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "009d1cd696d5194a",
                 State = DeviceState.Online
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
                 "root:"
@@ -638,13 +641,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void UnrootTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "009d1cd696d5194a",
                 State = DeviceState.Online
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
                 "unroot:"
@@ -672,13 +675,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void InstallTest()
         {
-            var device = new DeviceData()
+            DeviceData device = new DeviceData()
             {
                 Serial = "009d1cd696d5194a",
                 State = DeviceState.Online
             };
 
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
                 "exec:cmd package 'install'  -S 205774"
@@ -728,7 +731,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         private void RunConnectTest(Action test, string connectString)
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 $"host:connect:{connectString}"
             };
@@ -742,7 +745,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         private void RunCreateReverseTest(Action<DeviceData> test, string reverseString)
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
                 $"reverse:forward:{reverseString}",
@@ -765,7 +768,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         private void RunCreateForwardTest(Action<DeviceData> test, string forwardString)
         {
-            var requests = new string[]
+            string[] requests = new string[]
             {
                 $"host-serial:169.254.109.177:5555:forward:{forwardString}"
             };

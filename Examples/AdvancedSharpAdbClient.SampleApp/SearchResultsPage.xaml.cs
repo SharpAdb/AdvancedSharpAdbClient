@@ -7,10 +7,8 @@
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
 //*********************************************************
-using AdvancedSharpAdbClient.SampleApp.Common;
 using AdvancedSharpAdbClient.SampleApp.Data;
 using AdvancedSharpAdbClient.SampleApp.Helpers;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -28,7 +26,7 @@ namespace AdvancedSharpAdbClient.SampleApp
     {
         private IEnumerable<Filter> _filters;
         private int? _pivotIndex;
-        string _queryText;
+        private string _queryText;
 
         public IEnumerable<Filter> Filters
         {
@@ -45,7 +43,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             base.OnNavigatedTo(e);
 
-            var queryText = e.Parameter?.ToString().ToLower();
+            string queryText = e.Parameter?.ToString().ToLower();
 
             BuildFilterList(queryText);
 
@@ -75,13 +73,13 @@ namespace AdvancedSharpAdbClient.SampleApp
             {
                 // Application-specific searching logic.  The search process is responsible for
                 // creating a list of user-selectable result categories:
-                var filterList = new List<Filter>();
+                List<Filter> filterList = new List<Filter>();
 
                 // Query is already lowercase
-                var querySplit = queryText.ToLower().Split(" ");
-                foreach (var group in ControlInfoDataSource.Instance.Groups)
+                string[] querySplit = queryText.ToLower().Split(" ");
+                foreach (ControlInfoDataGroup group in ControlInfoDataSource.Instance.Groups)
                 {
-                    var matchingItems =
+                    List<ControlInfoDataItem> matchingItems =
                         group.Items.Where(item =>
                         {
                             // Idea: check for every word entered (separated by space) if it is in the name, 
@@ -111,13 +109,13 @@ namespace AdvancedSharpAdbClient.SampleApp
                 {
                     // Display informational text when there are no search results.
                     VisualStateManager.GoToState(this, "NoResultsFound", false);
-                    var textbox = NavigationRootPage.Current.PageHeader?.GetDescendantsOfType<AutoSuggestBox>().FirstOrDefault();
+                    AutoSuggestBox textbox = NavigationRootPage.Current.PageHeader?.GetDescendantsOfType<AutoSuggestBox>().FirstOrDefault();
                     textbox?.Focus(FocusState.Programmatic);
                 }
                 else
                 {
                     // When there are search results, set Filters
-                    var allControls = filterList.SelectMany(s => s.Items).ToList();
+                    List<ControlInfoDataItem> allControls = filterList.SelectMany(s => s.Items).ToList();
                     filterList.Insert(0, new Filter("All", allControls.Count, allControls, true));
                     Filters = filterList;
 
@@ -180,13 +178,25 @@ namespace AdvancedSharpAdbClient.SampleApp
         public string Name
         {
             get { return _name; }
-            set { if (this.SetProperty(ref _name, value)) this.NotifyPropertyChanged(nameof(Description)); }
+            set
+            {
+                if (this.SetProperty(ref _name, value))
+                {
+                    this.NotifyPropertyChanged(nameof(Description));
+                }
+            }
         }
 
         public int Count
         {
             get { return _count; }
-            set { if (this.SetProperty(ref _count, value)) this.NotifyPropertyChanged(nameof(Description)); }
+            set
+            {
+                if (this.SetProperty(ref _count, value))
+                {
+                    this.NotifyPropertyChanged(nameof(Description));
+                }
+            }
         }
 
         public bool? Active
@@ -219,7 +229,10 @@ namespace AdvancedSharpAdbClient.SampleApp
         /// desired value.</returns>
         private bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
-            if (object.Equals(storage, value)) return false;
+            if (object.Equals(storage, value))
+            {
+                return false;
+            }
 
             storage = value;
             this.NotifyPropertyChanged(propertyName);

@@ -4,7 +4,7 @@ using Windows.UI.Xaml;
 namespace AdvancedSharpAdbClient.SampleApp
 {
     // https://docs.microsoft.com/windows/uwp/input-and-devices/designing-for-tv#custom-visual-state-trigger-for-xbox
-    class DeviceFamilyTrigger : StateTriggerBase
+    internal class DeviceFamilyTrigger : StateTriggerBase
     {
         private string _actualDeviceFamily;
         private string _triggerDeviceFamily;

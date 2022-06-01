@@ -5,9 +5,9 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
 using System.Xml;
 
 namespace AdvancedSharpAdbClient.Tests

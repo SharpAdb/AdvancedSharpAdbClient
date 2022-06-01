@@ -9,10 +9,6 @@
 //*********************************************************
 using AdvancedSharpAdbClient.SampleApp.Data;
 using System.Linq;
-using Windows.UI;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
 namespace AdvancedSharpAdbClient.SampleApp
@@ -29,7 +25,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItem>().ElementAt(1);
+            Microsoft.UI.Xaml.Controls.NavigationViewItem menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItem>().ElementAt(1);
             menuItem.IsSelected = true;
             NavigationRootPage.Current.NavigationView.Header = string.Empty;
 

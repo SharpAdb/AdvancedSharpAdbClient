@@ -41,8 +41,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void IsOkayTest()
         {
-            var okay = Encoding.ASCII.GetBytes("OKAY");
-            var fail = Encoding.ASCII.GetBytes("FAIL");
+            byte[] okay = Encoding.ASCII.GetBytes("OKAY");
+            byte[] fail = Encoding.ASCII.GetBytes("FAIL");
 
             Assert.True(AdbSocket.IsOkay(okay));
             Assert.False(AdbSocket.IsOkay(fail));
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            var response = socket.ReadAdbResponse();
+            AdbResponse response = socket.ReadAdbResponse();
             Assert.True(response.IOSuccess);
             Assert.Equal(string.Empty, response.Message);
             Assert.True(response.Okay);
@@ -242,10 +242,10 @@ namespace AdvancedSharpAdbClient.Tests
             DummyTcpSocket tcpSocket = new DummyTcpSocket();
             AdbSocket socket = new AdbSocket(tcpSocket);
 
-            var stream = socket.GetShellStream();
+            Stream stream = socket.GetShellStream();
             Assert.IsType<ShellStream>(stream);
 
-            var shellStream = (ShellStream)stream;
+            ShellStream shellStream = (ShellStream)stream;
             Assert.Equal(tcpSocket.OutputStream, shellStream.Inner);
         }
 

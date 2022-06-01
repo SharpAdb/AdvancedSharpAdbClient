@@ -1,13 +1,12 @@
 ﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using System.IO;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -102,7 +101,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public int Read(byte[] data)
         {
-            var actual = this.SyncDataReceived.Dequeue();
+            byte[] actual = this.SyncDataReceived.Dequeue();
 
             for (int i = 0; i < data.Length && i < actual.Length; i++)
             {
@@ -121,14 +120,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public AdbResponse ReadAdbResponse()
         {
-            var response = this.Responses.Dequeue();
+            AdbResponse response = this.Responses.Dequeue();
 
-            if (!response.Okay)
-            {
-                throw new AdbException(response.Message, response);
-            }
-
-            return response;
+            return !response.Okay ? throw new AdbException(response.Message, response) : response;
         }
 
         public string ReadString()
@@ -152,11 +146,11 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            var message = this.ResponseMessages.Dequeue();
+            string message = this.ResponseMessages.Dequeue();
 
             if (message == ServerDisconnected)
             {
-                var socketException = new SocketException(AdbServer.ConnectionReset);
+                SocketException socketException = new SocketException(AdbServer.ConnectionReset);
                 throw new AdbException(socketException.Message, socketException);
             }
             else
@@ -187,7 +181,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public int Read(byte[] data, int length)
         {
-            var actual = this.SyncDataReceived.Dequeue();
+            byte[] actual = this.SyncDataReceived.Dequeue();
 
             Assert.Equal(actual.Length, length);
 
@@ -261,7 +255,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 try
                 {
-                    var response = this.ReadAdbResponse();
+                    AdbResponse response = this.ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {

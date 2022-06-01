@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient
         public static void Reset()
         {
             AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
-            AdbClientFactory = (endPoint) => new AdbClient(endPoint, Factories.AdbSocketFactory);
+            AdbClientFactory = (endPoint) => new AdbClient(endPoint, AdbSocketFactory);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
             SyncServiceFactory = (client, device) => new SyncService(client, device);
         }

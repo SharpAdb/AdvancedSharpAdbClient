@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Windows.Foundation.Metadata;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -53,8 +52,8 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected void OnItemGridViewItemClick(object sender, ItemClickEventArgs e)
         {
-            var gridView = (GridView)sender;
-            var item = (ControlInfoDataItem)e.ClickedItem;
+            GridView gridView = (GridView)sender;
+            ControlInfoDataItem item = (ControlInfoDataItem)e.ClickedItem;
 
             _itemId = item.UniqueId;
 
@@ -65,7 +64,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (e.Key == VirtualKey.Up)
             {
-                var nextElement = FocusManager.FindNextElement(FocusNavigationDirection.Up);
+                DependencyObject nextElement = FocusManager.FindNextElement(FocusNavigationDirection.Up);
                 if (nextElement?.GetType() == typeof(Microsoft.UI.Xaml.Controls.NavigationViewItem))
                 {
                     NavigationRootPage.Current.PageHeader.Focus(FocusState.Programmatic);
@@ -81,9 +80,9 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (_itemId != null)
             {
-                var gridView = (GridView)sender;
-                var items = gridView.ItemsSource as IEnumerable<ControlInfoDataItem>;
-                var item = items?.FirstOrDefault(s => s.UniqueId == _itemId);
+                GridView gridView = (GridView)sender;
+                IEnumerable<ControlInfoDataItem> items = gridView.ItemsSource as IEnumerable<ControlInfoDataItem>;
+                ControlInfoDataItem item = items?.FirstOrDefault(s => s.UniqueId == _itemId);
                 if (item != null)
                 {
                     gridView.ScrollIntoView(item);
@@ -98,7 +97,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected void OnItemGridViewSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var gridView = (GridView)sender;
+            GridView gridView = (GridView)sender;
 
             if (gridView.ItemsPanelRoot is ItemsWrapGrid wrapGrid)
             {
@@ -119,7 +118,10 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
-            if (Equals(storage, value)) return false;
+            if (Equals(storage, value))
+            {
+                return false;
+            }
 
             storage = value;
             NotifyPropertyChanged(propertyName);

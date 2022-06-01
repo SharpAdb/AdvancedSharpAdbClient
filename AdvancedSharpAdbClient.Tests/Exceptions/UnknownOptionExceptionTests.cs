@@ -1,5 +1,5 @@
-﻿using Xunit;
-using AdvancedSharpAdbClient.Exceptions;
+﻿using AdvancedSharpAdbClient.Exceptions;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.Exceptions
 {

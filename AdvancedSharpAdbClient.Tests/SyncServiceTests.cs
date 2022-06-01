@@ -1,9 +1,9 @@
-﻿using Xunit;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -89,27 +89,27 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.Equal(4, value.Count);
 
-            var time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
+            DateTime time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
 
-            var dir = value[0];
+            FileStatistics dir = value[0];
             Assert.Equal(".", dir.Path);
             Assert.Equal((UnixFileMode)16873, dir.FileMode);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
 
-            var parentDir = value[1];
+            FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
             Assert.Equal((UnixFileMode)16877, parentDir.FileMode);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
 
-            var sdcard0 = value[2];
+            FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
             Assert.Equal((UnixFileMode)41471, sdcard0.FileMode);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
 
-            var emulated = value[3];
+            FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
             Assert.Equal((UnixFileMode)16749, emulated.FileMode);
             Assert.Equal(0, emulated.Size);
@@ -126,8 +126,8 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             MemoryStream stream = new MemoryStream();
-            var content = File.ReadAllBytes("Assets/fstab.bin");
-            var contentLength = BitConverter.GetBytes(content.Length);
+            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             this.RunTest(
                 OkResponses(2),
@@ -164,8 +164,8 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             Stream stream = File.OpenRead("Assets/fstab.bin");
-            var content = File.ReadAllBytes("Assets/fstab.bin");
-            var contentMessage = new List<byte>();
+            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            List<byte> contentMessage = new List<byte>();
             contentMessage.AddRange(SyncCommandConverter.GetBytes(SyncCommand.DATA));
             contentMessage.AddRange(BitConverter.GetBytes(content.Length));
             contentMessage.AddRange(content);

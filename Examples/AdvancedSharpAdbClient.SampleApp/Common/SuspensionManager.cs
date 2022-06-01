@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml;
@@ -60,7 +57,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
             try
             {
                 // Save the navigation state for all registered frames
-                foreach (var weakFrameReference in _registeredFrames)
+                foreach (WeakReference<Frame> weakFrameReference in _registeredFrames)
                 {
                     if (weakFrameReference.TryGetTarget(out Frame frame))
                     {
@@ -113,7 +110,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
                 }
 
                 // Restore any registered frames to their saved state
-                foreach (var weakFrameReference in _registeredFrames)
+                foreach (WeakReference<Frame> weakFrameReference in _registeredFrames)
                 {
                     if (weakFrameReference.TryGetTarget(out Frame frame))
                     {
@@ -200,11 +197,11 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
         /// <see cref="SessionState"/>.</returns>
         public static Dictionary<string, object> SessionStateForFrame(Frame frame)
         {
-            var frameState = (Dictionary<string, object>)frame.GetValue(FrameSessionStateProperty);
+            Dictionary<string, object> frameState = (Dictionary<string, object>)frame.GetValue(FrameSessionStateProperty);
 
             if (frameState == null)
             {
-                var frameSessionKey = (string)frame.GetValue(FrameSessionStateKeyProperty);
+                string frameSessionKey = (string)frame.GetValue(FrameSessionStateKeyProperty);
                 if (frameSessionKey != null)
                 {
                     // Registered frames reflect the corresponding session state
@@ -226,7 +223,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
         private static void RestoreFrameNavigationState(Frame frame)
         {
-            var frameState = SessionStateForFrame(frame);
+            Dictionary<string, object> frameState = SessionStateForFrame(frame);
             if (frameState.ContainsKey("Navigation"))
             {
                 frame.SetNavigationState((string)frameState["Navigation"]);
@@ -235,7 +232,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
         private static void SaveFrameNavigationState(Frame frame)
         {
-            var frameState = SessionStateForFrame(frame);
+            Dictionary<string, object> frameState = SessionStateForFrame(frame);
             frameState["Navigation"] = frame.GetNavigationState();
         }
     }

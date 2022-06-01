@@ -1,5 +1,5 @@
-﻿using Moq;
-using AdvancedSharpAdbClient.Exceptions;
+﻿using AdvancedSharpAdbClient.Exceptions;
+using Moq;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -35,13 +35,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetStatusNotRunningTest()
         {
-            var adbClientMock = new Mock<IAdbClient>();
+            Mock<IAdbClient> adbClientMock = new Mock<IAdbClient>();
             adbClientMock.Setup(c => c.GetAdbVersion())
                 .Throws(new SocketException(AdbServer.ConnectionRefused));
 
-            var adbServer = new AdbServer(adbClientMock.Object, this.adbCommandLineClientFactory);
+            AdbServer adbServer = new AdbServer(adbClientMock.Object, this.adbCommandLineClientFactory);
 
-            var status = adbServer.GetStatus();
+            AdbServerStatus status = adbServer.GetStatus();
             Assert.False(status.IsRunning);
             Assert.Null(status.Version);
         }
@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.Tests
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0020");
 
-            var status = this.adbServer.GetStatus();
+            AdbServerStatus status = this.adbServer.GetStatus();
 
             Assert.Empty(this.socket.Responses);
             Assert.Empty(this.socket.ResponseMessages);
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Tests
             this.socket.Responses.Enqueue(AdbResponse.OK);
             this.socket.ResponseMessages.Enqueue("0020");
 
-            var result = this.adbServer.StartServer(null, false);
+            StartServerResult result = this.adbServer.StartServer(null, false);
 
             Assert.Equal(StartServerResult.AlreadyRunning, result);
 
@@ -139,7 +139,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer(this.ServerName, false);
+            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.True(this.commandLineClient.ServerStarted);
 
@@ -163,7 +163,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer(this.ServerName, false);
+            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.True(this.commandLineClient.ServerStarted);
         }
@@ -178,7 +178,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer(this.ServerName, true);
+            StartServerResult result = this.adbServer.StartServer(this.ServerName, true);
 
             Assert.True(this.commandLineClient.ServerStarted);
 
@@ -197,7 +197,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(this.commandLineClient.ServerStarted);
 
-            var result = this.adbServer.StartServer(this.ServerName, false);
+            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
 
             Assert.False(this.commandLineClient.ServerStarted);
 

@@ -1,7 +1,7 @@
-﻿using Xunit;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -13,9 +13,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadFramebufferTest()
         {
-            var data = File.ReadAllBytes("Assets/framebufferheader.bin");
+            byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
 
-            var header = FramebufferHeader.Read(data);
+            FramebufferHeader header = FramebufferHeader.Read(data);
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -35,9 +35,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadFramebufferv2Test()
         {
-            var data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
+            byte[] data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
 
-            var header = FramebufferHeader.Read(data);
+            FramebufferHeader header = FramebufferHeader.Read(data);
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -57,13 +57,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToImageTest()
         {
-            var data = File.ReadAllBytes("Assets/framebufferheader.bin");
-            var header = FramebufferHeader.Read(data);
+            byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
+            FramebufferHeader header = FramebufferHeader.Read(data);
             header.Width = 1;
             header.Height = 1;
 
-            var framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
-            using (var image = (Bitmap)header.ToImage(framebuffer))
+            byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
+            using (Bitmap image = (Bitmap)header.ToImage(framebuffer))
             {
                 Assert.NotNull(image);
                 Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient.Tests
                 Assert.Equal(1, image.Width);
                 Assert.Equal(1, image.Height);
 
-                var pixel = image.GetPixel(0, 0);
+                Color pixel = image.GetPixel(0, 0);
                 Assert.Equal(0x35, pixel.R);
                 Assert.Equal(0x4a, pixel.G);
                 Assert.Equal(0x4c, pixel.B);
@@ -82,12 +82,12 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToImageEmptyTest()
         {
-            var data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
-            var header = FramebufferHeader.Read(data);
+            byte[] data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
+            FramebufferHeader header = FramebufferHeader.Read(data);
 
-            var framebuffer = new byte[] { };
+            byte[] framebuffer = new byte[] { };
 
-            var image = header.ToImage(framebuffer);
+            Image image = header.ToImage(framebuffer);
             Assert.Null(image);
         }
     }

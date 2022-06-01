@@ -8,10 +8,9 @@
 //
 //*********************************************************
 
-using System;
-using AdvancedSharpAdbClient.SampleApp;
 using AdvancedSharpAdbClient.SampleApp.Helpers;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using Windows.UI;
 using Windows.UI.Composition;
 using Windows.UI.Xaml;
@@ -35,8 +34,8 @@ namespace AdvancedSharpAdbClient.SampleApp
             get { return GetValue(TitleProperty); }
             set { SetValue(TitleProperty, value); }
         }
-        
-        public static readonly DependencyProperty TitleProperty = 
+
+        public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register("Title", typeof(object), typeof(PageHeader), new PropertyMetadata(null));
 
         public object Subtitle
@@ -80,7 +79,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         // Using a DependencyProperty as the backing store for BackgroundColorOpacity.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty AcrylicOpacityProperty =
             DependencyProperty.Register("AcrylicOpacity", typeof(double), typeof(PageHeader), new PropertyMetadata(0.3));
-        
+
         public double ShadowOpacity
         {
             get { return (double)GetValue(ShadowOpacityProperty); }
@@ -161,21 +160,21 @@ namespace AdvancedSharpAdbClient.SampleApp
             Compositor compositor = hostVisual.Compositor;
 
             // Create a drop shadow
-            var dropShadow = compositor.CreateDropShadow();
+            DropShadow dropShadow = compositor.CreateDropShadow();
             dropShadow.Color = Color.FromArgb(102, 0, 0, 0);
             dropShadow.BlurRadius = 4.0f;
             // Associate the shape of the shadow with the shape of the target element
             dropShadow.Mask = shadowTargetBrush;
 
             // Create a Visual to hold the shadow
-            var shadowVisual = compositor.CreateSpriteVisual();
+            SpriteVisual shadowVisual = compositor.CreateSpriteVisual();
             shadowVisual.Shadow = dropShadow;
 
             // Add the shadow as a child of the host in the visual tree
             ElementCompositionPreview.SetElementChildVisual(shadowHost, shadowVisual);
 
             // Make sure size of shadow host and shadow visual always stay in sync
-            var bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
+            ExpressionAnimation bindSizeAnimation = compositor.CreateExpressionAnimation("hostVisual.Size");
             bindSizeAnimation.SetReferenceParameter("hostVisual", hostVisual);
 
             shadowVisual.StartAnimation("Size", bindSizeAnimation);

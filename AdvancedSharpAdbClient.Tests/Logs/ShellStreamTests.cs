@@ -1,9 +1,9 @@
-﻿using Xunit;
-using AdvancedSharpAdbClient.Logs;
+﻿using AdvancedSharpAdbClient.Logs;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.Logs
 {
@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         [Fact]
         public void ConstructorWriteOnlyTest()
         {
-            var temp = Path.GetTempFileName();
+            string temp = Path.GetTempFileName();
 
             try
             {
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
 
                 stream.Position = 0;
                 byte[] buffer = new byte[2];
-                var read = shellStream.Read(buffer, 0, 2);
+                int read = shellStream.Read(buffer, 0, 2);
                 Assert.Equal(2, read);
                 Assert.Equal((byte)'\n', buffer[0]);
                 Assert.Equal((byte)'H', buffer[1]);
@@ -78,9 +78,9 @@ namespace AdvancedSharpAdbClient.Tests.Logs
 
                 stream.Position = 0;
                 byte[] buffer = new byte[100];
-                var read = shellStream.Read(buffer, 0, 100);
+                int read = shellStream.Read(buffer, 0, 100);
 
-                var actual = Encoding.ASCII.GetString(buffer, 0, read);
+                string actual = Encoding.ASCII.GetString(buffer, 0, read);
                 Assert.Equal("\n1\n2\n3\n4\n5", actual);
                 Assert.Equal(10, read);
 
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
             using (ShellStream shellStream = new ShellStream(stream, false))
             {
                 byte[] buffer = new byte[1];
-                var read = shellStream.Read(buffer, 0, 1);
+                int read = shellStream.Read(buffer, 0, 1);
                 Assert.Equal(1, read);
                 Assert.Equal((byte)'\n', buffer[0]);
 
@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
 
                 stream.Position = 0;
                 byte[] buffer = new byte[2];
-                var read = await shellStream.ReadAsync(buffer, 0, 2).ConfigureAwait(false);
+                int read = await shellStream.ReadAsync(buffer, 0, 2).ConfigureAwait(false);
                 Assert.Equal(2, read);
                 Assert.Equal((byte)'\n', buffer[0]);
                 Assert.Equal((byte)'H', buffer[1]);
@@ -148,9 +148,9 @@ namespace AdvancedSharpAdbClient.Tests.Logs
 
                 stream.Position = 0;
                 byte[] buffer = new byte[100];
-                var read = await shellStream.ReadAsync(buffer, 0, 100).ConfigureAwait(false);
+                int read = await shellStream.ReadAsync(buffer, 0, 100).ConfigureAwait(false);
 
-                var actual = Encoding.ASCII.GetString(buffer, 0, read);
+                string actual = Encoding.ASCII.GetString(buffer, 0, read);
                 Assert.Equal("\n1\n2\n3\n4\n5", actual);
                 Assert.Equal(10, read);
 
@@ -168,7 +168,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
             using (ShellStream shellStream = new ShellStream(stream, false))
             {
                 byte[] buffer = new byte[1];
-                var read = await shellStream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
+                int read = await shellStream.ReadAsync(buffer, 0, 1).ConfigureAwait(false);
                 Assert.Equal(1, read);
                 Assert.Equal((byte)'\n', buffer[0]);
 

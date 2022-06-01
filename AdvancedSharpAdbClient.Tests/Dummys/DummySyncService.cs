@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public bool IsOpen
         {
-            get {  return true; }
+            get { return true; }
         }
 
         public void Dispose()

@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void CombineTest()
         {
-            String result = LinuxPath.Combine("/system", "busybox");
+            string result = LinuxPath.Combine("/system", "busybox");
             Assert.Equal("/system/busybox", result);
 
             result = LinuxPath.Combine("/system/", "busybox");
@@ -76,14 +76,14 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void CombineCurrentDirTest()
         {
-            var result = LinuxPath.Combine(".", "test.txt");
+            string result = LinuxPath.Combine(".", "test.txt");
             Assert.Equal("./test.txt", result);
         }
 
         [Fact]
         public void GetDirectoryNameTest()
         {
-            String result = LinuxPath.GetDirectoryName("/system/busybox");
+            string result = LinuxPath.GetDirectoryName("/system/busybox");
             Assert.Equal("/system/", result);
 
             result = LinuxPath.GetDirectoryName("/");
@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void GetFileNameTest()
         {
-            String result = LinuxPath.GetFileName("/system/busybox");
+            string result = LinuxPath.GetFileName("/system/busybox");
             Assert.Equal("busybox", result);
 
             result = LinuxPath.GetFileName("/");

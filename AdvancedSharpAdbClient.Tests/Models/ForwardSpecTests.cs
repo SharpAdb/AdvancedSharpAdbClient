@@ -1,9 +1,5 @@
-﻿using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -15,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void TcpTest()
         {
-            var value = ForwardSpec.Parse("tcp:1234");
+            ForwardSpec value = ForwardSpec.Parse("tcp:1234");
 
             Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.Tcp, value.Protocol);
@@ -29,7 +25,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SocketText()
         {
-            var value = ForwardSpec.Parse("localabstract:/tmp/1234");
+            ForwardSpec value = ForwardSpec.Parse("localabstract:/tmp/1234");
 
             Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.LocalAbstract, value.Protocol);
@@ -43,7 +39,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void JdwpTest()
         {
-            var value = ForwardSpec.Parse("jdwp:1234");
+            ForwardSpec value = ForwardSpec.Parse("jdwp:1234");
 
             Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.JavaDebugWireProtocol, value.Protocol);
@@ -87,7 +83,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringInvalidProtocol()
         {
-            var spec = new ForwardSpec();
+            ForwardSpec spec = new ForwardSpec();
             spec.Protocol = (ForwardProtocol)99;
             Assert.Equal(string.Empty, spec.ToString());
         }
@@ -95,30 +91,30 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EqualsTest()
         {
-            var dummy = new ForwardSpec()
+            ForwardSpec dummy = new ForwardSpec()
             {
                 Protocol = (ForwardProtocol)99
             };
 
-            var tcpa1 = ForwardSpec.Parse("tcp:1234");
-            var tcpa2 = ForwardSpec.Parse("tcp:1234");
-            var tcpb = ForwardSpec.Parse("tcp:4321");
+            ForwardSpec tcpa1 = ForwardSpec.Parse("tcp:1234");
+            ForwardSpec tcpa2 = ForwardSpec.Parse("tcp:1234");
+            ForwardSpec tcpb = ForwardSpec.Parse("tcp:4321");
             Assert.True(tcpa1.Equals(tcpa2));
             Assert.False(tcpa1.Equals(tcpb));
             Assert.True(tcpa1.GetHashCode() == tcpa2.GetHashCode());
             Assert.False(tcpa1.GetHashCode() == tcpb.GetHashCode());
 
-            var jdwpa1 = ForwardSpec.Parse("jdwp:1234");
-            var jdwpa2 = ForwardSpec.Parse("jdwp:1234");
-            var jdwpb = ForwardSpec.Parse("jdwp:4321");
+            ForwardSpec jdwpa1 = ForwardSpec.Parse("jdwp:1234");
+            ForwardSpec jdwpa2 = ForwardSpec.Parse("jdwp:1234");
+            ForwardSpec jdwpb = ForwardSpec.Parse("jdwp:4321");
             Assert.True(jdwpa1.Equals(jdwpa2));
             Assert.False(jdwpa1.Equals(jdwpb));
             Assert.True(jdwpa1.GetHashCode() == jdwpa2.GetHashCode());
             Assert.False(jdwpa1.GetHashCode() == jdwpb.GetHashCode());
 
-            var socketa1 = ForwardSpec.Parse("localabstract:/tmp/1234");
-            var socketa2 = ForwardSpec.Parse("localabstract:/tmp/1234");
-            var socketb = ForwardSpec.Parse("localabstract:/tmp/4321");
+            ForwardSpec socketa1 = ForwardSpec.Parse("localabstract:/tmp/1234");
+            ForwardSpec socketa2 = ForwardSpec.Parse("localabstract:/tmp/1234");
+            ForwardSpec socketb = ForwardSpec.Parse("localabstract:/tmp/4321");
             Assert.True(socketa1.Equals(socketa2));
             Assert.False(socketa1.Equals(socketb));
             Assert.True(socketa1.GetHashCode() == socketa2.GetHashCode());

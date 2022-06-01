@@ -4,15 +4,11 @@ using Windows.UI.Xaml.Data;
 
 namespace AdvancedSharpAdbClient.SampleApp.Common
 {
-    class DoubleToThicknessConverter : IValueConverter
+    internal class DoubleToThicknessConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (value is double?)
-            {
-                return new Thickness((double)value);
-            }
-            return false;
+            return value is double? ? new Thickness((double)value) : (object)false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

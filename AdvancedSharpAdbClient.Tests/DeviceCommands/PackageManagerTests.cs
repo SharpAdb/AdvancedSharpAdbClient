@@ -1,8 +1,8 @@
-﻿using Xunit;
-using AdvancedSharpAdbClient.DeviceCommands;
+﻿using AdvancedSharpAdbClient.DeviceCommands;
+using Moq;
 using System;
 using System.IO;
-using Moq;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void InstallRemotePackageTest()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
             adbClient.Commands.Add("pm install \"/data/test.apk\"", string.Empty);
@@ -78,28 +78,33 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void InstallPackageTest()
         {
-            var syncService = new DummySyncService();
-            Factories.SyncServiceFactory = (c, d) => syncService;
-
-            var adbClient = new DummyAdbClient();
-
-            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            adbClient.Commands.Add("pm install \"/data/local/tmp/test.txt\"", string.Empty);
-            adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
-
-            DeviceData device = new DeviceData()
+            lock (FactoriesTests.locker)
             {
-                State = DeviceState.Online
-            };
+                DummySyncService syncService = new DummySyncService();
+                Factories.SyncServiceFactory = (c, d) => syncService;
 
-            PackageManager manager = new PackageManager(adbClient, device);
-            manager.InstallPackage("Assets/test.txt", false);
-            Assert.Equal(3, adbClient.ReceivedCommands.Count);
-            Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
-            Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
+                DummyAdbClient adbClient = new DummyAdbClient();
 
-            Assert.Single(syncService.UploadedFiles);
-            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
+                adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+                adbClient.Commands.Add("pm install \"/data/local/tmp/test.txt\"", string.Empty);
+                adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
+
+                DeviceData device = new DeviceData()
+                {
+                    State = DeviceState.Online
+                };
+
+                PackageManager manager = new PackageManager(adbClient, device);
+                manager.InstallPackage("Assets/test.txt", false);
+                Assert.Equal(3, adbClient.ReceivedCommands.Count);
+                Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
+                Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
+
+                Assert.Single(syncService.UploadedFiles);
+                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
+
+                Factories.Reset();
+            }
         }
 
         [Fact]
@@ -132,7 +137,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
             client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("Assets/gapps.txt"));
             PackageManager manager = new PackageManager(client, device, skipInit: true);
 
-            var versionInfo = manager.GetVersionInfo("com.google.android.gms");
+            VersionInfo versionInfo = manager.GetVersionInfo("com.google.android.gms");
             Assert.Equal(11062448, versionInfo.VersionCode);
             Assert.Equal("11.0.62 (448-160311229)", versionInfo.VersionName);
         }

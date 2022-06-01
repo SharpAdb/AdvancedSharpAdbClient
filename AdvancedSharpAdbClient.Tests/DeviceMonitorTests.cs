@@ -1,8 +1,7 @@
-﻿using Xunit;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Linq;
 using System.Threading;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -35,7 +34,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ConstructorNullTest()
         {
-            Assert.Throws< ArgumentNullException>(() => new DeviceMonitor(null));
+            Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
         }
 
         [Fact]
@@ -69,7 +68,7 @@ namespace AdvancedSharpAdbClient.Tests
                 this.Socket.Requests.Clear();
 
                 // Device disconnects
-                var eventWaiter = sink.CreateEventSignal();
+                ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
                 base.RunTest(
                 NoResponses,
@@ -118,7 +117,7 @@ namespace AdvancedSharpAdbClient.Tests
                 this.Socket.Requests.Clear();
 
                 // Device disconnects
-                var eventWaiter = sink.CreateEventSignal();
+                ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
                 base.RunTest(
                 NoResponses,
@@ -198,7 +197,7 @@ namespace AdvancedSharpAdbClient.Tests
                 this.Socket.Requests.Clear();
 
                 // Device disconnects
-                var eventWaiter = sink.CreateEventSignal();
+                ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
                 base.RunTest(
                 NoResponses,
@@ -225,7 +224,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void AdbKilledTest()
         {
-            var dummyAdbServer = new DummyAdbServer();
+            DummyAdbServer dummyAdbServer = new DummyAdbServer();
             AdbServer.Instance = dummyAdbServer;
 
             this.Socket.WaitForNewData = true;

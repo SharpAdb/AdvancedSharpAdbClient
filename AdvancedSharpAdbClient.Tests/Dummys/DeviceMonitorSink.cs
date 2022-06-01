@@ -8,12 +8,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         public DeviceMonitorSink(DeviceMonitor monitor)
         {
-            if (monitor == null)
-            {
-                throw new ArgumentNullException(nameof(monitor));
-            }
-
-            this.Monitor = monitor;
+            this.Monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
             this.Monitor.DeviceChanged += OnDeviceChanged;
             this.Monitor.DeviceConnected += OnDeviceConnected;
             this.Monitor.DeviceDisconnected += OnDeviceDisconnected;

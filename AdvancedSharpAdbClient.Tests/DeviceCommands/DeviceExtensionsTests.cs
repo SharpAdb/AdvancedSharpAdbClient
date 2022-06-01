@@ -1,7 +1,7 @@
-﻿using Xunit;
+﻿using AdvancedSharpAdbClient.DeviceCommands;
 using Moq;
-using AdvancedSharpAdbClient.DeviceCommands;
 using System.Linq;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 {
@@ -12,34 +12,42 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
     {
         public DeviceExtensionsTests()
         {
-            Factories.Reset();
+            lock (FactoriesTests.locker)
+            {
+                Factories.Reset();
+            }
         }
 
         [Fact]
         public void StatTest()
         {
-            FileStatistics stats = new FileStatistics();
+            lock (FactoriesTests.locker)
+            {
+                FileStatistics stats = new FileStatistics();
 
-            var client = new Mock<IAdbClient>();
-            var mock = new Mock<ISyncService>();
-            mock.Setup(m => m.Stat("/test")).Returns(stats);
+                Mock<IAdbClient> client = new Mock<IAdbClient>();
+                Mock<ISyncService> mock = new Mock<ISyncService>();
+                mock.Setup(m => m.Stat("/test")).Returns(stats);
 
-            Factories.SyncServiceFactory = (c, d) => mock.Object;
+                Factories.SyncServiceFactory = (c, d) => mock.Object;
 
-            var device = new DeviceData();
-            Assert.Equal(stats, client.Object.Stat(device, "/test"));
+                DeviceData device = new DeviceData();
+                Assert.Equal(stats, client.Object.Stat(device, "/test"));
+
+                Factories.Reset();
+            }
         }
 
         [Fact]
         public void GetEnvironmentVariablesTest()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add(EnvironmentVariablesReceiver.PrintEnvCommand, "a=b");
 
-            var device = new DeviceData();
+            DeviceData device = new DeviceData();
 
-            var variables = adbClient.GetEnvironmentVariables(device);
+            System.Collections.Generic.Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
@@ -49,12 +57,12 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void UninstallPackageTests()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("pm uninstall com.example", "");
 
-            var device = new DeviceData();
+            DeviceData device = new DeviceData();
             device.State = DeviceState.Online;
             adbClient.UninstallPackage(device, "com.example");
 
@@ -66,7 +74,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void GetPackageVersionTest()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package com.example",
@@ -105,9 +113,9 @@ Shared users:
     grantedPermissions:
       android.permission.WRITE_SETTINGS");
 
-            var device = new DeviceData();
+            DeviceData device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = adbClient.GetPackageVersion(device, "com.example");
+            VersionInfo version = adbClient.GetPackageVersion(device, "com.example");
 
             Assert.Equal(22, version.VersionCode);
             Assert.Equal("5.1-eng.buildbot.20151117.204057", version.VersionName);
@@ -120,7 +128,7 @@ Shared users:
         [Fact]
         public void GetPackageVersionTest2()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
@@ -194,9 +202,9 @@ mPackages:
 the number of packages is 223
 End!!!!");
 
-            var device = new DeviceData();
+            DeviceData device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
+            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -209,7 +217,7 @@ End!!!!");
         [Fact]
         public void GetPackageVersionTest3()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add("pm list packages -f", "");
             adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
@@ -337,9 +345,9 @@ Compiler stats:
   [jp.co.cyberagent.stf]
      base.apk - 1084");
 
-            var device = new DeviceData();
+            DeviceData device = new DeviceData();
             device.State = DeviceState.Online;
-            var version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
+            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -352,7 +360,7 @@ Compiler stats:
         [Fact]
         public void ListProcessesTest()
         {
-            var adbClient = new DummyAdbClient();
+            DummyAdbClient adbClient = new DummyAdbClient();
 
             adbClient.Commands.Add(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
@@ -360,7 +368,7 @@ then
     /system/bin/ls /proc/
 else
     /system/bin/ls -1 /proc/
-fi".Replace("\r\n", "\n"), 
+fi".Replace("\r\n", "\n"),
 @"1
 2
 3
@@ -378,8 +386,8 @@ asound");
 
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
 
-            var device = new DeviceData();
-            var processes = adbClient.ListProcesses(device).ToArray();
+            DeviceData device = new DeviceData();
+            AndroidProcess[] processes = adbClient.ListProcesses(device).ToArray();
 
             Assert.Equal(3, processes.Length);
             Assert.Equal("init", processes[0].Name);

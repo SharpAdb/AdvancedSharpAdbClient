@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             get
             {
-                var version = Windows.ApplicationModel.Package.Current.Id.Version;
+                Windows.ApplicationModel.PackageVersion version = Windows.ApplicationModel.Package.Current.Id.Version;
                 return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
             }
         }
@@ -40,17 +40,18 @@ namespace AdvancedSharpAdbClient.SampleApp
             Loaded += OnSettingsPageLoaded;
 
             if (ElementSoundPlayer.State == ElementSoundPlayerState.On)
+            {
                 soundToggle.IsOn = true;
+            }
+
             if (ElementSoundPlayer.SpatialAudioMode == ElementSpatialAudioMode.On)
+            {
                 spatialSoundBox.IsChecked = true;
-            if (NavigationRootPage.Current.NavigationView.PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Auto)
-            {
-                navigationLocation.SelectedIndex = 0;
             }
-            else
-            {
-                navigationLocation.SelectedIndex = 1;
-            }
+
+            navigationLocation.SelectedIndex = NavigationRootPage.Current.NavigationView.PaneDisplayMode == Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Auto
+                ? 0
+                : 1;
 
             screenshotModeToggle.IsOn = UIHelper.IsScreenshotMode;
             screenshotFolderLinkContent.Text = UIHelper.ScreenshotStorageFolder.Path;
@@ -65,13 +66,13 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void OnSettingsPageLoaded(object sender, RoutedEventArgs e)
         {
-            var currentTheme = ThemeHelper.RootTheme.ToString();
-            (ThemePanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == currentTheme)).IsChecked = true;
+            string currentTheme = ThemeHelper.RootTheme.ToString();
+            ThemePanel.Children.Cast<RadioButton>().FirstOrDefault(c => c?.Tag?.ToString() == currentTheme).IsChecked = true;
         }
 
         private void OnThemeRadioButtonChecked(object sender, RoutedEventArgs e)
         {
-            var selectedTheme = ((RadioButton)sender)?.Tag?.ToString();
+            string selectedTheme = ((RadioButton)sender)?.Tag?.ToString();
             if (selectedTheme != null)
             {
                 ThemeHelper.RootTheme = App.GetEnum<ElementTheme>(selectedTheme);
