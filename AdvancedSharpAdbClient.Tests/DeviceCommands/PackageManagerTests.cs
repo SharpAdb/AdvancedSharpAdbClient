@@ -108,6 +108,90 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         }
 
         [Fact]
+        public void InstallMultipleRemotePackageTest()
+        {
+            DummyAdbClient adbClient = new DummyAdbClient();
+
+            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+            adbClient.Commands.Add("pm install-create", "Success: created install session [936013062]");
+            adbClient.Commands.Add("pm install-create -r", "Success: created install session [936013062]");
+            adbClient.Commands.Add("pm install-write 936013062 base.apk \"/data/base.apk\"", string.Empty);
+            adbClient.Commands.Add("pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\"", string.Empty);
+            adbClient.Commands.Add("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", string.Empty);
+            adbClient.Commands.Add("pm install-commit 936013062", string.Empty);
+
+            DeviceData device = new DeviceData()
+            {
+                State = DeviceState.Online
+            };
+
+            PackageManager manager = new PackageManager(adbClient, device);
+            manager.InstallMultipleRemotePackage("/data/base.apk", new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, false);
+
+            Assert.Equal(6, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
+            Assert.Equal("pm install-write 936013062 base.apk \"/data/base.apk\"", adbClient.ReceivedCommands[2]);
+            Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\"", adbClient.ReceivedCommands[3]);
+            Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", adbClient.ReceivedCommands[4]);
+            Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
+
+            manager.InstallMultipleRemotePackage("/data/base.apk", new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, true);
+
+            Assert.Equal(11, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install-create -r", adbClient.ReceivedCommands[6]);
+            Assert.Equal("pm install-write 936013062 base.apk \"/data/base.apk\"", adbClient.ReceivedCommands[7]);
+            Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\"", adbClient.ReceivedCommands[8]);
+            Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", adbClient.ReceivedCommands[9]);
+            Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[10]);
+        }
+
+        [Fact]
+        public void InstallMultiplePackageTest()
+        {
+            lock (FactoriesTests.locker)
+            {
+                DummySyncService syncService = new DummySyncService();
+                Factories.SyncServiceFactory = (c, d) => syncService;
+
+                DummyAdbClient adbClient = new DummyAdbClient();
+
+                adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+                adbClient.Commands.Add("pm install-create", "Success: created install session [936013062]");
+                adbClient.Commands.Add("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", string.Empty);
+                adbClient.Commands.Add("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", string.Empty);
+                adbClient.Commands.Add("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", string.Empty);
+                adbClient.Commands.Add("pm install-commit 936013062", string.Empty);
+                adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
+                adbClient.Commands.Add("rm /data/local/tmp/gapps.txt", string.Empty);
+                adbClient.Commands.Add("rm /data/local/tmp/logcat.bin", string.Empty);
+
+                DeviceData device = new DeviceData()
+                {
+                    State = DeviceState.Online
+                };
+
+                PackageManager manager = new PackageManager(adbClient, device);
+                manager.InstallMultiplePackage("Assets/test.txt", new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, false);
+                Assert.Equal(9, adbClient.ReceivedCommands.Count);
+                Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
+                Assert.Equal("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
+                Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[3]);
+                Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[4]);
+                Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
+                Assert.Equal("rm /data/local/tmp/gapps.txt", adbClient.ReceivedCommands[6]);
+                Assert.Equal("rm /data/local/tmp/logcat.bin", adbClient.ReceivedCommands[7]);
+                Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[8]);
+
+                Assert.Equal(3, syncService.UploadedFiles.Count);
+                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
+                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
+                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
+
+                Factories.Reset();
+            }
+        }
+
+        [Fact]
         public void UninstallPackageTest()
         {
             DeviceData device = new DeviceData()

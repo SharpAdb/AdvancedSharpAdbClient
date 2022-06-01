@@ -403,10 +403,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            string? reinstallSwitch = reinstall ? "-r " : string.Empty;
-            string? addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}";
+            string? reinstallSwitch = reinstall ? " -r" : string.Empty;
+            string? addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
 
-            string cmd = $"pm install-create {reinstallSwitch}{addon}";
+            string cmd = $"pm install-create{reinstallSwitch}{addon}";
             client.ExecuteShellCommand(Device, cmd, receiver);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))
