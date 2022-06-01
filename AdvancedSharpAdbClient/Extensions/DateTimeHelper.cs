@@ -33,6 +33,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="time">The Unix equivalent to convert to the date.</param>
         /// <returns>A <see cref="DateTime"/> that represents the date.</returns>
-        public static DateTime ToDateTime(this long time) => Epoch.Add(new TimeSpan(time * 1000_0000));
+        public static DateTime ToDateTime(this long time) => Epoch.Add(new TimeSpan(time * 1000_0000)).ToLocalTime();
     }
 }
