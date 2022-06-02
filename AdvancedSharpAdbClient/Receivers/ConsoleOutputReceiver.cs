@@ -13,10 +13,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if NET452
-using AdvancedSharpAdbClient.Logs;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>

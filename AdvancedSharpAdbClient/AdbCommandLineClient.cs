@@ -16,10 +16,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if NET452
-using AdvancedSharpAdbClient.Logs;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -133,6 +129,7 @@ namespace AdvancedSharpAdbClient
                 return;
             }
 
+#if !NETSTANDARD1_3
             // Starting the adb server failed for whatever reason. This can happen if adb.exe
             // is running but is not accepting requests. In that case, try to kill it & start again.
             // It kills all processes named "adb", so let's hope nobody else named their process that way.
@@ -154,6 +151,9 @@ namespace AdvancedSharpAdbClient
                     // There is no process associated with this Process object.
                 }
             }
+#else
+            throw new PlatformNotSupportedException();
+#endif
 
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
@@ -263,6 +263,7 @@ namespace AdvancedSharpAdbClient
 
             int status;
 
+#if !NETSTANDARD1_3
             ProcessStartInfo psi = new ProcessStartInfo(AdbPath, command)
             {
                 CreateNoWindow = true,
@@ -297,6 +298,9 @@ namespace AdvancedSharpAdbClient
             }
 
             return status;
+#else
+            throw new PlatformNotSupportedException();
+#endif
         }
     }
 }

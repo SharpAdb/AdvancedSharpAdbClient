@@ -160,12 +160,16 @@ namespace AdvancedSharpAdbClient
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
             PixelFormat pixelFormat = StandardizePixelFormat(buffer);
 
+#if !NETSTANDARD1_3
             Bitmap bitmap = new Bitmap((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
             Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
             bitmap.UnlockBits(bitmapData);
 
             return bitmap;
+#else
+            throw new PlatformNotSupportedException();
+#endif
         }
 
         /// <summary>

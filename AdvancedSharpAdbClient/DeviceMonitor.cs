@@ -14,10 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if NET452
-using AdvancedSharpAdbClient.Logs;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -156,7 +152,9 @@ namespace AdvancedSharpAdbClient
                 monitorTaskCancellationTokenSource.Cancel();
                 monitorTask.Wait();
 
+#if !NETSTANDARD1_3
                 monitorTask.Dispose();
+#endif
                 monitorTask = null;
             }
 
