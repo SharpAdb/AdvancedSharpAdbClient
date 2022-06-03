@@ -31,9 +31,11 @@ body:
       label: NuGet package version
       description: Specify the version of AdvancedSharpAdbClient you're using.
       options:
+        - "Latest Source"
         - "2.5.2"
         - "2.5.1"
         - "2.5.0"
+        - "Others"
   - type: dropdown
     attributes:
       label: .NET Platform
@@ -46,8 +48,8 @@ body:
         - ".NET Framework 4.6.x"
         - ".NET Framework 4.7.x"
         - ".NET Framework 4.8"
-        - ".NET Standard 1.3"
-        - ".NET Standard 2.0"
+        - ".NET Standard 1.x"
+        - ".NET Standard 2.x"
         - ".NET Core App 1.x"
         - ".NET Core App 2.x"
         - ".NET Core App 3.x"

@@ -28,6 +28,7 @@ Added important features.
 - .NET Framework 4.0 (Need [Microsoft.Bcl.Async](https://www.nuget.org/packages/Microsoft.Bcl.Async))
 - .NET Framework 4.5.2
 - .NET Framework 4.6.2
+- .NET Framework 4.7.2
 - .NET Framework 4.8
 - .NET Standard 1.3 (Not full supports)
 - .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
