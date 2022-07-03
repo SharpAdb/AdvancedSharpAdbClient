@@ -147,10 +147,9 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(path));
             }
 
-            SendSyncRequest(command, path.Length);
-
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
-            _ = Write(pathBytes);
+            this.SendSyncRequest(command, pathBytes.Length);
+            this.Write(pathBytes);
         }
 
         /// <inheritdoc/>
