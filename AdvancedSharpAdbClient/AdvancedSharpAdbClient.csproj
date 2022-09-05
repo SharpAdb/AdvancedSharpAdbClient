@@ -17,13 +17,13 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8;netstandard1.3;netstandard2.0;netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
     <VersionPrefix>2.5.3</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.109" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
@@ -55,7 +55,17 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.8'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net4.8.1'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
 
@@ -69,16 +79,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
   </ItemGroup>
