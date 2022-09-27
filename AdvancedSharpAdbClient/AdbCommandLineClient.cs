@@ -24,11 +24,6 @@ namespace AdvancedSharpAdbClient
     public class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
-        /// The process tool to run the <c>adb.exe</c> executable. Default is <see cref="SystemProcess"/>
-        /// </summary>
-        public static IProcess ADBProcess;
-
-        /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
@@ -54,11 +49,6 @@ namespace AdvancedSharpAdbClient
             if (adbPath.IsNullOrWhiteSpace())
             {
                 throw new ArgumentNullException(nameof(adbPath));
-            }
-
-            if (ADBProcess == null)
-            {
-                ADBProcess = new SystemProcess();
             }
 
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -171,7 +161,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual bool IsValidAdbFile(string adbPath)
         {
-            return File.Exists(adbPath);
+            return CrossPlatformFunc.CheckFileExists(adbPath);
         }
 
         /// <summary>
@@ -269,7 +259,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(command));
             }
 
-            int status = ADBProcess.RunProcess(AdbPath, command, errorOutput, standardOutput);
+            int status = CrossPlatformFunc.RunProcess(AdbPath, command, errorOutput, standardOutput);
 
             return status;
         }

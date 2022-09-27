@@ -153,7 +153,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RestartServer()
         {
-            if (!File.Exists(cachedAdbPath))
+            if (!CrossPlatformFunc.CheckFileExists(cachedAdbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
