@@ -108,7 +108,8 @@ namespace AdvancedSharpAdbClient
         /// <returns>An array containing <c>####req</c>.</returns>
         public static byte[] FormAdbRequest(string req)
         {
-            string resultStr = string.Format("{0}{1}", req.Length.ToString("X4"), req);
+            int payloadLength = Encoding.GetByteCount(req);
+            string resultStr = string.Format("{0}{1}", payloadLength.ToString("X4"), req);
             byte[] result = Encoding.GetBytes(resultStr);
             return result;
         }
