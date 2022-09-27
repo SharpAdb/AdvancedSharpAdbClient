@@ -11,8 +11,7 @@ namespace AdvancedSharpAdbClient.Tests.Extensions
         [Fact]
         public void TryParseTest()
         {
-            DeviceState result;
-            Assert.True(Utilities.TryParse("BootLoader", false, out result));
+            Assert.True(Utilities.TryParse("BootLoader", false, out DeviceState result));
             Assert.Equal(DeviceState.BootLoader, result);
             Assert.True(Utilities.TryParse("Bootloader", true, out result));
             Assert.Equal(DeviceState.BootLoader, result);

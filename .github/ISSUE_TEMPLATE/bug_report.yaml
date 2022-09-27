@@ -47,7 +47,7 @@ body:
         - ".NET Framework 4.5.x"
         - ".NET Framework 4.6.x"
         - ".NET Framework 4.7.x"
-        - ".NET Framework 4.8"
+        - ".NET Framework 4.8.x"
         - ".NET Standard 1.x"
         - ".NET Standard 2.x"
         - ".NET Core App 1.x"
@@ -66,7 +66,6 @@ body:
         - "Windows"
         - "Linux"
         - "MacOS"
-        - "UWP"
         - "Others"
   - type: textarea
     attributes:

@@ -29,8 +29,8 @@ Added important features.
 - .NET Framework 4.5.2
 - .NET Framework 4.6.2
 - .NET Framework 4.7.2
-- .NET Framework 4.8
-- .NET Standard 1.3 (Not full supports)
+- .NET Framework 4.8.1
+- .NET Standard 1.3 (Not fully supported)
 - .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
 - .NET Core App 3.1
 - .NET 6.0
@@ -437,7 +437,7 @@ static async void Main(string[] args)
 ```
 
 ### Encoding
-Default encoding is UTF8,if you want to change it, use
+Default encoding is UTF8, if you want to change it, use
 
 ```c#
 AdvancedAdbClient.SetEncoding(Encoding.ASCII);

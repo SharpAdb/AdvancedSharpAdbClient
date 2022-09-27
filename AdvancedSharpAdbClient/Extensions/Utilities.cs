@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace AdvancedSharpAdbClient
 {
@@ -62,7 +61,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if NETSTANDARD1_3
-        public static IAsyncResult BeginReceive(this Socket socket,byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback? callback, object? state)
+        public static IAsyncResult BeginReceive(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback? callback, object? state)
         {
             return TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
         }
