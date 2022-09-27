@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
-        private static string? cachedAdbPath;
+        private static string cachedAdbPath;
 
         private readonly IAdbClient adbClient;
 
@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient
             AdbServerStatus serverStatus = GetStatus();
             Version commandLineVersion = null;
 
-            IAdbCommandLineClient? commandLineClient = adbCommandLineClientFactory(adbPath);
+            IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient
                 else
                 {
                     // An unexpected exception occurred; re-throw the exception
-                    throw;
+                    throw ex;
                 }
             }
         }

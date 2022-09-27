@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.Receivers
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
-            foreach (string? line in lines)
+            foreach (string line in lines)
             {
                 // Process has already died (e.g. the cat process itself)
                 if (line.Contains("No such file or directory"))

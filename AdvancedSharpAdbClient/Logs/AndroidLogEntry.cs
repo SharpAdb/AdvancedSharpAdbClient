@@ -41,12 +41,12 @@ namespace AdvancedSharpAdbClient.Logs
         /// Gets or sets the log tag of the message. Used to identify the source of a log message.
         /// It usually identifies the class or activity where the log call occured.
         /// </summary>
-        public string? Tag { get; set; }
+        public string Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the message that has been logged.
         /// </summary>
-        public string? Message { get; set; }
+        public string Message { get; set; }
 
         /// <inheritdoc/>
         public override string ToString() => $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";

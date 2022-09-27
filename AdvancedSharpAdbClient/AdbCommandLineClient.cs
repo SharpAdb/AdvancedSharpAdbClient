@@ -24,6 +24,11 @@ namespace AdvancedSharpAdbClient
     public class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
+        /// The process tool to run the <c>adb.exe</c> executable. Default is <see cref="SystemProcess"/>
+        /// </summary>
+        public static IProcess ADBProcess;
+
+        /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
@@ -51,6 +56,11 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
+            if (ADBProcess == null)
+            {
+                ADBProcess = new SystemProcess();
+            }
+
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 
@@ -75,7 +85,7 @@ namespace AdvancedSharpAdbClient
 
             this.EnsureIsValidAdbFile(adbPath);
 
-            this.AdbPath = adbPath;
+            AdbPath = adbPath;
 #if !NET35 && !NET40
             this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
 #endif
@@ -98,7 +108,7 @@ namespace AdvancedSharpAdbClient
             RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
-            Version? version = GetVersionFromOutput(standardOutput);
+            Version version = GetVersionFromOutput(standardOutput);
 
             if (version == null)
             {
@@ -107,7 +117,7 @@ namespace AdvancedSharpAdbClient
 
             if (version < AdbServer.RequiredAdbVersion)
             {
-                AdbException? ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+                AdbException ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
 #if !NET35 && !NET40
                 logger.LogError(ex, ex.Message);
 #endif
@@ -133,7 +143,7 @@ namespace AdvancedSharpAdbClient
             // Starting the adb server failed for whatever reason. This can happen if adb.exe
             // is running but is not accepting requests. In that case, try to kill it & start again.
             // It kills all processes named "adb", so let's hope nobody else named their process that way.
-            foreach (Process? adbProcess in Process.GetProcessesByName("adb"))
+            foreach (Process adbProcess in Process.GetProcessesByName("adb"))
             {
                 try
                 {
@@ -151,8 +161,6 @@ namespace AdvancedSharpAdbClient
                     // There is no process associated with this Process object.
                 }
             }
-#else
-            throw new PlatformNotSupportedException();
 #endif
 
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
@@ -174,7 +182,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
         internal static Version GetVersionFromOutput(List<string> output)
         {
-            foreach (string? line in output)
+            foreach (string line in output)
             {
                 // Skip empty lines
                 if (string.IsNullOrEmpty(line))
@@ -220,7 +228,7 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">
         /// The process exited with an exit code other than <c>0</c>.
         /// </exception>
-        protected virtual void RunAdbProcess(string command, List<string>? errorOutput, List<string>? standardOutput)
+        protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
 
@@ -254,53 +262,16 @@ namespace AdvancedSharpAdbClient
         /// <c>adb version</c>. This operation times out after 5 seconds.
         /// </para>
         /// </remarks>
-        protected virtual int RunAdbProcessInner(string command, List<string>? errorOutput, List<string>? standardOutput)
+        protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
             }
 
-            int status;
-
-#if !NETSTANDARD1_3
-            ProcessStartInfo psi = new ProcessStartInfo(AdbPath, command)
-            {
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            };
-
-            using (Process process = Process.Start(psi))
-            {
-                string? standardErrorString = process.StandardError.ReadToEnd();
-                string? standardOutputString = process.StandardOutput.ReadToEnd();
-
-                if (errorOutput != null)
-                {
-                    errorOutput.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
-                }
-
-                if (standardOutput != null)
-                {
-                    standardOutput.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
-                }
-
-                // get the return code from the process
-                if (!process.WaitForExit(5000))
-                {
-                    process.Kill();
-                }
-
-                status = process.ExitCode;
-            }
+            int status = ADBProcess.RunProcess(AdbPath, command, errorOutput, standardOutput);
 
             return status;
-#else
-            throw new PlatformNotSupportedException();
-#endif
         }
     }
 }

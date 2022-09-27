@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureNotDisposed();
 
-            using (IAdbSocket? socket = Factories.AdbSocketFactory(client.EndPoint))
+            using (IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint))
             {
                 // Select the target device
                 socket.SetDevice(Device);

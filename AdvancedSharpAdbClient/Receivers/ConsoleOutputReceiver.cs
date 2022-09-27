@@ -135,7 +135,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
-            foreach (string? line in lines)
+            foreach (string line in lines)
             {
                 if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
                 {

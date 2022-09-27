@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
 #endif
             .IsNullOrWhiteSpace(value);
 
-        public static async Task<string?> ReadLineEx(this TextReader reader) =>
+        public static async Task<string> ReadLineEx(this TextReader reader) =>
 #if NET35
             reader.ReadLine();
 #else
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if NETSTANDARD1_3
-        public static IAsyncResult BeginReceive(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback? callback, object? state)
+        public static IAsyncResult BeginReceive(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
         {
             return TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
         }

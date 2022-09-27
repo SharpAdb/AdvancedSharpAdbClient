@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the path of the file.
         /// </summary>
-        public string? Path { get; set; }
+        public string Path { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="UnixFileMode"/> attributes of the file.

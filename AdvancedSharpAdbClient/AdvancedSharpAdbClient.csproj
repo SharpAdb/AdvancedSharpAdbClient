@@ -8,7 +8,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
-    <Nullable>Enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

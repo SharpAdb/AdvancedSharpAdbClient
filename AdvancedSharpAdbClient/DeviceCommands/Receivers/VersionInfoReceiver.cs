@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the version code of the specified package
         /// </summary>
-        public VersionInfo? VersionInfo => GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
+        public VersionInfo VersionInfo => GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
                     ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
                     : null;
 
@@ -75,13 +75,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version name.</returns>
-        internal object? GetVersionName(string line)
+        internal object GetVersionName(string line)
         {
             CheckPackagesSection(line);
 
             return !inPackagesSection
                 ? null
-                : line != null && line.Trim().StartsWith("versionName=") ? line.Trim().Substring(12).Trim() : (object?)null;
+                : line != null && line.Trim().StartsWith("versionName=") ? line.Trim().Substring(12).Trim() : (object)null;
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version code.</returns>
-        internal object? GetVersionCode(string line)
+        internal object GetVersionCode(string line)
         {
             CheckPackagesSection(line);
 

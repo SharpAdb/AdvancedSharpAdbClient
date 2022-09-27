@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="propertyName">The name of the property</param>
         /// <returns>The received value</returns>
-        public object? GetPropertyValue(string propertyName) => Properties.ContainsKey(propertyName) ? Properties[propertyName] : null;
+        public object GetPropertyValue(string propertyName) => Properties.ContainsKey(propertyName) ? Properties[propertyName] : null;
 
         /// <summary>
         /// Adds a new parser to this receiver.
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="lines">The lines to process.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
-            foreach (string? line in lines)
+            foreach (string line in lines)
             {
                 if (line == null)
                 {
@@ -66,7 +66,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 foreach (KeyValuePair<string, Func<string, object>> parser in PropertyParsers)
                 {
-                    object? propertyValue = parser.Value(line);
+                    object propertyValue = parser.Value(line);
                     if (propertyValue != null)
                     {
                         Properties.Add(parser.Key, propertyValue);

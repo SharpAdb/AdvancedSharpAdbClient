@@ -150,7 +150,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case LogId.Events:
                     {
                         // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry? entry = new EventLogEntry()
+                        EventLogEntry entry = new EventLogEntry()
                         {
                             Data = data,
                             ProcessId = pid,

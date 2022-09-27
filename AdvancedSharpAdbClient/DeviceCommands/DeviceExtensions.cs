@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A dictionary containing the properties of the device, and their values.</returns>
         public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
-            GetPropReceiver? receiver = new GetPropReceiver();
+            GetPropReceiver receiver = new GetPropReceiver();
             client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
@@ -65,7 +65,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A dictionary containing the environment variables of the device, and their values.</returns>
         public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
-            EnvironmentVariablesReceiver? receiver = new EnvironmentVariablesReceiver();
+            EnvironmentVariablesReceiver receiver = new EnvironmentVariablesReceiver();
             client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
@@ -85,6 +85,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Requests the version information from the device.
         /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
@@ -140,7 +141,7 @@ fi".Replace("\r\n", "\n"), receiver);
 
             Collection<int> pids = new Collection<int>();
 
-            string? output = receiver.ToString();
+            string output = receiver.ToString();
             using (StringReader reader = new StringReader(output))
             {
                 while (reader.Peek() > 0)

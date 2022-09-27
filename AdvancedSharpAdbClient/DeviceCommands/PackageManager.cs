@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            string? reinstallSwitch = reinstall ? "-r " : string.Empty;
+            string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
             client.ExecuteShellCommand(Device, cmd, receiver);
@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             WriteInstallSession(session, "base", baseRemoteFilePath);
 
             int i = 0;
-            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string session = CreateInstallSession(reinstall, packageName);
 
             int i = 0;
-            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -363,7 +363,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if !NET40 && !NET35
                 logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
 #endif
-                throw;
+                throw e;
             }
         }
 
@@ -384,7 +384,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if !NET40 && !NET35
                 logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
 #endif
-                throw;
+                throw e;
             }
         }
 
@@ -399,8 +399,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            string? reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string? addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
+            string reinstallSwitch = reinstall ? " -r" : string.Empty;
+            string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
             client.ExecuteShellCommand(Device, cmd, receiver);

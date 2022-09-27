@@ -35,12 +35,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
-        public string? ErrorMessage { get; private set; }
+        public string ErrorMessage { get; private set; }
 
         /// <summary>
         /// Gets the success message if the install is successful.
         /// </summary>
-        public string? SuccessMessage { get; private set; }
+        public string SuccessMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.
@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 {
                     if (line.StartsWith(SuccessOutput))
                     {
-                        Match? m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        Match m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         SuccessMessage = SuccessOutput;
 
                         ErrorMessage = null;
@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-                        Match? m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        Match m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                         ErrorMessage = UnknownError;
 
                         SuccessMessage = null;

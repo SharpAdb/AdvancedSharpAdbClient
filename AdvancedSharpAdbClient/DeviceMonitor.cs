@@ -214,7 +214,7 @@ namespace AdvancedSharpAdbClient
             {
                 try
                 {
-                    string? value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
+                    string value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
                     ProcessIncomingDeviceData(value);
 
                     firstDeviceListParsed.Set();
@@ -234,7 +234,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw;
+                        throw ex;
                     }
                 }
                 catch (ObjectDisposedException ex)
@@ -252,7 +252,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw;
+                        throw ex;
                     }
                 }
                 catch (AdbException adbException)
@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw;
+                        throw adbException;
                     }
                 }
                 catch (Exception ex)
@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
                     logger.LogError(ex, ex.Message);
 #endif
-                    throw;
+                    throw ex;
                 }
             }
             while (!cancellationToken.IsCancellationRequested);
@@ -315,9 +315,9 @@ namespace AdvancedSharpAdbClient
                 // add them to the list, and start monitoring them.
 
                 // Add or update existing devices
-                foreach (DeviceData? device in devices)
+                foreach (DeviceData device in devices)
                 {
-                    DeviceData? existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
+                    DeviceData existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
 
                     if (existingDevice == null)
                     {
@@ -332,7 +332,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Remove devices
-                foreach (DeviceData? device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
+                foreach (DeviceData device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.devices.Remove(device);
                     OnDeviceDisconnected(new DeviceDataEventArgs(device));

@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     continue;
                 }
 
-                Match? m = Regex.Match(line, GetpropRegex, RegexOptions.Compiled);
+                Match m = Regex.Match(line, GetpropRegex, RegexOptions.Compiled);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();

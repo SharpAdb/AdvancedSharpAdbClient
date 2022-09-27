@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             int read = Read(reply);
 
             if (read == 0)
@@ -211,7 +211,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             _ = Read(reply);
 
             if (!BitConverter.IsLittleEndian)
@@ -233,7 +233,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
@@ -251,7 +251,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
-            AdbResponse? response = ReadAdbResponseInner();
+            AdbResponse response = ReadAdbResponseInner();
 
             if (!response.IOSuccess || !response.Okay)
             {
@@ -295,7 +295,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35 && !NET40
                 logger.LogError(sex, sex.Message);
 #endif
-                throw;
+                throw sex;
             }
         }
 
@@ -413,7 +413,7 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    AdbResponse? response = ReadAdbResponse();
+                    AdbResponse response = ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {
@@ -423,7 +423,7 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw;
+                        throw e;
                     }
                 }
             }
@@ -432,7 +432,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Stream GetShellStream()
         {
-            Stream? stream = socket.GetStream();
+            Stream stream = socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -476,7 +476,7 @@ namespace AdvancedSharpAdbClient
 
             if (!resp.Okay)
             {
-                string? message = ReadString();
+                string message = ReadString();
                 resp.Message = message;
 #if !NET35 && !NET40
                 logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
