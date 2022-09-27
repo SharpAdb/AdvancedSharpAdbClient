@@ -2,38 +2,29 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Receivers;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Text;
+
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    using Receivers;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading;
-
     /// <summary>
-    /// Provides extension methods for the <see cref="DeviceData"/> class, allowing you to run
-    /// commands directory against a <see cref="DeviceData"/> object.
+    /// Provides extension methods for the <see cref="DeviceData"/> class,
+    /// allowing you to run commands directory against a <see cref="DeviceData"/> object.
     /// </summary>
     public static class DeviceExtensions
     {
         /// <summary>
         /// Executes a shell command on the device.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="IAdvancedAdbClient"/> to use when executing the command.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to run the command.
-        /// </param>
-        /// <param name="command">
-        /// The command to execute.
-        /// </param>
-        /// <param name="receiver">
-        /// Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.
-        /// </param>
-        public static void ExecuteShellCommand(this IAdvancedAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
         {
             client.ExecuteRemoteCommand(command, device, receiver);
         }
@@ -41,19 +32,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the file statistics of a given file.
         /// </summary>
-        /// <param name="client">
-        /// The <see cref="IAdvancedAdbClient"/> to use when executing the command.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to look for the file.
-        /// </param>
-        /// <param name="path">
-        /// The path to the file.
-        /// </param>
-        /// <returns>
-        /// A <see cref="FileStatistics"/> object that represents the file.
-        /// </returns>
-        public static FileStatistics Stat(this IAdvancedAdbClient client, DeviceData device, string path)
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
+        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
             using (ISyncService service = Factories.SyncServiceFactory(client, device))
             {
@@ -64,18 +47,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the properties of a device.
         /// </summary>
-        /// <param name="client">
-        /// The connection to the adb server.
-        /// </param>
-        /// <param name="device">
-        /// The device for which to list the properties.
-        /// </param>
-        /// <returns>
-        /// A dictionary containing the properties of the device, and their values.
-        /// </returns>
-        public static Dictionary<string, string> GetProperties(this IAdvancedAdbClient client, DeviceData device)
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device for which to list the properties.</param>
+        /// <returns>A dictionary containing the properties of the device, and their values.</returns>
+        public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
-            var receiver = new GetPropReceiver();
+            GetPropReceiver? receiver = new GetPropReceiver();
             client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
@@ -83,18 +60,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the environment variables currently defined on a device.
         /// </summary>
-        /// <param name="client">
-        /// The connection to the adb server.
-        /// </param>
-        /// <param name="device">
-        /// The device for which to list the environment variables.
-        /// </param>
-        /// <returns>
-        /// A dictionary containing the environment variables of the device, and their values.
-        /// </returns>
-        public static Dictionary<string, string> GetEnvironmentVariables(this IAdvancedAdbClient client, DeviceData device)
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device for which to list the environment variables.</param>
+        /// <returns>A dictionary containing the environment variables of the device, and their values.</returns>
+        public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
-            var receiver = new EnvironmentVariablesReceiver();
+            EnvironmentVariablesReceiver? receiver = new EnvironmentVariablesReceiver();
             client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
@@ -102,16 +73,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Uninstalls a package from the device.
         /// </summary>
-        /// <param name="client">
-        /// The connection to the adb server.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to uninstall the package.
-        /// </param>
-        /// <param name="packageName">
-        /// The name of the package to uninstall.
-        /// </param>
-        public static void UninstallPackage(this IAdvancedAdbClient client, DeviceData device, string packageName)
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
         {
             PackageManager manager = new PackageManager(client, device);
             manager.UninstallPackage(packageName);
@@ -120,13 +85,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Requests the version information from the device.
         /// </summary>
-        /// <param name="device">
-        /// The device on which to uninstall the package.
-        /// </param>
-        /// <param name="packageName">
-        /// The name of the package from which to get the application version.
-        /// </param>
-        public static VersionInfo GetPackageVersion(this IAdvancedAdbClient client, DeviceData device, string packageName)
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package from which to get the application version.</param>
+        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
             PackageManager manager = new PackageManager(client, device);
             return manager.GetVersionInfo(packageName);
@@ -135,17 +96,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Lists all processes running on the device.
         /// </summary>
-        /// <param name="client">
-        /// A connection to ADB.
-        /// </param>
-        /// <param name="device">
-        /// The device on which to list the processes that are running.
-        /// </param>
-        /// <returns>
-        /// An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all
-        /// processes that are currently running on the device.
-        /// </returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this IAdvancedAdbClient client, DeviceData device)
+        /// <param name="client">A connection to ADB.</param>
+        /// <param name="device">The device on which to list the processes that are running.</param>
+        /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
+        /// that are currently running on the device.</returns>
+        public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
@@ -185,7 +140,7 @@ fi".Replace("\r\n", "\n"), receiver);
 
             Collection<int> pids = new Collection<int>();
 
-            var output = receiver.ToString();
+            string? output = receiver.ToString();
             using (StringReader reader = new StringReader(output))
             {
                 while (reader.Peek() > 0)
@@ -197,7 +152,7 @@ fi".Replace("\r\n", "\n"), receiver);
                         continue;
                     }
 
-                    var pid = int.Parse(line);
+                    int pid = int.Parse(line);
 
                     pids.Add(pid);
                 }

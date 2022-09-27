@@ -2,26 +2,22 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
-{
-    using AdvancedSharpAdbClient.Exceptions;
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using System.Text.RegularExpressions;
+using AdvancedSharpAdbClient.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 #if !NET35 && !NET40
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if NET452
-    using AdvancedSharpAdbClient.Logs;
-#endif
-
+namespace AdvancedSharpAdbClient
+{
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
@@ -42,12 +38,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
-        /// <param name="adbPath">
-        /// The path to the <c>adb.exe</c> executable.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public AdbCommandLineClient(string adbPath
 #if !NET35 && !NET40
             , ILogger<AdbCommandLineClient> logger = null
@@ -92,38 +84,32 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
         /// </summary>
-        public string AdbPath
-        {
-            get;
-            private set;
-        }
+        public string AdbPath { get; private set; }
 
         /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
-        /// <returns>
-        /// A <see cref="Version"/> object that contains the version number of the Android Command Line client.
-        /// </returns>
+        /// <returns>A <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
         public Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = new List<string>();
 
-            this.RunAdbProcess("version", null, standardOutput);
+            RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
-            var version = GetVersionFromOutput(standardOutput);
+            Version? version = GetVersionFromOutput(standardOutput);
 
             if (version == null)
             {
-                throw new AdbException($"The version of the adb executable at {this.AdbPath} could not be determined.");
+                throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
             }
 
             if (version < AdbServer.RequiredAdbVersion)
             {
-                var ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+                AdbException? ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
 #if !NET35 && !NET40
-                this.logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message);
 #endif
                 throw ex;
             }
@@ -136,17 +122,18 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public void StartServer()
         {
-            int status = this.RunAdbProcessInner("start-server", null, null);
+            int status = RunAdbProcessInner("start-server", null, null);
 
             if (status == 0)
             {
                 return;
             }
 
+#if !NETSTANDARD1_3
             // Starting the adb server failed for whatever reason. This can happen if adb.exe
             // is running but is not accepting requests. In that case, try to kill it & start again.
             // It kills all processes named "adb", so let's hope nobody else named their process that way.
-            foreach (var adbProcess in Process.GetProcessesByName("adb"))
+            foreach (Process? adbProcess in Process.GetProcessesByName("adb"))
             {
                 try
                 {
@@ -164,10 +151,13 @@ namespace AdvancedSharpAdbClient
                     // There is no process associated with this Process object.
                 }
             }
+#else
+            throw new PlatformNotSupportedException();
+#endif
 
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
-            this.RunAdbProcess("start-server", null, null);
+            RunAdbProcess("start-server", null, null);
         }
 
         /// <inheritdoc/>
@@ -180,16 +170,11 @@ namespace AdvancedSharpAdbClient
         /// Parses the output of the <c>adb.exe version</c> command and determines the
         /// adb version.
         /// </summary>
-        /// <param name="output">
-        /// The output of the <c>adb.exe version</c> command.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Version"/> object that represents the version of the adb command
-        /// line client.
-        /// </returns>
+        /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
+        /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
         internal static Version GetVersionFromOutput(List<string> output)
         {
-            foreach (var line in output)
+            foreach (string? line in output)
             {
                 // Skip empty lines
                 if (string.IsNullOrEmpty(line))
@@ -215,9 +200,7 @@ namespace AdvancedSharpAdbClient
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="command">
-        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
-        /// </param>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
         /// <param name="errorOutput">
         /// A list in which to store the standard error output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard
@@ -237,9 +220,9 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">
         /// The process exited with an exit code other than <c>0</c>.
         /// </exception>
-        protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual void RunAdbProcess(string command, List<string>? errorOutput, List<string>? standardOutput)
         {
-            int status = this.RunAdbProcessInner(command, errorOutput, standardOutput);
+            int status = RunAdbProcessInner(command, errorOutput, standardOutput);
 
             if (status != 0)
             {
@@ -251,9 +234,7 @@ namespace AdvancedSharpAdbClient
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
-        /// <param name="command">
-        /// The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.
-        /// </param>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
         /// <param name="errorOutput">
         /// A list in which to store the standard error output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard
@@ -273,7 +254,7 @@ namespace AdvancedSharpAdbClient
         /// <c>adb version</c>. This operation times out after 5 seconds.
         /// </para>
         /// </remarks>
-        protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual int RunAdbProcessInner(string command, List<string>? errorOutput, List<string>? standardOutput)
         {
             if (command == null)
             {
@@ -282,7 +263,8 @@ namespace AdvancedSharpAdbClient
 
             int status;
 
-            ProcessStartInfo psi = new ProcessStartInfo(this.AdbPath, command)
+#if !NETSTANDARD1_3
+            ProcessStartInfo psi = new ProcessStartInfo(AdbPath, command)
             {
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -293,8 +275,8 @@ namespace AdvancedSharpAdbClient
 
             using (Process process = Process.Start(psi))
             {
-                var standardErrorString = process.StandardError.ReadToEnd();
-                var standardOutputString = process.StandardOutput.ReadToEnd();
+                string? standardErrorString = process.StandardError.ReadToEnd();
+                string? standardOutputString = process.StandardOutput.ReadToEnd();
 
                 if (errorOutput != null)
                 {
@@ -316,6 +298,9 @@ namespace AdvancedSharpAdbClient
             }
 
             return status;
+#else
+            throw new PlatformNotSupportedException();
+#endif
         }
     }
 }

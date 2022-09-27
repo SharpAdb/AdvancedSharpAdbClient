@@ -1,20 +1,12 @@
+using AdvancedSharpAdbClient.SampleApp.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation.Metadata;
 using Windows.System;
 using Windows.UI.Core;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using AdvancedSharpAdbClient.SampleApp.Common;
 
 namespace AdvancedSharpAdbClient.SampleApp.Helpers
 {
@@ -103,14 +95,14 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         /// property provides the group to be displayed.</param>
         public void OnNavigatedTo(NavigationEventArgs e)
         {
-            var frameState = SuspensionManager.SessionStateForFrame(this.Frame);
+            Dictionary<string, object> frameState = SuspensionManager.SessionStateForFrame(this.Frame);
             this._pageKey = "Page-" + this.Frame.BackStackDepth;
 
             if (e.NavigationMode == NavigationMode.New)
             {
                 // Clear existing state for forward navigation when adding a new page to the
                 // navigation stack
-                var nextPageKey = this._pageKey;
+                string nextPageKey = this._pageKey;
                 int nextPageIndex = this.Frame.BackStackDepth;
                 while (frameState.Remove(nextPageKey))
                 {
@@ -139,8 +131,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         /// property provides the group to be displayed.</param>
         public void OnNavigatedFrom(NavigationEventArgs e)
         {
-            var frameState = SuspensionManager.SessionStateForFrame(this.Frame);
-            var pageState = new Dictionary<string, object>();
+            Dictionary<string, object> frameState = SuspensionManager.SessionStateForFrame(this.Frame);
+            Dictionary<string, object> pageState = new Dictionary<string, object>();
             this.SaveState?.Invoke(this, new SaveStateEventArgs(pageState));
             frameState[_pageKey] = pageState;
         }
@@ -169,7 +161,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
     public class RootFrameNavigationHelper
     {
         private Frame Frame { get; set; }
-        SystemNavigationManager systemNavigationManager;
+
+        private SystemNavigationManager systemNavigationManager;
         private Microsoft.UI.Xaml.Controls.NavigationView CurrentNavView { get; set; }
 
         /// <summary>
@@ -224,7 +217,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
                 this.Frame.GoBack();
                 navigated = true;
             }
-            
+
             return navigated;
         }
 
@@ -251,12 +244,13 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         {
             if (ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 6))
             {
-                this.CurrentNavView.IsBackEnabled = this.Frame.CanGoBack ? true : false;
-            } else
+                this.CurrentNavView.IsBackEnabled = this.Frame.CanGoBack;
+            }
+            else
             {
                 systemNavigationManager.AppViewBackButtonVisibility = this.Frame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
             }
-            
+
         }
 
         /// <summary>
@@ -269,7 +263,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         private void CoreDispatcher_AcceleratorKeyActivated(CoreDispatcher sender,
             AcceleratorKeyEventArgs e)
         {
-            var virtualKey = e.VirtualKey;
+            VirtualKey virtualKey = e.VirtualKey;
 
             // Only investigate further when Left, Right, or the dedicated Previous or Next keys
             // are pressed
@@ -278,8 +272,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
                 (virtualKey == VirtualKey.Left || virtualKey == VirtualKey.Right ||
                 (int)virtualKey == 166 || (int)virtualKey == 167))
             {
-                var coreWindow = Window.Current.CoreWindow;
-                var downState = CoreVirtualKeyStates.Down;
+                CoreWindow coreWindow = Window.Current.CoreWindow;
+                CoreVirtualKeyStates downState = CoreVirtualKeyStates.Down;
                 bool menuKey = (coreWindow.GetKeyState(VirtualKey.Menu) & downState) == downState;
                 bool controlKey = (coreWindow.GetKeyState(VirtualKey.Control) & downState) == downState;
                 bool shiftKey = (coreWindow.GetKeyState(VirtualKey.Shift) & downState) == downState;
@@ -311,12 +305,14 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         private void CoreWindow_PointerPressed(CoreWindow sender,
             PointerEventArgs e)
         {
-            var properties = e.CurrentPoint.Properties;
+            Windows.UI.Input.PointerPointProperties properties = e.CurrentPoint.Properties;
 
             // Ignore button chords with the left, right, and middle buttons
             if (properties.IsLeftButtonPressed || properties.IsRightButtonPressed ||
                 properties.IsMiddleButtonPressed)
+            {
                 return;
+            }
 
             // If back or forward are pressed (but not both) navigate appropriately
             bool backPressed = properties.IsXButton1Pressed;
@@ -324,8 +320,15 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
             if (backPressed ^ forwardPressed)
             {
                 e.Handled = true;
-                if (backPressed) this.TryGoBack();
-                if (forwardPressed) this.TryGoForward();
+                if (backPressed)
+                {
+                    this.TryGoBack();
+                }
+
+                if (forwardPressed)
+                {
+                    this.TryGoForward();
+                }
             }
         }
     }

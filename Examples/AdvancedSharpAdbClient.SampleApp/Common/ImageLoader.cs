@@ -22,11 +22,11 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.RegisterAttached("Source", typeof(string), typeof(ImageLoader), new PropertyMetadata(string.Empty, OnPropertyChanged));
 
-        private async static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is Image image)
             {
-                var item = await ControlInfoDataSource.Instance.GetItemAsync(e.NewValue?.ToString());
+                ControlInfoDataItem item = await ControlInfoDataSource.Instance.GetItemAsync(e.NewValue?.ToString());
                 if (item?.ImageIconPath != null)
                 {
                     Uri imageUri = new Uri(item.ImageIconPath, UriKind.Absolute);

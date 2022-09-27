@@ -3,7 +3,7 @@ using Windows.UI.Xaml.Data;
 
 namespace AdvancedSharpAdbClient.SampleApp.Common
 {
-    public sealed class BooleanToValueConverter: IValueConverter
+    public sealed class BooleanToValueConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

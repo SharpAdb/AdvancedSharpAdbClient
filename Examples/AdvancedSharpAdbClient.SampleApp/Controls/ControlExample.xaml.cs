@@ -7,26 +7,25 @@
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
 //*********************************************************
+using AdvancedSharpAdbClient.SampleApp.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
+using Windows.Media.AppRecording;
 using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.Media.AppRecording;
-using Windows.ApplicationModel.Core;
-using ColorCode;
-using AdvancedSharpAdbClient.SampleApp.Helpers;
 
 namespace AdvancedSharpAdbClient.SampleApp
 {
@@ -78,12 +77,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                 value = ((SolidColorBrush)value).Color;
             }
 
-            if (value == null)
-            {
-                return string.Empty;
-            }
-
-            return value.ToString();
+            return value == null ? string.Empty : value.ToString();
         }
     }
 
@@ -174,7 +168,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             set { SetValue(WebViewWidthProperty, value); }
         }
 
-        public new static readonly DependencyProperty HorizontalContentAlignmentProperty = DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(ControlExample), new PropertyMetadata(HorizontalAlignment.Left));
+        public static new readonly DependencyProperty HorizontalContentAlignmentProperty = DependencyProperty.Register("HorizontalContentAlignment", typeof(HorizontalAlignment), typeof(ControlExample), new PropertyMetadata(HorizontalAlignment.Left));
         public new HorizontalAlignment HorizontalContentAlignment
         {
             get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
@@ -199,7 +193,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void ControlExample_Loaded(object sender, RoutedEventArgs e)
         {
-            if(!XamlPresenter.IsEmpty && !CSharpPresenter.IsEmpty)
+            if (!XamlPresenter.IsEmpty && !CSharpPresenter.IsEmpty)
             {
                 VisualStateManager.GoToState(this, "SeparatorVisible", false);
             }
@@ -207,7 +201,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void rootGrid_Loaded(object sender, RoutedEventArgs e)
         {
-            if (MinimumUniversalAPIContract != 0 && !(ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", (ushort)MinimumUniversalAPIContract)))
+            if (MinimumUniversalAPIContract != 0 && !ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", (ushort)MinimumUniversalAPIContract))
             {
                 ErrorTextBlock.Visibility = Visibility.Visible;
             }
@@ -233,14 +227,14 @@ namespace AdvancedSharpAdbClient.SampleApp
             RenderTargetBitmap rtb = new RenderTargetBitmap();
             await rtb.RenderAsync(ControlPresenter);
 
-            var pixelBuffer = await rtb.GetPixelsAsync();
-            var pixels = pixelBuffer.ToArray();
+            Windows.Storage.Streams.IBuffer pixelBuffer = await rtb.GetPixelsAsync();
+            byte[] pixels = pixelBuffer.ToArray();
 
-            var file = await UIHelper.ScreenshotStorageFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
-            using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+            StorageFile file = await UIHelper.ScreenshotStorageFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
+            using (Windows.Storage.Streams.IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
             {
-                var displayInformation = DisplayInformation.GetForCurrentView();
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+                DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8,
                     BitmapAlphaMode.Premultiplied,
                     (uint)rtb.PixelWidth,
@@ -274,10 +268,10 @@ namespace AdvancedSharpAdbClient.SampleApp
             }
             else
             {
-                var manager = AppRecordingManager.GetDefault();
+                AppRecordingManager manager = AppRecordingManager.GetDefault();
                 if (manager.GetStatus().CanRecord)
                 {
-                    var result = await manager.SaveScreenshotToFilesAsync(
+                    AppRecordingSaveScreenshotResult result = await manager.SaveScreenshotToFilesAsync(
                         ApplicationData.Current.LocalFolder,
                         "appScreenshot",
                         AppRecordingSaveScreenshotOption.HdrContentVisible,
@@ -286,15 +280,15 @@ namespace AdvancedSharpAdbClient.SampleApp
                     if (result.Succeeded)
                     {
                         // Open the screenshot back up
-                        var screenshotFile = await ApplicationData.Current.LocalFolder.GetFileAsync("appScreenshot.png");
-                        using (var stream = await screenshotFile.OpenAsync(FileAccessMode.Read))
+                        StorageFile screenshotFile = await ApplicationData.Current.LocalFolder.GetFileAsync("appScreenshot.png");
+                        using (Windows.Storage.Streams.IRandomAccessStream stream = await screenshotFile.OpenAsync(FileAccessMode.Read))
                         {
-                            var decoder = await BitmapDecoder.CreateAsync(stream);
+                            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
 
                             // Find the control in the picture
                             GeneralTransform t = ControlPresenter.TransformToVisual(Window.Current.Content);
                             Point pos = t.TransformPoint(new Point(0, 0));
-;
+                            ;
                             if (!CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar)
                             {
                                 // Add the height of the title bar, which I really wish was programmatically available anywhere.
@@ -302,13 +296,18 @@ namespace AdvancedSharpAdbClient.SampleApp
                             }
 
                             // Crop the screenshot to the control area
-                            var transform = new BitmapTransform() { Bounds = new BitmapBounds() {
-                                X = (uint)(Math.Ceiling(pos.X)) + 1, // Avoid the 1px window border
-                                Y = (uint)(Math.Ceiling(pos.Y)) + 1,
-                                Width = (uint)ControlPresenter.ActualWidth - 1, // Rounding issues -- this avoids capturing the control border
-                                Height = (uint)ControlPresenter.ActualHeight - 1} };
+                            BitmapTransform transform = new BitmapTransform()
+                            {
+                                Bounds = new BitmapBounds()
+                                {
+                                    X = (uint)Math.Ceiling(pos.X) + 1, // Avoid the 1px window border
+                                    Y = (uint)Math.Ceiling(pos.Y) + 1,
+                                    Width = (uint)ControlPresenter.ActualWidth - 1, // Rounding issues -- this avoids capturing the control border
+                                    Height = (uint)ControlPresenter.ActualHeight - 1
+                                }
+                            };
 
-                            var softwareBitmap = await decoder.GetSoftwareBitmapAsync(
+                            SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync(
                                 decoder.BitmapPixelFormat,
                                 BitmapAlphaMode.Ignore,
                                 transform,
@@ -316,8 +315,8 @@ namespace AdvancedSharpAdbClient.SampleApp
                                 ColorManagementMode.DoNotColorManage);
 
                             // Save the cropped picture
-                            var file = await ApplicationData.Current.LocalFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
-                            using (var outStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                            StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
+                            using (Windows.Storage.Streams.IRandomAccessStream outStream = await file.OpenAsync(FileAccessMode.ReadWrite))
                             {
                                 BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
                                 encoder.SetSoftwareBitmap(softwareBitmap);
@@ -335,7 +334,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             ScreenshotStatusTextBlock.Text = "";
         }
 
-        string GetBestScreenshotName()
+        private string GetBestScreenshotName()
         {
             string imageName = "Screenshot.png";
             if (XamlSource != null)

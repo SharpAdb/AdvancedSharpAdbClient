@@ -7,18 +7,17 @@
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
 //*********************************************************
+using AdvancedSharpAdbClient.SampleApp.Helpers;
+using ColorCode;
+using ColorCode.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AdvancedSharpAdbClient.SampleApp.Helpers;
-using ColorCode;
-using ColorCode.Common;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -75,21 +74,14 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
 
         private void ReevaluateVisibility()
         {
-            if (Code.Length == 0 && CodeSourceFile == null)
-            {
-                Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                Visibility = Visibility.Visible;
-            }
+            Visibility = Code.Length == 0 && CodeSourceFile == null ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void SampleCodePresenter_Loaded(object sender, RoutedEventArgs e)
         {
             ReevaluateVisibility();
             VisualStateManager.GoToState(this, IsCSharpSample ? "CSharpSample" : "XAMLSample", false);
-            foreach (var substitution in Substitutions)
+            foreach (ControlExampleSubstitution substitution in Substitutions)
             {
                 substitution.ValueChanged += OnValueChanged;
             }
@@ -142,7 +134,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
             if (source != null && source.AbsolutePath.EndsWith("txt"))
             {
                 Uri derivedSource = GetDerivedSource(source);
-                var file = await StorageFile.GetFileFromApplicationUriAsync(derivedSource);
+                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(derivedSource);
                 string sampleString = await FileIO.ReadTextAsync(file);
 
                 FormatAndRenderSampleFromString(sampleString, presenter, highlightLanguage);
@@ -164,7 +156,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
             // Perform any applicable substitutions.
             sampleString = SubstitutionPattern.Replace(sampleString, match =>
             {
-                foreach (var substitution in Substitutions)
+                foreach (ControlExampleSubstitution substitution in Substitutions)
                 {
                     if (substitution.Key == match.Groups[1].Value)
                     {
@@ -176,16 +168,16 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
 
             actualCode = sampleString;
 
-            var sampleCodeRTB = new RichTextBlock { FontFamily = new FontFamily("Consolas") };
+            RichTextBlock sampleCodeRTB = new RichTextBlock { FontFamily = new FontFamily("Consolas") };
 
-            var formatter = GenerateRichTextFormatter();
+            RichTextBlockFormatter formatter = GenerateRichTextFormatter();
             formatter.FormatRichTextBlock(sampleString, highlightLanguage, sampleCodeRTB);
             presenter.Content = sampleCodeRTB;
         }
 
         private RichTextBlockFormatter GenerateRichTextFormatter()
         {
-            var formatter = new RichTextBlockFormatter(ThemeHelper.ActualTheme);
+            RichTextBlockFormatter formatter = new RichTextBlockFormatter(ThemeHelper.ActualTheme);
 
             if (ThemeHelper.ActualTheme == ElementTheme.Dark)
             {

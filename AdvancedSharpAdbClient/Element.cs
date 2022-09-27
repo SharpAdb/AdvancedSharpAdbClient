@@ -1,7 +1,7 @@
-﻿namespace AdvancedSharpAdbClient
+﻿using System.Collections.Generic;
+
+namespace AdvancedSharpAdbClient
 {
-    using System.Collections.Generic;
-    using System.Linq;
     /// <summary>
     /// Implement of screen element, likes Selenium
     /// </summary>
@@ -10,7 +10,7 @@
         /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        private IAdvancedAdbClient client { get; set; }
+        private IAdbClient client { get; set; }
 
         /// <summary>
         /// The current device containing the element
@@ -34,7 +34,7 @@
         /// <param name="device"></param>
         /// <param name="cords"></param>
         /// <param name="attributes"></param>
-        public Element(IAdvancedAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
+        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
         {
             this.client = client;
             this.device = device;
@@ -62,7 +62,8 @@
             if (charcount == 0)
             {
                 client.ClearInput(device, attributes["text"].Length);
-            } else
+            }
+            else
             {
                 client.ClearInput(device, charcount);
             }

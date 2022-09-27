@@ -7,18 +7,17 @@
 // PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 //
 //*********************************************************
+using AdvancedSharpAdbClient.SampleApp.Data;
+using AdvancedSharpAdbClient.SampleApp.Helpers;
 using System;
 using System.Numerics;
 using System.Reflection;
-using AdvancedSharpAdbClient.SampleApp.Data;
-using AdvancedSharpAdbClient.SampleApp.Helpers;
 using Windows.ApplicationModel.Resources;
 using Windows.UI.Composition;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Hosting;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 
 namespace AdvancedSharpAdbClient.SampleApp
@@ -43,7 +42,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             this.InitializeComponent();
 
             LayoutVisualStates.CurrentStateChanged += (s, e) => UpdateSeeAlsoPanelVerticalTranslationAnimation();
-            Loaded += (s,e) => SetInitialVisuals();
+            Loaded += (s, e) => SetInitialVisuals();
             this.Unloaded += this.ItemPage_Unloaded;
         }
 
@@ -72,11 +71,11 @@ namespace AdvancedSharpAdbClient.SampleApp
 
             if (UIHelper.IsScreenshotMode)
             {
-                var controlExamples = (this.contentFrame.Content as UIElement)?.GetDescendantsOfType<ControlExample>();
+                System.Collections.Generic.IEnumerable<ControlExample> controlExamples = (this.contentFrame.Content as UIElement)?.GetDescendantsOfType<ControlExample>();
 
                 if (controlExamples != null)
                 {
-                    foreach (var controlExample in controlExamples)
+                    foreach (ControlExample controlExample in controlExamples)
                     {
                         VisualStateManager.GoToState(controlExample, "ScreenshotMode", false);
                     }
@@ -86,18 +85,18 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void UpdateSeeAlsoPanelVerticalTranslationAnimation()
         {
-            var isEnabled = LayoutVisualStates.CurrentState == LargeLayout;
+            bool isEnabled = LayoutVisualStates.CurrentState == LargeLayout;
 
             ElementCompositionPreview.SetIsTranslationEnabled(seeAlsoPanel, true);
 
-            var targetPanelVisual = ElementCompositionPreview.GetElementVisual(seeAlsoPanel);
+            Visual targetPanelVisual = ElementCompositionPreview.GetElementVisual(seeAlsoPanel);
             targetPanelVisual.Properties.InsertVector3("Translation", Vector3.Zero);
 
             if (isEnabled)
             {
-                var scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(svPanel);
+                CompositionPropertySet scrollProperties = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(svPanel);
 
-                var expression = _compositor.CreateExpressionAnimation("ScrollManipulation.Translation.Y * -1");
+                ExpressionAnimation expression = _compositor.CreateExpressionAnimation("ScrollManipulation.Translation.Y * -1");
                 expression.SetReferenceParameter("ScrollManipulation", scrollProperties);
                 expression.Target = "Translation.Y";
                 targetPanelVisual.StartAnimation(expression.Target, expression);
@@ -120,21 +119,21 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void OnToggleTheme()
         {
-            var currentElementTheme = ((_currentElementTheme ?? ElementTheme.Default) == ElementTheme.Default) ? ThemeHelper.ActualTheme : _currentElementTheme.Value;
-            var newTheme = currentElementTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
+            ElementTheme currentElementTheme = ((_currentElementTheme ?? ElementTheme.Default) == ElementTheme.Default) ? ThemeHelper.ActualTheme : _currentElementTheme.Value;
+            ElementTheme newTheme = currentElementTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
             SetControlExamplesTheme(newTheme);
         }
 
         private void SetControlExamplesTheme(ElementTheme theme)
         {
-            var controlExamples = (this.contentFrame.Content as UIElement)?.GetDescendantsOfType<ControlExample>();
+            System.Collections.Generic.IEnumerable<ControlExample> controlExamples = (this.contentFrame.Content as UIElement)?.GetDescendantsOfType<ControlExample>();
 
             if (controlExamples != null)
             {
                 _currentElementTheme = theme;
-                foreach (var controlExample in controlExamples)
+                foreach (ControlExample controlExample in controlExamples)
                 {
-                    var exampleContent = controlExample.Example as FrameworkElement;
+                    FrameworkElement exampleContent = controlExample.Example as FrameworkElement;
                     exampleContent.RequestedTheme = theme;
                     controlExample.ExampleContainer.RequestedTheme = theme;
                 }
@@ -150,14 +149,14 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            var item = await ControlInfoDataSource.Instance.GetItemAsync((string)e.Parameter);
+            ControlInfoDataItem item = await ControlInfoDataSource.Instance.GetItemAsync((string)e.Parameter);
 
             if (item != null)
             {
                 Item = item;
 
                 // Load control page into frame.
-                var loader = ResourceLoader.GetForCurrentView();
+                ResourceLoader loader = ResourceLoader.GetForCurrentView();
 
                 string pageRoot = loader.GetString("PageStringRoot");
 
@@ -168,8 +167,8 @@ namespace AdvancedSharpAdbClient.SampleApp
                 {
                     // Pagetype is not null!
                     // So lets generate the github links and set them!
-                    var gitHubBaseURI = "https://github.com/microsoft/WinUI-Gallery/tree/winui2/WinUIGallery/ControlPages/";
-                    var pageName = pageType.Name + ".xaml";
+                    string gitHubBaseURI = "https://github.com/microsoft/WinUI-Gallery/tree/winui2/WinUIGallery/ControlPages/";
+                    string pageName = pageType.Name + ".xaml";
                     PageCodeGitHubLink.NavigateUri = new Uri(gitHubBaseURI + pageName + ".cs");
                     PageMarkupGitHubLink.NavigateUri = new Uri(gitHubBaseURI + pageName);
 
@@ -201,7 +200,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
             // We use reflection to call the OnNavigatedFrom function the user leaves this page
             // See this PR for more information: https://github.com/microsoft/WinUI-Gallery/pull/145
-            Frame contentFrameAsFrame = contentFrame as Frame;
+            Frame contentFrameAsFrame = contentFrame;
             Page innerPage = contentFrameAsFrame.Content as Page;
             MethodInfo dynMethod = innerPage.GetType().GetMethod("OnNavigatedFrom",
                 BindingFlags.NonPublic | BindingFlags.Instance);
@@ -214,7 +213,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             string targetState = "NormalFrameContent";
 
-            if ((contentColumn.ActualWidth) >= 1000)
+            if (contentColumn.ActualWidth >= 1000)
             {
                 targetState = "WideFrameContent";
             }

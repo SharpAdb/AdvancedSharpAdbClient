@@ -8,10 +8,10 @@
 //
 //*********************************************************
 using AdvancedSharpAdbClient.SampleApp.Data;
-using System.Linq;
-using Windows.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Windows.UI.Xaml.Navigation;
 
 namespace AdvancedSharpAdbClient.SampleApp
 {
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItem>().First();
+            Microsoft.UI.Xaml.Controls.NavigationViewItem menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItem>().First();
             menuItem.IsSelected = true;
             NavigationRootPage.Current.NavigationView.Header = string.Empty;
 
@@ -34,17 +34,17 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private ObservableCollection<GroupInfoList> FormatData()
         {
-            var query = from item in this.Items
-                        group item by item.BadgeString into g
-                        orderby g.Key
-                        select new GroupInfoList(g) { Key = g.Key };
+            IEnumerable<GroupInfoList> query = from item in this.Items
+                                               group item by item.BadgeString into g
+                                               orderby g.Key
+                                               select new GroupInfoList(g) { Key = g.Key };
 
             ObservableCollection<GroupInfoList> groupList = new ObservableCollection<GroupInfoList>(query);
 
             //Move Preview samples to the back of the list
             if (groupList.Any())
             {
-                var previewGroup = groupList?.ElementAt(1);
+                GroupInfoList previewGroup = groupList?.ElementAt(1);
                 if (previewGroup?.Key.ToString() == "Preview")
                 {
                     groupList.RemoveAt(1);
@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                 }
             }
 
-            foreach (var item in groupList)
+            foreach (GroupInfoList item in groupList)
             {
                 switch (item.Key.ToString())
                 {

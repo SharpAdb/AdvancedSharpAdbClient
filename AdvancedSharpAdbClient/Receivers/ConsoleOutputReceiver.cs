@@ -2,23 +2,19 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
-{
-    using Exceptions;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using System.Text.RegularExpressions;
+using AdvancedSharpAdbClient.Exceptions;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
 #if !NET35 && !NET40
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if NET452
-    using AdvancedSharpAdbClient.Logs;
-#endif
-
+namespace AdvancedSharpAdbClient
+{
     /// <summary>
     /// Recieves console output, and makes the console output available as a <see cref="string"/>. To
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
@@ -64,7 +60,7 @@ namespace AdvancedSharpAdbClient
         /// </returns>
         public override string ToString()
         {
-            return this.output.ToString();
+            return output.ToString();
         }
 
         /// <summary>
@@ -75,12 +71,12 @@ namespace AdvancedSharpAdbClient
         /// </param>
         public void ThrowOnError(string line)
         {
-            if (!this.ParsesErrors)
+            if (!ParsesErrors)
             {
                 if (line.EndsWith(": not found"))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: '{line}'");
+                    logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
@@ -88,7 +84,7 @@ namespace AdvancedSharpAdbClient
                 if (line.EndsWith("No such file or directory"))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: {line}");
+                    logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
@@ -97,7 +93,7 @@ namespace AdvancedSharpAdbClient
                 if (line.Contains("Unknown option"))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: {line}");
+                    logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new UnknownOptionException($"The remote execution returned: '{line}'");
                 }
@@ -106,7 +102,7 @@ namespace AdvancedSharpAdbClient
                 if (Regex.IsMatch(line, "Aborting.$", DefaultRegexOptions))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: {line}");
+                    logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new CommandAbortingException($"The remote execution returned: '{line}'");
                 }
@@ -116,7 +112,7 @@ namespace AdvancedSharpAdbClient
                 if (Regex.IsMatch(line, "applet not found$", DefaultRegexOptions))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: '{line}'");
+                    logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }
@@ -126,7 +122,7 @@ namespace AdvancedSharpAdbClient
                 if (Regex.IsMatch(line, "(permission|access) denied$", DefaultRegexOptions))
                 {
 #if !NET35 && !NET40
-                    this.logger.LogWarning($"The remote execution returned: '{line}'");
+                    logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new PermissionDeniedException($"The remote execution returned: '{line}'");
                 }
@@ -139,17 +135,17 @@ namespace AdvancedSharpAdbClient
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
-            foreach (var line in lines)
+            foreach (string? line in lines)
             {
                 if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
                 {
                     continue;
                 }
 
-                this.output.AppendLine(line);
+                output.AppendLine(line);
 
 #if !NET35 && !NET40
-                this.logger.LogDebug(line);
+                logger.LogDebug(line);
 #endif
             }
         }

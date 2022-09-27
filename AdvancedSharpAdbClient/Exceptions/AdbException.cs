@@ -2,12 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Net.Sockets;
+using System.Runtime.Serialization;
+
 namespace AdvancedSharpAdbClient.Exceptions
 {
-    using System;
-    using System.Net.Sockets;
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// Represents an exception with communicating with ADB
     /// </summary>
@@ -16,54 +16,34 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>
-        public AdbException()
-            : base("An error occurred with ADB")
+        public AdbException() : base("An error occurred with ADB")
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbException"/> class with the
-        /// specified error message.
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the specified error message.
         /// </summary>
-        /// <param name="message">
-        /// The message that describes the error.
-        /// </param>
-        public AdbException(string message)
-            : base(message)
+        /// <param name="message">The message that describes the error.</param>
+        public AdbException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbException"/> class with the
-        /// specified client error message and adb error message.
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the specified client error message and adb error message.
         /// </summary>
-        /// <param name="message">
-        /// The message that describes the error on the client side.
-        /// </param>
-        /// <param name="adbError">
-        /// The raw error message that was sent by adb.
-        /// </param>
-        public AdbException(string message, string adbError)
-            : base(message)
-        {
-            this.AdbError = adbError;
-        }
+        /// <param name="message">The message that describes the error on the client side.</param>
+        /// <param name="adbError">The raw error message that was sent by adb.</param>
+        public AdbException(string message, string adbError) : base(message) => AdbError = adbError;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbException"/> class with the
-        /// specified client error message and <see cref="AdbResponse"/>
+        /// Initializes a new instance of the <see cref="AdbException"/> class with the specified client error message and <see cref="AdbResponse"/>
         /// </summary>
-        /// <param name="message">
-        /// The message that describes the error on the client side.
-        /// </param>
-        /// <param name="response">
-        /// The <see cref="AdbResponse"/> that was sent by adb.
-        /// </param>
-        public AdbException(string message, AdbResponse response)
-            : base(message)
+        /// <param name="message">The message that describes the error on the client side.</param>
+        /// <param name="response">The <see cref="AdbResponse"/> that was sent by adb.</param>
+        public AdbException(string message, AdbResponse response) : base(message)
         {
-            this.AdbError = response.Message;
-            this.Response = response;
+            AdbError = response.Message;
+            Response = response;
         }
 
         /// <summary>
@@ -71,9 +51,18 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public AdbException(SerializationInfo serializationInfo, StreamingContext context)
-            : base(serializationInfo, context)
+        public AdbException(SerializationInfo serializationInfo, StreamingContext context) :
+#if !NETSTANDARD1_3
+            base(serializationInfo, context)
+#else
+            base(serializationInfo.GetString("Message"))
+#endif
         {
+#if NETSTANDARD1_3
+            HelpLink = serializationInfo.GetString("HelpURL"); // Do not rename (binary serialization)
+            HResult = serializationInfo.GetInt32("HResult"); // Do not rename (binary serialization)
+            Source = serializationInfo.GetString("Source"); // Do not rename (binary serialization)
+#endif
         }
 
         /// <summary>
@@ -81,28 +70,19 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public AdbException(string message, Exception innerException)
-            : base(message, innerException)
+        public AdbException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
         /// <summary>
         /// Gets the error message that was sent by adb.
         /// </summary>
-        public string AdbError
-        {
-            get;
-            private set;
-        }
+        public string? AdbError { get; private set; }
 
         /// <summary>
         /// Gets the response that was sent by adb.
         /// </summary>
-        public AdbResponse Response
-        {
-            get;
-            private set;
-        }
+        public AdbResponse? Response { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the underlying error was a <see cref="SocketException"/> where the
@@ -113,14 +93,9 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
             get
             {
-                var socketException = this.InnerException as SocketException;
+                SocketException? socketException = InnerException as SocketException;
 
-                if (socketException == null)
-                {
-                    return false;
-                }
-
-                return socketException.SocketErrorCode == SocketError.ConnectionReset;
+                return socketException != null && socketException.SocketErrorCode == SocketError.ConnectionReset;
             }
         }
     }

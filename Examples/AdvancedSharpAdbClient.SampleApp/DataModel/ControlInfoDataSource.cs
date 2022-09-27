@@ -14,8 +14,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Storage;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
 
 // The data model defined by this file serves as a representative example of a strongly-typed
 // model.  The property names chosen coincide with data bindings in the standard item templates.
@@ -159,26 +157,23 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
         {
             await _instance.GetControlInfoDataAsync();
             // Simple linear search is acceptable for small data sets
-            var matches = _instance.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
-            if (matches.Count() == 1) return matches.First();
-            return null;
+            IEnumerable<ControlInfoDataGroup> matches = _instance.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
+            return matches.Count() == 1 ? matches.First() : null;
         }
 
         public async Task<ControlInfoDataItem> GetItemAsync(string uniqueId)
         {
             await _instance.GetControlInfoDataAsync();
             // Simple linear search is acceptable for small data sets
-            var matches = _instance.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
-            if (matches.Count() > 0) return matches.First();
-            return null;
+            IEnumerable<ControlInfoDataItem> matches = _instance.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
+            return matches.Count() > 0 ? matches.First() : null;
         }
 
         public async Task<ControlInfoDataGroup> GetGroupFromItemAsync(string uniqueId)
         {
             await _instance.GetControlInfoDataAsync();
-            var matches = _instance.Groups.Where((group) => group.Items.FirstOrDefault(item => item.UniqueId.Equals(uniqueId)) != null);
-            if (matches.Count() == 1) return matches.First();
-            return null;
+            IEnumerable<ControlInfoDataGroup> matches = _instance.Groups.Where((group) => group.Items.FirstOrDefault(item => item.UniqueId.Equals(uniqueId)) != null);
+            return matches.Count() == 1 ? matches.First() : null;
         }
 
         private async Task GetControlInfoDataAsync()
@@ -217,9 +212,9 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
 
                         string badgeString = null;
 
-                        bool isNew = itemObject.ContainsKey("IsNew") ? itemObject["IsNew"].GetBoolean() : false;
-                        bool isUpdated = itemObject.ContainsKey("IsUpdated") ? itemObject["IsUpdated"].GetBoolean() : false;
-                        bool isPreview = itemObject.ContainsKey("IsPreview") ? itemObject["IsPreview"].GetBoolean() : false;
+                        bool isNew = itemObject.ContainsKey("IsNew") && itemObject["IsNew"].GetBoolean();
+                        bool isUpdated = itemObject.ContainsKey("IsUpdated") && itemObject["IsUpdated"].GetBoolean();
+                        bool isPreview = itemObject.ContainsKey("IsPreview") && itemObject["IsPreview"].GetBoolean();
 
                         if (isNew)
                         {
@@ -234,7 +229,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
                             badgeString = "Preview";
                         }
 
-                        var item = new ControlInfoDataItem(itemObject["UniqueId"].GetString(),
+                        ControlInfoDataItem item = new ControlInfoDataItem(itemObject["UniqueId"].GetString(),
                                                                 itemObject["Title"].GetString(),
                                                                 itemObject["Subtitle"].GetString(),
                                                                 itemObject["ImagePath"].GetString(),

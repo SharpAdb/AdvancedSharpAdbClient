@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Runtime.CompilerServices;
+
 namespace AdvancedSharpAdbClient
 {
-    using System.Runtime.CompilerServices;
-
     /// <summary>
     /// <para>
     ///     SharpAdbClient is a .NET library that allows.NET applications to communicate with Android devices.
@@ -14,9 +14,9 @@ namespace AdvancedSharpAdbClient
     /// </para>
     ///
     /// <para>
-    ///     Most of the adb functionality is exposed through the <see cref="AdvancedAdbClient"/> class.
+    ///     Most of the adb functionality is exposed through the <see cref="AdbClient"/> class.
     ///     You can create your own instance of that class, or just use the instance we provide for you at
-    ///     <see cref="AdvancedSharpAdbClient.AdvancedAdbClient.Instance"/>
+    ///     <see cref="AdbClient.Instance"/>
     /// </para>
     ///
     /// <para>

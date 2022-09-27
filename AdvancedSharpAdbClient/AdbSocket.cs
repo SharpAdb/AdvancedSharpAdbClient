@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient
     /// <para>
     /// The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
     /// sending and receiving messages. For interacting with the services the Android Debug
-    /// Bridge exposes, use the <see cref="AdvancedAdbClient"/>.
+    /// Bridge exposes, use the <see cref="AdbClient"/>.
     /// </para>
     /// <para>
     /// For more information about the protocol that is implemented here, see chapter
@@ -53,13 +53,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        /// <param name="endPoint">
-        /// The <see cref="EndPoint"/> at which the Android Debug Bridge is listening
-        /// for clients.
-        /// </param>
-        /// <param name="logger">
-        /// The logger to use when logging.
-        /// </param>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
+        /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(EndPoint endPoint
 #if !NET35 && !NET40
             , ILogger<AdbSocket> logger = null
@@ -77,10 +72,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        /// <param name="socket">
-        /// The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening
-        /// for clients.
-        /// </param>
+        /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
@@ -102,52 +94,49 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public bool Connected
         {
-            get { return this.socket.Connected; }
+            get { return socket.Connected; }
         }
 
         /// <summary>
         /// Determines whether the specified reply is okay.
         /// </summary>
         /// <param name="reply">The reply.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
         public static bool IsOkay(byte[] reply)
         {
-            return AdvancedAdbClient.Encoding.GetString(reply).Equals("OKAY");
+            return AdbClient.Encoding.GetString(reply).Equals("OKAY");
         }
 
         /// <inheritdoc/>
         public virtual void Reconnect()
         {
-            this.socket.Reconnect();
+            socket.Reconnect();
         }
 
         /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/>
-        /// class.
+        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         public virtual void Dispose()
         {
-            this.socket.Dispose();
+            socket.Dispose();
         }
 
         /// <inheritdoc/>
         public virtual int Read(byte[] data)
         {
-            return this.Read(data, data.Length);
+            return Read(data, data.Length);
         }
 
         /// <inheritdoc/>
         public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken)
         {
-            return this.ReadAsync(data, data.Length, cancellationToken);
+            return ReadAsync(data, data.Length, cancellationToken);
         }
 
         /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path, int permissions)
         {
-            this.SendSyncRequest(command, $"{path},{permissions}");
+            SendSyncRequest(command, $"{path},{permissions}");
         }
 
         /// <inheritdoc/>
@@ -158,7 +147,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(path));
             }
 
-            byte[] pathBytes = AdvancedAdbClient.Encoding.GetBytes(path);
+            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             this.SendSyncRequest(command, pathBytes.Length);
             this.Write(pathBytes);
         }
@@ -180,15 +169,15 @@ namespace AdvancedSharpAdbClient
                 Array.Reverse(lengthBytes);
             }
 
-            this.Write(commandBytes);
-            this.Write(lengthBytes);
+            _ = Write(commandBytes);
+            _ = Write(lengthBytes);
         }
 
         /// <inheritdoc/>
         public virtual SyncCommand ReadSyncResponse()
         {
             byte[] data = new byte[4];
-            this.Read(data);
+            _ = Read(data);
 
             return SyncCommandConverter.GetCommand(data);
         }
@@ -197,8 +186,8 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
-            int read = this.Read(reply);
+            byte[]? reply = new byte[4];
+            int read = Read(reply);
 
             if (read == 0)
             {
@@ -207,14 +196,14 @@ namespace AdvancedSharpAdbClient
             }
 
             // Convert the bytes to a hex string
-            string lenHex = AdvancedAdbClient.Encoding.GetString(reply);
+            string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
-            this.Read(reply);
+            _ = Read(reply);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -222,8 +211,8 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
-            this.Read(reply);
+            byte[]? reply = new byte[4];
+            _ = Read(reply);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -234,9 +223,9 @@ namespace AdvancedSharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            this.Read(reply);
+            _ = Read(reply);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
@@ -244,29 +233,29 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
-            var reply = new byte[4];
-            await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            byte[]? reply = new byte[4];
+            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
-            string lenHex = AdvancedAdbClient.Encoding.GetString(reply);
+            string lenHex = AdbClient.Encoding.GetString(reply);
             int len = int.Parse(lenHex, NumberStyles.HexNumber);
 
             // And get the string
             reply = new byte[len];
-            await this.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-            string value = AdvancedAdbClient.Encoding.GetString(reply);
+            string value = AdbClient.Encoding.GetString(reply);
             return value;
         }
 
         /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
-            var response = this.ReadAdbResponseInner();
+            AdbResponse? response = ReadAdbResponseInner();
 
             if (!response.IOSuccess || !response.Okay)
             {
-                this.socket.Dispose();
+                socket.Dispose();
                 throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
             }
 
@@ -276,9 +265,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void SendAdbRequest(string request)
         {
-            byte[] data = AdvancedAdbClient.FormAdbRequest(request);
+            byte[] data = AdbClient.FormAdbRequest(request);
 
-            if (!this.Write(data))
+            if (!Write(data))
             {
                 throw new IOException($"Failed sending the request '{request}' to ADB");
             }
@@ -287,7 +276,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
         {
-            this.Send(data, 0, length);
+            Send(data, 0, length);
         }
 
         /// <inheritdoc/>
@@ -295,7 +284,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = this.socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
+                int count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -304,7 +293,7 @@ namespace AdvancedSharpAdbClient
             catch (SocketException sex)
             {
 #if !NET35 && !NET40
-                this.logger.LogError(sex, sex.Message);
+                logger.LogError(sex, sex.Message);
 #endif
                 throw;
             }
@@ -340,19 +329,19 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = await this.socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count = await socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {
 #if !NET35 && !NET40
-                        this.logger.LogError("read: channel EOF");
+                        logger.LogError("read: channel EOF");
 #endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
 #if !NET35 && !NET40
-                        this.logger.LogInformation("DONE with Read");
+                        logger.LogInformation("DONE with Read");
 #endif
                     }
                     else
@@ -384,18 +373,18 @@ namespace AdvancedSharpAdbClient
                     int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
                     byte[] buffer = new byte[buflen];
-                    count = this.socket.Receive(buffer, buflen, SocketFlags.None);
+                    count = socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
 #if !NET35 && !NET40
-                        this.logger.LogError("read: channel EOF");
+                        logger.LogError("read: channel EOF");
 #endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
 #if !NET35 && !NET40
-                        this.logger.LogInformation("DONE with Read");
+                        logger.LogInformation("DONE with Read");
 #endif
                     }
                     else
@@ -420,11 +409,11 @@ namespace AdvancedSharpAdbClient
             // to a specific device
             if (device != null)
             {
-                this.SendAdbRequest($"host:transport:{device.Serial}");
+                SendAdbRequest($"host:transport:{device.Serial}");
 
                 try
                 {
-                    var response = this.ReadAdbResponse();
+                    AdbResponse? response = ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {
@@ -443,7 +432,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Stream GetShellStream()
         {
-            var stream = this.socket.GetStream();
+            Stream? stream = socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -451,23 +440,18 @@ namespace AdvancedSharpAdbClient
         /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
         /// <param name="data">The data to send.</param>
-        /// <returns>
-        /// Returns <see langword="true"/> if all data was written; otherwise,
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This uses the default time out value.
-        /// </remarks>
+        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
         protected bool Write(byte[] data)
         {
             try
             {
-                this.Send(data, -1);
+                Send(data, -1);
             }
             catch (IOException e)
             {
 #if !NET35 && !NET40
-                this.logger.LogError(e, e.Message);
+                logger.LogError(e, e.Message);
 #endif
                 return false;
             }
@@ -478,33 +462,24 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reads the response from ADB after a command.
         /// </summary>
-        /// <returns>
-        /// A <see cref="AdbResponse"/> that represents the response received from ADB.
-        /// </returns>
+        /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected AdbResponse ReadAdbResponseInner()
         {
             AdbResponse resp = new AdbResponse();
 
             byte[] reply = new byte[4];
-            this.Read(reply);
+            Read(reply);
 
             resp.IOSuccess = true;
 
-            if (IsOkay(reply))
-            {
-                resp.Okay = true;
-            }
-            else
-            {
-                resp.Okay = false;
-            }
+            resp.Okay = IsOkay(reply);
 
             if (!resp.Okay)
             {
-                var message = this.ReadString();
+                string? message = ReadString();
                 resp.Message = message;
 #if !NET35 && !NET40
-                this.logger.LogError("Got reply '{0}', diag='{1}'", this.ReplyToString(reply), resp.Message);
+                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
 #endif
             }
 
@@ -514,12 +489,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Converts an ADB reply to a string.
         /// </summary>
-        /// <param name="reply">
-        /// A <see cref="byte"/> array that represents the ADB reply.
-        /// </param>
-        /// <returns>
-        /// A <see cref="string"/> that represents the ADB reply.
-        /// </returns>
+        /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
+        /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
         protected string ReplyToString(byte[] reply)
         {
             string result;
@@ -530,7 +501,7 @@ namespace AdvancedSharpAdbClient
             catch (DecoderFallbackException uee)
             {
 #if !NET35 && !NET40
-                this.logger.LogError(uee, uee.Message);
+                logger.LogError(uee, uee.Message);
 #endif
                 result = string.Empty;
             }

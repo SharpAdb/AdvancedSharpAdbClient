@@ -27,9 +27,9 @@ namespace AdvancedSharpAdbClient.SampleApp
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var group = await ControlInfoDataSource.Instance.GetGroupAsync((string)e.Parameter);
+            ControlInfoDataGroup group = await ControlInfoDataSource.Instance.GetGroupAsync((string)e.Parameter);
 
-            var menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItemBase>().Single(i => (string)i.Tag == group.UniqueId);
+            Microsoft.UI.Xaml.Controls.NavigationViewItemBase menuItem = NavigationRootPage.Current.NavigationView.MenuItems.Cast<Microsoft.UI.Xaml.Controls.NavigationViewItemBase>().Single(i => (string)i.Tag == group.UniqueId);
             menuItem.IsSelected = true;
             NavigationRootPage.Current.NavigationView.Header = menuItem.Content;
 

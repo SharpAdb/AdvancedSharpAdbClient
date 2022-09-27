@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.ObjectModel;
+
 namespace AdvancedSharpAdbClient.Logs
 {
-    using System.Collections.ObjectModel;
-
     /// <summary>
     /// Represents an entry in event buffer of the the Android log.
     /// </summary>
@@ -15,27 +15,16 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Initializes a new instance of the <seealso cref="EventLogEntry"/> class.
         /// </summary>
-        public EventLogEntry()
-        {
-            this.Values = new Collection<object>();
-        }
+        public EventLogEntry() => Values = new Collection<object>();
 
         /// <summary>
         /// Gets or sets the 4 bytes integer key from "/system/etc/event-log-tags" file.
         /// </summary>
-        public int Tag
-        {
-            get;
-            set;
-        }
+        public int Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the values of this event log entry.
         /// </summary>
-        public Collection<object> Values
-        {
-            get;
-            set;
-        }
+        public Collection<object> Values { get; set; }
     }
 }

@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
 
 namespace AdvancedSharpAdbClient.SampleApp.Helpers
 {
@@ -20,8 +14,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         {
             get
             {
-                var valueFromSettings = ApplicationData.Current.LocalSettings.Values[IsLeftModeKey];
-                if(valueFromSettings == null)
+                object valueFromSettings = ApplicationData.Current.LocalSettings.Values[IsLeftModeKey];
+                if (valueFromSettings == null)
                 {
                     ApplicationData.Current.LocalSettings.Values[IsLeftModeKey] = true;
                     valueFromSettings = true;
@@ -51,7 +45,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
             else
             {
                 NavigationRootPage.Current.NavigationView.PaneDisplayMode = Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Top;
-                var userSettings = new UISettings();
+                UISettings userSettings = new UISettings();
                 titleBar.ButtonBackgroundColor = userSettings.GetColorValue(UIColorType.Accent);
                 titleBar.ButtonInactiveBackgroundColor = userSettings.GetColorValue(UIColorType.Accent);
             }

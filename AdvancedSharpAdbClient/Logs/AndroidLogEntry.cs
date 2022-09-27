@@ -35,56 +35,27 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Gets or sets the priority of the log message.
         /// </summary>
-        public Priority Priority
-        {
-            get;
-            set;
-        }
+        public Priority Priority { get; set; }
 
         /// <summary>
         /// Gets or sets the log tag of the message. Used to identify the source of a log message.
         /// It usually identifies the class or activity where the log call occured.
         /// </summary>
-        public string Tag
-        {
-            get;
-            set;
-        }
+        public string? Tag { get; set; }
 
         /// <summary>
         /// Gets or sets the message that has been logged.
         /// </summary>
-        public string Message
-        {
-            get;
-            set;
-        }
+        public string? Message { get; set; }
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"{this.TimeStamp:yy-MM HH:mm:ss.fff} {this.ProcessId, 5} {this.ProcessId, 5} {FormatPriority(this.Priority)} {this.Tag, -8}: {this.Message}";
-        }
+        public override string ToString() => $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";
 
         /// <summary>
         /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.
         /// </summary>
-        /// <param name="value">
-        /// The value to convert.
-        /// </param>
-        /// <returns>
-        /// A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.
-        /// </returns>
-        private static char FormatPriority(Priority value)
-        {
-            if (PriorityFormatters == null || !PriorityFormatters.ContainsKey(value))
-            {
-                return '?';
-            }
-            else
-            {
-                return PriorityFormatters[value];
-            }
-        }
+        /// <param name="value">The value to convert.</param>
+        /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.</returns>
+        private static char FormatPriority(Priority value) => PriorityFormatters == null || !PriorityFormatters.ContainsKey(value) ? '?' : PriorityFormatters[value];
     }
 }

@@ -2,15 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
-    ///
+    /// Multi Line Receiver
     /// </summary>
     public abstract class MultiLineReceiver : IShellOutputReceiver
     {
@@ -35,7 +32,7 @@ namespace AdvancedSharpAdbClient
         ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
         /// </value>
         /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdvancedAdbClient"/>
+        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
         /// will detect common error messages and throw an exception.
         /// </remarks>
         public virtual bool ParsesErrors { get; protected set; }
@@ -52,24 +49,21 @@ namespace AdvancedSharpAdbClient
         /// <param name="line">
         /// The line to add to the output.
         /// </param>
-        public void AddOutput(string line)
-        {
-            this.Lines.Add(line);
-        }
+        public void AddOutput(string line) => Lines.Add(line);
 
         /// <summary>
         /// Flushes the output.
         /// </summary>
         public void Flush()
         {
-            if (this.Lines.Count > 0)
+            if (Lines.Count > 0)
             {
                 // send it for final processing
-                this.ProcessNewLines(this.Lines);
-                this.Lines.Clear();
+                ProcessNewLines(Lines);
+                Lines.Clear();
             }
 
-            this.Done();
+            Done();
         }
 
         /// <summary>

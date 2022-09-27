@@ -41,12 +41,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         {
             get
             {
-                if (Window.Current.Content is FrameworkElement rootElement)
-                {
-                    return rootElement.RequestedTheme;
-                }
-
-                return ElementTheme.Default;
+                return Window.Current.Content is FrameworkElement rootElement ? rootElement.RequestedTheme : ElementTheme.Default;
             }
             set
             {
@@ -91,25 +86,16 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
 
         public static bool IsDarkTheme()
         {
-            if (RootTheme == ElementTheme.Default)
-            {
-                return Application.Current.RequestedTheme == ApplicationTheme.Dark;
-            }
-            return RootTheme == ElementTheme.Dark;
+            return RootTheme == ElementTheme.Default
+                ? Application.Current.RequestedTheme == ApplicationTheme.Dark
+                : RootTheme == ElementTheme.Dark;
         }
 
         public static void UpdateSystemCaptionButtonColors()
         {
             ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
 
-            if (ThemeHelper.IsDarkTheme())
-            {
-                titleBar.ButtonForegroundColor = Colors.White;
-            }
-            else
-            {
-                titleBar.ButtonForegroundColor = Colors.Black;
-            }
+            titleBar.ButtonForegroundColor = ThemeHelper.IsDarkTheme() ? Colors.White : Colors.Black;
         }
     }
 }

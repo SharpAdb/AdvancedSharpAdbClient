@@ -2,11 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+using System.Runtime.Serialization;
+
 namespace AdvancedSharpAdbClient.Exceptions
 {
-    using System;
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// Unable to connect to the device because it was not found in the list of available devices.
     /// </summary>
@@ -15,8 +15,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
-        public DeviceNotFoundException()
-            : base("The device was not found.")
+        public DeviceNotFoundException() : base("The device was not found.")
         {
         }
 
@@ -24,9 +23,8 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public DeviceNotFoundException(string device)
-            : base("The device '" + device + "' was not found.")
-            {
+        public DeviceNotFoundException(string device) : base("The device '" + device + "' was not found.")
+        {
         }
 
         /// <summary>
@@ -34,8 +32,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public DeviceNotFoundException(string message, Exception innerException)
-            : base(message, innerException)
+        public DeviceNotFoundException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
@@ -44,8 +41,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public DeviceNotFoundException(SerializationInfo serializationInfo, StreamingContext context)
-            : base(serializationInfo, context)
+        public DeviceNotFoundException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
         }
     }

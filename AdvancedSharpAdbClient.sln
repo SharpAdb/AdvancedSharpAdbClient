@@ -11,9 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedSharpAdbClient.Samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AdvancedSharpAdbClient.SampleApp.Delegate", "AdvancedSharpAdbClient.SampleApp.Delegate", "{43324C2D-A3FD-4653-9FE7-BDD3A35BD62D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedSharpAdbClient.SampleApp.Delegate", "Examples\AdvancedSharpAdbClient.SampleApp.Delegate\AdvancedSharpAdbClient.SampleApp.Delegate.csproj", "{84051176-4D6A-43DA-B0AB-8ACDE6525FBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedSharpAdbClient.SampleApp.Delegate", "Examples\AdvancedSharpAdbClient.SampleApp.Delegate\AdvancedSharpAdbClient.SampleApp.Delegate.csproj", "{84051176-4D6A-43DA-B0AB-8ACDE6525FBA}"
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "AdvancedSharpAdbClient.SampleApp.Delegate.Package", "Examples\AdvancedSharpAdbClient.SampleApp.Delegate.Package\AdvancedSharpAdbClient.SampleApp.Delegate.Package.wapproj", "{3AFA55DE-7CC4-4823-9CCA-8CE4F637678B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedSharpAdbClient.Tests", "AdvancedSharpAdbClient.Tests\AdvancedSharpAdbClient.Tests.csproj", "{F1B44867-B64E-4813-8F13-0B0918AEC202}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,26 @@ Global
 		{3AFA55DE-7CC4-4823-9CCA-8CE4F637678B}.Release|x86.ActiveCfg = Release|x86
 		{3AFA55DE-7CC4-4823-9CCA-8CE4F637678B}.Release|x86.Build.0 = Release|x86
 		{3AFA55DE-7CC4-4823-9CCA-8CE4F637678B}.Release|x86.Deploy.0 = Release|x86
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|ARM.Build.0 = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|ARM64.Build.0 = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x64.Build.0 = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
