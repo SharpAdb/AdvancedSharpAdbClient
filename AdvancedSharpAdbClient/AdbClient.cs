@@ -501,9 +501,9 @@ namespace AdvancedSharpAdbClient
 
                 string responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
 
-                // See https://android.googlesource.com/platform/system/core/+/master/adb/commandline.cpp#1026 (adb_root)
-                // for more information on how upstream does this.
-                if (!string.Equals(responseMessage, "restarting", StringComparison.OrdinalIgnoreCase))
+                // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
+                // for possible return strings
+                if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
                 {
                     throw new AdbException(responseMessage);
                 }
