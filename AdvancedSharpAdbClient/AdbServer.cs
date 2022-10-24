@@ -4,7 +4,6 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.IO;
 using System.Net.Sockets;
 
 namespace AdvancedSharpAdbClient
@@ -107,8 +106,7 @@ namespace AdvancedSharpAdbClient
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
-            // If the server is running, and no adb path is provided, check if we have the minimum
-            // version
+            // If the server is running, and no adb path is provided, check if we have the minimum version
             if (adbPath == null)
             {
                 return !serverStatus.IsRunning

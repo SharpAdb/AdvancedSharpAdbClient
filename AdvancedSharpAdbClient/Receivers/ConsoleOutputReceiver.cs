@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
     {
         private const RegexOptions DefaultRegexOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -42,12 +42,12 @@ namespace AdvancedSharpAdbClient
         /// The logger to use when logging.
         /// </param>
         public ConsoleOutputReceiver(
-#if !NET35 && !NET40
+#if HAS_LOGGER
             ILogger<ConsoleOutputReceiver> logger = null
 #endif
             )
         {
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<ConsoleOutputReceiver>.Instance;
 #endif
         }
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
             {
                 if (line.EndsWith(": not found"))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient
 
                 if (line.EndsWith("No such file or directory"))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient
                 // for "unknown options"
                 if (line.Contains("Unknown option"))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new UnknownOptionException($"The remote execution returned: '{line}'");
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient
                 // for "aborting" commands
                 if (Regex.IsMatch(line, "Aborting.$", DefaultRegexOptions))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new CommandAbortingException($"The remote execution returned: '{line}'");
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient
                 // cmd: applet not found
                 if (Regex.IsMatch(line, "applet not found$", DefaultRegexOptions))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
@@ -121,7 +121,7 @@ namespace AdvancedSharpAdbClient
                 // workitem: 16822
                 if (Regex.IsMatch(line, "(permission|access) denied$", DefaultRegexOptions))
                 {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
 #endif
                     throw new PermissionDeniedException($"The remote execution returned: '{line}'");
@@ -144,7 +144,7 @@ namespace AdvancedSharpAdbClient
 
                 output.AppendLine(line);
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
                 logger.LogDebug(line);
 #endif
             }

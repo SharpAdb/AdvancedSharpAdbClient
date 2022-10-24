@@ -11,7 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public AdbCommandLineClient(string adbPath
-#if !NET35 && !NET40
+#if HAS_LOGGER
             , ILogger<AdbCommandLineClient> logger = null
 #endif
             )
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             AdbPath = adbPath;
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
 #endif
         }
@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if !NET35 && !NET40
+#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
 #endif
                 throw ex;

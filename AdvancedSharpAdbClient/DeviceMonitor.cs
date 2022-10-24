@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public DeviceMonitor(IAdbSocket socket
-#if !NET35 && !NET40
+#if HAS_LOGGER
             , ILogger<DeviceMonitor> logger = null
 #endif
             )
@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             devices = new List<DeviceData>();
             Devices = devices.AsReadOnly();
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
 #endif
         }
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
                         throw ex;
@@ -249,7 +249,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
                         throw ex;
@@ -272,7 +272,7 @@ namespace AdvancedSharpAdbClient
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
+#if HAS_LOGGER
                     logger.LogError(ex, ex.Message);
 #endif
                     throw ex;

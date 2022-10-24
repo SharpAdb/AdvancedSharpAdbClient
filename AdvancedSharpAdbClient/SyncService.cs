@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -51,6 +52,9 @@ namespace AdvancedSharpAdbClient
         /// The maximum length of a path on the remote device.
         /// </summary>
         private const int MaxPathLength = 1024;
+
+        /// <inheritdoc/>
+        public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
@@ -192,6 +196,8 @@ namespace AdvancedSharpAdbClient
                 // now send the data to the device
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
@@ -280,6 +286,8 @@ namespace AdvancedSharpAdbClient
                 _ = Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
                 totalBytesRead += size;
+
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
