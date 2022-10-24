@@ -8,7 +8,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return value is double? ? new Thickness((double)value) : (object)false;
+            return value is double? ? new Thickness((double)value) : false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

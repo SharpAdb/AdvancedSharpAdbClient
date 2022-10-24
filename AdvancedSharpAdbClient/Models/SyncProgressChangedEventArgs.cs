@@ -10,18 +10,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the number of progress percentage for the sync operation.
         /// </summary>
-        public double ProgressPercentage
-        {
-            get
-            {
-                if (TotalBytesToReceive != 0L)
-                {
-                    return ReceivedBytesSize * 100.0 / TotalBytesToReceive;
-                }
-
-                return 0.0;
-            }
-        }
+        public double ProgressPercentage => TotalBytesToReceive != 0L ? ReceivedBytesSize * 100.0 / TotalBytesToReceive : 0.0;
 
         /// <summary>
         /// Gets the number of bytes sync to the local computer.

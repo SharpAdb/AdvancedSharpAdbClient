@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage;
-using Process = ProcessForUWP.UWP.Process;
 using DataReceivedEventArgs = ProcessForUWP.UWP.DataReceivedEventArgs;
+using Process = ProcessForUWP.UWP.Process;
 
 namespace AdvancedSharpAdbClient.SampleApp.Common
 {

@@ -3,7 +3,6 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
-using Microsoft;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -157,7 +156,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
-                InstallProgressChanged?.Invoke(this, (args.ProgressPercentage * 0.9));
+                InstallProgressChanged?.Invoke(this, args.ProgressPercentage * 0.9);
             }
         }
 

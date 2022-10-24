@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             return imagePath.ToLowerInvariant().EndsWith(".png") ?
                         new BitmapIcon() { UriSource = new Uri(imagePath, UriKind.RelativeOrAbsolute), ShowAsMonochrome = false } :
-                        (IconElement)new FontIcon()
+                        new FontIcon()
                         {
                             // FontFamily = new FontFamily("Segoe MDL2 Assets"),
                             Glyph = imagePath
@@ -362,7 +362,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                 }
                 controlsSearchBox.ItemsSource = suggestions.Count > 0
                     ? suggestions.OrderByDescending(i => i.Title.StartsWith(sender.Text, StringComparison.CurrentCultureIgnoreCase)).ThenBy(i => i.Title)
-                    : (object)(new string[] { "No results found" });
+                    : (new string[] { "No results found" });
             }
         }
 
