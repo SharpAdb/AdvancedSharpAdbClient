@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -23,13 +22,6 @@ namespace AdvancedSharpAdbClient
 #endif
             .IsNullOrWhiteSpace(value);
 
-        public static async Task<string> ReadLineEx(this TextReader reader) =>
-#if NET35
-            reader.ReadLine();
-#else
-            await reader.ReadLineAsync();
-#endif
-
         public static Task Delay(int dueTime) =>
 #if NET35 || NET40
             TaskEx
@@ -39,6 +31,14 @@ namespace AdvancedSharpAdbClient
             .Delay(dueTime);
 
         public static Task Run(Func<Task> function) =>
+#if NET35 || NET40
+            TaskEx
+#else
+            Task
+#endif
+            .Run(function);
+
+        public static Task<TResult> Run<TResult>(Func<TResult> function) =>
 #if NET35 || NET40
             TaskEx
 #else

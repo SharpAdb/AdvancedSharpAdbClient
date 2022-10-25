@@ -71,6 +71,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private Task monitorTask;
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
@@ -89,6 +92,9 @@ namespace AdvancedSharpAdbClient
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <inheritdoc/>
         public event EventHandler<DeviceDataEventArgs> DeviceChanged;
@@ -269,13 +275,16 @@ namespace AdvancedSharpAdbClient
                         throw adbException;
                     }
                 }
+#if HAS_LOGGER
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                     logger.LogError(ex, ex.Message);
+#else
+                catch (Exception)
+                {
 #endif
-                    throw ex;
+                    throw;
                 }
             }
             while (!cancellationToken.IsCancellationRequested);

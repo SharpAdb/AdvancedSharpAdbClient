@@ -334,7 +334,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35
                                 await reader.ReadLineAsync().ConfigureAwait(false);
 #else
-                                reader.ReadLine();
+                                await Utilities.Run(reader.ReadLine).ConfigureAwait(false);
 #endif
 
                             if (line == null)
@@ -342,10 +342,7 @@ namespace AdvancedSharpAdbClient
                                 break;
                             }
 
-                            if (receiver != null)
-                            {
-                                receiver.AddOutput(line);
-                            }
+                            receiver?.AddOutput(line);
                         }
                     }
                 }
@@ -361,10 +358,7 @@ namespace AdvancedSharpAdbClient
                 }
                 finally
                 {
-                    if (receiver != null)
-                    {
-                        receiver.Flush();
-                    }
+                    receiver?.Flush();
                 }
             }
         }

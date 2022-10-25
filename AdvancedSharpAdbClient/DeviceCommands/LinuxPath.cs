@@ -136,12 +136,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>Returns the file name and extension of the specified path string.</summary>
-        /// <returns>A <see cref="string"></see> consisting of the characters after the last directory character in path.
+        /// <returns>A <see cref="string"/> consisting of the characters after the last directory character in path.
         /// If the last character of path is a directory or volume separator character,
-        /// this method returns <see cref="string.Empty"></see>. If path is null, this method returns null.</returns>
+        /// this method returns <see cref="string.Empty"/>. If path is null, this method returns null.</returns>
         /// <param name="path">The path string from which to obtain the file name and extension. </param>
         /// <exception cref="ArgumentException">path contains one or more of the invalid characters
-        /// defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
+        /// defined in <see cref="InvalidCharacters"/>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
         public static string GetFileName(string path)
         {
@@ -169,7 +169,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>true if path contains an absolute path; otherwise, false.</returns>
         /// <param name="path">The path to test.</param>
         /// <exception cref="ArgumentException">path contains one or more of the invalid characters
-        /// defined in <see cref="System.IO.Path.InvalidPathChars"></see>, or contains a wildcard character. </exception>
+        /// defined in <see cref="InvalidCharacters"/>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
         public static bool IsPathRooted(string path)
         {

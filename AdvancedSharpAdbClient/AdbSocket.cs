@@ -50,6 +50,9 @@ namespace AdvancedSharpAdbClient
         private readonly ILogger<AdbSocket> logger;
 #endif
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
@@ -61,13 +64,16 @@ namespace AdvancedSharpAdbClient
 #endif
             )
         {
-            this.socket = new TcpSocket();
-            this.socket.Connect(endPoint);
-            this.socket.ReceiveBufferSize = ReceiveBufferSize;
+            socket = new TcpSocket();
+            socket.Connect(endPoint);
+            socket.ReceiveBufferSize = ReceiveBufferSize;
 #if HAS_LOGGER
             this.logger = logger ?? NullLogger<AdbSocket>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -448,10 +454,13 @@ namespace AdvancedSharpAdbClient
             {
                 Send(data, -1);
             }
+#if HAS_LOGGER
             catch (IOException e)
             {
-#if HAS_LOGGER
                 logger.LogError(e, e.Message);
+#else
+            catch (IOException)
+            {
 #endif
                 return false;
             }
@@ -498,10 +507,13 @@ namespace AdvancedSharpAdbClient
             {
                 result = Encoding.ASCII.GetString(reply);
             }
-            catch (DecoderFallbackException uee)
-            {
 #if HAS_LOGGER
-                logger.LogError(uee, uee.Message);
+            catch (DecoderFallbackException e)
+            {
+                logger.LogError(e, e.Message);
+#else
+            catch (DecoderFallbackException)
+            {
 #endif
                 result = string.Empty;
             }

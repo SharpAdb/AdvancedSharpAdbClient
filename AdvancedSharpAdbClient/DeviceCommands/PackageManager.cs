@@ -67,6 +67,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public event ProgressHandler InstallProgressChanged;
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
@@ -102,6 +105,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             this.logger = logger ?? NullLogger<PackageManager>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Gets a value indicating whether this package manager only lists third party applications,

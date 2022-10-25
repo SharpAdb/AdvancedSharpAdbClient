@@ -35,6 +35,9 @@ namespace AdvancedSharpAdbClient
         private readonly ILogger<AdbCommandLineClient> logger;
 #endif
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
@@ -80,6 +83,9 @@ namespace AdvancedSharpAdbClient
             this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
