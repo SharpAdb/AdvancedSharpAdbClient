@@ -51,12 +51,12 @@
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
     <ProjectGuid>3afa55de-7cc4-4823-9cca-8ce4f637678b</ProjectGuid>
-    <TargetPlatformVersion>10.0.22000.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.22621.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
-    <EntryPointProjectUniqueName>..\AdvancedSharpAdbClient.SampleApp.Delegate\AdvancedSharpAdbClient.SampleApp.Delegate.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\AdvancedSharpAdbClient.SampleApp\AdvancedSharpAdbClient.SampleApp.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -78,5 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdvancedSharpAdbClient.SampleApp.Delegate\AdvancedSharpAdbClient.SampleApp.Delegate.csproj" />
+    <ProjectReference Include="..\AdvancedSharpAdbClient.SampleApp\AdvancedSharpAdbClient.SampleApp.csproj" />
   </ItemGroup>
 </Project>

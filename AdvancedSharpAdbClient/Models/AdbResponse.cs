@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
         public override bool Equals(object obj)
         {
-            AdbResponse? other = obj as AdbResponse;
+            AdbResponse other = obj as AdbResponse;
 
             return other != null
                 && other.IOSuccess == IOSuccess

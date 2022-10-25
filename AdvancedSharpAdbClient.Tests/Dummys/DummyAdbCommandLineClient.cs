@@ -34,15 +34,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         protected override int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {
-            if (errorOutput != null)
-            {
-                errorOutput.Add(null);
-            }
+            errorOutput?.Add(null);
 
-            if (standardOutput != null)
-            {
-                standardOutput.Add(null);
-            }
+            standardOutput?.Add(null);
 
             if (command == "start-server")
             {

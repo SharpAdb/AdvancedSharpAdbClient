@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
                 }
                 else
                 {
-                    throw;
+                    throw ex;
                 }
             }
         }

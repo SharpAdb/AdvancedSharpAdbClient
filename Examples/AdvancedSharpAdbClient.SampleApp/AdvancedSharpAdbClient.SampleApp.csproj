@@ -10,6 +10,7 @@
     <RootNamespace>AdvancedSharpAdbClient.SampleApp</RootNamespace>
     <AssemblyName>AdvancedSharpAdbClient.SampleApp</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
+    <LangVersion>latest</LangVersion>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22621.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
@@ -122,6 +123,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Common\UWPPlatformFunc.cs" />
     <Compile Include="Common\BooleanToValueConverter.cs" />
     <Compile Include="Common\DeviceFamilyTrigger.cs" />
     <Compile Include="Common\DoubleToThicknessConverter.cs" />
@@ -266,6 +268,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.8.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts">
+      <Version>10.0.22621.2</Version>
+    </PackageReference>
+    <PackageReference Include="ProcessForUWP.UWP">
+      <Version>0.0.3</Version>
     </PackageReference>
     <PackageReference Include="Win2D.uwp">
       <Version>1.26.0</Version>

@@ -8,7 +8,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
-    <Nullable>Enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -28,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net3.5-client'">
-    <PackageReference Include="AsyncBridge.Net35" Version="0.3.1" />
+    <PackageReference Include="AsyncBridge" Version="0.3.1" />
     <PackageReference Include="mscorlib.Polyfill.NET35" Version="0.0.2" />
     <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.2" />
     <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.2" />
@@ -83,4 +82,14 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
+                         and '$(TargetFramework)' != 'net4.0-client'">
+    <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
+  </PropertyGroup>
+ 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+                         or '$(TargetFramework)' == 'netstandard1.3'">
+    <DefineConstants>$(DefineConstants);HAS_OLDLOGGER</DefineConstants>
+  </PropertyGroup>
+ 
 </Project>

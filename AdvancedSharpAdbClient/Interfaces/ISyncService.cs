@@ -60,5 +60,10 @@ namespace AdvancedSharpAdbClient
         /// Opens this connection.
         /// </summary>
         void Open();
+
+        /// <summary>
+        /// Occurs when there is a change in the status of the sync.
+        /// </summary>
+        event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
     }
 }

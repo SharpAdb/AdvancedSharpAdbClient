@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     using System.Threading;
     using System.Threading.Tasks;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -43,31 +43,37 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly ITcpSocket socket;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<AdbSocket> logger;
 #endif
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(EndPoint endPoint
-#if !NET35 && !NET40
+#if HAS_LOGGER
             , ILogger<AdbSocket> logger = null
 #endif
             )
         {
-            this.socket = new TcpSocket();
-            this.socket.Connect(endPoint);
-            this.socket.ReceiveBufferSize = ReceiveBufferSize;
-#if !NET35 && !NET40
+            socket = new TcpSocket();
+            socket.Connect(endPoint);
+            socket.ReceiveBufferSize = ReceiveBufferSize;
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<AdbSocket>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -76,7 +82,7 @@ namespace AdvancedSharpAdbClient
         public AdbSocket(ITcpSocket socket)
         {
             this.socket = socket;
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<AdbSocket>.Instance;
 #endif
         }
@@ -186,7 +192,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadString()
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             int read = Read(reply);
 
             if (read == 0)
@@ -211,7 +217,7 @@ namespace AdvancedSharpAdbClient
         public virtual string ReadSyncString()
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             _ = Read(reply);
 
             if (!BitConverter.IsLittleEndian)
@@ -233,7 +239,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             // The first 4 bytes contain the length of the string
-            byte[]? reply = new byte[4];
+            byte[] reply = new byte[4];
             await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
@@ -251,7 +257,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
-            AdbResponse? response = ReadAdbResponseInner();
+            AdbResponse response = ReadAdbResponseInner();
 
             if (!response.IOSuccess || !response.Okay)
             {
@@ -292,10 +298,10 @@ namespace AdvancedSharpAdbClient
             }
             catch (SocketException sex)
             {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                 logger.LogError(sex, sex.Message);
 #endif
-                throw;
+                throw sex;
             }
         }
 
@@ -333,14 +339,14 @@ namespace AdvancedSharpAdbClient
 
                     if (count < 0)
                     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError("read: channel EOF");
 #endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogInformation("DONE with Read");
 #endif
                     }
@@ -376,14 +382,14 @@ namespace AdvancedSharpAdbClient
                     count = socket.Receive(buffer, buflen, SocketFlags.None);
                     if (count < 0)
                     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError("read: channel EOF");
 #endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogInformation("DONE with Read");
 #endif
                     }
@@ -413,7 +419,7 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    AdbResponse? response = ReadAdbResponse();
+                    AdbResponse response = ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {
@@ -423,7 +429,7 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw;
+                        throw e;
                     }
                 }
             }
@@ -432,7 +438,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Stream GetShellStream()
         {
-            Stream? stream = socket.GetStream();
+            Stream stream = socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -448,10 +454,13 @@ namespace AdvancedSharpAdbClient
             {
                 Send(data, -1);
             }
+#if HAS_LOGGER
             catch (IOException e)
             {
-#if !NET35 && !NET40
                 logger.LogError(e, e.Message);
+#else
+            catch (IOException)
+            {
 #endif
                 return false;
             }
@@ -476,9 +485,9 @@ namespace AdvancedSharpAdbClient
 
             if (!resp.Okay)
             {
-                string? message = ReadString();
+                string message = ReadString();
                 resp.Message = message;
-#if !NET35 && !NET40
+#if HAS_LOGGER
                 logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
 #endif
             }
@@ -498,10 +507,13 @@ namespace AdvancedSharpAdbClient
             {
                 result = Encoding.ASCII.GetString(reply);
             }
-            catch (DecoderFallbackException uee)
+#if HAS_LOGGER
+            catch (DecoderFallbackException e)
             {
-#if !NET35 && !NET40
-                logger.LogError(uee, uee.Message);
+                logger.LogError(e, e.Message);
+#else
+            catch (DecoderFallbackException)
+            {
 #endif
                 result = string.Empty;
             }

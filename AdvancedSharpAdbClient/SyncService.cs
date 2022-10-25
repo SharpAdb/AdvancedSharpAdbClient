@@ -52,6 +52,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private const int MaxPathLength = 1024;
 
+        /// <inheritdoc/>
+        public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
@@ -192,6 +195,8 @@ namespace AdvancedSharpAdbClient
                 // now send the data to the device
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)
                 {
@@ -209,7 +214,7 @@ namespace AdvancedSharpAdbClient
 
             if (result == SyncCommand.FAIL)
             {
-                string? message = Socket.ReadSyncString();
+                string message = Socket.ReadSyncString();
 
                 throw new AdbException(message);
             }
@@ -233,7 +238,7 @@ namespace AdvancedSharpAdbClient
             }
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics? stat = Stat(remoteFilepath);
+            FileStatistics stat = Stat(remoteFilepath);
             long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
@@ -252,7 +257,7 @@ namespace AdvancedSharpAdbClient
                 }
                 else if (response == SyncCommand.FAIL)
                 {
-                    string? message = Socket.ReadSyncString();
+                    string message = Socket.ReadSyncString();
                     throw new AdbException($"Failed to pull '{remoteFilepath}'. {message}");
                 }
                 else if (response != SyncCommand.DATA)
@@ -261,7 +266,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // The first 4 bytes contain the length of the data packet
-                byte[]? reply = new byte[4];
+                byte[] reply = new byte[4];
                 _ = Socket.Read(reply);
 
                 if (!BitConverter.IsLittleEndian)
@@ -280,6 +285,8 @@ namespace AdvancedSharpAdbClient
                 _ = Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
                 totalBytesRead += size;
+
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // Let the caller know about our progress, if requested
                 if (progress != null && totalBytesToProcess != 0)

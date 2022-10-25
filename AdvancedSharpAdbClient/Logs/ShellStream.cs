@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
-                    Inner.Read(buffer, offset + 1, count - 1);
+                    await Utilities.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
 #endif
                 read++;
                 pendingByte = null;

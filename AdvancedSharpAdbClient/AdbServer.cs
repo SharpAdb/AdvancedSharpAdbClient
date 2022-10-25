@@ -4,7 +4,6 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.IO;
 using System.Net.Sockets;
 
 namespace AdvancedSharpAdbClient
@@ -61,7 +60,7 @@ namespace AdvancedSharpAdbClient
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
-        private static string? cachedAdbPath;
+        private static string cachedAdbPath;
 
         private readonly IAdbClient adbClient;
 
@@ -99,7 +98,7 @@ namespace AdvancedSharpAdbClient
             AdbServerStatus serverStatus = GetStatus();
             Version commandLineVersion = null;
 
-            IAdbCommandLineClient? commandLineClient = adbCommandLineClientFactory(adbPath);
+            IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
@@ -107,8 +106,7 @@ namespace AdvancedSharpAdbClient
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
-            // If the server is running, and no adb path is provided, check if we have the minimum
-            // version
+            // If the server is running, and no adb path is provided, check if we have the minimum version
             if (adbPath == null)
             {
                 return !serverStatus.IsRunning
@@ -153,7 +151,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RestartServer()
         {
-            if (!File.Exists(cachedAdbPath))
+            if (!CrossPlatformFunc.CheckFileExists(cachedAdbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
@@ -191,7 +189,7 @@ namespace AdvancedSharpAdbClient
                 else
                 {
                     // An unexpected exception occurred; re-throw the exception
-                    throw;
+                    throw ex;
                 }
             }
         }

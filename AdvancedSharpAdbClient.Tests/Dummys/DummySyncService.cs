@@ -15,6 +15,8 @@ namespace AdvancedSharpAdbClient.Tests
             get { return true; }
         }
 
+        public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
+
         public void Dispose()
         {
         }

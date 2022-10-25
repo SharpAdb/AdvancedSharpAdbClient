@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string ListThirdPartyOnly = "pm list packages -f -3";
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -56,6 +56,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
 
         /// <summary>
+        /// Represents the method that will handle an event when the event provides double num.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">An object that contains the double num.</param>
+        public delegate void ProgressHandler(object sender, double e);
+
+        /// <summary>
+        /// Occurs when there is a change in the status of the installing.
+        /// </summary>
+        public event ProgressHandler InstallProgressChanged;
+
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
+        /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
@@ -69,7 +84,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
-#if !NET35 && !NET40
+#if HAS_LOGGER
             , ILogger<PackageManager> logger = null
 #endif
             )
@@ -86,10 +101,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 RefreshPackages();
             }
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<PackageManager>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Gets a value indicating whether this package manager only lists third party applications,
@@ -131,15 +149,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
-        /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed;
-        /// otherwise, <see langword="false"/>.</param>
+        /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed; otherwise, <see langword="false"/>.</param>
         public void InstallPackage(string packageFilePath, bool reinstall)
         {
             ValidateDevice();
 
-            string remoteFilePath = SyncPackageToDevice(packageFilePath);
+            string remoteFilePath = SyncPackageToDevice(packageFilePath, OnSyncProgressChanged);
             InstallRemotePackage(remoteFilePath, reinstall);
             RemoveRemotePackage(remoteFilePath);
+
+            InstallProgressChanged?.Invoke(this, 100);
+
+            void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
+            {
+                InstallProgressChanged?.Invoke(this, args.ProgressPercentage * 0.9);
+            }
         }
 
         /// <summary>
@@ -152,10 +176,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            string? reinstallSwitch = reinstall ? "-r " : string.Empty;
+            string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
             client.ExecuteShellCommand(Device, cmd, receiver);
+
+            InstallProgressChanged?.Invoke(this, 95);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -173,22 +199,31 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath);
+            string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath, OnMainSyncProgressChanged);
+
+            void OnMainSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, args.ProgressPercentage * 0.45);
 
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
             for (int i = 0; i < splitPackageFilePaths.Length; i++)
             {
-                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i]);
+                int percent = 45 + (45 * i / splitPackageFilePaths.Length);
+
+                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i], OnSplitSyncProgressChanged);
+
+                void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.45 / splitPackageFilePaths.Length));
             }
 
             InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, reinstall);
 
-            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
+            for (int i = 0; i < splitRemoteFilePaths.Length; i++)
             {
+                string splitRemoteFilePath = splitRemoteFilePaths[i];
                 RemoveRemotePackage(splitRemoteFilePath);
+                InstallProgressChanged?.Invoke(this, 95 + (5 * (i + 1) / (splitRemoteFilePaths.Length + 1)));
             }
 
             RemoveRemotePackage(baseRemoteFilePath);
+            InstallProgressChanged?.Invoke(this, 100);
         }
 
         /// <summary>
@@ -204,14 +239,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
             for (int i = 0; i < splitPackageFilePaths.Length; i++)
             {
-                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i]);
+                int percent = 90 * i / splitPackageFilePaths.Length;
+
+                splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i], OnSyncProgressChanged);
+
+                void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.9 / splitPackageFilePaths.Length));
             }
 
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, reinstall);
 
-            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
+            for (int i = 0; i < splitRemoteFilePaths.Length; i++)
             {
+                string splitRemoteFilePath = splitRemoteFilePaths[i];
                 RemoveRemotePackage(splitRemoteFilePath);
+                InstallProgressChanged?.Invoke(this, 95 + (5 * (i + 1) / splitRemoteFilePaths.Length));
             }
         }
 
@@ -227,10 +268,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             string session = CreateInstallSession(reinstall);
 
+            InstallProgressChanged?.Invoke(this, 91);
+
             WriteInstallSession(session, "base", baseRemoteFilePath);
 
+            InstallProgressChanged?.Invoke(this, 92);
+
             int i = 0;
-            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -242,8 +287,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
 
+            InstallProgressChanged?.Invoke(this, 94);
+
             InstallReceiver receiver = new InstallReceiver();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
+
+            InstallProgressChanged?.Invoke(this, 95);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -263,8 +312,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             string session = CreateInstallSession(reinstall, packageName);
 
+            InstallProgressChanged?.Invoke(this, 91);
+
             int i = 0;
-            foreach (string? splitRemoteFilePath in splitRemoteFilePaths)
+            foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 try
                 {
@@ -276,8 +327,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
 
+            InstallProgressChanged?.Invoke(this, 93);
+
             InstallReceiver receiver = new InstallReceiver();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
+
+            InstallProgressChanged?.Invoke(this, 95);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -326,9 +381,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Pushes a file to device
         /// </summary>
         /// <param name="localFilePath">the absolute path to file on local host</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>destination path on device for file</returns>
         /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
-        private string SyncPackageToDevice(string localFilePath)
+        private string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress)
         {
             ValidateDevice();
 
@@ -341,29 +397,36 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
                 logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{Device.Serial}'");
 #endif
 
                 using (ISyncService sync = syncServiceFactory(client, Device))
-                using (Stream stream = File.OpenRead(localFilePath))
                 {
-#if !NET35 && !NET40
-                    logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
+                    if (progress != null)
+                    {
+                        sync.SyncProgressChanged += (sender, e) => progress(sender, e);
+                    }
+
+                    using (Stream stream = File.OpenRead(localFilePath))
+                    {
+#if HAS_LOGGER
+                        logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif
 
-                    // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                        // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
+                        sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
+                    }
                 }
 
                 return remoteFilePath;
             }
             catch (IOException e)
             {
-#if !NET40 && !NET35
+#if HAS_LOGGER
                 logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
 #endif
-                throw;
+                throw e;
             }
         }
 
@@ -381,10 +444,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             catch (IOException e)
             {
-#if !NET40 && !NET35
+#if HAS_LOGGER
                 logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
 #endif
-                throw;
+                throw e;
             }
         }
 
@@ -399,8 +462,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallReceiver receiver = new InstallReceiver();
-            string? reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string? addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
+            string reinstallSwitch = reinstall ? " -r" : string.Empty;
+            string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
             client.ExecuteShellCommand(Device, cmd, receiver);

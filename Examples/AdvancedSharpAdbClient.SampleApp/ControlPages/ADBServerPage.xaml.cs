@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -31,9 +30,7 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
             StorageFile file = await FileOpen.PickSingleFileAsync();
             if (file != null)
             {
-                await Launcher.LaunchUriAsync(new Uri($"adbsampledelegate:StartADB={file.Path}"));
-                Control1Output.Text = "Wait 5s ...";
-                await Task.Delay(5000);
+                StartServerResult result = new AdbServer().StartServer(file.Path, false);
             }
             AdbServerStatus status = await Task.Run(AdbServer.Instance.GetStatus);
             Control1Output.Text = status.IsRunning ? "Succeed" : "Failed";

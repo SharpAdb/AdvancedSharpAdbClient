@@ -238,14 +238,11 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
             VisualStateManager.GoToState(this, "ConfirmationDialogVisible", false);
 
             // Automatically close teachingtip after 1 seconds
-            if (DispatcherQueue.GetForCurrentThread() != null)
+            DispatcherQueue.GetForCurrentThread()?.TryEnqueue(async () =>
             {
-                DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
-                {
-                    await Task.Delay(1000);
-                    VisualStateManager.GoToState(this, "ConfirmationDialogHidden", false);
-                });
-            }
+                await Task.Delay(1000);
+                VisualStateManager.GoToState(this, "ConfirmationDialogHidden", false);
+            });
         }
     }
 }

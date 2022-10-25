@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient
         /// <see cref="ForwardProtocol.LocalReserved"/> or <see cref="ForwardProtocol.LocalFilesystem"/>,
         /// the Unix domain socket name of the socket being forwarded.
         /// </summary>
-        public string? SocketName { get; set; }
+        public string SocketName { get; set; }
 
         /// <summary>
         /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.JavaDebugWireProtocol"/>,
@@ -58,14 +58,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
         /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
-        public static ForwardSpec Parse(string? spec)
+        public static ForwardSpec Parse(string spec)
         {
             if (spec == null)
             {
                 throw new ArgumentNullException(nameof(spec));
             }
 
-            string[]? parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public override string ToString()
         {
-            string? protocolString = Mappings.FirstOrDefault(v => v.Value == Protocol).Key;
+            string protocolString = Mappings.FirstOrDefault(v => v.Value == Protocol).Key;
 
             switch (Protocol)
             {
@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            ForwardSpec? other = obj as ForwardSpec;
+            ForwardSpec other = obj as ForwardSpec;
 
             if (other == null)
             {

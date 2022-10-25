@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the name of the process, including arguments, if any.
         /// </summary>
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the state of the process.
@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (cmdLinePrefix)
             {
-                string[]? cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
+                string[] cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
 
                 if (cmdLineParts.Length <= 1)
                 {
@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
             }
 
-            string[]? parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 35)
             {
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             // Only fields in Linux 2.1.10 and earlier are listed here,
             // additional fields exist in newer versions of linux.
-            string? state = parts[0];
+            string state = parts[0];
             int ppid = ParseInt(parts[1]);
             int pgrp = ParseInt(parts[2]);
             int session = ParseInt(parts[3]);
@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The index of the first element in <paramref name="values"/> that is present in the list, or <c>-1</c>.</returns>
         private static int IndexOf(List<string> list, params string[] values)
         {
-            foreach (string? value in values)
+            foreach (string value in values)
             {
                 int index = list.IndexOf(value);
 

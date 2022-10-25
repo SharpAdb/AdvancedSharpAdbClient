@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if !NET35 && !NET40
+#if HAS_LOGGER
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 #endif
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public class DeviceMonitor : IDeviceMonitor, IDisposable
     {
-#if !NET35 && !NET40
+#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -71,13 +71,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private Task monitorTask;
 
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
         /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public DeviceMonitor(IAdbSocket socket
-#if !NET35 && !NET40
+#if HAS_LOGGER
             , ILogger<DeviceMonitor> logger = null
 #endif
             )
@@ -85,10 +88,13 @@ namespace AdvancedSharpAdbClient
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             devices = new List<DeviceData>();
             Devices = devices.AsReadOnly();
-#if !NET35 && !NET40
+#if HAS_LOGGER
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
 #endif
         }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <inheritdoc/>
         public event EventHandler<DeviceDataEventArgs> DeviceChanged;
@@ -214,7 +220,7 @@ namespace AdvancedSharpAdbClient
             {
                 try
                 {
-                    string? value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
+                    string value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
                     ProcessIncomingDeviceData(value);
 
                     firstDeviceListParsed.Set();
@@ -231,10 +237,10 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw;
+                        throw ex;
                     }
                 }
                 catch (ObjectDisposedException ex)
@@ -249,10 +255,10 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
+#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw;
+                        throw ex;
                     }
                 }
                 catch (AdbException adbException)
@@ -266,14 +272,17 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw;
+                        throw adbException;
                     }
                 }
+#if HAS_LOGGER
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
-#if !NET35 && !NET40
                     logger.LogError(ex, ex.Message);
+#else
+                catch (Exception)
+                {
 #endif
                     throw;
                 }
@@ -315,9 +324,9 @@ namespace AdvancedSharpAdbClient
                 // add them to the list, and start monitoring them.
 
                 // Add or update existing devices
-                foreach (DeviceData? device in devices)
+                foreach (DeviceData device in devices)
                 {
-                    DeviceData? existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
+                    DeviceData existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
 
                     if (existingDevice == null)
                     {
@@ -332,7 +341,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Remove devices
-                foreach (DeviceData? device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
+                foreach (DeviceData device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.devices.Remove(device);
                     OnDeviceDisconnected(new DeviceDataEventArgs(device));

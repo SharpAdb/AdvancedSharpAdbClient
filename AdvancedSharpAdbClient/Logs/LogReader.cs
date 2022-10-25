@@ -150,7 +150,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case LogId.Events:
                     {
                         // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry? entry = new EventLogEntry()
+                        EventLogEntry entry = new EventLogEntry()
                         {
                             Data = data,
                             ProcessId = pid,
@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
 #else
-                stream.Read(data, totalRead, count - totalRead)
+                await Utilities.Run(() => stream.Read(data, totalRead, count - totalRead)).ConfigureAwait(false)
 #endif
                 ) > 0)
             {
