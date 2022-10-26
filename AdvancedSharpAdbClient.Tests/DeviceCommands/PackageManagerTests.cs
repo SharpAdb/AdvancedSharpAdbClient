@@ -12,9 +12,9 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new PackageManager(null, null));
-            Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData()));
-            Assert.Throws<ArgumentNullException>(() => new PackageManager(Mock.Of<IAdbClient>(), null));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, null));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData()));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Mock.Of<IAdbClient>(), null));
         }
 
         [Fact]

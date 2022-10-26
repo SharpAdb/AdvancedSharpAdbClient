@@ -9,10 +9,7 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
     /// </summary>
     internal static class ExceptionTester<T> where T : Exception
     {
-        public static void TestEmptyConstructor(Func<T> constructor)
-        {
-            T ex = constructor();
-        }
+        public static void TestEmptyConstructor(Func<T> constructor) => _ = constructor();
 
         public static void TestMessageConstructor(Func<string, T> constructor)
         {
@@ -50,7 +47,7 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
             info.AddValue("HResult", 1);
             info.AddValue("Source", string.Empty);
 
-            T ex = constructor(info, context);
+            _ = constructor(info, context);
         }
 #endif
     }

@@ -16,59 +16,31 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
-        public Stream ShellStream
-        {
-            get;
-            set;
-        }
+        public Stream ShellStream { get; set; }
 
-        public bool DoDispose
-        {
-            get;
-            set;
-        }
+        public bool DoDispose { get; set; }
 
-        public Queue<AdbResponse> Responses
-        {
-            get;
-        } = new Queue<AdbResponse>();
+        public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
 
-        public Queue<string> ResponseMessages
-        { get; } = new Queue<string>();
+        public Queue<string> ResponseMessages { get; } = new Queue<string>();
 
-        public Queue<SyncCommand> SyncResponses
-        {
-            get;
-        } = new Queue<SyncCommand>();
+        public Queue<SyncCommand> SyncResponses { get; } = new Queue<SyncCommand>();
 
-        public Queue<byte[]> SyncDataReceived
-        {
-            get;
-        } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataReceived { get; } = new Queue<byte[]>();
 
-        public Queue<byte[]> SyncDataSent
-        {
-            get;
-        } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataSent { get; } = new Queue<byte[]>();
 
-        public List<string> Requests
-        { get; } = new List<string>();
+        public List<string> Requests { get; } = new List<string>();
 
-        public List<Tuple<SyncCommand, string>> SyncRequests
-        { get; } = new List<Tuple<SyncCommand, string>>();
+        public List<Tuple<SyncCommand, string>> SyncRequests { get; } = new List<Tuple<SyncCommand, string>>();
 
-        public bool DidReconnect
-        { get; private set; }
+        public bool DidReconnect { get; private set; }
 
-        public bool WaitForNewData
-        {
-            get;
-            set;
-        }
+        public bool WaitForNewData { get; set; }
 
         public override void Dispose()
         {
-            if (this.DoDispose)
+            if (DoDispose)
             {
                 base.Dispose();
             }
@@ -86,7 +58,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncDataReceived.Enqueue(data);
+                SyncDataReceived.Enqueue(data);
             }
 
             return read;
@@ -104,7 +76,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncDataReceived.Enqueue(data.Take(length).ToArray());
+                SyncDataReceived.Enqueue(data.Take(length).ToArray());
             }
 
             return read;
@@ -125,7 +97,7 @@ namespace AdvancedSharpAdbClient.Tests
                 response = ex.Response;
             }
 
-            this.Responses.Enqueue(response);
+            Responses.Enqueue(response);
 
             return exception != null ? throw exception : response;
         }
@@ -133,33 +105,33 @@ namespace AdvancedSharpAdbClient.Tests
         public override string ReadString()
         {
             string value = base.ReadString();
-            this.ResponseMessages.Enqueue(value);
+            ResponseMessages.Enqueue(value);
             return value;
         }
 
         public override string ReadSyncString()
         {
             string value = base.ReadSyncString();
-            this.ResponseMessages.Enqueue(value);
+            ResponseMessages.Enqueue(value);
             return value;
         }
 
         public override async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
             string value = await base.ReadStringAsync(cancellationToken);
-            this.ResponseMessages.Enqueue(value);
+            ResponseMessages.Enqueue(value);
             return value;
         }
 
         public override void SendAdbRequest(string request)
         {
-            this.Requests.Add(request);
+            Requests.Add(request);
             base.SendAdbRequest(request);
         }
 
         public override void SendSyncRequest(SyncCommand command, string path)
         {
-            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
+            SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
             base.SendSyncRequest(command, path);
         }
 
@@ -173,7 +145,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
+                SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
             }
 
             base.SendSyncRequest(command, length);
@@ -182,7 +154,7 @@ namespace AdvancedSharpAdbClient.Tests
         public override SyncCommand ReadSyncResponse()
         {
             SyncCommand response = base.ReadSyncResponse();
-            this.SyncResponses.Enqueue(response);
+            SyncResponses.Enqueue(response);
             return response;
         }
 
@@ -198,7 +170,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                this.SyncDataSent.Enqueue(data.Take(length).ToArray());
+                SyncDataSent.Enqueue(data.Take(length).ToArray());
             }
         }
 
@@ -206,7 +178,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             base.Reconnect();
 
-            this.DidReconnect = true;
+            DidReconnect = true;
         }
     }
 }

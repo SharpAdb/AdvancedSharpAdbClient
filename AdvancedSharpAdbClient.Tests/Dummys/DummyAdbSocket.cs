@@ -20,88 +20,42 @@ namespace AdvancedSharpAdbClient.Tests
 
         public DummyAdbSocket()
         {
-            this.IsConnected = true;
+            IsConnected = true;
         }
 
-        public Stream ShellStream
-        {
-            get;
-            set;
-        }
+        public Stream ShellStream { get; set; }
 
-        public Queue<AdbResponse> Responses
-        {
-            get;
-        } = new Queue<AdbResponse>();
+        public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
 
-        public Queue<SyncCommand> SyncResponses
-        {
-            get;
-        } = new Queue<SyncCommand>();
+        public Queue<SyncCommand> SyncResponses { get; } = new Queue<SyncCommand>();
 
-        public Queue<byte[]> SyncDataReceived
-        {
-            get;
-        } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataReceived { get; } = new Queue<byte[]>();
 
-        public Queue<byte[]> SyncDataSent
-        {
-            get;
-        } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataSent { get; } = new Queue<byte[]>();
 
-        public Queue<string> ResponseMessages
-        { get; } = new Queue<string>();
+        public Queue<string> ResponseMessages { get; } = new Queue<string>();
 
-        public List<string> Requests
-        { get; } = new List<string>();
+        public List<string> Requests { get; } = new List<string>();
 
-        public List<Tuple<SyncCommand, string>> SyncRequests
-        { get; } = new List<Tuple<SyncCommand, string>>();
+        public List<Tuple<SyncCommand, string>> SyncRequests { get; } = new List<Tuple<SyncCommand, string>>();
 
-        public bool IsConnected
-        {
-            get;
-            set;
-        }
+        public bool IsConnected { get; set; }
 
-        public bool WaitForNewData
-        {
-            get;
-            set;
-        }
+        public bool WaitForNewData { get; set; }
 
-        public bool Connected
-        {
-            get
-            {
-                return this.IsConnected
-                    && (this.WaitForNewData || this.Responses.Count > 0 || this.ResponseMessages.Count > 0 || this.SyncResponses.Count > 0 || this.SyncDataReceived.Count > 0);
-            }
-        }
+        public bool Connected => IsConnected
+            && (WaitForNewData || Responses.Count > 0 || ResponseMessages.Count > 0 || SyncResponses.Count > 0 || SyncDataReceived.Count > 0);
 
         /// <inheritdoc/>
-        public bool DidReconnect
-        {
-            get;
-            private set;
-        }
+        public bool DidReconnect { get; private set; }
 
-        public Socket Socket
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public Socket Socket => throw new NotImplementedException();
 
-        public void Dispose()
-        {
-            this.IsConnected = false;
-        }
+        public void Dispose() => IsConnected = false;
 
         public int Read(byte[] data)
         {
-            byte[] actual = this.SyncDataReceived.Dequeue();
+            byte[] actual = SyncDataReceived.Dequeue();
 
             for (int i = 0; i < data.Length && i < actual.Length; i++)
             {
@@ -113,40 +67,34 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task ReadAsync(byte[] data, CancellationToken cancellationToken)
         {
-            this.Read(data);
+            Read(data);
 
             return Task.FromResult(true);
         }
 
         public AdbResponse ReadAdbResponse()
         {
-            AdbResponse response = this.Responses.Dequeue();
+            AdbResponse response = Responses.Dequeue();
 
             return !response.Okay ? throw new AdbException(response.Message, response) : response;
         }
 
-        public string ReadString()
-        {
-            return this.ReadStringAsync(CancellationToken.None).Result;
-        }
+        public string ReadString() => ReadStringAsync(CancellationToken.None).Result;
 
-        public string ReadSyncString()
-        {
-            return this.ResponseMessages.Dequeue();
-        }
+        public string ReadSyncString() => ResponseMessages.Dequeue();
 
         public async Task<string> ReadStringAsync(CancellationToken cancellationToken)
         {
-            if (this.WaitForNewData)
+            if (WaitForNewData)
             {
-                while (this.ResponseMessages.Count == 0)
+                while (ResponseMessages.Count == 0)
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
             }
 
-            string message = this.ResponseMessages.Dequeue();
+            string message = ResponseMessages.Dequeue();
 
             if (message == ServerDisconnected)
             {
@@ -159,29 +107,17 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public void SendAdbRequest(string request)
-        {
-            this.Requests.Add(request);
-        }
+        public void SendAdbRequest(string request) => Requests.Add(request);
 
-        public void Close()
-        {
-            this.IsConnected = false;
-        }
+        public void Close() => IsConnected = false;
 
-        public void SendSyncRequest(string command, int value)
-        {
-            throw new NotImplementedException();
-        }
+        public void SendSyncRequest(string command, int value) => throw new NotImplementedException();
 
-        public void Send(byte[] data, int length)
-        {
-            this.SyncDataSent.Enqueue(data.Take(length).ToArray());
-        }
+        public void Send(byte[] data, int length) => SyncDataSent.Enqueue(data.Take(length).ToArray());
 
         public int Read(byte[] data, int length)
         {
-            byte[] actual = this.SyncDataReceived.Dequeue();
+            byte[] actual = SyncDataReceived.Dequeue();
 
             Assert.Equal(actual.Length, length);
 
@@ -190,31 +126,19 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public void SendSyncRequest(SyncCommand command, string path)
-        {
-            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
-        }
+        public void SendSyncRequest(SyncCommand command, string path) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
 
-        public SyncCommand ReadSyncResponse()
-        {
-            return this.SyncResponses.Dequeue();
-        }
+        public SyncCommand ReadSyncResponse() => SyncResponses.Dequeue();
 
-        public void SendSyncRequest(SyncCommand command, int length)
-        {
-            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
-        }
+        public void SendSyncRequest(SyncCommand command, int length) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
 
-        public void SendSyncRequest(SyncCommand command, string path, int permissions)
-        {
-            this.SyncRequests.Add(new Tuple<SyncCommand, string>(command, $"{path},{permissions}"));
-        }
+        public void SendSyncRequest(SyncCommand command, string path, int permissions) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, $"{path},{permissions}"));
 
         public Stream GetShellStream()
         {
-            if (this.ShellStream != null)
+            if (ShellStream != null)
             {
-                return this.ShellStream;
+                return ShellStream;
             }
             else
             {
@@ -223,21 +147,15 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public void Reconnect()
-        {
-            this.DidReconnect = true;
-        }
+        public void Reconnect() => DidReconnect = true;
 
-        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void Send(byte[] data, int offset, int length)
         {
             if (offset == 0)
             {
-                this.Send(data, length);
+                Send(data, length);
             }
             else
             {
@@ -251,11 +169,11 @@ namespace AdvancedSharpAdbClient.Tests
             // to a specific device
             if (device != null)
             {
-                this.SendAdbRequest($"host:transport:{device.Serial}");
+                SendAdbRequest($"host:transport:{device.Serial}");
 
                 try
                 {
-                    AdbResponse response = this.ReadAdbResponse();
+                    AdbResponse response = ReadAdbResponse();
                 }
                 catch (AdbException e)
                 {

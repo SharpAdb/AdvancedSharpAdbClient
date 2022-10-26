@@ -53,31 +53,31 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ParseNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => ForwardSpec.Parse(null));
+            _ = Assert.Throws<ArgumentNullException>(() => ForwardSpec.Parse(null));
         }
 
         [Fact]
         public void ParseInvalidTest()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("abc"));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("abc"));
         }
 
         [Fact]
         public void ParseInvalidTcpPortTest()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("tcp:xyz"));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("tcp:xyz"));
         }
 
         [Fact]
         public void ParseInvalidProcessIdTest()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("jdwp:abc"));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("jdwp:abc"));
         }
 
         [Fact]
         public void ParseInvalidProtocolTest()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("xyz:1234"));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("xyz:1234"));
         }
 
         [Fact]

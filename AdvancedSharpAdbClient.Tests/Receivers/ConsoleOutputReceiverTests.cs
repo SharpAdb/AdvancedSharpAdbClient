@@ -68,11 +68,10 @@ namespace AdvancedSharpAdbClient.Tests
             receiver.ThrowOnError("Stay calm and watch cat movies.");
         }
 
-        private void AssertTrowsException<T>(string line)
-            where T : Exception
+        private void AssertTrowsException<T>(string line) where T : Exception
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            Assert.Throws<T>(() => receiver.ThrowOnError(line));
+            _ = Assert.Throws<T>(() => receiver.ThrowOnError(line));
         }
     }
 }

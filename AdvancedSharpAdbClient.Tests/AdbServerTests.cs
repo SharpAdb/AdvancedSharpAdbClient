@@ -13,23 +13,23 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public class AdbServerTests
     {
-        private Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
-        private DummyAdbSocket socket;
-        private DummyAdbCommandLineClient commandLineClient;
+        private readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+        private readonly DummyAdbSocket socket;
+        private readonly DummyAdbCommandLineClient commandLineClient;
         private Func<EndPoint, IAdbSocket> adbSocketFactory;
         private AdbClient adbClient;
         private AdbServer adbServer;
 
         public AdbServerTests()
         {
-            this.socket = new DummyAdbSocket();
-            this.adbSocketFactory = (endPoint) => this.socket;
+            socket = new DummyAdbSocket();
+            adbSocketFactory = (endPoint) => socket;
 
-            this.commandLineClient = new DummyAdbCommandLineClient();
-            this.adbCommandLineClientFactory = (version) => this.commandLineClient;
+            commandLineClient = new DummyAdbCommandLineClient();
+            adbCommandLineClientFactory = (version) => commandLineClient;
 
-            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
-            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
+            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Tests
             adbClientMock.Setup(c => c.GetAdbVersion())
                 .Throws(new SocketException(AdbServer.ConnectionRefused));
 
-            AdbServer adbServer = new AdbServer(adbClientMock.Object, this.adbCommandLineClientFactory);
+            AdbServer adbServer = new AdbServer(adbClientMock.Object, adbCommandLineClientFactory);
 
             AdbServerStatus status = adbServer.GetStatus();
             Assert.False(status.IsRunning);
@@ -49,15 +49,15 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetStatusRunningTest()
         {
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("0020");
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("0020");
 
-            AdbServerStatus status = this.adbServer.GetStatus();
+            AdbServerStatus status = adbServer.GetStatus();
 
-            Assert.Empty(this.socket.Responses);
-            Assert.Empty(this.socket.ResponseMessages);
-            Assert.Single(this.socket.Requests);
-            Assert.Equal("host:version", this.socket.Requests[0]);
+            Assert.Empty(socket.Responses);
+            Assert.Empty(socket.ResponseMessages);
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:version", socket.Requests[0]);
 
             Assert.True(status.IsRunning);
             Assert.Equal(new Version(1, 0, 32), status.Version);
@@ -66,151 +66,148 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetStatusOtherSocketExceptionTest()
         {
-            this.adbSocketFactory = (endPoint) =>
+            adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException();
             };
 
-            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
-            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
+            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
 
-            Assert.Throws<SocketException>(() => this.adbServer.GetStatus());
+            _ = Assert.Throws<SocketException>(() => adbServer.GetStatus());
         }
 
         [Fact]
         public void GetStatusOtherExceptionTest()
         {
-            this.adbSocketFactory = (endPoint) =>
+            adbSocketFactory = (endPoint) =>
             {
                 throw new Exception();
             };
 
-            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
-            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
+            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
 
-            Assert.Throws<Exception>(() => this.adbServer.GetStatus());
+            _ = Assert.Throws<Exception>(() => adbServer.GetStatus());
         }
 
         [Fact]
         public void StartServerAlreadyRunningTest()
         {
-            this.commandLineClient.Version = new Version(1, 0, 20);
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("0020");
+            commandLineClient.Version = new Version(1, 0, 20);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("0020");
 
-            StartServerResult result = this.adbServer.StartServer(null, false);
+            StartServerResult result = adbServer.StartServer(null, false);
 
             Assert.Equal(StartServerResult.AlreadyRunning, result);
 
-            Assert.Single(this.socket.Requests);
-            Assert.Equal("host:version", this.socket.Requests[0]);
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:version", socket.Requests[0]);
         }
 
         [Fact]
         public void StartServerOutdatedRunningNoExecutableTest()
         {
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("0010");
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("0010");
 
-            Assert.Throws<AdbException>(() => this.adbServer.StartServer(null, false));
+            _ = Assert.Throws<AdbException>(() => adbServer.StartServer(null, false));
         }
 
         [Fact]
         public void StartServerNotRunningNoExecutableTest()
         {
-            this.adbSocketFactory = (endPoint) =>
+            adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException(AdbServer.ConnectionRefused);
             };
 
-            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
-            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
+            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
 
-            Assert.Throws<AdbException>(() => this.adbServer.StartServer(null, false));
+            _ = Assert.Throws<AdbException>(() => adbServer.StartServer(null, false));
         }
 
         [Fact]
         public void StartServerOutdatedRunningTest()
         {
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("0010");
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("0010");
 
-            this.commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.False(this.commandLineClient.ServerStarted);
+            Assert.False(commandLineClient.ServerStarted);
+            _ = adbServer.StartServer(ServerName, false);
 
-            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
+            Assert.True(commandLineClient.ServerStarted);
 
-            Assert.True(this.commandLineClient.ServerStarted);
-
-            Assert.Equal(2, this.socket.Requests.Count);
-            Assert.Equal("host:version", this.socket.Requests[0]);
-            Assert.Equal("host:kill", this.socket.Requests[1]);
+            Assert.Equal(2, socket.Requests.Count);
+            Assert.Equal("host:version", socket.Requests[0]);
+            Assert.Equal("host:kill", socket.Requests[1]);
         }
 
         [Fact]
         public void StartServerNotRunningTest()
         {
-            this.adbSocketFactory = (endPoint) =>
+            adbSocketFactory = (endPoint) =>
             {
                 throw new SocketException(AdbServer.ConnectionRefused);
             };
 
-            this.adbClient = new AdbClient(AdbClient.DefaultEndPoint, this.adbSocketFactory);
-            this.adbServer = new AdbServer(this.adbClient, this.adbCommandLineClientFactory);
+            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
+            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
 
-            this.commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.False(this.commandLineClient.ServerStarted);
+            Assert.False(commandLineClient.ServerStarted);
 
-            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
+            StartServerResult result = adbServer.StartServer(ServerName, false);
 
-            Assert.True(this.commandLineClient.ServerStarted);
+            Assert.True(commandLineClient.ServerStarted);
         }
 
         [Fact]
         public void StartServerIntermediateRestartRequestedRunningTest()
         {
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("001f");
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("001f");
 
-            this.commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.False(this.commandLineClient.ServerStarted);
+            Assert.False(commandLineClient.ServerStarted);
+            _ = adbServer.StartServer(ServerName, true);
 
-            StartServerResult result = this.adbServer.StartServer(this.ServerName, true);
+            Assert.True(commandLineClient.ServerStarted);
 
-            Assert.True(this.commandLineClient.ServerStarted);
-
-            Assert.Equal(2, this.socket.Requests.Count);
-            Assert.Equal("host:version", this.socket.Requests[0]);
-            Assert.Equal("host:kill", this.socket.Requests[1]);
+            Assert.Equal(2, socket.Requests.Count);
+            Assert.Equal("host:version", socket.Requests[0]);
+            Assert.Equal("host:kill", socket.Requests[1]);
         }
 
         [Fact]
         public void StartServerIntermediateRestartNotRequestedRunningTest()
         {
-            this.socket.Responses.Enqueue(AdbResponse.OK);
-            this.socket.ResponseMessages.Enqueue("001f");
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("001f");
 
-            this.commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = new Version(1, 0, 32);
 
-            Assert.False(this.commandLineClient.ServerStarted);
+            Assert.False(commandLineClient.ServerStarted);
+            _ = adbServer.StartServer(ServerName, false);
 
-            StartServerResult result = this.adbServer.StartServer(this.ServerName, false);
+            Assert.False(commandLineClient.ServerStarted);
 
-            Assert.False(this.commandLineClient.ServerStarted);
-
-            Assert.Single(this.socket.Requests);
-            Assert.Equal("host:version", this.socket.Requests[0]);
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:version", socket.Requests[0]);
         }
 
         [Fact]
         public void ConstructorAdbClientNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new AdbServer(null, this.adbCommandLineClientFactory));
+            _ = Assert.Throws<ArgumentNullException>(() => new AdbServer(null, adbCommandLineClientFactory));
         }
 
-        private string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
+        private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
     }
 }

@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
             commandLine.Version = null;
-            Assert.Throws<AdbException>(() => commandLine.GetVersion());
+            _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Tests
             DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
             commandLine.Version = new Version(1, 0, 1);
 
-            Assert.Throws<AdbException>(() => commandLine.GetVersion());
+            _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 
         [Fact]

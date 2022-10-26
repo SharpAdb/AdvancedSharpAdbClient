@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -21,6 +22,14 @@ namespace AdvancedSharpAdbClient
             string
 #endif
             .IsNullOrWhiteSpace(value);
+
+        public static string Join(string separator, IEnumerable<string> values) =>
+#if NET35
+            StringEx
+#else
+            string
+#endif
+            .Join(separator, values);
 
         public static Task Delay(int dueTime) =>
 #if NET35 || NET40

@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         [Fact]
         public void ConstructorNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellStream(null, false));
+            _ = Assert.Throws<ArgumentNullException>(() => new ShellStream(null, false));
         }
 
         [Fact]
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
             {
                 using (FileStream stream = File.OpenWrite(temp))
                 {
-                    Assert.Throws<ArgumentOutOfRangeException>(() => new ShellStream(stream, false));
+                    _ = Assert.Throws<ArgumentOutOfRangeException>(() => new ShellStream(stream, false));
                 }
             }
             finally

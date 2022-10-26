@@ -12,13 +12,13 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ParseNullTest()
         {
-            Assert.Throws<ArgumentNullException>(() => AndroidProcess.Parse(null));
+            _ = Assert.Throws<ArgumentNullException>(() => AndroidProcess.Parse(null));
         }
 
         [Fact]
         public void ParseTooFewPartsTest()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => AndroidProcess.Parse("1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 "));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => AndroidProcess.Parse("1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 "));
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using AdvancedSharpAdbClient.DeviceCommands;
+using System.Collections.Generic;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests.DeviceCommands
@@ -18,7 +19,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 [init.svc.MtkCodecService]: [running]
 [init.svc.bootanim]: [stopped]");
 
-            System.Collections.Generic.Dictionary<string, string> properties = client.GetProperties(device);
+            Dictionary<string, string> properties = client.GetProperties(device);
             Assert.NotNull(properties);
             Assert.Equal(3, properties.Count);
             Assert.True(properties.ContainsKey("init.svc.BGW"));

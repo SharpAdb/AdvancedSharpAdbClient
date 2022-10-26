@@ -9,22 +9,13 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     internal class DummyAdbCommandLineClient : AdbCommandLineClient
     {
-        public DummyAdbCommandLineClient()
-            : base(ServerName)
+        public DummyAdbCommandLineClient() : base(ServerName)
         {
         }
 
-        public Version Version
-        {
-            get;
-            set;
-        }
+        public Version Version { get; set; }
 
-        public bool ServerStarted
-        {
-            get;
-            private set;
-        }
+        public bool ServerStarted { get; private set; }
 
         public override bool IsValidAdbFile(string adbPath)
         {
@@ -40,13 +31,13 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (command == "start-server")
             {
-                this.ServerStarted = true;
+                ServerStarted = true;
             }
             else if (command == "version")
             {
-                if (standardOutput != null && this.Version != null)
+                if (standardOutput != null && Version != null)
                 {
-                    standardOutput.Add($"Android Debug Bridge version {this.Version.ToString(3)}");
+                    standardOutput.Add($"Android Debug Bridge version {Version.ToString(3)}");
                 }
             }
             else

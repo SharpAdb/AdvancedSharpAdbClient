@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] responseData = new byte[128];
             socket.Receive(responseData, 0, SocketFlags.None);
 
-            string response = Encoding.ASCII.GetString(responseData);
+            _ = Encoding.ASCII.GetString(responseData);
             socket.Dispose();
         }
 
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void CreateUnsupportedSocketTest()
         {
             TcpSocket socket = new TcpSocket();
-            Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
+            _ = Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
         }
     }
 }
