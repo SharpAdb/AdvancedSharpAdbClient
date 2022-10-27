@@ -18,6 +18,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
+    <VersionPrefix>2.5.3</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
@@ -26,7 +27,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
   </ItemGroup>
 
