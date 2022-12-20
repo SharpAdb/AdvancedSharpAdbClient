@@ -1,5 +1,6 @@
 ﻿using AdvancedSharpAdbClient.DeviceCommands;
 using Moq;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -47,7 +48,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 
             DeviceData device = new DeviceData();
 
-            System.Collections.Generic.Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(device);
+            Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));

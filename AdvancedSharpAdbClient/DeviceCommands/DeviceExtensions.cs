@@ -45,6 +45,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Gets the property of a device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device for which to get the property.</param>
+        /// <param name="property">The name of property which to get.</param>
+        /// <returns>The value of the property on the device.</returns>
+        public static string GetProperty(this IAdbClient client, DeviceData device, string property)
+        {
+            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            client.ExecuteRemoteCommand($"{GetPropReceiver.GetpropCommand} {property}", device, receiver);
+            return receiver.ToString();
+        }
+
+        /// <summary>
         /// Gets the properties of a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>

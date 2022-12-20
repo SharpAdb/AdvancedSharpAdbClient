@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ThirdPartyOnly = thirdPartyOnly;
             this.client = client ?? throw new ArgumentNullException(nameof(client));
 
-            this.syncServiceFactory = syncServiceFactory == null ? Factories.SyncServiceFactory : syncServiceFactory;
+            this.syncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
 
             if (!skipInit)
             {
@@ -437,10 +437,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="IOException">if file removal failed</exception>
         private void RemoveRemotePackage(string remoteFilePath)
         {
-            // now we delete the app we sync'ed
+            // now we delete the app we synced
             try
             {
-                client.ExecuteShellCommand(Device, "rm " + remoteFilePath, null);
+                client.ExecuteShellCommand(Device, $"rm {remoteFilePath}", null);
             }
             catch (IOException e)
             {

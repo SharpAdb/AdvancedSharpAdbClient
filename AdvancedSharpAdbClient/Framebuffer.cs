@@ -5,6 +5,7 @@
 using System;
 using System.Buffers;
 using System.Drawing;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -94,6 +95,9 @@ namespace AdvancedSharpAdbClient
         /// Converts the framebuffer data to a <see cref="Image"/>.
         /// </summary>
         /// <returns>An <see cref="Image"/> which represents the framebuffer data.</returns>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
         public Image ToImage()
         {
             EnsureNotDisposed();

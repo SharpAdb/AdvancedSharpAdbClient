@@ -178,8 +178,8 @@ namespace AdvancedSharpAdbClient
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
                 socket.SendAdbRequest($"reverse:forward:{rebind}{remote};{local}");
-                AdbResponse response = socket.ReadAdbResponse();
-                response = socket.ReadAdbResponse();
+                _ = socket.ReadAdbResponse();
+                _ = socket.ReadAdbResponse();
                 string portString = socket.ReadString();
 
                 return portString != null && int.TryParse(portString, out int port) ? port : 0;
@@ -217,7 +217,6 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
-
             EnsureDevice(device);
 
             using (IAdbSocket socket = adbSocketFactory(EndPoint))
@@ -225,8 +224,8 @@ namespace AdvancedSharpAdbClient
                 string rebind = allowRebind ? string.Empty : "norebind:";
 
                 socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
-                AdbResponse response = socket.ReadAdbResponse();
-                response = socket.ReadAdbResponse();
+                _ = socket.ReadAdbResponse();
+                _ = socket.ReadAdbResponse();
                 string portString = socket.ReadString();
 
                 return portString != null && int.TryParse(portString, out int port) ? port : 0;
@@ -277,7 +276,7 @@ namespace AdvancedSharpAdbClient
 
                 string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                return parts.Select(p => ForwardData.FromString(p));
+                return parts.Select(ForwardData.FromString);
             }
         }
 
@@ -297,7 +296,7 @@ namespace AdvancedSharpAdbClient
 
                 string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-                return parts.Select(p => ForwardData.FromString(p));
+                return parts.Select(ForwardData.FromString);
             }
         }
 
@@ -1011,13 +1010,7 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charcount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommandAsync("input keyevent " +
-#if !NET35
-                string
-#else
-                StringEx
-#endif
-                .Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, CancellationToken.None).Wait();
+            ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, CancellationToken.None).Wait();
         }
 
         /// <inheritdoc/>

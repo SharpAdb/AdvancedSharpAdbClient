@@ -13,42 +13,33 @@ namespace AdvancedSharpAdbClient.Tests
         /// The value is set to a value different from the default adb end point, to detect the dummy
         /// server being used. 
         /// </remarks>
-        public EndPoint EndPoint
-        { get; set; } = new IPEndPoint(IPAddress.Loopback, 9999);
+        public EndPoint EndPoint { get; set; } = new IPEndPoint(IPAddress.Loopback, 9999);
 
         /// <summary>
         /// Gets or sets the status as is to be reported by the <see cref="DummyAdbServer"/>.
         /// </summary>
-        public AdbServerStatus Status
-        { get; set; }
+        public AdbServerStatus Status { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the server was restarted.
         /// </summary>
-        public bool WasRestarted
-        { get; private set; }
+        public bool WasRestarted { get; private set; }
 
         /// <inheritdoc/>
-        public AdbServerStatus GetStatus()
-        {
-            return this.Status;
-        }
+        public AdbServerStatus GetStatus() => Status;
 
         /// <inheritdoc/>
-        public void RestartServer()
-        {
-            this.WasRestarted = true;
-        }
+        public void RestartServer() => WasRestarted = true;
 
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
-            if (this.Status.IsRunning == true)
+            if (Status.IsRunning == true)
             {
                 return StartServerResult.AlreadyRunning;
             }
 
-            this.Status = new AdbServerStatus()
+            Status = new AdbServerStatus()
             {
                 IsRunning = true,
                 Version = new Version(1, 0, 20)

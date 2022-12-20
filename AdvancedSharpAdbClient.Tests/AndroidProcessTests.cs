@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void ParseTests(string line)
         {
-            AndroidProcess process = AndroidProcess.Parse(line, true);
+            _ = AndroidProcess.Parse(line, true);
         }
     }
 }

@@ -21,54 +21,49 @@
     <VersionPrefix>2.5.3</VersionPrefix>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
+    <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net3.5-client'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net3.5-client'">
     <PackageReference Include="AsyncBridge" Version="0.3.1" />
     <PackageReference Include="mscorlib.Polyfill.NET35" Version="0.0.2" />
     <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.2" />
     <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.0-client'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.0-client'">
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
     <PackageReference Include="mscorlib.Polyfill.NET40" Version="0.0.1" />
     <PackageReference Include="Polyfill.System.Buffers.NET40" Version="0.0.1" />
     <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET40" Version="0.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.5.2'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.6.2'">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'">
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.7.2'">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+						 or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net4.8.1'">
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Drawing-dotnet-core" Version="1.2.3" />
@@ -77,9 +72,13 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
+                         or '$(TargetFramework)' == 'net4.7.2'
+                         or '$(TargetFramework)' == 'net4.8.1'
+                         or '$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+						 or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'

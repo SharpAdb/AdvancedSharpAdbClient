@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             string data = "xyz";
 
-            Assert.Throws<ArgumentException>(() => DeviceData.CreateFromAdbData(data));
+            _ = Assert.Throws<ArgumentException>(() => DeviceData.CreateFromAdbData(data));
         }
 
         [Fact]

@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EnsureIsValidAdbFileNullValueTest()
         {
-            Assert.Throws<ArgumentNullException>(() => AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe"));
+            _ = Assert.Throws<ArgumentNullException>(() => AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe"));
         }
 
         [Fact]
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             IAdbCommandLineClient client = clientMock.Object;
 
-            Assert.Throws<FileNotFoundException>(() => client.EnsureIsValidAdbFile("xyz.exe"));
+            _ = Assert.Throws<FileNotFoundException>(() => client.EnsureIsValidAdbFile("xyz.exe"));
         }
     }
 }

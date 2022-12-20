@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncRequestTest()
         {
-            this.RunTest(
+            RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DATA, 2),
                 new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
         }
@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncRequestTest2()
         {
-            this.RunTest(
+            RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
                 new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
         }
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncRequest3()
         {
-            this.RunTest(
+            RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
                 new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });
         }
@@ -75,9 +75,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncNullRequestTest()
         {
-            Assert.Throws<ArgumentNullException>(() => this.RunTest(
-               (socket) => socket.SendSyncRequest(SyncCommand.DATA, null),
-               new byte[] { }));
+            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), new byte[] { }));
         }
 
         [Fact]
@@ -167,7 +165,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            Assert.Throws<AdbException>(() => socket.ReadAdbResponse());
+            _ = Assert.Throws<AdbException>(() => socket.ReadAdbResponse());
         }
 
         [Fact]
@@ -231,7 +229,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendAdbRequestTest()
         {
-            this.RunTest(
+            RunTest(
                 (socket) => socket.SendAdbRequest("Test"),
                 Encoding.ASCII.GetBytes("0004Test"));
         }

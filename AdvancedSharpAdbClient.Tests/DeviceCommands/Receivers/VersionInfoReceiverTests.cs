@@ -37,8 +37,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
             Assert.Null((string)receiver.GetVersionName(" test"));
             Assert.Null((string)receiver.GetVersionName("    versionName"));
             Assert.Equal(string.Empty, (string)receiver.GetVersionName("    versionName="));
-
-            DeviceData device = new DeviceData();
+            _ = new DeviceData();
 
             string dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"Assets/dumpsys_package.txt"));
             receiver = new VersionInfoReceiver();

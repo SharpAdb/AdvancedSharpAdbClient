@@ -10,11 +10,7 @@ namespace AdvancedSharpAdbClient
 {
     public class SocketBasedTests
     {
-        protected AdbClient TestClient
-        {
-            get;
-            private set;
-        }
+        protected AdbClient TestClient { get; private set; }
 
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
@@ -25,7 +21,7 @@ namespace AdvancedSharpAdbClient
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                TracingAdbSocket tracingSocket = new TracingAdbSocket(this.EndPoint) { DoDispose = doDispose };
+                TracingAdbSocket tracingSocket = new TracingAdbSocket(EndPoint) { DoDispose = doDispose };
 
                 Factories.AdbSocketFactory = (endPoint) => tracingSocket;
             }
@@ -35,17 +31,17 @@ namespace AdvancedSharpAdbClient
                 Factories.AdbSocketFactory = (endPoint) => socket;
             }
 
-            this.IntegrationTest = integrationTest;
+            IntegrationTest = integrationTest;
 #else
             // In release mode (e.g. on the build server),
             // never run integration tests.
-            var socket = new DummyAdbSocket();
+            DummyAdbSocket socket = new DummyAdbSocket();
             Factories.AdbSocketFactory = (endPoint) => socket;
-            this.IntegrationTest = false;
+            IntegrationTest = false;
 #endif
-            this.Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(this.EndPoint);
+            Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(EndPoint);
 
-            this.TestClient = new AdbClient();
+            TestClient = new AdbClient();
         }
 
         protected static readonly AdbResponse[] NoResponses = new AdbResponse[] { };
@@ -57,23 +53,11 @@ namespace AdvancedSharpAdbClient
             State = DeviceState.Online
         };
 
-        protected IDummyAdbSocket Socket
-        {
-            get;
-            set;
-        }
+        protected IDummyAdbSocket Socket { get; set; }
 
-        public EndPoint EndPoint
-        {
-            get;
-            set;
-        }
+        public EndPoint EndPoint { get; set; }
 
-        public bool IntegrationTest
-        {
-            get;
-            set;
-        }
+        public bool IntegrationTest { get; set; }
 
         /// <summary>
         /// <para>
@@ -133,7 +117,7 @@ namespace AdvancedSharpAdbClient
             IEnumerable<byte[]> syncDataSent,
             Action test)
         {
-            this.RunTest(
+            RunTest(
                 responses,
                 responseMessages,
                 requests,
@@ -158,25 +142,25 @@ namespace AdvancedSharpAdbClient
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
-            if (!this.IntegrationTest)
+            if (!IntegrationTest)
             {
-                this.Socket.ShellStream = shellStream;
+                Socket.ShellStream = shellStream;
 
                 foreach (AdbResponse response in responses)
                 {
-                    this.Socket.Responses.Enqueue(response);
+                    Socket.Responses.Enqueue(response);
                 }
 
                 foreach (string responseMessage in responseMessages)
                 {
-                    this.Socket.ResponseMessages.Enqueue(responseMessage);
+                    Socket.ResponseMessages.Enqueue(responseMessage);
                 }
 
                 if (syncResponses != null)
                 {
                     foreach (SyncCommand syncResponse in syncResponses)
                     {
-                        this.Socket.SyncResponses.Enqueue(syncResponse);
+                        Socket.SyncResponses.Enqueue(syncResponse);
                     }
                 }
 
@@ -184,7 +168,7 @@ namespace AdvancedSharpAdbClient
                 {
                     foreach (byte[] syncDatum in syncDataReceived)
                     {
-                        this.Socket.SyncDataReceived.Enqueue(syncDatum);
+                        Socket.SyncDataReceived.Enqueue(syncDatum);
                     }
                 }
             }
@@ -200,81 +184,81 @@ namespace AdvancedSharpAdbClient
                 exception = ex;
             }
 
-            if (!this.IntegrationTest)
+            if (!IntegrationTest)
             {
                 // If we are running unit tests, we need to make sure all messages
                 // were read, and the correct request was sent.
 
                 // Make sure the messages were read
-                Assert.Empty(this.Socket.ResponseMessages);
-                Assert.Empty(this.Socket.Responses);
-                Assert.Empty(this.Socket.SyncResponses);
-                Assert.Empty(this.Socket.SyncDataReceived);
+                Assert.Empty(Socket.ResponseMessages);
+                Assert.Empty(Socket.Responses);
+                Assert.Empty(Socket.SyncResponses);
+                Assert.Empty(Socket.SyncDataReceived);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToList(), this.Socket.Requests);
+                Assert.Equal(requests.ToList(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), this.Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncRequests);
+                    Assert.Empty(Socket.SyncRequests);
                 }
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), this.Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncDataSent);
+                    Assert.Empty(Socket.SyncDataSent);
                 }
             }
             else
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToList(), this.Socket.Requests);
+                Assert.Equal(requests.ToList(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), this.Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncRequests);
+                    Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToList(), this.Socket.Responses);
-                Assert.Equal(responseMessages.ToList(), this.Socket.ResponseMessages);
+                Assert.Equal(responses.ToList(), Socket.Responses);
+                Assert.Equal(responseMessages.ToList(), Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToList(), this.Socket.SyncResponses);
+                    Assert.Equal(syncResponses.ToList(), Socket.SyncResponses);
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncResponses);
+                    Assert.Empty(Socket.SyncResponses);
                 }
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToList(), this.Socket.SyncDataReceived.ToList());
+                    AssertEqual(syncDataReceived.ToList(), Socket.SyncDataReceived.ToList());
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncDataReceived);
+                    Assert.Empty(Socket.SyncDataReceived);
                 }
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), this.Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
                 }
                 else
                 {
-                    Assert.Empty(this.Socket.SyncDataSent);
+                    Assert.Empty(Socket.SyncDataSent);
                 }
             }
 
@@ -284,15 +268,9 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        protected static IEnumerable<string> Requests(params string[] requests)
-        {
-            return requests;
-        }
+        protected static IEnumerable<string> Requests(params string[] requests) => requests;
 
-        protected static IEnumerable<string> ResponseMessages(params string[] requests)
-        {
-            return requests;
-        }
+        protected static IEnumerable<string> ResponseMessages(params string[] requests) => requests;
 
         protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path)
         {
@@ -320,7 +298,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        private void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
+        private static void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
         {
             Assert.Equal(expected.Count, actual.Count);
 

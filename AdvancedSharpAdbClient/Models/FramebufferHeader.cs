@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text;
 
 namespace AdvancedSharpAdbClient
@@ -143,6 +144,9 @@ namespace AdvancedSharpAdbClient
         /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/> if the framebuffer
         /// does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
         public Image ToImage(byte[] buffer)
         {
             if (buffer == null)
@@ -180,6 +184,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <returns>A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
         private PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.

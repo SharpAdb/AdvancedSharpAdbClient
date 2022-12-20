@@ -15,15 +15,21 @@ namespace AdvancedSharpAdbClient.Tests.Extensions
             Assert.Equal(DeviceState.BootLoader, result);
             Assert.True(Utilities.TryParse("Bootloader", true, out result));
             Assert.Equal(DeviceState.BootLoader, result);
-            Assert.True(!Utilities.TryParse<DeviceState>("Bootloader", false, out _));
-            Assert.True(!Utilities.TryParse<DeviceState>("Reset", true, out _));
+            Assert.False(Utilities.TryParse<DeviceState>("Bootloader", false, out _));
+            Assert.False(Utilities.TryParse<DeviceState>("Reset", true, out _));
         }
 
         [Fact]
         public void IsNullOrWhiteSpaceTest()
         {
             Assert.True(" ".IsNullOrWhiteSpace());
-            Assert.True(!" test ".IsNullOrWhiteSpace());
+            Assert.False(" test ".IsNullOrWhiteSpace());
+        }
+
+        [Fact]
+        public void JoinTest()
+        {
+            Assert.Equal("Hello World!", Utilities.Join(" ", new string[] { "Hello", "World!" }));
         }
 
         [Fact]
