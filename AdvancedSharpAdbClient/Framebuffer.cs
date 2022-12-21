@@ -5,9 +5,12 @@
 using System;
 using System.Buffers;
 using System.Drawing;
-using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+
+#if NET
+using System.Runtime.Versioning;
+#endif
 
 namespace AdvancedSharpAdbClient
 {

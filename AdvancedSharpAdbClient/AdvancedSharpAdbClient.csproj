@@ -2,16 +2,17 @@
 
   <PropertyGroup>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
-    <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat</Authors>
+    <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat, wherewhere</Authors>
     <Copyright>https://github.com/quamotion/madb</Copyright>
-    <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices. It's improved version of SharpAdbClient.</Description>
+    <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>latest</LangVersion>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient;</PackageTags>
+    <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
+    <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
@@ -59,7 +60,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
                          or '$(TargetFramework)' == 'netcoreapp3.1'
-						 or '$(TargetFramework)' == 'netstandard2.0'">
+                         or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
@@ -73,16 +74,16 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
-                         or '$(TargetFramework)' == 'net4.7.2'
-                         or '$(TargetFramework)' == 'net4.8.1'
-                         or '$(TargetFramework)' == 'net6.0'
-                         or '$(TargetFramework)' == 'netcoreapp3.1'
-						 or '$(TargetFramework)' == 'netstandard2.0'">
+                     or '$(TargetFramework)' == 'net4.7.2'
+                     or '$(TargetFramework)' == 'net4.8.1'
+                     or '$(TargetFramework)' == 'net6.0'
+                     or '$(TargetFramework)' == 'netcoreapp3.1'
+                     or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
-                         and '$(TargetFramework)' != 'net4.0-client'">
+                        and '$(TargetFramework)' != 'net4.0-client'">
     <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
   </PropertyGroup>
  

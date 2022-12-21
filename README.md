@@ -1,6 +1,6 @@
 | Issues | License | NuGet |
 |--------|---------|-------|
-[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![Github Issues](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/SharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/SharpAdbClient/)
+[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![Github Issues](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
 
 # A .NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)
 
@@ -10,18 +10,6 @@ It provides a .NET implementation of the `adb` protocol, giving more flexibility
 
 It's upgraded verion of [SharpAdbClient](https://github.com/quamotion/madb).
 Added important features.
-
-## Changes
-
-### 2.5.2
-+ Memory leaks fix
-
-### 2.5.1
-+ Now Click, Swipe, SendKeyEvent and SendText no longer return values, they have become voids
-+ Added ElementNotFoundException and InvalidKeyEventException
-
-### 2.5.0
-+ First commit
 
 ## Support Platform
 - .NET Framework 3.5 (Maybe unstable)
@@ -48,7 +36,7 @@ AdvancedSharpAdbClient does not communicate directly with your Android devices, 
 
 You can do so by either running `adb.exe` yourself (it comes as a part of the ADK, the Android Development Kit), or you can use the `AdbServer.StartServer` method like this:
 
-```c#
+```cs
 if (!AdbServer.Instance.GetStatus().IsRunning)
 {
     AdbServer server = new AdbServer();
@@ -61,20 +49,20 @@ if (!AdbServer.Instance.GetStatus().IsRunning)
 ```
 
 ### Connecting to device
-Before using all the methods, you must initialize the new AdvancedAdbClient class and then connect to the device
+Before using all the methods, you must initialize the new AdbClient class and then connect to the device
 
-If you want to automate 2 or more devices at the same time, you must remember: 1 device - 1 AdvancedAdbClient class
+If you want to automate 2 or more devices at the same time, you must remember: 1 device - 1 AdbClient class
 
 You can look at the examples to understand more
 
-```c#
-static AdvancedAdbClient client;
+```cs
+static AdbClient client;
 
 static DeviceData device;
 
 static void Main(string[] args)
 {
-    client = new AdvancedAdbClient();
+    client = new AdbClient();
     client.Connect("127.0.0.1:62001");
     device = client.GetDevices().FirstOrDefault(); // Get first connected device
 }
@@ -85,14 +73,14 @@ static void Main(string[] args)
 ### Finding element
 You can find the element on the screen by xpath
 
-```c#
-static AdvancedAdbClient client;
+```cs
+static AdbClient client;
 
 static DeviceData device;
 
 static void Main(string[] args)
 {
-    client = new AdvancedAdbClient();
+    client = new AdbClient();
     client.Connect("127.0.0.1:62001");
     device = client.GetDevices().FirstOrDefault();
     Element el = client.FindElement(device, "//node[@text='Login']");
@@ -101,13 +89,13 @@ static void Main(string[] args)
 
 You can also specify the waiting time for the element
 
-```c#
+```cs
 Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(5));
 ```
 
 And you can find several elements
 
-```c#
+```cs
 Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
 
@@ -115,7 +103,7 @@ Element[] els = client.FindElements(device, "//node[@resource-id='Login']", Time
 ### Getting element attributes
 You can get all element attributes
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -130,7 +118,7 @@ static void Main(string[] args)
 ### Clicking on an element
 You can click on the x and y coordinates
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -141,7 +129,7 @@ static void Main(string[] args)
 
 Or on the element(need xpath)
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -153,7 +141,7 @@ static void Main(string[] args)
 
 The Click() method throw ElementNotFoundException if the element is not found
 
-```c#
+```cs
 try
 {
     el.Click();
@@ -168,7 +156,7 @@ catch (Exception ex)
 ### Swipe
 You can swipe from one element to another
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -181,7 +169,7 @@ static void Main(string[] args)
 
 Or swipe by coordinates
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -193,7 +181,7 @@ static void Main(string[] args)
 
 The Swipe() method throw ElementNotFoundException if the element is not found
 
-```c#
+```cs
 try
 {
     client.Swipe(device, 0x2232323, 0x954,0x9128,0x11111, 200);
@@ -212,7 +200,7 @@ You can send any text except Cyrillic (Russian isn't supported by adb)
 
 The text field should be in focus
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -223,7 +211,7 @@ static void Main(string[] args)
 
 You can also send text to the element (clicks on the element and sends the text)
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -234,7 +222,7 @@ static void Main(string[] args)
 
 The SendText() method throw InvalidTextException if text is incorrect
 
-```c#
+```cs
 try
 {
     client.SendText(device, null);
@@ -253,7 +241,7 @@ You can clear text input
 The text field should be in focus
 
 **Recommended**
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -263,7 +251,7 @@ static void Main(string[] args)
 ```
 
 **It may work unstable**
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -276,7 +264,7 @@ static void Main(string[] args)
 
 You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent#constants
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -287,7 +275,7 @@ static void Main(string[] args)
 
 The SendKeyEvent method throw InvalidKeyEventException if keyevent is incorrect
 
-```c#
+```cs
 try
 {
     client.SendKeyEvent(device, null);
@@ -300,7 +288,7 @@ catch (Exception ex)
 
 ### BACK and HOME buttons
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -315,7 +303,7 @@ static void Main(string[] args)
 **Some commands require Root**
 ### Install and Uninstall applications
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -326,9 +314,9 @@ static void Main(string[] args)
 }
 ```
 
-Or you can use AdvancedAdbClient.Install
+Or you can use AdbClient.Install
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -338,7 +326,7 @@ static void Main(string[] args)
 ```
 ### Install multiple applications
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -349,9 +337,9 @@ static void Main(string[] args)
 }
 ```
 
-Or you can use AdvancedAdbClient.Install
+Or you can use AdbClient.Install
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -362,7 +350,7 @@ static void Main(string[] args)
 ```
 ### Start and stop applications
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -374,7 +362,7 @@ static void Main(string[] args)
 
 ### Getting a screenshot
 
-```c#
+```cs
 static async void Main(string[] args)
 {
     ...
@@ -387,7 +375,7 @@ static async void Main(string[] args)
 
 ### Getting screen xml hierarchy
 
-```c#
+```cs
 static void Main(string[] args)
 {
     ...
@@ -398,7 +386,7 @@ static void Main(string[] args)
 
 ### Send or receive files
 
-```c#
+```cs
 void DownloadFile()
 {
     using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
@@ -424,7 +412,7 @@ void UploadFile()
 
 ### Run shell commands
 
-```c#
+```cs
 static async void Main(string[] args)
 {
     ...
@@ -439,18 +427,18 @@ static async void Main(string[] args)
 ### Encoding
 Default encoding is UTF8, if you want to change it, use
 
-```c#
-AdvancedAdbClient.SetEncoding(Encoding.ASCII);
+```cs
+AdbClient.SetEncoding(Encoding.ASCII);
 ```
+
+## Contributors
+[![Contributors](https://contrib.rocks/image?repo=yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/graphs/contributors)
 
 ## Consulting and Support
 Please open an **issue** on if you have suggestions or problems.
 
 ## History
-AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the 
-[ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).
+AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).
 
 Credits:
 https://github.com/camalot, https://github.com/quamotion
-
-

@@ -17,6 +17,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
+#if NET
+using System.Runtime.Versioning;
+#endif
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -371,6 +375,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
         public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
         {
             EnsureDevice(device);
