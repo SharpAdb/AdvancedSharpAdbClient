@@ -209,7 +209,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
-        private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken)
+        private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
 

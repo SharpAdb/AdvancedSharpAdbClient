@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient
         public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             if (stream == null)
             {
@@ -225,7 +225,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             if (remoteFilepath == null)
             {
