@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public EndPoint EndPoint { get; private set; }
 
-        public void Connect(DnsEndPoint endpoint) => throw new NotImplementedException();
+        public Task<string> Connect(DnsEndPoint endpoint, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) => throw new NotImplementedException();
 
@@ -28,8 +28,12 @@ namespace AdvancedSharpAdbClient.Tests
 
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind) => throw new NotImplementedException();
 
-
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken)
+        {
+            return ExecuteRemoteCommandAsync(command, device, receiver, Encoding.Default, cancellationToken);
+        }
+
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)
         {
             ReceivedCommands.Add(command);
 
@@ -87,13 +91,11 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Unroot(DeviceData device) => throw new NotImplementedException();
 
-        public void Disconnect(DnsEndPoint endpoint) => throw new NotImplementedException();
+        public string Disconnect(DnsEndPoint endpoint) => throw new NotImplementedException();
 
         public void Install(DeviceData device, Stream apk, params string[] arguments) => throw new NotImplementedException();
 
         public List<string> GetFeatureSet(DeviceData device) => throw new NotImplementedException();
-
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public string InstallCreated(DeviceData device, string packageName = null, params string[] arguments) => throw new NotImplementedException();
 

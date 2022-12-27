@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken)
+        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             return ReadAsync(data, data.Length, cancellationToken);
         }
@@ -236,7 +236,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken)
+        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
@@ -306,7 +306,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken)
+        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
             if (length < 0)
             {

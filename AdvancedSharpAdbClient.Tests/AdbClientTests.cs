@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -487,37 +488,38 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ConnectIPAddressNullTest()
+        public async Task ConnectIPAddressNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
         }
 
         [Fact]
-        public void ConnectDnsEndpointNullTest()
+        public async Task ConnectDnsEndpointNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.Connect(null));
         }
 
         [Fact]
-        public void ConnectIPEndpointNullTest()
+        public async Task ConnectIPEndpointNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
         }
 
         [Fact]
-        public void ConnectHostEndpointNullTest()
+        public async Task ConnectHostEndpointNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((string)null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.Connect((string)null));
         }
 
         [Fact]
         public void DisconnectTest()
         {
             string[] requests = new string[] { "host:disconnect:localhost:5555" };
+            string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
 
             RunTest(
                 OkResponse,
-                NoResponseMessages,
+                responseMessages,
                 requests,
                 () => TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
         }

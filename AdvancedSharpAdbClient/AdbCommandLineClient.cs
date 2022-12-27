@@ -104,13 +104,8 @@ namespace AdvancedSharpAdbClient
             RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
-            Version version = GetVersionFromOutput(standardOutput);
-
-            if (version == null)
-            {
-                throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-            }
-
+            Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
+            
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");

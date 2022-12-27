@@ -7,6 +7,7 @@ using System;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -66,7 +67,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                client.ExecuteRemoteCommandAsync(command, device, rcvr, CancellationToken.None).Wait();
+                client.ExecuteRemoteCommandAsync(command, device, rcvr, encoding, CancellationToken.None).Wait();
             }
             catch (AggregateException ex)
             {
@@ -96,14 +97,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
-        public static void Connect(this IAdbClient client, IPAddress address)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        public static Task<string> Connect(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default)
         {
             if (address == null)
             {
                 throw new ArgumentNullException(nameof(address));
             }
 
-            client.Connect(new IPEndPoint(address, AdbClient.DefaultPort));
+            return client.Connect(new IPEndPoint(address, AdbClient.DefaultPort), cancellationToken);
         }
 
         /// <summary>
@@ -111,14 +114,23 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
-        public static void Connect(this IAdbClient client, string host)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        public static Task<string> Connect(this IAdbClient client, string host, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentNullException(nameof(host));
             }
 
-            client.Connect(new DnsEndPoint(host, AdbClient.DefaultPort));
+            string[] values = host.Split(':');
+
+            if (values.Length <= 0)
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            return client.Connect(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), cancellationToken);
         }
 
         /// <summary>
@@ -126,14 +138,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
-        public static void Connect(this IAdbClient client, IPEndPoint endpoint)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        public static Task<string> Connect(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default)
         {
             if (endpoint == null)
             {
                 throw new ArgumentNullException(nameof(endpoint));
             }
 
-            client.Connect(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
+            return client.Connect(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), cancellationToken);
         }
     }
 }

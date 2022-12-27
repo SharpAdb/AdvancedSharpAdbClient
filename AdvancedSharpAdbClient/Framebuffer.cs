@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task RefreshAsync(CancellationToken cancellationToken)
+        public async Task RefreshAsync(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
 

@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
             return socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
         }

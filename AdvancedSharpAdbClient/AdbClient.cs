@@ -166,7 +166,7 @@ namespace AdvancedSharpAdbClient
 
                 string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                return data.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
+                return data.Select(DeviceData.CreateFromAdbData).ToList();
             }
         }
 
@@ -305,19 +305,19 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default)
         {
             return ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
             using (IAdbSocket socket = adbSocketFactory(EndPoint))
             {
-                cancellationToken.Register(() => socket.Dispose());
+                cancellationToken.Register(socket.Dispose);
 
                 socket.SetDevice(device);
                 socket.SendAdbRequest($"shell:{command}");
@@ -378,7 +378,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken)
+        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -392,7 +392,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
+        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             if (messageSink == null)
             {
@@ -464,7 +464,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Connect(DnsEndPoint endpoint)
+        public async Task<string> Connect(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
         {
             if (endpoint == null)
             {
@@ -475,6 +475,8 @@ namespace AdvancedSharpAdbClient
             {
                 socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
                 AdbResponse response = socket.ReadAdbResponse();
+                string results = await socket.ReadStringAsync(cancellationToken);
+                return results;
             }
         }
 
@@ -1039,7 +1041,7 @@ namespace AdvancedSharpAdbClient
         public static void SetEncoding(Encoding encoding) => Encoding = encoding;
 
         /// <inheritdoc/>
-        public void Disconnect(DnsEndPoint endpoint)
+        public string Disconnect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
             {
@@ -1050,6 +1052,8 @@ namespace AdvancedSharpAdbClient
             {
                 socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
                 AdbResponse response = socket.ReadAdbResponse();
+                string results = socket.ReadString();
+                return results;
             }
         }
 

@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
         /// <returns>A new <see cref="LogEntry"/> object.</returns>
-        public async Task<LogEntry> ReadEntry(CancellationToken cancellationToken)
+        public async Task<LogEntry> ReadEntry(CancellationToken cancellationToken = default)
         {
             LogEntry value = new LogEntry();
 
@@ -231,28 +231,28 @@ namespace AdvancedSharpAdbClient.Logs
             }
         }
 
-        private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken)
+        private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
             byte[] data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
-        private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken)
+        private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
             byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
-        private async Task<int?> ReadInt32Async(CancellationToken cancellationToken)
+        private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
             byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
-        private async Task<byte[]> ReadBytesSafeAsync(int count, CancellationToken cancellationToken)
+        private async Task<byte[]> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;
             int read = 0;

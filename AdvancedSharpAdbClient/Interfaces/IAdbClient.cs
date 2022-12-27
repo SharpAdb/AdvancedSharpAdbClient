@@ -320,13 +320,16 @@ namespace AdvancedSharpAdbClient
         /// Connect to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
-        void Connect(DnsEndPoint endpoint);
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        Task<string> Connect(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
         /// Disconnects a remote device from this local ADB server.
         /// </summary>
         /// <param name="endpoint">The endpoint of the remote device to disconnect.</param>
-        void Disconnect(DnsEndPoint endpoint);
+        /// <returns>The results from adb.</returns>
+        string Disconnect(DnsEndPoint endpoint);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with root privileges.
