@@ -808,8 +808,8 @@ namespace AdvancedSharpAdbClient
                 AdbResponse response = socket.ReadAdbResponse();
                 using (StreamReader reader = new StreamReader(socket.GetShellStream(), Encoding))
                 {
-                    string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "");
-                    if (xmlString != "" && !xmlString.Contains("ERROR"))
+                    string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
+                    if (xmlString != "" && !xmlString.StartsWith("ERROR"))
                     {
                         doc.LoadXml(xmlString);
                         return doc;
