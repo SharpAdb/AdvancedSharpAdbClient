@@ -59,9 +59,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </summary>
-        /// <returns>
-        /// A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
-        /// </returns>
+        /// <returns>A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.</returns>
         public override string ToString()
         {
             return output.ToString();
@@ -70,9 +68,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an error message if the console output line contains an error message.
         /// </summary>
-        /// <param name="line">
-        /// The line to inspect.
-        /// </param>
+        /// <param name="line">The line to inspect.</param>
         public void ThrowOnError(string line)
         {
             if (!ParsesErrors)
@@ -81,6 +77,14 @@ namespace AdvancedSharpAdbClient
                 {
 #if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
+#endif
+                    throw new FileNotFoundException($"The remote execution returned: '{line}'");
+                }
+
+                if (line.EndsWith("Not a directory"))
+                {
+#if HAS_LOGGER
+                    logger.LogWarning($"The remote execution returned: {line}");
 #endif
                     throw new FileNotFoundException($"The remote execution returned: '{line}'");
                 }

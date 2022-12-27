@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
 
         public static DateTimeOffset FromUnixTimeSeconds(long seconds) =>
 #if NET35 || NET40 || NET452
-            new DateTimeOffset(seconds.ToDateTime());
+            seconds.ToDateTime();
 #else
             DateTimeOffset.FromUnixTimeSeconds(seconds);
 #endif

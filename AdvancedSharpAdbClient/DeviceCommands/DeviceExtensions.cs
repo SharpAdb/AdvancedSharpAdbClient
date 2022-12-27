@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Requests the version information from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
-        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="device">The device on which to get the package version.</param>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {

@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -30,6 +31,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         };
 
         /// <summary>
+        /// Returns the path of the current user's temporary folder.
+        /// </summary>
+        /// <returns>The path to the temporary folder, ending with a <see cref="DirectorySeparatorChar"/>.</returns>
+        public static string GetTempPath() => "/data/local/tmp/";
+
+        internal static bool IsDirectorySeparator(char c) => c == DirectorySeparatorChar;
+
+        /// <summary>
         /// Combine the specified paths to form one path
         /// </summary>
         /// <param name="paths">The paths.</param>
@@ -41,8 +50,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 throw new ArgumentNullException(nameof(paths));
             }
 
-            int capacity = 0;
-            int num2 = 0;
+            int maxSize = 0;
+            int firstComponent = 0;
+
+            // We have two passes, the first calculates how large a buffer to allocate and does some precondition
+            // checks on the paths passed in.  The second actually does the combination.
+
             for (int i = 0; i < paths.Length; i++)
             {
                 if (paths[i] == null)
@@ -50,46 +63,50 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     throw new ArgumentNullException(nameof(paths));
                 }
 
-                if (paths[i].Length != 0)
+                if (paths[i].Length == 0)
                 {
-                    CheckInvalidPathChars(paths[i]);
-                    if (IsPathRooted(paths[i]))
-                    {
-                        num2 = i;
-                        capacity = paths[i].Length;
-                    }
-                    else
-                    {
-                        capacity += paths[i].Length;
-                    }
+                    continue;
+                }
 
-                    char ch = paths[i][paths[i].Length - 1];
-                    if (ch != DirectorySeparatorChar)
-                    {
-                        capacity++;
-                    }
+                CheckInvalidPathChars(paths[i]);
+                if (IsPathRooted(paths[i]))
+                {
+                    firstComponent = i;
+                    maxSize = paths[i].Length;
+                }
+                else
+                {
+                    maxSize += paths[i].Length;
+                }
+
+                char ch = paths[i][paths[i].Length - 1];
+                if (!IsDirectorySeparator(ch))
+                {
+                    maxSize++;
                 }
             }
 
-            StringBuilder builder = new StringBuilder(capacity);
-            for (int j = num2; j < paths.Length; j++)
+            StringBuilder builder = new StringBuilder(maxSize);
+            for (int i = firstComponent; i < paths.Length; i++)
             {
-                if (paths[j].Length != 0)
+                if (paths[i].Length == 0)
                 {
-                    if (builder.Length == 0)
-                    {
-                        builder.Append(FixupPath(paths[j]));
-                    }
-                    else
-                    {
-                        char ch2 = builder[builder.Length - 1];
-                        if (ch2 != DirectorySeparatorChar)
-                        {
-                            builder.Append(DirectorySeparatorChar);
-                        }
+                    continue;
+                }
 
-                        builder.Append(paths[j]);
+                if (builder.Length == 0)
+                {
+                    builder.Append(FixupPath(paths[i]));
+                }
+                else
+                {
+                    char ch = builder[builder.Length - 1];
+                    if (!IsDirectorySeparator(ch))
+                    {
+                        builder.Append(DirectorySeparatorChar);
                     }
+
+                    builder.Append(paths[i]);
                 }
             }
 
@@ -247,6 +264,50 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
 
             return sb;
+        }
+
+        /// <summary>
+        /// Returns the absolute path for the specified path string.
+        /// </summary>
+        /// <param name="path">The file or directory for which to obtain absolute path information.</param>
+        /// <returns>The fully qualified location of <paramref name="path"/>, such as "/MyFile.txt".</returns>
+        // Expands the given path to a fully qualified path.
+        public static string GetFullPath(string path)
+        {
+            if (path != null)
+            {
+                CheckInvalidPathChars(path);
+                
+                // Expand with current directory if necessary
+                if (!IsPathRooted(path))
+                {
+                    path = Combine("/", path);
+                }
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Returns an absolute path from a relative path and a fully qualified base path.
+        /// </summary>
+        /// <param name="path">A relative path to concatenate to <paramref name="basePath"/>.</param>
+        /// <param name="basePath">The beginning of a fully qualified path.</param>
+        /// <returns>The absolute path.</returns>
+        public static string GetFullPath(string path, string basePath)
+        {
+            if (path != null)
+            {
+                CheckInvalidPathChars(path);
+
+                // Expand with current directory if necessary
+                if (!IsPathRooted(path))
+                {
+                    path = GetFullPath(Combine(basePath, path));
+                }
+            }
+
+            return path;
         }
     }
 }

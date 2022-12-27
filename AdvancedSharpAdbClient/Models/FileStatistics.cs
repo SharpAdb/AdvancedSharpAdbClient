@@ -17,9 +17,9 @@ namespace AdvancedSharpAdbClient
         public string Path { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="UnixFileMode"/> attributes of the file.
+        /// Gets or sets the <see cref="UnixFileType"/> attributes of the file.
         /// </summary>
-        public UnixFileMode FileMode { get; set; }
+        public UnixFileType FileMode { get; set; }
 
         /// <summary>
         /// Gets or sets the total file size, in bytes.

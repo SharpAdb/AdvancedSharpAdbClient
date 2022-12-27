@@ -58,9 +58,7 @@
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
-                         or '$(TargetFramework)' == 'netcoreapp3.1'
-                         or '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'&#xD;&#xA;                         or '$(TargetFramework)' == 'netcoreapp3.1'&#xD;&#xA;                         or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
@@ -73,22 +71,15 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
-                     or '$(TargetFramework)' == 'net4.7.2'
-                     or '$(TargetFramework)' == 'net4.8.1'
-                     or '$(TargetFramework)' == 'net6.0'
-                     or '$(TargetFramework)' == 'netcoreapp3.1'
-                     or '$(TargetFramework)' == 'netstandard2.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'&#xD;&#xA;                     or '$(TargetFramework)' == 'net4.7.2'&#xD;&#xA;                     or '$(TargetFramework)' == 'net4.8.1'&#xD;&#xA;                     or '$(TargetFramework)' == 'net6.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'netcoreapp3.1'&#xD;&#xA;                     or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
-                        and '$(TargetFramework)' != 'net4.0-client'">
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'&#xD;&#xA;                        and '$(TargetFramework)' != 'net4.0-client'">
     <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
   </PropertyGroup>
  
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'
-                         or '$(TargetFramework)' == 'netstandard1.3'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'&#xD;&#xA;                         or '$(TargetFramework)' == 'netstandard1.3'">
     <DefineConstants>$(DefineConstants);HAS_OLDLOGGER</DefineConstants>
   </PropertyGroup>
  
