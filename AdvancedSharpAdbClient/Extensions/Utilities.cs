@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
@@ -39,21 +40,29 @@ namespace AdvancedSharpAdbClient
 #endif
             .Delay(dueTime);
 
-        public static Task Run(Func<Task> function) =>
+        public static Task Run(Action function, CancellationToken cancellationToken = default) =>
 #if NET35 || NET40
             TaskEx
 #else
             Task
 #endif
-            .Run(function);
+            .Run(function, cancellationToken);
 
-        public static Task<TResult> Run<TResult>(Func<TResult> function) =>
+        public static Task Run(Func<Task> function, CancellationToken cancellationToken = default) =>
 #if NET35 || NET40
             TaskEx
 #else
             Task
 #endif
-            .Run(function);
+            .Run(function, cancellationToken);
+
+        public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken = default) =>
+#if NET35 || NET40
+            TaskEx
+#else
+            Task
+#endif
+            .Run(function, cancellationToken);
 
         public static DateTimeOffset FromUnixTimeSeconds(long seconds) =>
 #if NET35 || NET40 || NET452

@@ -337,7 +337,7 @@ namespace AdvancedSharpAdbClient
 #if !NET35
                                 await reader.ReadLineAsync().ConfigureAwait(false);
 #else
-                                await Utilities.Run(reader.ReadLine).ConfigureAwait(false);
+                                await Utilities.Run(reader.ReadLine, cancellationToken).ConfigureAwait(false);
 #endif
 
                             if (line == null)

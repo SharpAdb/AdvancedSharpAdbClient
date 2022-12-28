@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void CopyFile(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath, bool overwrite)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"cp {(overwrite ? "-f " : "")}{sourceFullPath} {destFullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"cp {(overwrite ? "-f " : "")}\"{sourceFullPath}\" \"{destFullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -65,13 +65,13 @@ namespace AdvancedSharpAdbClient.FileManager
         private static void LinkOrCopyFile(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"ln {sourceFullPath} {destFullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"ln \"{sourceFullPath}\" \"{destFullPath}\"", device, receiver);
             if (receiver.ToString().Trim().Length <= 0) { return; }
             CopyFile(client, device, sourceFullPath, destFullPath, overwrite: false);
         }
 
 #nullable enable
-        public static void ReplaceFile(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath, string? destBackupFullPath, bool ignoreMetadataErrors /* unused */)
+        public static void ReplaceFile(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath, string? destBackupFullPath)
 #nullable disable
         {
             if (destBackupFullPath != null)
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.FileManager
                 LinkOrCopyFile(client, device, sourceFullPath, destBackupFullPath);
             }
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"mv {sourceFullPath} {destFullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"mv -f \"{sourceFullPath}\" \"{destFullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -95,7 +95,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void MoveFile(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath, bool overwrite)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"mv {(overwrite ? "-f" : "-n")} {sourceFullPath} {destFullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"mv {(overwrite ? "-f" : "-n")} \"{sourceFullPath}\" \"{destFullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void DeleteFile(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"rm {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"rm \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0 && !results.EndsWith("No such file or directory"))
             {
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void CreateDirectory(IAdbClient client, DeviceData device, string fullPath, UnixFileMode unixCreateMode)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"mkdir -m {Convert.ToString((int)unixCreateMode, 8)} {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"mkdir -m {Convert.ToString((int)unixCreateMode, 8)} \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient.FileManager
         private static void CreateParentsAndDirectory(IAdbClient client, DeviceData device, string fullPath, UnixFileMode unixCreateMode)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"mkdir -p -m {Convert.ToString((int)unixCreateMode, 8)} {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"mkdir -p -m {Convert.ToString((int)unixCreateMode, 8)} \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -142,7 +142,7 @@ namespace AdvancedSharpAdbClient.FileManager
         internal static void MoveDirectory(IAdbClient client, DeviceData device, string sourceFullPath, string destFullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"mv -a -f {sourceFullPath} {destFullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"mv -a -f \"{sourceFullPath}\" \"{destFullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -153,7 +153,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void RemoveDirectory(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"rm -r {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"rm -r \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0 && !results.EndsWith("No such file or directory"))
             {
@@ -172,7 +172,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static UnixFileMode GetUnixFileMode(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"stat -c '%a' {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"stat -c '%a' \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results == "?")
             {
@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static void SetUnixFileMode(IAdbClient client, DeviceData device, string fullPath, UnixFileMode mode)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"chmod {Convert.ToString((int)mode, 8)} {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"chmod {Convert.ToString((int)mode, 8)} \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results.Length > 0)
             {
@@ -202,7 +202,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static DateTimeOffset GetCreationTime(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"stat -c '%W' {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"stat -c '%W' \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results == "?")
             {
@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static DateTimeOffset GetLastAccessTime(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"stat -c '%X' {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"stat -c '%X' \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results == "?")
             {
@@ -240,7 +240,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static DateTimeOffset GetLastWriteTime(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"stat -c '%Y' {fullPath}", device, receiver);
+            client.ExecuteRemoteCommand($"stat -c '%Y' \"{fullPath}\"", device, receiver);
             string results = receiver.ToString().Trim();
             if (results == "?")
             {
@@ -259,7 +259,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static bool DirectoryExists(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"[ -d {fullPath} ] && echo 1 || echo 0", device, receiver);
+            client.ExecuteRemoteCommand($"[ -d \"{fullPath}\" ] && echo 1 || echo 0", device, receiver);
             string results = receiver.ToString().Trim();
             return results == "1";
         }
@@ -267,7 +267,7 @@ namespace AdvancedSharpAdbClient.FileManager
         public static bool FileExists(IAdbClient client, DeviceData device, string fullPath)
         {
             ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand($"[ -f {fullPath} ] && echo 1 || echo 0", device, receiver);
+            client.ExecuteRemoteCommand($"[ -f \"{fullPath}\" ] && echo 1 || echo 0", device, receiver);
             string results = receiver.ToString().Trim();
             return results == "1";
         }

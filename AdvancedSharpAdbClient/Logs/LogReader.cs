@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
 #else
-                await Utilities.Run(() => stream.Read(data, totalRead, count - totalRead)).ConfigureAwait(false)
+                await Utilities.Run(() => stream.Read(data, totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
 #endif
                 ) > 0)
             {
