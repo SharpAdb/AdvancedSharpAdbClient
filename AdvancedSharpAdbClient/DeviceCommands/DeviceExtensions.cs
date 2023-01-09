@@ -3,11 +3,13 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Receivers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -41,6 +43,76 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             using (ISyncService service = Factories.SyncServiceFactory(client, device))
             {
                 return service.Stat(path);
+            }
+        }
+
+        /// <summary>
+        /// Lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <returns></returns>
+        public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device,
+            string remotePath)
+        {
+            using (ISyncService service = Factories.SyncServiceFactory(client, device))
+            {
+                return service.GetDirectoryListing(remotePath);
+            }
+        }
+
+        /// <summary>
+        /// Pulls (downloads) a file from the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to pull the file.</param>
+        /// <param name="remotePath">The path, on the device, of the file to pull.</param>
+        /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
+        /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        public static void Pull(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream,
+            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
+            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+        {
+            using (ISyncService service = Factories.SyncServiceFactory(client, device))
+            {
+                if (syncProgressEventHandler != null)
+                {
+                    service.SyncProgressChanged += syncProgressEventHandler;
+                }
+
+                service.Pull(remotePath, stream, progress, cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// Pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        public static void Push(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
+            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
+            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+        {
+            using (ISyncService service = Factories.SyncServiceFactory(client, device))
+            {
+                if (syncProgressEventHandler != null)
+                {
+                    service.SyncProgressChanged += syncProgressEventHandler;
+                }
+
+                service.Push(stream, remotePath, permissions, timestamp, progress, cancellationToken);
             }
         }
 
