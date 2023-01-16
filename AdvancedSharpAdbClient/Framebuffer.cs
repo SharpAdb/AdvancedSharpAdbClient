@@ -111,11 +111,6 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
-            if (Data != null)
-            {
-                ArrayPool<byte>.Shared.Return(Data, clearArray: false);
-            }
-
             headerData = null;
             headerInitialized = false;
             disposed = true;
