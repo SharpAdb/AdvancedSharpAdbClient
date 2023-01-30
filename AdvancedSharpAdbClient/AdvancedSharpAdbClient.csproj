@@ -19,7 +19,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>2.5.3</VersionPrefix>
+    <VersionPrefix>2.5.4</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
@@ -53,25 +53,22 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'">
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
-                         or '$(TargetFramework)' == 'netcoreapp3.1'
-                         or '$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Drawing-dotnet-core" Version="1.2.3" />
-    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+                     or '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
@@ -82,6 +79,12 @@
                      or '$(TargetFramework)' == 'netcoreapp3.1'
                      or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+                         or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
