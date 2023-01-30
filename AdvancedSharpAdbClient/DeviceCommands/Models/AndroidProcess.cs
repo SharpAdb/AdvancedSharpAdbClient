@@ -5,7 +5,6 @@
 //-----------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -113,39 +112,39 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // additional fields exist in newer versions of linux.
             string state = parts[0];
             int ppid = ParseInt(parts[1]);
-            int pgrp = ParseInt(parts[2]);
-            int session = ParseInt(parts[3]);
-            int tty_nr = ParseInt(parts[4]);
-            int tpgid = ParseInt(parts[5]);
-            uint flags = ParseUInt(parts[6]);
-            ulong minflt = ParseULong(parts[7]);
-            ulong cminflt = ParseULong(parts[8]);
-            ulong majflt = ParseULong(parts[9]);
-            ulong cmajflt = ParseULong(parts[10]);
-            ulong utime = ParseULong(parts[11]);
-            ulong stime = ParseULong(parts[12]);
-            long cutime = ParseLong(parts[13]);
-            long cstime = ParseLong(parts[14]);
-            long priority = ParseLong(parts[15]);
-            long nice = ParseLong(parts[16]);
-            long num_threads = ParseLong(parts[17]);
-            long itrealvalue = ParseLong(parts[18]);
-            ulong starttime = ParseULong(parts[19]);
+            //int pgrp = ParseInt(parts[2]);
+            //int session = ParseInt(parts[3]);
+            //int tty_nr = ParseInt(parts[4]);
+            //int tpgid = ParseInt(parts[5]);
+            //uint flags = ParseUInt(parts[6]);
+            //ulong minflt = ParseULong(parts[7]);
+            //ulong cminflt = ParseULong(parts[8]);
+            //ulong majflt = ParseULong(parts[9]);
+            //ulong cmajflt = ParseULong(parts[10]);
+            //ulong utime = ParseULong(parts[11]);
+            //ulong stime = ParseULong(parts[12]);
+            //long cutime = ParseLong(parts[13]);
+            //long cstime = ParseLong(parts[14]);
+            //long priority = ParseLong(parts[15]);
+            //long nice = ParseLong(parts[16]);
+            //long num_threads = ParseLong(parts[17]);
+            //long itrealvalue = ParseLong(parts[18]);
+            //ulong starttime = ParseULong(parts[19]);
             ulong vsize = ParseULong(parts[20]);
             int rss = int.Parse(parts[21]);
-            ulong rsslim = ParseULong(parts[22]);
-            ulong startcode = ParseULong(parts[23]);
-            ulong endcode = ParseULong(parts[24]);
-            ulong startstack = ParseULong(parts[25]);
-            ulong kstkesp = ParseULong(parts[26]);
-            ulong kstkeip = ParseULong(parts[27]);
-            ulong signal = ParseULong(parts[28]);
-            ulong blocked = ParseULong(parts[29]);
-            ulong sigignore = ParseULong(parts[30]);
-            ulong sigcatch = ParseULong(parts[31]);
+            //ulong rsslim = ParseULong(parts[22]);
+            //ulong startcode = ParseULong(parts[23]);
+            //ulong endcode = ParseULong(parts[24]);
+            //ulong startstack = ParseULong(parts[25]);
+            //ulong kstkesp = ParseULong(parts[26]);
+            //ulong kstkeip = ParseULong(parts[27]);
+            //ulong signal = ParseULong(parts[28]);
+            //ulong blocked = ParseULong(parts[29]);
+            //ulong sigignore = ParseULong(parts[30]);
+            //ulong sigcatch = ParseULong(parts[31]);
             ulong wchan = ParseULong(parts[32]);
-            ulong nswap = ParseULong(parts[33]);
-            ulong cnswap = ParseULong(parts[34]);
+            //ulong nswap = ParseULong(parts[33]);
+            //ulong cnswap = ParseULong(parts[34]);
 
             return new AndroidProcess()
             {
@@ -164,50 +163,35 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// in the format of "<see cref="Name"/> (<see cref="ProcessId"/>)".
         /// </summary>
         /// <returns>A <see cref="string"/> that represents this <see cref="AndroidProcess"/>.</returns>
-        public override string ToString()
-        {
-            return $"{Name} ({ProcessId})";
-        }
+        public override string ToString() => $"{Name} ({ProcessId})";
 
-        /// <summary>
-        /// Gets the index of the first value of a set of values that is part of a list.
-        /// </summary>
-        /// <param name="list">The list in which to search for the value.</param>
-        /// <param name="values">The values to search for.</param>
-        /// <returns>The index of the first element in <paramref name="values"/> that is present in the list, or <c>-1</c>.</returns>
-        private static int IndexOf(List<string> list, params string[] values)
-        {
-            foreach (string value in values)
-            {
-                int index = list.IndexOf(value);
+        ///// <summary>
+        ///// Gets the index of the first value of a set of values that is part of a list.
+        ///// </summary>
+        ///// <param name="list">The list in which to search for the value.</param>
+        ///// <param name="values">The values to search for.</param>
+        ///// <returns>The index of the first element in <paramref name="values"/> that is present in the list, or <c>-1</c>.</returns>
+        //private static int IndexOf(List<string> list, params string[] values)
+        //{
+        //    foreach (string value in values)
+        //    {
+        //        int index = list.IndexOf(value);
 
-                if (index != -1)
-                {
-                    return index;
-                }
-            }
+        //        if (index != -1)
+        //        {
+        //            return index;
+        //        }
+        //    }
 
-            return -1;
-        }
+        //    return -1;
+        //}
 
-        private static int ParseInt(string value)
-        {
-            return value == "-" ? 0 : int.Parse(value);
-        }
+        private static int ParseInt(string value) => value == "-" ? 0 : int.Parse(value);
 
-        private static uint ParseUInt(string value)
-        {
-            return value == "-" ? 0 : uint.Parse(value);
-        }
+        //private static uint ParseUInt(string value) => value == "-" ? 0 : uint.Parse(value);
 
-        private static long ParseLong(string value)
-        {
-            return value == "-" ? 0 : long.Parse(value);
-        }
+        //private static long ParseLong(string value) => value == "-" ? 0 : long.Parse(value);
 
-        private static ulong ParseULong(string value)
-        {
-            return value == "-" ? 0 : ulong.Parse(value);
-        }
+        private static ulong ParseULong(string value) => value == "-" ? 0 : ulong.Parse(value);
     }
 }

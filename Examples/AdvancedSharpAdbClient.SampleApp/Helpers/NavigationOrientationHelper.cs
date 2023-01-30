@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
             else
             {
                 NavigationRootPage.Current.NavigationView.PaneDisplayMode = Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode.Top;
-                UISettings userSettings = new UISettings();
+                UISettings userSettings = new();
                 titleBar.ButtonBackgroundColor = userSettings.GetColorValue(UIColorType.Accent);
                 titleBar.ButtonInactiveBackgroundColor = userSettings.GetColorValue(UIColorType.Accent);
             }

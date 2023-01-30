@@ -17,11 +17,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public bool ServerStarted { get; private set; }
 
-        public override bool IsValidAdbFile(string adbPath)
-        {
+        public override bool IsValidAdbFile(string adbPath) =>
             // No validation done in the dummy adb client.
-            return true;
-        }
+            true;
 
         protected override int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {

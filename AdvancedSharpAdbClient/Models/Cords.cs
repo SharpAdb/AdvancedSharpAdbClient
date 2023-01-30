@@ -12,18 +12,18 @@
         /// <param name="cy"></param>
         public Cords(int cx, int cy)
         {
-            x = cx;
-            y = cy;
+            X = cx;
+            Y = cy;
         }
 
         /// <summary>
         /// Gets or sets the horizontal "X" coordinate
         /// </summary>
-        public int x { get; set; }
+        public int X { get; set; }
 
         /// <summary>
         /// Gets or sets the vertical "Y" coordinate
         /// </summary>
-        public int y { get; set; }
+        public int Y { get; set; }
     }
 }

@@ -44,7 +44,5 @@ namespace AdvancedSharpAdbClient
     /// </code>
     /// </example>
     [CompilerGeneratedAttribute]
-    internal class NamespaceDoc
-    {
-    }
+    internal class NamespaceDoc { }
 }

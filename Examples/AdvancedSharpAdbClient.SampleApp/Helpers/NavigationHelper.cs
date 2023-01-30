@@ -132,7 +132,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         public void OnNavigatedFrom(NavigationEventArgs e)
         {
             Dictionary<string, object> frameState = SuspensionManager.SessionStateForFrame(this.Frame);
-            Dictionary<string, object> pageState = new Dictionary<string, object>();
+            Dictionary<string, object> pageState = new();
             this.SaveState?.Invoke(this, new SaveStateEventArgs(pageState));
             frameState[_pageKey] = pageState;
         }
@@ -162,7 +162,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
     {
         private Frame Frame { get; set; }
 
-        private SystemNavigationManager systemNavigationManager;
+        private readonly SystemNavigationManager systemNavigationManager;
         private Microsoft.UI.Xaml.Controls.NavigationView CurrentNavView { get; set; }
 
         /// <summary>

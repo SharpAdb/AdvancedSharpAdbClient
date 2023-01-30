@@ -51,47 +51,39 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ParseNullTest()
-        {
+        public void ParseNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => ForwardSpec.Parse(null));
-        }
 
         [Fact]
-        public void ParseInvalidTest()
-        {
+        public void ParseInvalidTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("abc"));
-        }
 
         [Fact]
-        public void ParseInvalidTcpPortTest()
-        {
+        public void ParseInvalidTcpPortTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("tcp:xyz"));
-        }
 
         [Fact]
-        public void ParseInvalidProcessIdTest()
-        {
+        public void ParseInvalidProcessIdTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("jdwp:abc"));
-        }
 
         [Fact]
-        public void ParseInvalidProtocolTest()
-        {
+        public void ParseInvalidProtocolTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("xyz:1234"));
-        }
 
         [Fact]
         public void ToStringInvalidProtocol()
         {
-            ForwardSpec spec = new ForwardSpec();
-            spec.Protocol = (ForwardProtocol)99;
+            ForwardSpec spec = new()
+            {
+                Protocol = (ForwardProtocol)99
+            };
             Assert.Equal(string.Empty, spec.ToString());
         }
 
         [Fact]
         public void EqualsTest()
         {
-            ForwardSpec dummy = new ForwardSpec()
+            ForwardSpec dummy = new()
             {
                 Protocol = (ForwardProtocol)99
             };

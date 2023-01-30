@@ -6,29 +6,21 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
     public class UnknownOptionExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor()
-        {
+        public void TestEmptyConstructor() =>
             ExceptionTester<UnknownOptionException>.TestEmptyConstructor(() => new UnknownOptionException());
-        }
 
         [Fact]
-        public void TestMessageConstructor()
-        {
+        public void TestMessageConstructor() =>
             ExceptionTester<UnknownOptionException>.TestMessageConstructor((message) => new UnknownOptionException(message));
-        }
 
         [Fact]
-        public void TestMessageAndInnerConstructor()
-        {
+        public void TestMessageAndInnerConstructor() =>
             ExceptionTester<UnknownOptionException>.TestMessageAndInnerConstructor((message, inner) => new UnknownOptionException(message, inner));
-        }
 
 #if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor()
-        {
+        public void TestSerializationConstructor() =>
             ExceptionTester<UnknownOptionException>.TestSerializationConstructor((info, context) => new UnknownOptionException(info, context));
-        }
 #endif
     }
 }

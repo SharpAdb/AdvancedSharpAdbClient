@@ -31,13 +31,13 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
 
         public static void Copy(ControlInfoDataItem item)
         {
-            Uri uri = new Uri($"winui2gallery://item/{item.UniqueId}", UriKind.Absolute);
+            Uri uri = new($"winui2gallery://item/{item.UniqueId}", UriKind.Absolute);
             ProtocolActivationClipboardHelper.Copy(uri, $"{Package.Current.DisplayName} - {item.Title} Sample");
         }
 
         public static void Copy(ControlInfoDataGroup group)
         {
-            Uri uri = new Uri($"winui2gallery://category/{group.UniqueId}", UriKind.Absolute);
+            Uri uri = new($"winui2gallery://category/{group.UniqueId}", UriKind.Absolute);
             ProtocolActivationClipboardHelper.Copy(uri, $"{Package.Current.DisplayName} - {group.Title} Samples");
         }
 
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
         {
             string htmlFormat = HtmlFormatHelper.CreateHtmlFormat($"<a href='{uri}'>{displayName}</a>");
 
-            DataPackage dataPackage = new DataPackage();
+            DataPackage dataPackage = new();
             dataPackage.SetApplicationLink(uri);
             dataPackage.SetWebLink(uri);
             dataPackage.SetText(uri.ToString());

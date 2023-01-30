@@ -15,7 +15,5 @@ namespace AdvancedSharpAdbClient.Receivers
     /// </para>
     /// </summary>
     [CompilerGeneratedAttribute]
-    internal class NamespaceDoc
-    {
-    }
+    internal class NamespaceDoc { }
 }

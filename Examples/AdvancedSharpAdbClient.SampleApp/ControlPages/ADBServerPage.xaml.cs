@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
         {
             Control1Progress.Visibility = Visibility.Visible;
             Control1.Content = "Starting";
-            FileOpenPicker FileOpen = new FileOpenPicker();
+            FileOpenPicker FileOpen = new();
             FileOpen.FileTypeFilter.Add(".exe");
             FileOpen.SuggestedStartLocation = PickerLocationId.ComputerFolder;
             Control1Output.Text = "Choose ADB ...";

@@ -10,9 +10,11 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SpecTests()
         {
-            ForwardData data = new ForwardData();
-            data.Local = "tcp:1234";
-            data.Remote = "tcp:4321";
+            ForwardData data = new()
+            {
+                Local = "tcp:1234",
+                Remote = "tcp:4321"
+            };
 
             Assert.Equal("tcp:1234", data.LocalSpec.ToString());
             Assert.Equal("tcp:4321", data.RemoteSpec.ToString());

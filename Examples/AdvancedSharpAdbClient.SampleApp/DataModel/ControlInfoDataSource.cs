@@ -117,62 +117,51 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
     /// </summary>
     public sealed class ControlInfoDataSource
     {
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new();
 
         #region Singleton
 
-        private static ControlInfoDataSource _instance;
 
-        public static ControlInfoDataSource Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static ControlInfoDataSource Instance { get; private set; }
 
         static ControlInfoDataSource()
         {
-            _instance = new ControlInfoDataSource();
+            Instance = new ControlInfoDataSource();
         }
 
         private ControlInfoDataSource() { }
 
         #endregion
 
-        private IList<ControlInfoDataGroup> _groups = new List<ControlInfoDataGroup>();
-        public IList<ControlInfoDataGroup> Groups
-        {
-            get { return this._groups; }
-        }
+        public IList<ControlInfoDataGroup> Groups { get; } = new List<ControlInfoDataGroup>();
 
         public async Task<IEnumerable<ControlInfoDataGroup>> GetGroupsAsync()
         {
-            await _instance.GetControlInfoDataAsync();
+            await Instance.GetControlInfoDataAsync();
 
-            return _instance.Groups;
+            return Instance.Groups;
         }
 
         public async Task<ControlInfoDataGroup> GetGroupAsync(string uniqueId)
         {
-            await _instance.GetControlInfoDataAsync();
+            await Instance.GetControlInfoDataAsync();
             // Simple linear search is acceptable for small data sets
-            IEnumerable<ControlInfoDataGroup> matches = _instance.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
+            IEnumerable<ControlInfoDataGroup> matches = Instance.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
             return matches.Count() == 1 ? matches.First() : null;
         }
 
         public async Task<ControlInfoDataItem> GetItemAsync(string uniqueId)
         {
-            await _instance.GetControlInfoDataAsync();
+            await Instance.GetControlInfoDataAsync();
             // Simple linear search is acceptable for small data sets
-            IEnumerable<ControlInfoDataItem> matches = _instance.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
+            IEnumerable<ControlInfoDataItem> matches = Instance.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
             return matches.Count() > 0 ? matches.First() : null;
         }
 
         public async Task<ControlInfoDataGroup> GetGroupFromItemAsync(string uniqueId)
         {
-            await _instance.GetControlInfoDataAsync();
-            IEnumerable<ControlInfoDataGroup> matches = _instance.Groups.Where((group) => group.Items.FirstOrDefault(item => item.UniqueId.Equals(uniqueId)) != null);
+            await Instance.GetControlInfoDataAsync();
+            IEnumerable<ControlInfoDataGroup> matches = Instance.Groups.Where((group) => group.Items.FirstOrDefault(item => item.UniqueId.Equals(uniqueId)) != null);
             return matches.Count() == 1 ? matches.First() : null;
         }
 
@@ -186,7 +175,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
                 }
             }
 
-            Uri dataUri = new Uri("ms-appx:///DataModel/ControlInfoData.json");
+            Uri dataUri = new("ms-appx:///DataModel/ControlInfoData.json");
 
             StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
             string jsonText = await FileIO.ReadTextAsync(file);
@@ -199,7 +188,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
                 foreach (JsonValue groupValue in jsonArray)
                 {
                     JsonObject groupObject = groupValue.GetObject();
-                    ControlInfoDataGroup group = new ControlInfoDataGroup(groupObject["UniqueId"].GetString(),
+                    ControlInfoDataGroup group = new(groupObject["UniqueId"].GetString(),
                                                                           groupObject["Title"].GetString(),
                                                                           groupObject["Subtitle"].GetString(),
                                                                           groupObject["ImagePath"].GetString(),
@@ -229,7 +218,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Data
                             badgeString = "Preview";
                         }
 
-                        ControlInfoDataItem item = new ControlInfoDataItem(itemObject["UniqueId"].GetString(),
+                        ControlInfoDataItem item = new(itemObject["UniqueId"].GetString(),
                                                                 itemObject["Title"].GetString(),
                                                                 itemObject["Subtitle"].GetString(),
                                                                 itemObject["ImagePath"].GetString(),

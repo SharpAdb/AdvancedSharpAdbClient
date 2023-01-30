@@ -10,22 +10,22 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        private IAdbClient client { get; set; }
+        private IAdbClient Client { get; set; }
 
         /// <summary>
         /// The current device containing the element
         /// </summary>
-        private DeviceData device { get; set; }
+        private DeviceData Device { get; set; }
 
         /// <summary>
         /// Contains element coordinates 
         /// </summary>
-        public Cords cords { get; set; }
+        public Cords Cords { get; set; }
 
         /// <summary>
         /// Gets or sets element attributes
         /// </summary>
-        public Dictionary<string, string> attributes { get; set; }
+        public Dictionary<string, string> Attributes { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Element"/> class.
@@ -36,23 +36,20 @@ namespace AdvancedSharpAdbClient
         /// <param name="attributes"></param>
         public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
         {
-            this.client = client;
-            this.device = device;
-            this.cords = cords;
-            this.attributes = attributes;
+            Client = client;
+            Device = device;
+            Cords = cords;
+            Attributes = attributes;
         }
 
         /// <inheritdoc/>
-        public void Click()
-        {
-            client.Click(device, cords);
-        }
+        public void Click() => Client.Click(Device, Cords);
 
         /// <inheritdoc/>
         public void SendText(string text)
         {
             Click();
-            client.SendText(device, text);
+            Client.SendText(Device, text);
         }
 
         /// <inheritdoc/>
@@ -61,11 +58,11 @@ namespace AdvancedSharpAdbClient
             Click(); // focuse
             if (charcount == 0)
             {
-                client.ClearInput(device, attributes["text"].Length);
+                Client.ClearInput(Device, Attributes["text"].Length);
             }
             else
             {
-                client.ClearInput(device, charcount);
+                Client.ClearInput(Device, charcount);
             }
         }
     }

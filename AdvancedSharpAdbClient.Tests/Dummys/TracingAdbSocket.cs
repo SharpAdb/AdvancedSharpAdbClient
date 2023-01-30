@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public List<string> Requests { get; } = new List<string>();
 
-        public List<Tuple<SyncCommand, string>> SyncRequests { get; } = new List<Tuple<SyncCommand, string>>();
+        public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
 
         public bool DidReconnect { get; private set; }
 
@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests
 #if NETCOREAPP1_1
             StackTrace trace = null;
 #else
-            StackTrace trace = new StackTrace();
+            StackTrace trace = new();
 #endif
 
             int read = base.Read(data);
@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient.Tests
 #if NETCOREAPP1_1
             StackTrace trace = null;
 #else
-            StackTrace trace = new StackTrace();
+            StackTrace trace = new();
 #endif
 
             int read = base.Read(data, length);
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override void SendSyncRequest(SyncCommand command, string path)
         {
-            SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
+            SyncRequests.Add((command, path));
             base.SendSyncRequest(command, path);
         }
 
@@ -140,12 +140,12 @@ namespace AdvancedSharpAdbClient.Tests
 #if NETCOREAPP1_1
             StackTrace trace = null;
 #else
-            StackTrace trace = new StackTrace();
+            StackTrace trace = new();
 #endif
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
+                SyncRequests.Add((command, length.ToString()));
             }
 
             base.SendSyncRequest(command, length);
@@ -163,7 +163,7 @@ namespace AdvancedSharpAdbClient.Tests
 #if NETCOREAPP1_1
             StackTrace trace = null;
 #else
-            StackTrace trace = new StackTrace();
+            StackTrace trace = new();
 #endif
 
             base.Send(data, length);

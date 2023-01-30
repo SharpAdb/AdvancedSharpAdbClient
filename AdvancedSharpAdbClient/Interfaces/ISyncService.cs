@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
         /// Lists the contents of a directory on the device.
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> objectnwith information of the item.</returns>
+        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         IEnumerable<FileStatistics> GetDirectoryListing(string remotePath);
 
         /// <summary>

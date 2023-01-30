@@ -21,68 +21,61 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ConstructorTest()
         {
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
-            {
-                Assert.NotNull(monitor.Devices);
-                Assert.Equal(0, monitor.Devices.Count);
-                Assert.Equal(Socket, monitor.Socket);
-                Assert.False(monitor.IsRunning);
-            }
+            using DeviceMonitor monitor = new(Socket);
+            Assert.NotNull(monitor.Devices);
+            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Equal(Socket, monitor.Socket);
+            Assert.False(monitor.IsRunning);
         }
 
         [Fact]
-        public void ConstructorNullTest()
-        {
-            _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
-        }
+        public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
 
         [Fact]
         public void DeviceDisconnectedTest()
         {
             Socket.WaitForNewData = true;
 
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
+
+            Assert.Equal(0, monitor.Devices.Count);
+
+            // Start the monitor, detect the initial device.
+            RunTest(
+            OkResponse,
+            ResponseMessages("169.254.109.177:5555\tdevice\n"),
+            Requests("host:track-devices"),
+            () =>
             {
-                DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
+                monitor.Start();
 
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+            });
+
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
+
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
+
+            RunTest(
+            NoResponses,
+            ResponseMessages(""),
+            Requests(),
+            () =>
+            {
+                eventWaiter.WaitOne(1000);
                 Assert.Equal(0, monitor.Devices.Count);
-
-                // Start the monitor, detect the initial device.
-                RunTest(
-                OkResponse,
-                ResponseMessages("169.254.109.177:5555\tdevice\n"),
-                Requests("host:track-devices"),
-                () =>
-                {
-                    monitor.Start();
-
-                    Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                });
-
-                Socket.ResponseMessages.Clear();
-                Socket.Responses.Clear();
-                Socket.Requests.Clear();
-
-                // Device disconnects
-                ManualResetEvent eventWaiter = sink.CreateEventSignal();
-
-                RunTest(
-                NoResponses,
-                ResponseMessages(""),
-                Requests(),
-                () =>
-                {
-                    eventWaiter.WaitOne(1000);
-                    Assert.Equal(0, monitor.Devices.Count);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Single(sink.DisconnectedEvents);
-                    Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
-                });
-            }
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Single(sink.DisconnectedEvents);
+                Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
+            });
         }
 
         [Fact]
@@ -90,49 +83,47 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
+
+            Assert.Equal(0, monitor.Devices.Count);
+
+            // Start the monitor, detect the initial device.
+            RunTest(
+            OkResponse,
+            ResponseMessages(""),
+            Requests("host:track-devices"),
+            () =>
             {
-                DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
+                monitor.Start();
 
                 Assert.Equal(0, monitor.Devices.Count);
+                Assert.Empty(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+            });
 
-                // Start the monitor, detect the initial device.
-                RunTest(
-                OkResponse,
-                ResponseMessages(""),
-                Requests("host:track-devices"),
-                () =>
-                {
-                    monitor.Start();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-                    Assert.Equal(0, monitor.Devices.Count);
-                    Assert.Empty(sink.ConnectedEvents);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                });
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-                Socket.ResponseMessages.Clear();
-                Socket.Responses.Clear();
-                Socket.Requests.Clear();
+            RunTest(
+            NoResponses,
+            ResponseMessages("169.254.109.177:5555\tdevice\n"),
+            Requests(),
+            () =>
+            {
+                eventWaiter.WaitOne(1000);
 
-                // Device disconnects
-                ManualResetEvent eventWaiter = sink.CreateEventSignal();
-
-                RunTest(
-                NoResponses,
-                ResponseMessages("169.254.109.177:5555\tdevice\n"),
-                Requests(),
-                () =>
-                {
-                    eventWaiter.WaitOne(1000);
-
-                    Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                    Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-                });
-            }
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+                Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+            });
         }
 
         [Fact]
@@ -140,28 +131,26 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
+
+            Assert.Equal(0, monitor.Devices.Count);
+
+            RunTest(
+            OkResponse,
+            ResponseMessages("169.254.109.177:5555\tdevice\n"),
+            Requests("host:track-devices"),
+            () =>
             {
-                DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
+                monitor.Start();
 
-                Assert.Equal(0, monitor.Devices.Count);
-
-                RunTest(
-                OkResponse,
-                ResponseMessages("169.254.109.177:5555\tdevice\n"),
-                Requests("host:track-devices"),
-                () =>
-                {
-                    monitor.Start();
-
-                    Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                });
-            }
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+            });
         }
 
         [Fact]
@@ -169,51 +158,49 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
+
+            Assert.Equal(0, monitor.Devices.Count);
+
+            // Start the monitor, detect the initial device.
+            RunTest(
+            OkResponse,
+            ResponseMessages("169.254.109.177:5555\toffline\n"),
+            Requests("host:track-devices"),
+            () =>
             {
-                DeviceMonitorSink sink = new DeviceMonitorSink(monitor);
+                monitor.Start();
 
-                Assert.Equal(0, monitor.Devices.Count);
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+            });
 
-                // Start the monitor, detect the initial device.
-                RunTest(
-                OkResponse,
-                ResponseMessages("169.254.109.177:5555\toffline\n"),
-                Requests("host:track-devices"),
-                () =>
-                {
-                    monitor.Start();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-                    Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Empty(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                });
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-                Socket.ResponseMessages.Clear();
-                Socket.Responses.Clear();
-                Socket.Requests.Clear();
+            RunTest(
+            NoResponses,
+            ResponseMessages("169.254.109.177:5555\tdevice\n"),
+            Requests(),
+            () =>
+            {
+                eventWaiter.WaitOne(1000);
 
-                // Device disconnects
-                ManualResetEvent eventWaiter = sink.CreateEventSignal();
-
-                RunTest(
-                NoResponses,
-                ResponseMessages("169.254.109.177:5555\tdevice\n"),
-                Requests(),
-                () =>
-                {
-                    eventWaiter.WaitOne(1000);
-
-                    Assert.Equal(1, monitor.Devices.Count);
-                    Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
-                    Assert.Single(sink.ConnectedEvents);
-                    Assert.Single(sink.ChangedEvents);
-                    Assert.Empty(sink.DisconnectedEvents);
-                    Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
-                });
-            }
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Single(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+                Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+            });
         }
 
         /// <summary>
@@ -223,29 +210,27 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void AdbKilledTest()
         {
-            DummyAdbServer dummyAdbServer = new DummyAdbServer();
+            DummyAdbServer dummyAdbServer = new();
             AdbServer.Instance = dummyAdbServer;
 
             Socket.WaitForNewData = true;
 
-            using (DeviceMonitor monitor = new DeviceMonitor(Socket))
+            using DeviceMonitor monitor = new(Socket);
+            RunTest(
+            new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+            ResponseMessages(
+                DummyAdbSocket.ServerDisconnected,
+                string.Empty),
+            Requests(
+                "host:track-devices",
+                "host:track-devices"),
+            () =>
             {
-                RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
-                ResponseMessages(
-                    DummyAdbSocket.ServerDisconnected,
-                    string.Empty),
-                Requests(
-                    "host:track-devices",
-                    "host:track-devices"),
-                () =>
-                {
-                    monitor.Start();
+                monitor.Start();
 
-                    Assert.True(Socket.DidReconnect);
-                    Assert.True(dummyAdbServer.WasRestarted);
-                });
-            }
+                Assert.True(Socket.DidReconnect);
+                Assert.True(dummyAdbServer.WasRestarted);
+            });
         }
     }
 }

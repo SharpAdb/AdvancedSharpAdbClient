@@ -2,23 +2,24 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
-{
-    using Exceptions;
-    using Logs;
-    using System;
-    using System.Globalization;
-    using System.IO;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
+using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 #if HAS_LOGGER
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 #endif
+
+namespace AdvancedSharpAdbClient
+{
 
     /// <summary>
     /// <para>
@@ -83,7 +84,7 @@ namespace AdvancedSharpAdbClient
         {
             this.socket = socket;
 #if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
+            logger ??= NullLogger<AdbSocket>.Instance;
 #endif
         }
 
@@ -98,52 +99,33 @@ namespace AdvancedSharpAdbClient
         public static int WriteBufferSize { get; set; } = 1024;
 
         /// <inheritdoc/>
-        public bool Connected
-        {
-            get { return socket.Connected; }
-        }
+        public bool Connected => socket.Connected;
 
         /// <summary>
         /// Determines whether the specified reply is okay.
         /// </summary>
         /// <param name="reply">The reply.</param>
         /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
-        public static bool IsOkay(byte[] reply)
-        {
-            return AdbClient.Encoding.GetString(reply).Equals("OKAY");
-        }
+        public static bool IsOkay(byte[] reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
 
         /// <inheritdoc/>
-        public virtual void Reconnect()
-        {
-            socket.Reconnect();
-        }
+        public virtual void Reconnect() => socket.Reconnect();
 
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        public virtual void Dispose()
-        {
-            socket.Dispose();
-        }
+        public virtual void Dispose() => socket.Dispose();
 
         /// <inheritdoc/>
-        public virtual int Read(byte[] data)
-        {
-            return Read(data, data.Length);
-        }
+        public virtual int Read(byte[] data) => Read(data, data.Length);
 
         /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default)
-        {
-            return ReadAsync(data, data.Length, cancellationToken);
-        }
+        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+            ReadAsync(data, data.Length, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual void SendSyncRequest(SyncCommand command, string path, int permissions)
-        {
+        public virtual void SendSyncRequest(SyncCommand command, string path, int permissions) =>
             SendSyncRequest(command, $"{path},{permissions}");
-        }
 
         /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path)
@@ -154,8 +136,8 @@ namespace AdvancedSharpAdbClient
             }
 
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
-            this.SendSyncRequest(command, pathBytes.Length);
-            this.Write(pathBytes);
+            SendSyncRequest(command, pathBytes.Length);
+            _ = Write(pathBytes);
         }
 
         /// <inheritdoc/>
@@ -280,10 +262,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Send(byte[] data, int length)
-        {
-            Send(data, 0, length);
-        }
+        public virtual void Send(byte[] data, int length) => Send(data, 0, length);
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int offset, int length)
@@ -474,7 +453,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected AdbResponse ReadAdbResponseInner()
         {
-            AdbResponse resp = new AdbResponse();
+            AdbResponse resp = new();
 
             byte[] reply = new byte[4];
             Read(reply);

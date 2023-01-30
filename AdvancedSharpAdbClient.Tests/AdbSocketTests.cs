@@ -17,8 +17,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CloseTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             Assert.True(socket.Connected);
 
@@ -29,8 +29,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DisposeTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             Assert.True(socket.Connected);
 
@@ -49,42 +49,34 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void SendSyncRequestTest()
-        {
+        public void SendSyncRequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DATA, 2),
                 new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
-        }
 
         [Fact]
-        public void SendSyncRequestTest2()
-        {
+        public void SendSyncRequestTest2() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
                 new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
-        }
 
         [Fact]
-        public void SendSyncRequest3()
-        {
+        public void SendSyncRequest3() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
                 new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });
-        }
 
         [Fact]
-        public void SendSyncNullRequestTest()
-        {
-            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), new byte[] { }));
-        }
+        public void SendSyncNullRequestTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), Array.Empty<byte>()));
 
         [Fact]
         public void ReadSyncResponse()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new StreamWriter(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 writer.Write("DENT");
             }
@@ -97,10 +89,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadSyncString()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
-            using (BinaryWriter writer = new BinaryWriter(tcpSocket.InputStream, Encoding.ASCII, true))
+            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
             {
                 writer.Write(5);
                 writer.Write(Encoding.ASCII.GetBytes("Hello"));
@@ -115,10 +107,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task ReadStringAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
-            using (BinaryWriter writer = new BinaryWriter(tcpSocket.InputStream, Encoding.ASCII, true))
+            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
             {
                 writer.Write(Encoding.ASCII.GetBytes(5.ToString("X4")));
                 writer.Write(Encoding.ASCII.GetBytes("Hello"));
@@ -133,10 +125,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadAdbOkayResponseTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new StreamWriter(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 writer.Write("OKAY");
             }
@@ -153,10 +145,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadAdbFailResponseTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new StreamWriter(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 writer.Write("FAIL");
                 writer.Write(17.ToString("X4"));
@@ -165,14 +157,14 @@ namespace AdvancedSharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            _ = Assert.Throws<AdbException>(() => socket.ReadAdbResponse());
+            _ = Assert.Throws<AdbException>(socket.ReadAdbResponse);
         }
 
         [Fact]
         public void ReadTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             // Read 100 bytes from a stream which has 101 bytes available
             byte[] data = new byte[101];
@@ -200,8 +192,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task ReadAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             // Read 100 bytes from a stream which has 101 bytes available
             byte[] data = new byte[101];
@@ -227,18 +219,16 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void SendAdbRequestTest()
-        {
+        public void SendAdbRequestTest() =>
             RunTest(
                 (socket) => socket.SendAdbRequest("Test"),
                 Encoding.ASCII.GetBytes("0004Test"));
-        }
 
         [Fact]
         public void GetShellStreamTest()
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             Stream stream = socket.GetShellStream();
             Assert.IsType<ShellStream>(stream);
@@ -247,10 +237,10 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(tcpSocket.OutputStream, shellStream.Inner);
         }
 
-        private void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
+        private static void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
         {
-            DummyTcpSocket tcpSocket = new DummyTcpSocket();
-            AdbSocket socket = new AdbSocket(tcpSocket);
+            DummyTcpSocket tcpSocket = new();
+            AdbSocket socket = new(tcpSocket);
 
             // Run the test.
             test(socket);

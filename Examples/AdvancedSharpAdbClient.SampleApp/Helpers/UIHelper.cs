@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
 
         public static IEnumerable<DependencyObject> GetDescendants(this DependencyObject start)
         {
-            Queue<DependencyObject> queue = new Queue<DependencyObject>();
+            Queue<DependencyObject> queue = new();
             int count1 = VisualTreeHelper.GetChildrenCount(start);
 
             for (int i = 0; i < count1; i++)

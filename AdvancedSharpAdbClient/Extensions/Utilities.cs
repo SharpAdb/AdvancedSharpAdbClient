@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
 
         public static DateTimeOffset FromUnixTimeSeconds(long seconds) =>
 #if NET35 || NET40 || NET452
-            new DateTimeOffset(seconds.ToDateTime());
+            new(seconds.ToDateTime());
 #else
             DateTimeOffset.FromUnixTimeSeconds(seconds);
 #endif
@@ -70,17 +70,13 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if NETSTANDARD1_3
-        public static IAsyncResult BeginReceive(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
-        {
-            return TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
-        }
+        public static IAsyncResult BeginReceive(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state) =>
+            TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
 #endif
 
 #if NETSTANDARD1_3
-        public static int EndReceive(this Socket socket, IAsyncResult asyncResult)
-        {
-            return TaskToApm.End<int>(asyncResult);
-        }
+        public static int EndReceive(this Socket _, IAsyncResult asyncResult) =>
+            TaskToApm.End<int>(asyncResult);
 #endif
     }
 }

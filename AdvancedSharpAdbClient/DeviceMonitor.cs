@@ -59,12 +59,12 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
-        private readonly ManualResetEvent firstDeviceListParsed = new ManualResetEvent(false);
+        private readonly ManualResetEvent firstDeviceListParsed = new(false);
 
         /// <summary>
         /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
         /// </summary>
-        private readonly CancellationTokenSource monitorTaskCancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource monitorTaskCancellationTokenSource = new();
 
         /// <summary>
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
@@ -183,28 +183,19 @@ namespace AdvancedSharpAdbClient
         /// Raises the <see cref="DeviceChanged"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceChanged(DeviceDataEventArgs e)
-        {
-            DeviceChanged?.Invoke(this, e);
-        }
+        protected void OnDeviceChanged(DeviceDataEventArgs e) => DeviceChanged?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="DeviceConnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceConnected(DeviceDataEventArgs e)
-        {
-            DeviceConnected?.Invoke(this, e);
-        }
+        protected void OnDeviceConnected(DeviceDataEventArgs e) => DeviceConnected?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="DeviceDisconnected"/> event.
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceDisconnected(DeviceDataEventArgs e)
-        {
-            DeviceDisconnected?.Invoke(this, e);
-        }
+        protected void OnDeviceDisconnected(DeviceDataEventArgs e) => DeviceDisconnected?.Invoke(this, e);
 
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
@@ -302,11 +293,11 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private void ProcessIncomingDeviceData(string result)
         {
-            List<DeviceData> list = new List<DeviceData>();
+            List<DeviceData> list = new();
 
             string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            List<DeviceData> currentDevices = deviceValues.Select(d => DeviceData.CreateFromAdbData(d)).ToList();
+            List<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData).ToList();
             UpdateDevices(currentDevices);
         }
 

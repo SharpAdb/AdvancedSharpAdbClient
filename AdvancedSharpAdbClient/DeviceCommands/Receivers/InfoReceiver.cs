@@ -15,24 +15,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class InfoReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InfoReceiver"/> class.
-        /// </summary>
-        public InfoReceiver()
-        {
-            Properties = new Dictionary<string, object>();
-            PropertyParsers = new Dictionary<string, Func<string, object>>();
-        }
-
-        /// <summary>
         /// Gets or sets a dictionary with the extracted properties and their corresponding values.
         /// </summary>
-        private Dictionary<string, object> Properties { get; set; }
+        private Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets or sets the dictionary with all properties and their corresponding property parsers.
         /// A property parser extracts the property value out of a <see cref="string"/> if possible.
         /// </summary>
-        private Dictionary<string, Func<string, object>> PropertyParsers { get; set; }
+        private Dictionary<string, Func<string, object>> PropertyParsers { get; set; } = new Dictionary<string, Func<string, object>>();
 
         /// <summary>
         /// Gets the value of the property out of the Properties dictionary.

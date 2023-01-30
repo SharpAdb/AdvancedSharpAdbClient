@@ -9,15 +9,15 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         public void ParseThirdPartyPackage()
         {
             // Arrange
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 State = DeviceState.Online
             };
 
-            DummyAdbClient client = new DummyAdbClient();
+            DummyAdbClient client = new();
 
-            PackageManager manager = new PackageManager(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
-            PackageManagerReceiver receiver = new PackageManagerReceiver(device, manager);
+            PackageManager manager = new(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
+            PackageManagerReceiver receiver = new(device, manager);
 
             // Act
             receiver.AddOutput("package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus");

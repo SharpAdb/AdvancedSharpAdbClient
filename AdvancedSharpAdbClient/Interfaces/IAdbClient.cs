@@ -317,12 +317,19 @@ namespace AdvancedSharpAdbClient
         void Reboot(string into, DeviceData device);
 
         /// <summary>
-        /// Connect to a device via TCP/IP.
+        /// ConnectAsync to a device via TCP/IP.
+        /// </summary>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <returns>The results from adb.</returns>
+        string Connect(DnsEndPoint endpoint);
+
+        /// <summary>
+        /// ConnectAsync to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
-        Task<string> Connect(DnsEndPoint endpoint, CancellationToken cancellationToken);
+        Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
         /// Disconnects a remote device from this local ADB server.

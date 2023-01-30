@@ -22,19 +22,12 @@ namespace AdvancedSharpAdbClient
         /// Gets a value indicating whether a <see cref="ITcpSocket"/> is connected to a remote host as of the last
         /// <see cref="Send"/> or <see cref="Receive"/> operation.
         /// </summary>
-        bool Connected
-        {
-            get;
-        }
+        bool Connected { get; }
 
         /// <summary>
         /// Gets or sets a value that specifies the size of the receive buffer of the <see cref="ITcpSocket"/>.
         /// </summary>
-        int ReceiveBufferSize
-        {
-            get;
-            set;
-        }
+        int ReceiveBufferSize { get; set; }
 
         /// <summary>
         /// Establishes a connection to a remote host.

@@ -77,10 +77,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Helpers
             if (CurrentApplicationWindow != null)
             {
                 // Dispatch on UI thread so that we have a current appbar to access and change
-                _ = CurrentApplicationWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
-                {
-                    UpdateSystemCaptionButtonColors();
-                });
+                _ = CurrentApplicationWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, UpdateSystemCaptionButtonColors);
             }
         }
 

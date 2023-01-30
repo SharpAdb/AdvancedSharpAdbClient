@@ -18,10 +18,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// </summary>
         public const string ServerDisconnected = "ServerDisconnected";
 
-        public DummyAdbSocket()
-        {
-            IsConnected = true;
-        }
+        public DummyAdbSocket() => IsConnected = true;
 
         public Stream ShellStream { get; set; }
 
@@ -37,7 +34,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public List<string> Requests { get; } = new List<string>();
 
-        public List<Tuple<SyncCommand, string>> SyncRequests { get; } = new List<Tuple<SyncCommand, string>>();
+        public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
 
         public bool IsConnected { get; set; }
 
@@ -98,7 +95,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (message == ServerDisconnected)
             {
-                SocketException socketException = new SocketException(AdbServer.ConnectionReset);
+                SocketException socketException = new(AdbServer.ConnectionReset);
                 throw new AdbException(socketException.Message, socketException);
             }
             else
@@ -126,13 +123,13 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public void SendSyncRequest(SyncCommand command, string path) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, path));
+        public void SendSyncRequest(SyncCommand command, string path) => SyncRequests.Add((command, path));
 
         public SyncCommand ReadSyncResponse() => SyncResponses.Dequeue();
 
-        public void SendSyncRequest(SyncCommand command, int length) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, length.ToString()));
+        public void SendSyncRequest(SyncCommand command, int length) => SyncRequests.Add((command, length.ToString()));
 
-        public void SendSyncRequest(SyncCommand command, string path, int permissions) => SyncRequests.Add(new Tuple<SyncCommand, string>(command, $"{path},{permissions}"));
+        public void SendSyncRequest(SyncCommand command, string path, int permissions) => SyncRequests.Add((command, $"{path},{permissions}"));
 
         public Stream GetShellStream()
         {

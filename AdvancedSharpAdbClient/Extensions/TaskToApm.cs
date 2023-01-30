@@ -59,12 +59,10 @@ namespace System.Threading.Tasks
         public static Task GetTask(IAsyncResult asyncResult) => (asyncResult as TaskAsyncResult)?._task;
 
         /// <summary>Throws an argument exception for the invalid <paramref name="asyncResult"/>.</summary>
-        private static void ThrowArgumentException(IAsyncResult asyncResult)
-        {
-            throw asyncResult is null ?
-                new ArgumentNullException(nameof(asyncResult)) :
-                new ArgumentException(null, nameof(asyncResult));
-        }
+        private static void ThrowArgumentException(IAsyncResult asyncResult) =>
+            throw (asyncResult is null
+                ? new ArgumentNullException(nameof(asyncResult))
+                : new ArgumentException(null, nameof(asyncResult)));
 
         /// <summary>Provides a simple IAsyncResult that wraps a Task.</summary>
         /// <remarks>
@@ -107,10 +105,7 @@ namespace System.Threading.Tasks
             }
 
             /// <summary>Invokes the callback.</summary>
-            private void InvokeCallback()
-            {
-                _callback.Invoke(this);
-            }
+            private void InvokeCallback() => _callback.Invoke(this);
 
             /// <summary>Gets a user-defined object that qualifies or contains information about an asynchronous operation.</summary>
             public object AsyncState { get; }

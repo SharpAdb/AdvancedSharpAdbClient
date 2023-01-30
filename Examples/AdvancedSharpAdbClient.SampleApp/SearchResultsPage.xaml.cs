@@ -73,7 +73,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             {
                 // Application-specific searching logic.  The search process is responsible for
                 // creating a list of user-selectable result categories:
-                List<Filter> filterList = new List<Filter>();
+                List<Filter> filterList = new();
 
                 // Query is already lowercase
                 string[] querySplit = queryText.ToLower().Split(" ");

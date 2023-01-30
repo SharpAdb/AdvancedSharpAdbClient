@@ -64,7 +64,6 @@ namespace AdvancedSharpAdbClient.Logs
         public override long Position
         {
             get => throw new NotImplementedException();
-
             set => throw new NotImplementedException();
         }
 
@@ -79,7 +78,7 @@ namespace AdvancedSharpAdbClient.Logs
             // Read the raw data from the base stream. There may be a
             // 'pending byte' from a previous operation; if that's the case,
             // consume it.
-            int read = 0;
+            int read;
 
             if (pendingByte != null)
             {

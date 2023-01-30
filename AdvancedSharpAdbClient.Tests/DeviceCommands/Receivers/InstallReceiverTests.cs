@@ -8,7 +8,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ProcessFailureTest()
         {
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             receiver.AddOutput("Failure [message]");
             receiver.Flush();
 
@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ProcessFailureEmptyMessageTest()
         {
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             receiver.AddOutput("Failure [  ]");
             receiver.Flush();
 
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ProcessFailureNoMessageTest()
         {
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             receiver.AddOutput("Failure");
             receiver.Flush();
 
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ProcessSuccessTest()
         {
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             receiver.AddOutput("Success");
             receiver.Flush();
 

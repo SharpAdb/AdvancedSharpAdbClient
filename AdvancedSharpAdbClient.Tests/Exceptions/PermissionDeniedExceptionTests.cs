@@ -6,29 +6,21 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
     public class PermissionDeniedExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor()
-        {
+        public void TestEmptyConstructor() =>
             ExceptionTester<PermissionDeniedException>.TestEmptyConstructor(() => new PermissionDeniedException());
-        }
 
         [Fact]
-        public void TestMessageConstructor()
-        {
+        public void TestMessageConstructor() =>
             ExceptionTester<PermissionDeniedException>.TestMessageConstructor((message) => new PermissionDeniedException(message));
-        }
 
         [Fact]
-        public void TestMessageAndInnerConstructor()
-        {
+        public void TestMessageAndInnerConstructor() =>
             ExceptionTester<PermissionDeniedException>.TestMessageAndInnerConstructor((message, inner) => new PermissionDeniedException(message, inner));
-        }
 
 #if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor()
-        {
+        public void TestSerializationConstructor() =>
             ExceptionTester<PermissionDeniedException>.TestSerializationConstructor((info, context) => new PermissionDeniedException(info, context));
-        }
 #endif
     }
 }

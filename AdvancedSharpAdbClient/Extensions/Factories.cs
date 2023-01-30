@@ -12,10 +12,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public static class Factories
     {
-        static Factories()
-        {
-            Reset();
-        }
+        static Factories() => Reset();
 
         /// <summary>
         /// Gets or sets a delegate which creates a new instance of the <see cref="AdbSocket"/> class.

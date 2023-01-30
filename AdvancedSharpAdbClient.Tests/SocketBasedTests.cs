@@ -21,13 +21,13 @@ namespace AdvancedSharpAdbClient
             // use the dummy socket factory to run unit tests.
             if (integrationTest)
             {
-                TracingAdbSocket tracingSocket = new TracingAdbSocket(EndPoint) { DoDispose = doDispose };
+                TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
 
                 Factories.AdbSocketFactory = (endPoint) => tracingSocket;
             }
             else
             {
-                DummyAdbSocket socket = new DummyAdbSocket();
+                DummyAdbSocket socket = new();
                 Factories.AdbSocketFactory = (endPoint) => socket;
             }
 
@@ -44,10 +44,10 @@ namespace AdvancedSharpAdbClient
             TestClient = new AdbClient();
         }
 
-        protected static readonly AdbResponse[] NoResponses = new AdbResponse[] { };
+        protected static readonly AdbResponse[] NoResponses = Array.Empty<AdbResponse>();
         protected static readonly AdbResponse[] OkResponse = new AdbResponse[] { AdbResponse.OK };
-        protected static readonly string[] NoResponseMessages = new string[] { };
-        protected static readonly DeviceData Device = new DeviceData()
+        protected static readonly string[] NoResponseMessages = Array.Empty<string>();
+        protected static readonly DeviceData Device = new()
         {
             Serial = "169.254.109.177:5555",
             State = DeviceState.Online
@@ -92,31 +92,26 @@ namespace AdvancedSharpAdbClient
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Action test)
-        {
+            Action test) =>
             RunTest(responses, responseMessages, requests, null, null, null, null, null, test);
-        }
 
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
             Stream shellStream,
-            Action test)
-        {
+            Action test) =>
             RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
-        }
 
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            IEnumerable<Tuple<SyncCommand, string>> syncRequests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Action test)
-        {
+            Action test) =>
             RunTest(
                 responses,
                 responseMessages,
@@ -127,13 +122,12 @@ namespace AdvancedSharpAdbClient
                 syncDataSent,
                 null,
                 test);
-        }
 
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            IEnumerable<Tuple<SyncCommand, string>> syncRequests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
@@ -272,22 +266,22 @@ namespace AdvancedSharpAdbClient
 
         protected static IEnumerable<string> ResponseMessages(params string[] requests) => requests;
 
-        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path)
+        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path)
         {
-            yield return new Tuple<SyncCommand, string>(command, path);
+            yield return (command, path);
         }
 
-        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2)
+        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2)
         {
-            yield return new Tuple<SyncCommand, string>(command, path);
-            yield return new Tuple<SyncCommand, string>(command2, path2);
+            yield return (command, path);
+            yield return (command2, path2);
         }
 
-        protected static IEnumerable<Tuple<SyncCommand, string>> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)
+        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)
         {
-            yield return new Tuple<SyncCommand, string>(command, path);
-            yield return new Tuple<SyncCommand, string>(command2, path2);
-            yield return new Tuple<SyncCommand, string>(command3, path3);
+            yield return (command, path);
+            yield return (command2, path2);
+            yield return (command3, path3);
         }
 
         protected static IEnumerable<AdbResponse> OkResponses(int count)

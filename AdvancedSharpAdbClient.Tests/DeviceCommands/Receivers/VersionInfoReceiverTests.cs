@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void GetVersionTest()
         {
-            VersionInfoReceiver receiver = new VersionInfoReceiver();
+            VersionInfoReceiver receiver = new();
 
             // Trick the receiver into thinking we're in the package section
             Assert.Null(receiver.GetVersionCode("Packages:"));
@@ -37,12 +37,11 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
             Assert.Null((string)receiver.GetVersionName(" test"));
             Assert.Null((string)receiver.GetVersionName("    versionName"));
             Assert.Equal(string.Empty, (string)receiver.GetVersionName("    versionName="));
-            _ = new DeviceData();
 
             string dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"Assets/dumpsys_package.txt"));
             receiver = new VersionInfoReceiver();
 
-            StringReader reader = new StringReader(dumpsys);
+            StringReader reader = new(dumpsys);
 
             while (reader.Peek() >= 0)
             {

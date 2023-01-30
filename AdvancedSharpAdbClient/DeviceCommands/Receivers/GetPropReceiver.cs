@@ -23,17 +23,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string GetpropRegex = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
-        /// </summary>
-        public GetPropReceiver()
-        {
-            Properties = new Dictionary<string, string>();
-        }
-
-        /// <summary>
         /// Gets the list of properties which have been retrieved.
         /// </summary>
-        public Dictionary<string, string> Properties { get; private set; }
+        public Dictionary<string, string> Properties { get; private set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Processes the new lines.

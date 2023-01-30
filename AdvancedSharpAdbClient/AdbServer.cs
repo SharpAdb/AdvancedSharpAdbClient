@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The minum version of <c>adb.exe</c> that is supported by this library.
         /// </summary>
-        public static readonly Version RequiredAdbVersion = new Version(1, 0, 20);
+        public static readonly Version RequiredAdbVersion = new(1, 0, 20);
 
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection is refused.
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
         /// </summary>
-        private static readonly object RestartLock = new object();
+        private static readonly object RestartLock = new();
 
         /// <summary>
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting

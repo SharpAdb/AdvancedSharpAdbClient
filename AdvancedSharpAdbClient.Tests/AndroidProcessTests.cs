@@ -78,9 +78,6 @@ namespace AdvancedSharpAdbClient.Tests
         [InlineData("1230 (bioset) S 2 0 0 0 -1 69238880 0 0 0 0 0 0 0 0 0 -20 1 0 79 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 6 0 0 0 0 0 0 0 0 0 0 0 0 0")]
         [InlineData("1869 (irq/306-(null)) S 2 0 0 0 -1 2129984 0 0 0 0 0 0 0 0 -51 0 1 0 116 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 0 0 0 17 0 50 1 0 0 0 0 0 0 0 0 0 0 0")]
 
-        public void ParseTests(string line)
-        {
-            _ = AndroidProcess.Parse(line, true);
-        }
+        public void ParseTests(string line) => _ = AndroidProcess.Parse(line, true);
     }
 }

@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
         public static void TestMessageAndInnerConstructor(Func<string, Exception, T> constructor)
         {
             string message = "Hello, World";
-            Exception inner = new Exception();
+            Exception inner = new();
             T ex = constructor(message, inner);
 
             Assert.Equal(message, ex.Message);
@@ -33,8 +33,8 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
 #if !NETCOREAPP1_1
         public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
         {
-            SerializationInfo info = new SerializationInfo(typeof(T), new FormatterConverter());
-            StreamingContext context = new StreamingContext();
+            SerializationInfo info = new(typeof(T), new FormatterConverter());
+            StreamingContext context = new();
 
             info.AddValue("ClassName", string.Empty);
             info.AddValue("Message", string.Empty);

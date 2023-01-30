@@ -36,9 +36,9 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         public VirtualKey ArrowKey;
 
-        private RootFrameNavigationHelper _navHelper;
+        private readonly RootFrameNavigationHelper _navHelper;
         private bool _isGamePadConnected;
-        private bool _isKeyboardConnected;
+        private readonly bool _isKeyboardConnected;
         private Microsoft.UI.Xaml.Controls.NavigationViewItem _allControlsMenuItem;
         private Microsoft.UI.Xaml.Controls.NavigationViewItem _newControlsMenuItem;
 
@@ -160,9 +160,9 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             foreach (ControlInfoDataGroup group in ControlInfoDataSource.Instance.Groups.OrderBy(i => i.Title))
             {
-                muxc.NavigationViewItem itemGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = group.Title, Tag = group.UniqueId, DataContext = group, Icon = GetIcon(group.ImageIconPath) };
+                muxc.NavigationViewItem itemGroup = new() { Content = group.Title, Tag = group.UniqueId, DataContext = group, Icon = GetIcon(group.ImageIconPath) };
 
-                MenuFlyoutItem groupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {group.Title} Samples", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = group };
+                MenuFlyoutItem groupMenuFlyoutItem = new() { Text = $"Copy Link to {group.Title} Samples", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = group };
                 groupMenuFlyoutItem.Click += this.OnMenuFlyoutItemClick;
                 itemGroup.ContextFlyout = new MenuFlyout() { Items = { groupMenuFlyoutItem } };
 
@@ -170,9 +170,9 @@ namespace AdvancedSharpAdbClient.SampleApp
 
                 foreach (ControlInfoDataItem item in group.Items)
                 {
-                    muxc.NavigationViewItem itemInGroup = new Microsoft.UI.Xaml.Controls.NavigationViewItem() { Content = item.Title, Tag = item.UniqueId, DataContext = item, Icon = GetIcon(item.ImageIconPath) };
+                    muxc.NavigationViewItem itemInGroup = new() { Content = item.Title, Tag = item.UniqueId, DataContext = item, Icon = GetIcon(item.ImageIconPath) };
 
-                    MenuFlyoutItem itemInGroupMenuFlyoutItem = new MenuFlyoutItem() { Text = $"Copy Link to {item.Title} Sample", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = item };
+                    MenuFlyoutItem itemInGroupMenuFlyoutItem = new() { Text = $"Copy Link to {item.Title} Sample", Icon = new FontIcon() { Glyph = "\uE8C8" }, Tag = item };
                     itemInGroupMenuFlyoutItem.Click += this.OnMenuFlyoutItemClick;
                     itemInGroup.ContextFlyout = new MenuFlyout() { Items = { itemInGroupMenuFlyoutItem } };
 
@@ -301,9 +301,8 @@ namespace AdvancedSharpAdbClient.SampleApp
                         string itemId = ((ControlInfoDataGroup)selectedItem.DataContext).UniqueId;
                         //rootFrame.Navigate(typeof(SectionPage), itemId);
                     }
-                    else if (selectedItem.DataContext is ControlInfoDataItem)
+                    else if (selectedItem.DataContext is ControlInfoDataItem item)
                     {
-                        ControlInfoDataItem item = (ControlInfoDataItem)selectedItem.DataContext;
                         rootFrame.Navigate(typeof(ItemPage), item.UniqueId);
                     }
 
@@ -332,7 +331,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                List<ControlInfoDataItem> suggestions = new List<ControlInfoDataItem>();
+                List<ControlInfoDataItem> suggestions = new();
 
                 string[] querySplit = sender.Text.Split(" ");
                 foreach (ControlInfoDataGroup group in ControlInfoDataSource.Instance.Groups)
@@ -368,7 +367,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void OnControlsSearchBoxQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
-            if (args.ChosenSuggestion != null && args.ChosenSuggestion is ControlInfoDataItem)
+            if (args.ChosenSuggestion is not null and ControlInfoDataItem)
             {
                 ControlInfoDataItem infoDataItem = args.ChosenSuggestion as ControlInfoDataItem;
                 string itemId = infoDataItem.UniqueId;
@@ -387,7 +386,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             foreach (object rawItem in NavigationView.MenuItems)
             {
                 // Check if we encountered the separator
-                if (!(rawItem is muxc.NavigationViewItem))
+                if (rawItem is not muxc.NavigationViewItem)
                 {
                     // Skipping this item
                     continue;

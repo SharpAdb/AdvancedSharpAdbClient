@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                                                orderby g.Key
                                                select new GroupInfoList(g) { Key = g.Key };
 
-            ObservableCollection<GroupInfoList> groupList = new ObservableCollection<GroupInfoList>(query);
+            ObservableCollection<GroupInfoList> groupList = new(query);
 
             //Move Preview samples to the back of the list
             if (groupList.Any())

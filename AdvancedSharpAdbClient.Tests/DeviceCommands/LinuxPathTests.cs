@@ -10,43 +10,31 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
     public class LinuxPathTests
     {
         [Fact]
-        public void CheckInvalidPathCharsNullTest()
-        {
+        public void CheckInvalidPathCharsNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.CheckInvalidPathChars(null));
-        }
 
         [Fact]
-        public void CheckInvalidPathCharsTest()
-        {
+        public void CheckInvalidPathCharsTest() =>
             // Should not throw an exception.
             LinuxPath.CheckInvalidPathChars("/var/test");
-        }
 
         [Fact]
-        public void CheckInvalidPathCharsTest2()
-        {
+        public void CheckInvalidPathCharsTest2() =>
             // Should throw an exception.
             _ = Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("/var/test > out"));
-        }
 
         [Fact]
-        public void CheckInvalidPathCharsTest3()
-        {
+        public void CheckInvalidPathCharsTest3() =>
             // Should throw an exception.
             _ = Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("\t/var/test"));
-        }
 
         [Fact]
-        public void CombineNullTest()
-        {
+        public void CombineNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(null));
-        }
 
         [Fact]
-        public void CombineNullTest2()
-        {
+        public void CombineNullTest2() =>
             _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(new string[] { "/test", "hi", null }));
-        }
 
         [Fact]
         public void CombineTest()

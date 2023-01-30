@@ -16,21 +16,15 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Maps Android log priorities to chars used to represent them in the system log.
         /// </summary>
-        private static readonly Dictionary<Priority, char> PriorityFormatters;
-
-        /// <summary>
-        /// Initializes static members of the <see cref="AndroidLogEntry"/> class.
-        /// </summary>
-        static AndroidLogEntry()
+        private static readonly Dictionary<Priority, char> PriorityFormatters = new()
         {
-            PriorityFormatters = new Dictionary<Priority, char>();
-            PriorityFormatters.Add(Priority.Verbose, 'V');
-            PriorityFormatters.Add(Priority.Debug, 'D');
-            PriorityFormatters.Add(Priority.Info, 'I');
-            PriorityFormatters.Add(Priority.Warn, 'W');
-            PriorityFormatters.Add(Priority.Error, 'E');
-            PriorityFormatters.Add(Priority.Assert, 'A');
-        }
+            { Priority.Verbose, 'V' },
+            { Priority.Debug, 'D' },
+            { Priority.Info, 'I' },
+            { Priority.Warn, 'W' },
+            { Priority.Error, 'E' },
+            { Priority.Assert, 'A' }
+        };
 
         /// <summary>
         /// Gets or sets the priority of the log message.
@@ -49,13 +43,15 @@ namespace AdvancedSharpAdbClient.Logs
         public string Message { get; set; }
 
         /// <inheritdoc/>
-        public override string ToString() => $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";
+        public override string ToString() =>
+            $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";
 
         /// <summary>
         /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.</returns>
-        private static char FormatPriority(Priority value) => PriorityFormatters == null || !PriorityFormatters.ContainsKey(value) ? '?' : PriorityFormatters[value];
+        private static char FormatPriority(Priority value) =>
+            PriorityFormatters == null || !PriorityFormatters.ContainsKey(value) ? '?' : PriorityFormatters[value];
     }
 }

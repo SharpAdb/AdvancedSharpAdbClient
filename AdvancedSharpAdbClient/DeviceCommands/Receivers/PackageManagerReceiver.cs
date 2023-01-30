@@ -51,10 +51,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     // Remove the "package:" prefix
                     string package = line.Substring(8);
 
-                    // If there's a '=' included, use the last instance,
-                    // to accomodate for values like
-                    // "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
-                    string[] parts = line.Split(':', '=');
+                    //// If there's a '=' included, use the last instance,
+                    //// to accomodate for values like
+                    //// "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
+                    //string[] parts = line.Split(':', '=');
 
                     int separator = package.LastIndexOf('=');
 

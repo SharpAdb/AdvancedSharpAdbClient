@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
-        private static readonly Regex Regex = new Regex(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex Regex = new(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -103,7 +103,7 @@ namespace AdvancedSharpAdbClient
         internal static DeviceState GetStateFromString(string state)
         {
             // Default to the unknown state
-            DeviceState value = DeviceState.Unknown;
+            DeviceState value;
 
             if (string.Equals(state, "device", StringComparison.OrdinalIgnoreCase))
             {

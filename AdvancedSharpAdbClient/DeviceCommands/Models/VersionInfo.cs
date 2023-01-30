@@ -10,10 +10,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class VersionInfo
     {
         /// <summary>
+        /// Gets or sets the version code of an Android application.
+        /// </summary>
+        public int VersionCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version name of an Android application.
+        /// </summary>
+        public string VersionName { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VersionInfo"/> class.
         /// </summary>
         /// <param name="versionCode">The version code of the application.</param>
-        /// <param name="versionName">The version name of the application</param>
+        /// <param name="versionName">The version name of the application.</param>
         public VersionInfo(int versionCode, string versionName)
         {
             VersionCode = versionCode;
@@ -21,13 +31,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets or sets the version code of an Android application
+        /// Deconstruct the <see cref="VersionInfo"/> class.
         /// </summary>
-        public int VersionCode { get; set; }
+        /// <param name="versionCode">The version code of the application.</param>
+        /// <param name="versionName">The version name of the application.</param>
+        public void Deconstruct(out int versionCode, out string versionName)
+        {
+            versionCode = VersionCode;
+            versionName = VersionName;
+        }
 
-        /// <summary>
-        /// Gets or sets the version name of an Android application
-        /// </summary>
-        public string VersionName { get; set; }
+        /// <inheritdoc/>
+        public override string ToString() => $"{VersionName} - {VersionCode}";
     }
 }

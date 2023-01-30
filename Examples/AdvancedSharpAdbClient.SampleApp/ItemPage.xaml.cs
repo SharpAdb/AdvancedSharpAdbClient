@@ -28,14 +28,9 @@ namespace AdvancedSharpAdbClient.SampleApp
     public partial class ItemPage : Page
     {
         private Compositor _compositor;
-        private ControlInfoDataItem _item;
         private ElementTheme? _currentElementTheme;
 
-        public ControlInfoDataItem Item
-        {
-            get { return _item; }
-            set { _item = value; }
-        }
+        public ControlInfoDataItem Item { get; set; }
 
         public ItemPage()
         {

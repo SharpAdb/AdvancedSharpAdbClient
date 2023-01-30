@@ -9,12 +9,12 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ListPropertiesTest()
         {
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 State = DeviceState.Online
             };
 
-            DummyAdbClient client = new DummyAdbClient();
+            DummyAdbClient client = new();
             client.Commands.Add("/system/bin/getprop", @"[init.svc.BGW]: [running]
 [init.svc.MtkCodecService]: [running]
 [init.svc.bootanim]: [stopped]");

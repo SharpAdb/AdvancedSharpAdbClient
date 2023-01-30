@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient
 #endif
             );
 
-            TaskCompletionSource<int> taskCompletionSource = new TaskCompletionSource<int>(socket);
+            TaskCompletionSource<int> taskCompletionSource = new(socket);
 
             socket.BeginReceive(buffer, offset, size, socketFlags, delegate (IAsyncResult iar)
             {

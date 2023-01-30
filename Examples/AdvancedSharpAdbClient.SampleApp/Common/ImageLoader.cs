@@ -29,8 +29,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
                 ControlInfoDataItem item = await ControlInfoDataSource.Instance.GetItemAsync(e.NewValue?.ToString());
                 if (item?.ImageIconPath != null)
                 {
-                    Uri imageUri = new Uri(item.ImageIconPath, UriKind.Absolute);
-                    BitmapImage imageBitmap = new BitmapImage(imageUri);
+                    Uri imageUri = new(item.ImageIconPath, UriKind.Absolute);
+                    BitmapImage imageBitmap = new(imageUri);
                     image.Source = imageBitmap;
                 }
             }

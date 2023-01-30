@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
         {
             int code = 1;
 
-            ProcessStartInfo psi = new ProcessStartInfo(filename, command)
+            ProcessStartInfo psi = new(filename, command)
             {
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
             using (Process process = Process.Start(psi))
             {
-                CancellationTokenSource Token = new CancellationTokenSource();
+                CancellationTokenSource Token = new();
 
                 process.BeginOutputReadLine();
 
@@ -81,7 +81,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
         public static TResult AwaitByTaskCompleteSource<TResult>(Func<Task<TResult>> func)
         {
-            TaskCompletionSource<TResult> taskCompletionSource = new TaskCompletionSource<TResult>();
+            TaskCompletionSource<TResult> taskCompletionSource = new();
             Task<TResult> task1 = taskCompletionSource.Task;
             _ = Task.Run(async () =>
             {

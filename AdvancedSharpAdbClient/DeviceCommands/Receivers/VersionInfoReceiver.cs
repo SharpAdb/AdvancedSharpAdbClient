@@ -17,12 +17,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// The name of the version code property.
         /// </summary>
-        private static string versionCode = "VersionCode";
+        private static readonly string versionCode = "VersionCode";
 
         /// <summary>
         /// The name of the version name property.
         /// </summary>
-        private static string versionName = "VersionName";
+        private static readonly string versionName = "VersionName";
 
         /// <summary>
         /// Tracks whether we're currently in the packages section or not.
@@ -41,9 +41,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the version code of the specified package
         /// </summary>
-        public VersionInfo VersionInfo => GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
-                    ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
-                    : null;
+        public VersionInfo VersionInfo =>
+            GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
+                ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
+                : null;
 
         private void CheckPackagesSection(string line)
         {
@@ -79,9 +80,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             CheckPackagesSection(line);
 
-            return !inPackagesSection
-                ? null
-                : line != null && line.Trim().StartsWith("versionName=") ? line.Trim().Substring(12).Trim() : (object)null;
+            return !inPackagesSection ? null
+                : line != null && line.Trim().StartsWith("versionName=")
+                ? line.Trim().Substring(12).Trim() : null;
         }
 
         /// <summary>

@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            PackageManagerReceiver pmr = new PackageManagerReceiver(Device, this);
+            PackageManagerReceiver pmr = new(Device, this);
 
             if (ThirdPartyOnly)
             {
@@ -175,7 +175,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
@@ -289,7 +289,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 94);
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             InstallProgressChanged?.Invoke(this, 95);
@@ -329,7 +329,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 93);
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             InstallProgressChanged?.Invoke(this, 95);
@@ -348,7 +348,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -364,7 +364,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            VersionInfoReceiver receiver = new VersionInfoReceiver();
+            VersionInfoReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"dumpsys package {packageName}", receiver);
             return receiver.VersionInfo;
         }
@@ -408,15 +408,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         sync.SyncProgressChanged += (sender, e) => progress(sender, e);
                     }
 
-                    using (Stream stream = File.OpenRead(localFilePath))
-                    {
+                    using Stream stream = File.OpenRead(localFilePath);
 #if HAS_LOGGER
-                        logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
+                    logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif
 
-                        // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                        sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
-                    }
+                    // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
                 return remoteFilePath;
@@ -461,7 +459,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             string reinstallSwitch = reinstall ? " -r" : string.Empty;
             string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
 
@@ -490,7 +488,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new InstallReceiver();
+            InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))

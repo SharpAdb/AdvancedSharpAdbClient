@@ -19,8 +19,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
     /// </summary>
     internal sealed class SuspensionManager
     {
-        private static Dictionary<string, object> _sessionState = new Dictionary<string, object>();
-        private static List<Type> _knownTypes = new List<Type>();
+        private static readonly List<Type> _knownTypes = new();
         private const string sessionStateFilename = "_sessionState.xml";
 
         /// <summary>
@@ -30,10 +29,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
         /// <see cref="DataContractSerializer"/> and should be as compact as possible.  Strings
         /// and other self-contained data types are strongly recommended.
         /// </summary>
-        public static Dictionary<string, object> SessionState
-        {
-            get { return _sessionState; }
-        }
+        public static Dictionary<string, object> SessionState { get; private set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// List of custom types provided to the <see cref="DataContractSerializer"/> when
@@ -67,17 +63,15 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
                 // Serialize the session state synchronously to avoid asynchronous access to shared
                 // state
-                MemoryStream sessionData = new MemoryStream();
-                DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<string, object>), _knownTypes);
-                serializer.WriteObject(sessionData, _sessionState);
+                MemoryStream sessionData = new();
+                DataContractSerializer serializer = new(typeof(Dictionary<string, object>), _knownTypes);
+                serializer.WriteObject(sessionData, SessionState);
 
                 // Get an output stream for the SessionState file and write the state asynchronously
                 StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(sessionStateFilename, CreationCollisionOption.ReplaceExisting);
-                using (Stream fileStream = await file.OpenStreamForWriteAsync())
-                {
-                    sessionData.Seek(0, SeekOrigin.Begin);
-                    await sessionData.CopyToAsync(fileStream);
-                }
+                using Stream fileStream = await file.OpenStreamForWriteAsync();
+                sessionData.Seek(0, SeekOrigin.Begin);
+                await sessionData.CopyToAsync(fileStream);
             }
             catch (Exception e)
             {
@@ -96,7 +90,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
         /// completes.</returns>
         public static async Task RestoreAsync()
         {
-            _sessionState = new Dictionary<string, object>();
+            SessionState = new Dictionary<string, object>();
 
             try
             {
@@ -105,8 +99,8 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
                 using (IInputStream inStream = await file.OpenSequentialReadAsync())
                 {
                     // Deserialize the Session State
-                    DataContractSerializer serializer = new DataContractSerializer(typeof(Dictionary<string, object>), _knownTypes);
-                    _sessionState = (Dictionary<string, object>)serializer.ReadObject(inStream.AsStreamForRead());
+                    DataContractSerializer serializer = new(typeof(Dictionary<string, object>), _knownTypes);
+                    SessionState = (Dictionary<string, object>)serializer.ReadObject(inStream.AsStreamForRead());
                 }
 
                 // Restore any registered frames to their saved state
@@ -125,11 +119,11 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
             }
         }
 
-        private static DependencyProperty FrameSessionStateKeyProperty =
+        private static readonly DependencyProperty FrameSessionStateKeyProperty =
             DependencyProperty.RegisterAttached("_FrameSessionStateKey", typeof(string), typeof(SuspensionManager), null);
-        private static DependencyProperty FrameSessionStateProperty =
+        private static readonly DependencyProperty FrameSessionStateProperty =
             DependencyProperty.RegisterAttached("_FrameSessionState", typeof(Dictionary<string, object>), typeof(SuspensionManager), null);
-        private static List<WeakReference<Frame>> _registeredFrames = new List<WeakReference<Frame>>();
+        private static readonly List<WeakReference<Frame>> _registeredFrames = new();
 
         /// <summary>
         /// Registers a <see cref="Frame"/> instance to allow its navigation history to be saved to
@@ -205,11 +199,11 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
                 if (frameSessionKey != null)
                 {
                     // Registered frames reflect the corresponding session state
-                    if (!_sessionState.ContainsKey(frameSessionKey))
+                    if (!SessionState.ContainsKey(frameSessionKey))
                     {
-                        _sessionState[frameSessionKey] = new Dictionary<string, object>();
+                        SessionState[frameSessionKey] = new Dictionary<string, object>();
                     }
-                    frameState = (Dictionary<string, object>)_sessionState[frameSessionKey];
+                    frameState = (Dictionary<string, object>)SessionState[frameSessionKey];
                 }
                 else
                 {

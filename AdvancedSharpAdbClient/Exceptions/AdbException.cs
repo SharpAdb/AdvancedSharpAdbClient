@@ -89,14 +89,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <see cref="SocketException.SocketErrorCode"/> is set to <see cref="SocketError.ConnectionReset"/>, indicating
         /// that the connection was reset by the remote server. This happens when the adb server was killed.
         /// </summary>
-        public bool ConnectionReset
-        {
-            get
-            {
-                SocketException socketException = InnerException as SocketException;
-
-                return socketException != null && socketException.SocketErrorCode == SocketError.ConnectionReset;
-            }
-        }
+        public bool ConnectionReset =>
+            InnerException is SocketException socketException && socketException.SocketErrorCode == SocketError.ConnectionReset;
     }
 }

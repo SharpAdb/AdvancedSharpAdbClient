@@ -65,20 +65,18 @@ namespace AdvancedSharpAdbClient.Tests
             header.Height = 1;
 
             byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
-            using (Bitmap image = (Bitmap)header.ToImage(framebuffer))
-            {
-                Assert.NotNull(image);
-                Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
+            using Bitmap image = (Bitmap)header.ToImage(framebuffer);
+            Assert.NotNull(image);
+            Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+            Assert.Equal(1, image.Width);
+            Assert.Equal(1, image.Height);
 
-                Color pixel = image.GetPixel(0, 0);
-                Assert.Equal(0x35, pixel.R);
-                Assert.Equal(0x4a, pixel.G);
-                Assert.Equal(0x4c, pixel.B);
-                Assert.Equal(0xff, pixel.A);
-            }
+            Color pixel = image.GetPixel(0, 0);
+            Assert.Equal(0x35, pixel.R);
+            Assert.Equal(0x4a, pixel.G);
+            Assert.Equal(0x4c, pixel.B);
+            Assert.Equal(0xff, pixel.A);
         }
 
         [Fact]

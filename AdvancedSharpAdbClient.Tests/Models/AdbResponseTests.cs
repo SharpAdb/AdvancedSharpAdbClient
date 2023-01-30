@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EqualsTest()
         {
-            AdbResponse first = new AdbResponse()
+            AdbResponse first = new()
             {
                 IOSuccess = false,
                 Message = "Hi",
@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Tests
                 Timeout = false
             };
 
-            AdbResponse second = new AdbResponse()
+            AdbResponse second = new()
             {
                 IOSuccess = true,
                 Message = "Hi",
@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetHashCodeTest()
         {
-            AdbResponse first = new AdbResponse()
+            AdbResponse first = new()
             {
                 IOSuccess = false,
                 Message = "Hi",
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.Tests
                 Timeout = false
             };
 
-            AdbResponse second = new AdbResponse()
+            AdbResponse second = new()
             {
                 IOSuccess = false,
                 Message = "Hi",

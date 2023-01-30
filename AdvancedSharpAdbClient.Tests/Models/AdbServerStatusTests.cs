@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringTest()
         {
-            AdbServerStatus s = new AdbServerStatus()
+            AdbServerStatus s = new()
             {
                 IsRunning = true,
                 Version = new Version(1, 0, 32)

@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A <see cref="StringBuilder"/> which receives all output from the device.
         /// </summary>
-        private readonly StringBuilder output = new StringBuilder();
+        private readonly StringBuilder output = new();
 
 #if !HAS_LOGGER
 #pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
@@ -52,6 +52,7 @@ namespace AdvancedSharpAdbClient
             this.logger = logger ?? NullLogger<ConsoleOutputReceiver>.Instance;
 #endif
         }
+
 #if !HAS_LOGGER
 #pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
 #endif
@@ -62,10 +63,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>
         /// A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </returns>
-        public override string ToString()
-        {
-            return output.ToString();
-        }
+        public override string ToString() => output.ToString();
 
         /// <summary>
         /// Throws an error message if the console output line contains an error message.

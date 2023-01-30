@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringTest()
         {
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             receiver.AddOutput("Hello, World!");
             receiver.AddOutput("See you!");
 
@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringIgnoredLineTest()
         {
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             receiver.AddOutput("#Hello, World!");
             receiver.AddOutput("See you!");
 
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringIgnoredLineTest2()
         {
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             receiver.AddOutput("Hello, World!");
             receiver.AddOutput("$See you!");
 
@@ -64,13 +64,13 @@ namespace AdvancedSharpAdbClient.Tests
             AssertTrowsException<PermissionDeniedException>("/dev/test: access denied");
 
             // Should not thrown an exception
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             receiver.ThrowOnError("Stay calm and watch cat movies.");
         }
 
-        private void AssertTrowsException<T>(string line) where T : Exception
+        private static void AssertTrowsException<T>(string line) where T : Exception
         {
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             _ = Assert.Throws<T>(() => receiver.ThrowOnError(line));
         }
     }

@@ -5,6 +5,6 @@
     /// </summary>
     public class FactoriesTests
     {
-        public static readonly object locker = new object();
+        public static readonly object locker = new();
     }
 }

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EnvironmentVariablesReceiverTest()
         {
-            EnvironmentVariablesReceiver receiver = new EnvironmentVariablesReceiver();
+            EnvironmentVariablesReceiver receiver = new();
             receiver.AddOutput("XDG_VTNR=7");
             receiver.AddOutput("XDG_SESSION_ID=c1");
             receiver.AddOutput("CLUTTER_IM_MODULE=xim");

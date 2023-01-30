@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         Queue<byte[]> SyncDataSent { get; }
 
-        List<Tuple<SyncCommand, string>> SyncRequests { get; }
+        List<(SyncCommand, string)> SyncRequests { get; }
 
         /// <summary>
         /// Gets a value indicating whether the socket reconnected.

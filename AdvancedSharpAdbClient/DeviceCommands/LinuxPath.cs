@@ -71,24 +71,24 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
 
-            StringBuilder builder = new StringBuilder(capacity);
+            StringBuilder builder = new(capacity);
             for (int j = num2; j < paths.Length; j++)
             {
                 if (paths[j].Length != 0)
                 {
                     if (builder.Length == 0)
                     {
-                        builder.Append(FixupPath(paths[j]));
+                        _ = builder.Append(FixupPath(paths[j]));
                     }
                     else
                     {
                         char ch2 = builder[builder.Length - 1];
                         if (ch2 != DirectorySeparatorChar)
                         {
-                            builder.Append(DirectorySeparatorChar);
+                            _ = builder.Append(DirectorySeparatorChar);
                         }
 
-                        builder.Append(paths[j]);
+                        _ = builder.Append(paths[j]);
                     }
                 }
             }
@@ -192,20 +192,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The entry name.</returns>
-        public static string Escape(string path)
-        {
-            return new Regex(EscapePattern).Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
-        }
+        public static string Escape(string path) => new Regex(EscapePattern).Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
 
         /// <summary>
         /// Quotes the specified path.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The quoted path.</returns>
-        public static string Quote(string path)
-        {
-            return path.Contains(" ") ? string.Format("\"{0}\"", path) : path;
-        }
+        public static string Quote(string path) => path.Contains(" ") ? string.Format("\"{0}\"", path) : path;
 
         /// <summary>
         /// Checks the invalid path chars.

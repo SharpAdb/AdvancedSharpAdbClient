@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="message">The error message returned by adb.</param>
         /// <returns>A new <see cref="AdbResponse"/> object that represents the error.</returns>
-        public static AdbResponse FromError(string message) => new AdbResponse()
+        public static AdbResponse FromError(string message) => new()
         {
             IOSuccess = true,
             Message = message,
@@ -73,16 +73,12 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object obj)
-        {
-            AdbResponse other = obj as AdbResponse;
-
-            return other != null
+        public override bool Equals(object obj) =>
+            obj is AdbResponse other
                 && other.IOSuccess == IOSuccess
                 && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
                 && other.Okay == Okay
                 && other.Timeout == Timeout;
-        }
 
         /// <summary>
         /// Gets the hash code for the current <see cref="AdbResponse"/>.

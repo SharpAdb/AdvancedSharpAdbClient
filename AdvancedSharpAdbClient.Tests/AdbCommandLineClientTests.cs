@@ -12,8 +12,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetVersionTest()
         {
-            DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
-            commandLine.Version = new Version(1, 0, 32);
+            DummyAdbCommandLineClient commandLine = new()
+            {
+                Version = new Version(1, 0, 32)
+            };
 
             Assert.Equal(new Version(1, 0, 32), commandLine.GetVersion());
         }
@@ -21,16 +23,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetVersionNullTest()
         {
-            DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
-            commandLine.Version = null;
+            DummyAdbCommandLineClient commandLine = new()
+            {
+                Version = null
+            };
             _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 
         [Fact]
         public void GetOutdatedVersionTest()
         {
-            DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
-            commandLine.Version = new Version(1, 0, 1);
+            DummyAdbCommandLineClient commandLine = new()
+            {
+                Version = new Version(1, 0, 1)
+            };
 
             _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
@@ -38,7 +44,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void StartServerTest()
         {
-            DummyAdbCommandLineClient commandLine = new DummyAdbCommandLineClient();
+            DummyAdbCommandLineClient commandLine = new();
             Assert.False(commandLine.ServerStarted);
             commandLine.StartServer();
             Assert.True(commandLine.ServerStarted);

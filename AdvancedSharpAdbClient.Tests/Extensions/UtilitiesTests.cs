@@ -27,22 +27,20 @@ namespace AdvancedSharpAdbClient.Tests.Extensions
         }
 
         [Fact]
-        public void JoinTest()
-        {
+        public void JoinTest() =>
             Assert.Equal("Hello World!", Utilities.Join(" ", new string[] { "Hello", "World!" }));
-        }
 
         [Fact]
         public void FromUnixTimeSecondsTest()
         {
-            DateTimeOffset time = new DateTimeOffset(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
+            DateTimeOffset time = new(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
             Assert.Equal(time, Utilities.FromUnixTimeSeconds(1654085434));
         }
 
         [Fact]
         public void ToUnixTimeSecondsTest()
         {
-            DateTimeOffset time = new DateTimeOffset(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
+            DateTimeOffset time = new(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
             Assert.Equal(1654085434, time.ToUnixTimeSeconds());
         }
     }

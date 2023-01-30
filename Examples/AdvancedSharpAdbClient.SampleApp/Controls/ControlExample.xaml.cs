@@ -224,27 +224,25 @@ namespace AdvancedSharpAdbClient.SampleApp
             // Using RTB doesn't capture popups; but in the non-delay case, that probably isn't necessary.
             // This method seems more robust than using AppRecordingManager and also will work on non-desktop devices.
 
-            RenderTargetBitmap rtb = new RenderTargetBitmap();
+            RenderTargetBitmap rtb = new();
             await rtb.RenderAsync(ControlPresenter);
 
             Windows.Storage.Streams.IBuffer pixelBuffer = await rtb.GetPixelsAsync();
             byte[] pixels = pixelBuffer.ToArray();
 
             StorageFile file = await UIHelper.ScreenshotStorageFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
-            using (Windows.Storage.Streams.IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite))
-            {
-                DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
-                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Premultiplied,
-                    (uint)rtb.PixelWidth,
-                    (uint)rtb.PixelHeight,
-                    displayInformation.RawDpiX,
-                    displayInformation.RawDpiY,
-                    pixels);
+            using Windows.Storage.Streams.IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+            DisplayInformation displayInformation = DisplayInformation.GetForCurrentView();
+            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+            encoder.SetPixelData(BitmapPixelFormat.Bgra8,
+                BitmapAlphaMode.Premultiplied,
+                (uint)rtb.PixelWidth,
+                (uint)rtb.PixelHeight,
+                displayInformation.RawDpiX,
+                displayInformation.RawDpiY,
+                pixels);
 
-                await encoder.FlushAsync();
-            }
+            await encoder.FlushAsync();
         }
 
         public async void TakeScreenshotWithDelay()
@@ -296,7 +294,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                             }
 
                             // Crop the screenshot to the control area
-                            BitmapTransform transform = new BitmapTransform()
+                            BitmapTransform transform = new()
                             {
                                 Bounds = new BitmapBounds()
                                 {
@@ -316,12 +314,10 @@ namespace AdvancedSharpAdbClient.SampleApp
 
                             // Save the cropped picture
                             StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(GetBestScreenshotName(), CreationCollisionOption.ReplaceExisting);
-                            using (Windows.Storage.Streams.IRandomAccessStream outStream = await file.OpenAsync(FileAccessMode.ReadWrite))
-                            {
-                                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
-                                encoder.SetSoftwareBitmap(softwareBitmap);
-                                await encoder.FlushAsync();
-                            }
+                            using Windows.Storage.Streams.IRandomAccessStream outStream = await file.OpenAsync(FileAccessMode.ReadWrite);
+                            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outStream);
+                            encoder.SetSoftwareBitmap(softwareBitmap);
+                            await encoder.FlushAsync();
                         }
 
                         // Delete intermediate file
@@ -342,16 +338,16 @@ namespace AdvancedSharpAdbClient.SampleApp
                 // Most of them don't have this, but the xaml source name is a really good file name
                 string xamlSource = XamlSource.LocalPath;
                 string fileName = Path.GetFileNameWithoutExtension(xamlSource);
-                if (!String.IsNullOrWhiteSpace(fileName))
+                if (!string.IsNullOrWhiteSpace(fileName))
                 {
                     imageName = fileName + ".png";
                 }
             }
-            else if (!String.IsNullOrWhiteSpace(Name))
+            else if (!string.IsNullOrWhiteSpace(Name))
             {
                 // Put together the page name and the control example name
                 UIElement uie = this;
-                while (uie != null && !(uie is Page))
+                while (uie is not null and not Page)
                 {
                     uie = VisualTreeHelper.GetParent(uie) as UIElement;
                 }
@@ -379,7 +375,7 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private void ControlPaddingBox_KeyUp(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter && !String.IsNullOrWhiteSpace(ControlPaddingBox.Text))
+            if (e.Key == Windows.System.VirtualKey.Enter && !string.IsNullOrWhiteSpace(ControlPaddingBox.Text))
             {
                 EvaluatePadding();
             }
@@ -397,7 +393,7 @@ namespace AdvancedSharpAdbClient.SampleApp
             double[] nums = new double[4];
             for (int i = 0; i < strs.Length; i++)
             {
-                if (!Double.TryParse(strs[i], out nums[i]))
+                if (!double.TryParse(strs[i], out nums[i]))
                 {
                     //  Bad format
                     return;

@@ -14,15 +14,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void LifecycleTest()
         {
-            TcpSocket socket = new TcpSocket();
+            TcpSocket socket = new();
             Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.bing.com", 80));
             Assert.True(socket.Connected);
 
-            byte[] data = Encoding.ASCII.GetBytes(@"GET / HTTP/1.1
-
-");
+            byte[] data = Encoding.ASCII.GetBytes("GET / HTTP/1.1\n\n");
             socket.Send(data, 0, data.Length, SocketFlags.None);
 
             byte[] responseData = new byte[128];
@@ -35,7 +33,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReconnectTest()
         {
-            TcpSocket socket = new TcpSocket();
+            TcpSocket socket = new();
             Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.bing.com", 80));
@@ -51,8 +49,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void BufferSizeTest()
         {
-            TcpSocket socket = new TcpSocket();
-            socket.ReceiveBufferSize = 1024;
+            TcpSocket socket = new()
+            {
+                ReceiveBufferSize = 1024
+            };
             Assert.Equal(1024, socket.ReceiveBufferSize);
             socket.Dispose();
         }
@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateUnsupportedSocketTest()
         {
-            TcpSocket socket = new TcpSocket();
+            TcpSocket socket = new();
             _ = Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
         }
     }

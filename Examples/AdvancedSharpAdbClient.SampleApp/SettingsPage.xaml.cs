@@ -131,8 +131,10 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private async void FolderButton_Click(object sender, RoutedEventArgs e)
         {
-            FolderPicker folderPicker = new FolderPicker();
-            folderPicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            FolderPicker folderPicker = new()
+            {
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary
+            };
             folderPicker.FileTypeFilter.Add(".png"); // meaningless, but you have to have something
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
 

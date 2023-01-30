@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <returns>A new <see cref="LogEntry"/> object.</returns>
         public async Task<LogEntry> ReadEntry(CancellationToken cancellationToken = default)
         {
-            LogEntry value = new LogEntry();
+            //LogEntry value = new();
 
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
@@ -54,14 +54,14 @@ namespace AdvancedSharpAdbClient.Logs
             int pid = pidValue.Value;
             int tid = tidValue.Value;
             int sec = secValue.Value;
-            int nsec = nsecValue.Value;
+            //int nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
             // In all cases, it appears that they always start with a two uint16's giving the
             // header size and payload length.
             // For both objects, the size should be 0x18
             uint id = 0;
-            uint uid = 0;
+            //uint uid = 0;
 
             if (headerSize != 0)
             {
@@ -77,17 +77,17 @@ namespace AdvancedSharpAdbClient.Logs
                     id = idValue.Value;
                 }
 
-                if (headerSize >= 0x1c)
-                {
-                    uint? uidValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
+                //if (headerSize >= 0x1c)
+                //{
+                //    uint? uidValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
-                    if (uidValue == null)
-                    {
-                        return null;
-                    }
+                //    if (uidValue == null)
+                //    {
+                //        return null;
+                //    }
 
-                    uid = uidValue.Value;
-                }
+                //    uid = uidValue.Value;
+                //}
 
                 if (headerSize >= 0x20)
                 {
@@ -112,11 +112,11 @@ namespace AdvancedSharpAdbClient.Logs
 
             switch ((LogId)id)
             {
-                case LogId.Crash:
-                case LogId.Kernel:
-                case LogId.Main:
-                case LogId.Radio:
-                case LogId.System:
+                case LogId.Crash
+                    or LogId.Kernel
+                    or LogId.Main
+                    or LogId.Radio
+                    or LogId.System:
                     {
                         // format: <priority:1><tag:N>\0<message:N>\0
                         byte priority = data[0];
@@ -150,7 +150,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case LogId.Events:
                     {
                         // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry entry = new EventLogEntry()
+                        EventLogEntry entry = new()
                         {
                             Data = data,
                             ProcessId = pid,
@@ -162,16 +162,14 @@ namespace AdvancedSharpAdbClient.Logs
                         // Use a stream on the data buffer. This will make sure that,
                         // if anything goes wrong parsing the data, we never go past
                         // the message boundary itself.
-                        using (MemoryStream dataStream = new MemoryStream(data))
+                        using (MemoryStream dataStream = new(data))
                         {
-                            using (BinaryReader reader = new BinaryReader(dataStream))
-                            {
-                                int priority = reader.ReadInt32();
+                            using BinaryReader reader = new(dataStream);
+                            int priority = reader.ReadInt32();
 
-                                while (dataStream.Position < dataStream.Length)
-                                {
-                                    ReadLogEntry(reader, entry.Values);
-                                }
+                            while (dataStream.Position < dataStream.Length)
+                            {
+                                ReadLogEntry(reader, entry.Values);
                             }
                         }
 
@@ -198,7 +196,6 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 case EventLogType.Float:
                     parent.Add(reader.ReadSingle());
-
                     break;
 
                 case EventLogType.Integer:
@@ -212,7 +209,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
 
-                    Collection<object> list = new Collection<object>();
+                    Collection<object> list = new();
 
                     for (int i = 0; i < listLength; i++)
                     {

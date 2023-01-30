@@ -10,16 +10,12 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
     public class AndroidProcessTests
     {
         [Fact]
-        public void ParseNullTest()
-        {
+        public void ParseNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => AndroidProcess.Parse(null));
-        }
 
         [Fact]
-        public void ParseTooFewPartsTest()
-        {
+        public void ParseTooFewPartsTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => AndroidProcess.Parse("1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 "));
-        }
 
         /// <summary>
         /// Tests the parsing of a process where the /cmdline output is prefixed.
@@ -51,9 +47,11 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ToStringTest()
         {
-            AndroidProcess p = new AndroidProcess();
-            p.ProcessId = 1;
-            p.Name = "init";
+            AndroidProcess p = new()
+            {
+                ProcessId = 1,
+                Name = "init"
+            };
 
             Assert.Equal("init (1)", p.ToString());
         }

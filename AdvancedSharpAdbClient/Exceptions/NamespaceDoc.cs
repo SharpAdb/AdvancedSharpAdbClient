@@ -11,7 +11,5 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// The classes in this namespace provide <see cref="Exception"/>s.
     /// </summary>
     [CompilerGeneratedAttribute]
-    internal class NamespaceDoc
-    {
-    }
+    internal class NamespaceDoc { }
 }

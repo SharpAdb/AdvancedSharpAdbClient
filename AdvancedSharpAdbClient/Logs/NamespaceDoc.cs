@@ -10,7 +10,5 @@ namespace AdvancedSharpAdbClient.Logs
     /// The classes in this namespace provide access to the Android system log.
     /// </summary>
     [CompilerGeneratedAttribute]
-    internal class NamespaceDoc
-    {
-    }
+    internal class NamespaceDoc { }
 }

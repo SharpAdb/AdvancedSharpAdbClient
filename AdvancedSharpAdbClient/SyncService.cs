@@ -309,8 +309,10 @@ namespace AdvancedSharpAdbClient
 
             // read the result, in a byte array containing 3 ints
             // (mode, size, time)
-            FileStatistics value = new FileStatistics();
-            value.Path = remotePath;
+            FileStatistics value = new()
+            {
+                Path = remotePath
+            };
 
             ReadStatistics(value);
 
@@ -320,7 +322,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
-            Collection<FileStatistics> value = new Collection<FileStatistics>();
+            Collection<FileStatistics> value = new();
 
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
@@ -338,7 +340,7 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException($"The server returned an invalid sync response.");
                 }
 
-                FileStatistics entry = new FileStatistics();
+                FileStatistics entry = new();
                 ReadStatistics(entry);
                 entry.Path = Socket.ReadSyncString();
 

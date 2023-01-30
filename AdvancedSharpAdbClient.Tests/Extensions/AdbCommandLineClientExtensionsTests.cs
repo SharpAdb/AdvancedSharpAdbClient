@@ -11,15 +11,13 @@ namespace AdvancedSharpAdbClient.Tests
     public class AdbCommandLineClientExtensionsTests
     {
         [Fact]
-        public void EnsureIsValidAdbFileNullValueTest()
-        {
+        public void EnsureIsValidAdbFileNullValueTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe"));
-        }
 
         [Fact]
         public void EnsureIsValidAdbFileInvalidFileTest()
         {
-            Mock<IAdbCommandLineClient> clientMock = new Mock<IAdbCommandLineClient>();
+            Mock<IAdbCommandLineClient> clientMock = new();
             clientMock.Setup(c => c.IsValidAdbFile(It.IsAny<string>())).Returns(false);
 
             IAdbCommandLineClient client = clientMock.Object;

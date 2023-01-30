@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public ManualResetEvent CreateEventSignal()
         {
-            ManualResetEvent signal = new ManualResetEvent(false);
+            ManualResetEvent signal = new(false);
             Monitor.DeviceChanged += (sender, e) => signal.Set();
             Monitor.DeviceConnected += (sender, e) => signal.Set();
             Monitor.DeviceDisconnected += (sender, e) => signal.Set();

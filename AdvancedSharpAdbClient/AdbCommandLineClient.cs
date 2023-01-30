@@ -99,16 +99,16 @@ namespace AdvancedSharpAdbClient
         public Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new List<string>();
+            List<string> standardOutput = new();
 
             RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
             Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-            
+
             if (version < AdbServer.RequiredAdbVersion)
             {
-                AdbException ex = new AdbException($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
+                AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
 #if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
 #endif
@@ -160,10 +160,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidAdbFile(string adbPath)
-        {
-            return CrossPlatformFunc.CheckFileExists(adbPath);
-        }
+        public virtual bool IsValidAdbFile(string adbPath) => CrossPlatformFunc.CheckFileExists(adbPath);
 
         /// <summary>
         /// Parses the output of the <c>adb.exe version</c> command and determines the

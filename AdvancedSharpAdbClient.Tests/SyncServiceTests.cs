@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void StatTest()
         {
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
@@ -41,10 +41,8 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using (SyncService service = new SyncService(Socket, device))
-                    {
-                        value = service.Stat("/fstab.donatello");
-                    }
+                    using SyncService service = new(Socket, device);
+                    value = service.Stat("/fstab.donatello");
                 });
 
             Assert.NotNull(value);
@@ -56,7 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetListingTest()
         {
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
@@ -80,10 +78,8 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using (SyncService service = new SyncService(Socket, device))
-                    {
-                        value = service.GetDirectoryListing("/storage").ToList();
-                    }
+                    using SyncService service = new(Socket, device);
+                    value = service.GetDirectoryListing("/storage").ToList();
                 });
 
             Assert.Equal(4, value.Count);
@@ -118,13 +114,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void PullTest()
         {
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 
-            MemoryStream stream = new MemoryStream();
+            MemoryStream stream = new();
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
@@ -143,10 +139,8 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using (SyncService service = new SyncService(Socket, device))
-                    {
-                        service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
-                    }
+                    using SyncService service = new(Socket, device);
+                    service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
@@ -156,7 +150,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void PushTest()
         {
-            DeviceData device = new DeviceData()
+            DeviceData device = new()
             {
                 Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
@@ -164,7 +158,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Stream stream = File.OpenRead("Assets/fstab.bin");
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
-            List<byte> contentMessage = new List<byte>();
+            List<byte> contentMessage = new();
             contentMessage.AddRange(SyncCommandConverter.GetBytes(SyncCommand.DATA));
             contentMessage.AddRange(BitConverter.GetBytes(content.Length));
             contentMessage.AddRange(content);
@@ -184,10 +178,8 @@ namespace AdvancedSharpAdbClient.Tests
                 },
                 () =>
                 {
-                    using (SyncService service = new SyncService(Socket, device))
-                    {
-                        service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
-                    }
+                    using SyncService service = new(Socket, device);
+                    service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
                 });
         }
     }

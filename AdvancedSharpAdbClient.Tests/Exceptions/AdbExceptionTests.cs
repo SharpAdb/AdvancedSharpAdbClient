@@ -6,29 +6,21 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
     public class AdbExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor()
-        {
+        public void TestEmptyConstructor() =>
             ExceptionTester<AdbException>.TestEmptyConstructor(() => new AdbException());
-        }
 
         [Fact]
-        public void TestMessageConstructor()
-        {
+        public void TestMessageConstructor() =>
             ExceptionTester<AdbException>.TestMessageConstructor((message) => new AdbException(message));
-        }
 
         [Fact]
-        public void TestMessageAndInnerConstructor()
-        {
+        public void TestMessageAndInnerConstructor() =>
             ExceptionTester<AdbException>.TestMessageAndInnerConstructor((message, inner) => new AdbException(message, inner));
-        }
 
 #if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor()
-        {
+        public void TestSerializationConstructor() =>
             ExceptionTester<AdbException>.TestSerializationConstructor((info, context) => new AdbException(info, context));
-        }
 #endif
     }
 }

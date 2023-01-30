@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
         public static Func<string, string, List<string>, List<string>, int> RunProcess = (string filename, string command, List<string> errorOutput, List<string> standardOutput) =>
         {
 #if !NETSTANDARD1_3
-            ProcessStartInfo psi = new ProcessStartInfo(filename, command)
+            ProcessStartInfo psi = new(filename, command)
             {
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -32,23 +32,21 @@ namespace AdvancedSharpAdbClient
                 RedirectStandardOutput = true
             };
 
-            using (Process process = Process.Start(psi))
+            using Process process = Process.Start(psi);
+            string standardErrorString = process.StandardError.ReadToEnd();
+            string standardOutputString = process.StandardOutput.ReadToEnd();
+
+            errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
             {
-                string standardErrorString = process.StandardError.ReadToEnd();
-                string standardOutputString = process.StandardOutput.ReadToEnd();
-
-                errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
-
-                standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
-
-                // get the return code from the process
-                if (!process.WaitForExit(5000))
-                {
-                    process.Kill();
-                }
-
-                return process.ExitCode;
+                process.Kill();
             }
+
+            return process.ExitCode;
 #else
             throw new PlatformNotSupportedException();
 #endif

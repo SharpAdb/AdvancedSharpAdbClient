@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient
         /// value, used for the <see cref="string"/> representation of the <see cref="ForwardSpec"/>
         /// class.
         /// </summary>
-        private static readonly Dictionary<string, ForwardProtocol> Mappings = new Dictionary<string, ForwardProtocol>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, ForwardProtocol> Mappings = new(StringComparer.OrdinalIgnoreCase)
         {
             { "tcp", ForwardProtocol.Tcp },
             { "localabstract", ForwardProtocol.LocalAbstract },
@@ -79,8 +79,10 @@ namespace AdvancedSharpAdbClient
 
             ForwardProtocol protocol = Mappings[parts[0]];
 
-            ForwardSpec value = new ForwardSpec();
-            value.Protocol = protocol;
+            ForwardSpec value = new()
+            {
+                Protocol = protocol
+            };
 
 
             bool isInt = int.TryParse(parts[1], out int intValue);
@@ -105,10 +107,10 @@ namespace AdvancedSharpAdbClient
                     value.Port = intValue;
                     break;
 
-                case ForwardProtocol.LocalAbstract:
-                case ForwardProtocol.LocalFilesystem:
-                case ForwardProtocol.LocalReserved:
-                case ForwardProtocol.Device:
+                case ForwardProtocol.LocalAbstract
+                    or ForwardProtocol.LocalFilesystem
+                    or ForwardProtocol.LocalReserved
+                    or ForwardProtocol.Device:
                     value.SocketName = parts[1];
                     break;
             }
@@ -121,40 +123,29 @@ namespace AdvancedSharpAdbClient
         {
             string protocolString = Mappings.FirstOrDefault(v => v.Value == Protocol).Key;
 
-            switch (Protocol)
+            return Protocol switch
             {
-                case ForwardProtocol.JavaDebugWireProtocol:
-                    return $"{protocolString}:{ProcessId}";
-
-                case ForwardProtocol.Tcp:
-                    return $"{protocolString}:{Port}";
-
-                case ForwardProtocol.LocalAbstract:
-                case ForwardProtocol.LocalFilesystem:
-                case ForwardProtocol.LocalReserved:
-                case ForwardProtocol.Device:
-                    return $"{protocolString}:{SocketName}";
-
-                default:
-                    return string.Empty;
-            }
+                ForwardProtocol.JavaDebugWireProtocol => $"{protocolString}:{ProcessId}",
+                ForwardProtocol.Tcp => $"{protocolString}:{Port}",
+                ForwardProtocol.LocalAbstract
+                or ForwardProtocol.LocalFilesystem
+                or ForwardProtocol.LocalReserved
+                or ForwardProtocol.Device => $"{protocolString}:{SocketName}",
+                _ => string.Empty,
+            };
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            return (int)Protocol
+        public override int GetHashCode() =>
+            (int)Protocol
                 ^ Port
                 ^ ProcessId
                 ^ (SocketName == null ? 1 : SocketName.GetHashCode());
-        }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            ForwardSpec other = obj as ForwardSpec;
-
-            if (other == null)
+            if (obj is not ForwardSpec other)
             {
                 return false;
             }
@@ -164,23 +155,16 @@ namespace AdvancedSharpAdbClient
                 return false;
             }
 
-            switch (Protocol)
+            return Protocol switch
             {
-                case ForwardProtocol.JavaDebugWireProtocol:
-                    return ProcessId == other.ProcessId;
-
-                case ForwardProtocol.Tcp:
-                    return Port == other.Port;
-
-                case ForwardProtocol.LocalAbstract:
-                case ForwardProtocol.LocalFilesystem:
-                case ForwardProtocol.LocalReserved:
-                case ForwardProtocol.Device:
-                    return string.Equals(SocketName, other.SocketName);
-
-                default:
-                    return false;
-            }
+                ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
+                ForwardProtocol.Tcp => Port == other.Port,
+                ForwardProtocol.LocalAbstract
+                or ForwardProtocol.LocalFilesystem
+                or ForwardProtocol.LocalReserved
+                or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
+                _ => false,
+            };
         }
     }
 }

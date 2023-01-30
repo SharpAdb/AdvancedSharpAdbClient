@@ -23,10 +23,8 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
-        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
-        {
+        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken) =>
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
-        }
 
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
         {

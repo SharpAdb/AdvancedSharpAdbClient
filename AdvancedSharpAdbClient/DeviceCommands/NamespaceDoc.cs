@@ -10,7 +10,5 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// The classes in this namespace provide Device Commands of adb.
     /// </summary>
     [CompilerGeneratedAttribute]
-    internal class NamespaceDoc
-    {
-    }
+    internal class NamespaceDoc { }
 }

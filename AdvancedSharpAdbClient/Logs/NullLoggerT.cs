@@ -16,13 +16,10 @@ namespace Microsoft.Extensions.Logging.Abstractions
         /// Returns an instance of <see cref="NullLogger{T}"/>.
         /// </summary>
         /// <returns>An instance of <see cref="NullLogger{T}"/>.</returns>
-        public static readonly NullLogger<T> Instance = new NullLogger<T>();
+        public static readonly NullLogger<T> Instance = new();
 
         /// <inheritdoc />
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            return NullScope.Instance;
-        }
+        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
 
         /// <inheritdoc />
         /// <remarks>
@@ -38,10 +35,7 @@ namespace Microsoft.Extensions.Logging.Abstractions
         }
 
         /// <inheritdoc />
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return false;
-        }
+        public bool IsEnabled(LogLevel logLevel) => false;
     }
 
     internal sealed class NullScope : IDisposable

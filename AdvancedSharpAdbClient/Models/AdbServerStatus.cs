@@ -2,10 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
-    using System;
-
     /// <summary>
     /// Represents the status of the adb server.
     /// </summary>
@@ -26,6 +26,7 @@ namespace AdvancedSharpAdbClient
         /// object.
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.</returns>
-        public override string ToString() => IsRunning ? $"Version {Version} of the adb daemon is running." : "The adb daemon is not running.";
+        public override string ToString() =>
+            IsRunning ? $"Version {Version} of the adb daemon is running." : "The adb daemon is not running.";
     }
 }

@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Buffers;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,32 +65,30 @@ namespace AdvancedSharpAdbClient
         {
             EnsureNotDisposed();
 
-            using (IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint))
+            using IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint);
+            // Select the target device
+            socket.SetDevice(Device);
+
+            // Send the framebuffer command
+            socket.SendAdbRequest("framebuffer:");
+            socket.ReadAdbResponse();
+
+            // The result first is a FramebufferHeader object,
+            await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
+
+            if (!headerInitialized)
             {
-                // Select the target device
-                socket.SetDevice(Device);
-
-                // Send the framebuffer command
-                socket.SendAdbRequest("framebuffer:");
-                socket.ReadAdbResponse();
-
-                // The result first is a FramebufferHeader object,
-                await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
-
-                if (!headerInitialized)
-                {
-                    Header = FramebufferHeader.Read(headerData);
-                    headerInitialized = true;
-                }
-
-                if (Data == null || Data.Length < Header.Size)
-                {
-                    Data = new byte[Header.Size];
-                }
-
-                // followed by the actual framebuffer content
-                _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
+                Header = FramebufferHeader.Read(headerData);
+                headerInitialized = true;
             }
+
+            if (Data == null || Data.Length < Header.Size)
+            {
+                Data = new byte[Header.Size];
+            }
+
+            // followed by the actual framebuffer content
+            _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

@@ -160,8 +160,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ToStringTest()
         {
-            DeviceData d = new DeviceData();
-            d.Serial = "xyz";
+            DeviceData d = new()
+            {
+                Serial = "xyz"
+            };
 
             Assert.Equal("xyz", d.ToString());
         }

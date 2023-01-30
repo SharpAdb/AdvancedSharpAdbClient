@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
         public bool IsEmpty => Code.Length == 0 && CodeSourceFile == null;
 
         private string actualCode = "";
-        private static Regex SubstitutionPattern = new Regex(@"\$\(([^\)]+)\)");
+        private static readonly Regex SubstitutionPattern = new(@"\$\(([^\)]+)\)");
 
         public SampleCodePresenter()
         {
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
             {
                 concatString += rawSource.Segments[i];
             }
-            Uri derivedSource = new Uri(new Uri("ms-appx:///ControlPagesSampleCode/"), concatString);
+            Uri derivedSource = new(new Uri("ms-appx:///ControlPagesSampleCode/"), concatString);
 
             return derivedSource;
         }
@@ -168,7 +168,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
 
             actualCode = sampleString;
 
-            RichTextBlock sampleCodeRTB = new RichTextBlock { FontFamily = new FontFamily("Consolas") };
+            RichTextBlock sampleCodeRTB = new() { FontFamily = new FontFamily("Consolas") };
 
             RichTextBlockFormatter formatter = GenerateRichTextFormatter();
             formatter.FormatRichTextBlock(sampleString, highlightLanguage, sampleCodeRTB);
@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
 
         private RichTextBlockFormatter GenerateRichTextFormatter()
         {
-            RichTextBlockFormatter formatter = new RichTextBlockFormatter(ThemeHelper.ActualTheme);
+            RichTextBlockFormatter formatter = new(ThemeHelper.ActualTheme);
 
             if (ThemeHelper.ActualTheme == ElementTheme.Dark)
             {
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient.SampleApp.Controls
 
         private void CopyCodeButton_Click(object sender, RoutedEventArgs e)
         {
-            DataPackage package = new DataPackage();
+            DataPackage package = new();
             package.SetText(actualCode);
             Clipboard.SetContent(package);
 

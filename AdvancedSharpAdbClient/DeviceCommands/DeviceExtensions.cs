@@ -26,10 +26,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver)
-        {
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver);
-        }
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -40,10 +38,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
         public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
-            using (ISyncService service = Factories.SyncServiceFactory(client, device))
-            {
-                return service.Stat(path);
-            }
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return service.Stat(path);
         }
 
         /// <summary>
@@ -52,14 +48,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to list the directory.</param>
         /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns></returns>
-        public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device,
-            string remotePath)
+        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device, string remotePath)
         {
-            using (ISyncService service = Factories.SyncServiceFactory(client, device))
-            {
-                return service.GetDirectoryListing(remotePath);
-            }
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return service.GetDirectoryListing(remotePath);
         }
 
         /// <summary>
@@ -77,15 +70,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
             IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
-            using (ISyncService service = Factories.SyncServiceFactory(client, device))
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            if (syncProgressEventHandler != null)
             {
-                if (syncProgressEventHandler != null)
-                {
-                    service.SyncProgressChanged += syncProgressEventHandler;
-                }
-
-                service.Pull(remotePath, stream, progress, cancellationToken);
+                service.SyncProgressChanged += syncProgressEventHandler;
             }
+
+            service.Pull(remotePath, stream, progress, cancellationToken);
         }
 
         /// <summary>
@@ -105,15 +96,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
             IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
-            using (ISyncService service = Factories.SyncServiceFactory(client, device))
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            if (syncProgressEventHandler != null)
             {
-                if (syncProgressEventHandler != null)
-                {
-                    service.SyncProgressChanged += syncProgressEventHandler;
-                }
-
-                service.Push(stream, remotePath, permissions, timestamp, progress, cancellationToken);
+                service.SyncProgressChanged += syncProgressEventHandler;
             }
+
+            service.Push(stream, remotePath, permissions, timestamp, progress, cancellationToken);
         }
 
         /// <summary>
@@ -125,7 +114,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The value of the property on the device.</returns>
         public static string GetProperty(this IAdbClient client, DeviceData device, string property)
         {
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             client.ExecuteRemoteCommand($"{GetPropReceiver.GetpropCommand} {property}", device, receiver);
             return receiver.ToString();
         }
@@ -138,7 +127,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A dictionary containing the properties of the device, and their values.</returns>
         public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
-            GetPropReceiver receiver = new GetPropReceiver();
+            GetPropReceiver receiver = new();
             client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
             return receiver.Properties;
         }
@@ -151,7 +140,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A dictionary containing the environment variables of the device, and their values.</returns>
         public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
-            EnvironmentVariablesReceiver receiver = new EnvironmentVariablesReceiver();
+            EnvironmentVariablesReceiver receiver = new();
             client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
             return receiver.EnvironmentVariables;
         }
@@ -164,7 +153,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package to uninstall.</param>
         public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new PackageManager(client, device);
+            PackageManager manager = new(client, device);
             manager.UninstallPackage(packageName);
         }
 
@@ -176,7 +165,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new PackageManager(client, device);
+            PackageManager manager = new(client, device);
             return manager.GetVersionInfo(packageName);
         }
 
@@ -201,7 +190,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = new List<AndroidProcess>();
+            List<AndroidProcess> processes = new();
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
@@ -216,7 +205,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // but unfortunately older versions do not handle the -1 parameter well. So we need to branch based
             // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
             // This if/then/else syntax was tested on Android 2.x, 4.x and 7
-            ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
+            ConsoleOutputReceiver receiver = new();
             client.ExecuteShellCommand(device, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
@@ -225,16 +214,16 @@ else
     /system/bin/ls -1 /proc/
 fi".Replace("\r\n", "\n"), receiver);
 
-            Collection<int> pids = new Collection<int>();
+            Collection<int> pids = new();
 
             string output = receiver.ToString();
-            using (StringReader reader = new StringReader(output))
+            using (StringReader reader = new(output))
             {
                 while (reader.Peek() > 0)
                 {
                     string line = reader.ReadLine();
 
-                    if (!line.All(c => char.IsDigit(c)))
+                    if (!line.All(char.IsDigit))
                     {
                         continue;
                     }
@@ -250,20 +239,20 @@ fi".Replace("\r\n", "\n"), receiver);
             // Doing cat on each file one by one takes too much time. Doing cat on all of them at the same time doesn't work
             // either, because the command line would be too long.
             // So we do it 25 processes at at time.
-            StringBuilder catBuilder = new StringBuilder();
-            ProcessOutputReceiver processOutputReceiver = new ProcessOutputReceiver();
+            StringBuilder catBuilder = new();
+            ProcessOutputReceiver processOutputReceiver = new();
 
-            catBuilder.Append("cat ");
+            _ = catBuilder.Append("cat ");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
+                _ = catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
                     client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
                     catBuilder.Clear();
-                    catBuilder.Append("cat ");
+                    _ = catBuilder.Append("cat ");
                 }
             }
 

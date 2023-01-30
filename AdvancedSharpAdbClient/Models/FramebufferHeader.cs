@@ -83,57 +83,55 @@ namespace AdvancedSharpAdbClient
             FramebufferHeader header = default;
 
             // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
-            using (MemoryStream stream = new MemoryStream(data))
+            using (MemoryStream stream = new(data))
             {
-                using (BinaryReader reader = new BinaryReader(stream, Encoding.ASCII
+                using BinaryReader reader = new(stream, Encoding.ASCII
 #if !NET35 && !NET40
                 , leaveOpen: true
 #endif
-                    ))
+                    );
+                header.Version = reader.ReadUInt32();
+
+                if (header.Version > 2)
                 {
-                    header.Version = reader.ReadUInt32();
-
-                    if (header.Version > 2)
-                    {
-                        // Technically, 0 is not a supported version either; we assume version 0 indicates
-                        // an empty framebuffer.
-                        throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
-                    }
-
-                    header.Bpp = reader.ReadUInt32();
-
-                    if (header.Version >= 2)
-                    {
-                        header.ColorSpace = reader.ReadUInt32();
-                    }
-
-                    header.Size = reader.ReadUInt32();
-                    header.Width = reader.ReadUInt32();
-                    header.Height = reader.ReadUInt32();
-                    header.Red = new ColorData
-                    {
-                        Offset = reader.ReadUInt32(),
-                        Length = reader.ReadUInt32()
-                    };
-
-                    header.Blue = new ColorData
-                    {
-                        Offset = reader.ReadUInt32(),
-                        Length = reader.ReadUInt32()
-                    };
-
-                    header.Green = new ColorData
-                    {
-                        Offset = reader.ReadUInt32(),
-                        Length = reader.ReadUInt32()
-                    };
-
-                    header.Alpha = new ColorData
-                    {
-                        Offset = reader.ReadUInt32(),
-                        Length = reader.ReadUInt32()
-                    };
+                    // Technically, 0 is not a supported version either; we assume version 0 indicates
+                    // an empty framebuffer.
+                    throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
                 }
+
+                header.Bpp = reader.ReadUInt32();
+
+                if (header.Version >= 2)
+                {
+                    header.ColorSpace = reader.ReadUInt32();
+                }
+
+                header.Size = reader.ReadUInt32();
+                header.Width = reader.ReadUInt32();
+                header.Height = reader.ReadUInt32();
+                header.Red = new ColorData
+                {
+                    Offset = reader.ReadUInt32(),
+                    Length = reader.ReadUInt32()
+                };
+
+                header.Blue = new ColorData
+                {
+                    Offset = reader.ReadUInt32(),
+                    Length = reader.ReadUInt32()
+                };
+
+                header.Green = new ColorData
+                {
+                    Offset = reader.ReadUInt32(),
+                    Length = reader.ReadUInt32()
+                };
+
+                header.Alpha = new ColorData
+                {
+                    Offset = reader.ReadUInt32(),
+                    Length = reader.ReadUInt32()
+                };
             }
 
             return header;
@@ -168,7 +166,7 @@ namespace AdvancedSharpAdbClient
             PixelFormat pixelFormat = StandardizePixelFormat(buffer);
 
 #if !NETSTANDARD1_3
-            Bitmap bitmap = new Bitmap((int)Width, (int)Height, pixelFormat);
+            Bitmap bitmap = new((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
             Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
             bitmap.UnlockBits(bitmapData);
@@ -220,7 +218,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Alpha can be present or absent, but must be 8 bytes long
-                if (Alpha.Length != 0 && Alpha.Length != 8)
+                if (Alpha.Length is not 0 and not 8)
                 {
                     throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported");
                 }

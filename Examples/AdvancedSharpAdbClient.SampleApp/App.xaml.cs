@@ -74,8 +74,8 @@ namespace AdvancedSharpAdbClient.SampleApp
 
             ThemeHelper.Initialize();
 
-            if (args.PreviousExecutionState == ApplicationExecutionState.Terminated
-                    || args.PreviousExecutionState == ApplicationExecutionState.Suspended)
+            if (args.PreviousExecutionState is ApplicationExecutionState.Terminated
+                    or ApplicationExecutionState.Suspended)
             {
                 try
                 {
@@ -176,7 +176,7 @@ namespace AdvancedSharpAdbClient.SampleApp
         private Frame GetRootFrame()
         {
             Frame rootFrame;
-            if (!(Window.Current.Content is NavigationRootPage rootPage))
+            if (Window.Current.Content is not NavigationRootPage rootPage)
             {
                 rootPage = new NavigationRootPage();
                 rootFrame = (Frame)rootPage.FindName("rootFrame");
@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient.SampleApp
                                 string json = JsonConvert.SerializeObject(value);
                                 try
                                 {
-                                    ValueSet message = new ValueSet() { { "UWP", json } };
+                                    ValueSet message = new() { { "UWP", json } };
                                     _ = Connection.SendMessageAsync(message);
                                 }
                                 catch (Exception ex)
