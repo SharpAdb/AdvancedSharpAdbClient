@@ -423,6 +423,36 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public string Pair(DnsEndPoint endpoint, string code)
+        {
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
+            AdbResponse response = socket.ReadAdbResponse();
+            string results = socket.ReadString();
+            return results;
+        }
+
+        /// <inheritdoc/>
+        public async Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default)
+        {
+            if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
+            AdbResponse response = socket.ReadAdbResponse();
+            string results = await socket.ReadStringAsync(cancellationToken);
+            return results;
+        }
+
+        /// <inheritdoc/>
         public string Connect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
@@ -666,13 +696,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        /// <summary>
-        /// Push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="baseapk">A <see cref="Stream"/> which represents the baseapk to install.</param>
-        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        /// <inheritdoc/>
         public void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments)
         {
             EnsureDevice(device);
@@ -713,13 +737,7 @@ namespace AdvancedSharpAdbClient
             InstallCommit(device, session);
         }
 
-        /// <summary>
-        /// Push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
-        /// <param name="packageName">The packagename of the baseapk to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        /// <inheritdoc/>
         public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments)
         {
             EnsureDevice(device);

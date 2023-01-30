@@ -317,14 +317,31 @@ namespace AdvancedSharpAdbClient
         void Reboot(string into, DeviceData device);
 
         /// <summary>
-        /// ConnectAsync to a device via TCP/IP.
+        /// Pair with a device for secure TCP/IP communication
+        /// </summary>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <returns>The results from adb.</returns>
+        string Pair(DnsEndPoint endpoint, string code);
+
+        /// <summary>
+        /// Pair with a device for secure TCP/IP communication
+        /// </summary>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
         string Connect(DnsEndPoint endpoint);
 
         /// <summary>
-        /// ConnectAsync to a device via TCP/IP.
+        /// Connect to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -357,6 +374,24 @@ namespace AdvancedSharpAdbClient
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         void Install(DeviceData device, Stream apk, params string[] arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
+        /// <param name="packageName">The packagename of the baseapk to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseapk">A <see cref="Stream"/> which represents the baseapk to install.</param>
+        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.

@@ -458,6 +458,50 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
+        public void PairIPAddressTest() =>
+            RunPairTest(
+                () => TestClient.Pair(IPAddress.Loopback, "114514"),
+                "127.0.0.1:5555",
+                "114514");
+
+        [Fact]
+        public void PairDnsEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair(new DnsEndPoint("localhost", 1234), "114514"),
+                "localhost:1234",
+                "114514");
+
+        [Fact]
+        public void PairIPEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
+                "127.0.0.1:4321",
+                "114514");
+
+        [Fact]
+        public void PairHostEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair("localhost:9926", "114514"),
+                "localhost:9926",
+                "114514");
+
+        [Fact]
+        public async Task PairIPAddressNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
+
+        [Fact]
+        public async Task PairDnsEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync(null, "114514"));
+
+        [Fact]
+        public async Task PairIPEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPEndPoint)null, "114514"));
+
+        [Fact]
+        public async Task PairHostEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((string)null, "114514"));
+
+        [Fact]
         public void ConnectIPAddressTest() =>
             RunConnectTest(
                 () => TestClient.Connect(IPAddress.Loopback),
@@ -667,6 +711,25 @@ namespace AdvancedSharpAdbClient.Tests
                     applicationDataChuncks.ToArray(),
                     () => TestClient.Install(device, stream));
             }
+        }
+
+        private void RunPairTest(Action test, string connectString, string code)
+        {
+            string[] requests = new string[]
+            {
+                $"host:pair:{code}:{connectString}"
+            };
+
+            string[] responseMessages = new string[]
+            {
+                $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
+            };
+
+            RunTest(
+                OkResponse,
+                responseMessages,
+                requests,
+                test);
         }
 
         private void RunConnectTest(Action test, string connectString)

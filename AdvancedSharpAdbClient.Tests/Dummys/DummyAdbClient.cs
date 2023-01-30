@@ -20,6 +20,12 @@ namespace AdvancedSharpAdbClient.Tests
 
         public EndPoint EndPoint { get; private set; }
 
+        public string Pair(DnsEndPoint endpoint, string code) =>
+            throw new NotImplementedException();
+
+        public Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
+
         public string Connect(DnsEndPoint endpoint) =>
             throw new NotImplementedException();
 
@@ -119,6 +125,12 @@ namespace AdvancedSharpAdbClient.Tests
             throw new NotImplementedException();
 
         public List<string> GetFeatureSet(DeviceData device) =>
+            throw new NotImplementedException();
+
+        public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments) =>
+            throw new NotImplementedException();
+
+        public void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments) =>
             throw new NotImplementedException();
 
         public string InstallCreated(DeviceData device, string packageName = null, params string[] arguments) =>
