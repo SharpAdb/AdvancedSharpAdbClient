@@ -181,10 +181,10 @@ namespace AdvancedSharpAdbClient.Tests
         public void ClearInput(DeviceData device, int charcount) =>
             throw new NotImplementedException();
 
-        public void StartApp(DeviceData device, string packagename) =>
+        public Task StartApp(DeviceData device, string packagename) =>
             throw new NotImplementedException();
 
-        public void StopApp(DeviceData device, string packagename) =>
+        public Task StopApp(DeviceData device, string packagename) =>
             throw new NotImplementedException();
 
         public void BackBtn(DeviceData device) =>

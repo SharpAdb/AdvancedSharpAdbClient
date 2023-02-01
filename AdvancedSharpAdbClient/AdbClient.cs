@@ -1066,11 +1066,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async void StartApp(DeviceData device, string packagename) =>
+        public async Task StartApp(DeviceData device, string packagename) =>
             await ExecuteRemoteCommandAsync($"monkey -p {packagename} 1", device, null, CancellationToken.None);
 
         /// <inheritdoc/>
-        public async void StopApp(DeviceData device, string packagename) =>
+        public async Task StopApp(DeviceData device, string packagename) =>
             await ExecuteRemoteCommandAsync($"am force-stop {packagename}", device, null, CancellationToken.None);
 
         /// <inheritdoc/>

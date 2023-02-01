@@ -534,14 +534,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packagename"></param>
-        void StartApp(DeviceData device, string packagename);
+        Task StartApp(DeviceData device, string packagename);
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packagename"></param>
-        void StopApp(DeviceData device, string packagename);
+        Task StopApp(DeviceData device, string packagename);
 
         /// <summary>
         /// Click BACK button.
