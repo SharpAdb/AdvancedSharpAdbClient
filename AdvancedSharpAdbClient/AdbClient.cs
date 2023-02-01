@@ -789,6 +789,28 @@ namespace AdvancedSharpAdbClient
             return null;
         }
 
+        /// <inheritdoc/>
+        public async Task<XmlDocument> DumpScreenAsync(DeviceData device)
+        {
+            XmlDocument doc = new();
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+            socket.SendAdbRequest("shell:uiautomator dump /dev/tty");
+            AdbResponse response = socket.ReadAdbResponse();
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+#if !NET35
+            string xmlString = await reader.ReadToEndAsync();
+#else
+            string xmlString = await Utilities.Run(reader.ReadToEnd).ConfigureAwait(false);
+#endif
+            xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
+            if (xmlString != "" && !xmlString.StartsWith("ERROR"))
+            {
+                doc.LoadXml(xmlString);
+                return doc;
+            }
+            return null;
+        }
 
         /// <inheritdoc/>
         public void Click(DeviceData device, Cords cords)
@@ -890,6 +912,41 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public async Task<Element> FindElementAsync(DeviceData device, string xpath, TimeSpan timeout = default)
+        {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
+            {
+                XmlDocument doc = await DumpScreenAsync(device);
+                if (doc != null)
+                {
+                    XmlNode xmlNode = doc.SelectSingleNode(xpath);
+                    if (xmlNode != null)
+                    {
+                        string bounds = xmlNode.Attributes["bounds"].Value;
+                        if (bounds != null)
+                        {
+                            int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
+                            Dictionary<string, string> attributes = new();
+                            foreach (XmlAttribute at in xmlNode.Attributes)
+                            {
+                                attributes.Add(at.Name, at.Value);
+                            }
+                            Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
+                            return new Element(this, device, cord, attributes);
+                        }
+                    }
+                }
+                if (timeout == TimeSpan.Zero)
+                {
+                    break;
+                }
+            }
+            return null;
+        }
+        
+        /// <inheritdoc/>
         public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default)
         {
             Stopwatch stopwatch = new();
@@ -897,6 +954,46 @@ namespace AdvancedSharpAdbClient
             while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
             {
                 XmlDocument doc = DumpScreen(device);
+                if (doc != null)
+                {
+                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    if (xmlNodes != null)
+                    {
+                        Element[] elements = new Element[xmlNodes.Count];
+                        for (int i = 0; i < elements.Length; i++)
+                        {
+                            string bounds = xmlNodes[i].Attributes["bounds"].Value;
+                            if (bounds != null)
+                            {
+                                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
+                                Dictionary<string, string> attributes = new();
+                                foreach (XmlAttribute at in xmlNodes[i].Attributes)
+                                {
+                                    attributes.Add(at.Name, at.Value);
+                                }
+                                Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
+                                elements[i] = new Element(this, device, cord, attributes);
+                            }
+                        }
+                        return elements.Length == 0 ? null : elements;
+                    }
+                }
+                if (timeout == TimeSpan.Zero)
+                {
+                    break;
+                }
+            }
+            return null;
+        }
+        
+        /// <inheritdoc/>
+        public async Task<Element[]> FindElementsAsync(DeviceData device, string xpath, TimeSpan timeout = default)
+        {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
+            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
+            {
+                XmlDocument doc = await DumpScreenAsync(device);
                 if (doc != null)
                 {
                     XmlNodeList xmlNodes = doc.SelectNodes(xpath);
