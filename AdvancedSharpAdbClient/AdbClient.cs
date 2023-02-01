@@ -3,18 +3,15 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 
 #if NET
@@ -40,7 +37,7 @@ namespace AdvancedSharpAdbClient
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
     /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
-    public class AdbClient : IAdbClient
+    public partial class AdbClient : IAdbClient
     {
         /// <summary>
         /// The port at which the Android Debug Bridge server listens by default.
@@ -281,16 +278,15 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver) =>
+            ExecuteRemoteCommand(command, device, receiver, Encoding);
 
         /// <inheritdoc/>
-        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
         {
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            cancellationToken.Register(socket.Dispose);
 
             socket.SetDevice(device);
             socket.SendAdbRequest($"shell:{command}");
@@ -303,28 +299,13 @@ namespace AdvancedSharpAdbClient
                 // break too soon in certain cases (about every 10 loops, so it appears to be a timing
                 // issue). Checking for reader.ReadLine() to return null appears to be much more robust
                 // -- one of the integration test fetches output 1000 times and found no truncations.
-                while (!cancellationToken.IsCancellationRequested)
+                while (true)
                 {
-                    string line =
-#if !NET35
-                        await reader.ReadLineAsync().ConfigureAwait(false);
-#else
-                                await Utilities.Run(reader.ReadLine).ConfigureAwait(false);
-#endif
+                    string line = reader.ReadLine();
 
                     if (line == null) { break; }
 
                     receiver?.AddOutput(line);
-                }
-            }
-            catch (Exception e)
-            {
-                // If a cancellation was requested, this main loop is interrupted with an exception
-                // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
-                // In all other cases, something went wrong, and we want to report it to the user.
-                if (!cancellationToken.IsCancellationRequested)
-                {
-                    throw new ShellCommandUnresponsiveException(e);
                 }
             }
             finally
@@ -339,74 +320,6 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             return new Framebuffer(device, this);
-        }
-
-        /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("windows")]
-#endif
-        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
-        {
-            EnsureDevice(device);
-
-            using Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
-            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
-
-            // Convert the framebuffer to an image, and return that.
-            return framebuffer.ToImage();
-        }
-
-        /// <inheritdoc/>
-        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
-        {
-            if (messageSink == null)
-            {
-                throw new ArgumentNullException(nameof(messageSink));
-            }
-
-            EnsureDevice(device);
-
-            // The 'log' service has been deprecated, see
-            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SetDevice(device);
-
-            StringBuilder request = new();
-            request.Append("shell:logcat -B");
-
-            foreach (LogId logName in logNames)
-            {
-                request.Append($" -b {logName.ToString().ToLowerInvariant()}");
-            }
-
-            socket.SendAdbRequest(request.ToString());
-            AdbResponse response = socket.ReadAdbResponse();
-
-            using Stream stream = socket.GetShellStream();
-            LogReader reader = new(stream);
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                LogEntry entry = null;
-
-                try
-                {
-                    entry = await reader.ReadEntry(cancellationToken).ConfigureAwait(false);
-                }
-                catch (EndOfStreamException)
-                {
-                    // This indicates the end of the stream; the entry will remain null.
-                }
-
-                if (entry != null)
-                {
-                    messageSink(entry);
-                }
-                else
-                {
-                    break;
-                }
-            }
         }
 
         /// <inheritdoc/>
@@ -438,21 +351,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default)
-        {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
-
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
-            AdbResponse response = socket.ReadAdbResponse();
-            string results = await socket.ReadStringAsync(cancellationToken);
-            return results;
-        }
-
-        /// <inheritdoc/>
         public string Connect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
@@ -468,7 +366,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
+        public string Disconnect(DnsEndPoint endpoint)
         {
             if (endpoint == null)
             {
@@ -476,9 +374,9 @@ namespace AdvancedSharpAdbClient
             }
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
+            socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
             AdbResponse response = socket.ReadAdbResponse();
-            string results = await socket.ReadStringAsync(cancellationToken);
+            string results = socket.ReadString();
             return results;
         }
 
@@ -790,29 +688,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<XmlDocument> DumpScreenAsync(DeviceData device)
-        {
-            XmlDocument doc = new();
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SetDevice(device);
-            socket.SendAdbRequest("shell:uiautomator dump /dev/tty");
-            AdbResponse response = socket.ReadAdbResponse();
-            using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string xmlString = await reader.ReadToEndAsync();
-#else
-            string xmlString = await Utilities.Run(reader.ReadToEnd).ConfigureAwait(false);
-#endif
-            xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            if (xmlString != "" && !xmlString.StartsWith("ERROR"))
-            {
-                doc.LoadXml(xmlString);
-                return doc;
-            }
-            return null;
-        }
-
-        /// <inheritdoc/>
         public void Click(DeviceData device, Cords cords)
         {
             EnsureDevice(device);
@@ -912,41 +787,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<Element> FindElementAsync(DeviceData device, string xpath, TimeSpan timeout = default)
-        {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
-            {
-                XmlDocument doc = await DumpScreenAsync(device);
-                if (doc != null)
-                {
-                    XmlNode xmlNode = doc.SelectSingleNode(xpath);
-                    if (xmlNode != null)
-                    {
-                        string bounds = xmlNode.Attributes["bounds"].Value;
-                        if (bounds != null)
-                        {
-                            int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                            Dictionary<string, string> attributes = new();
-                            foreach (XmlAttribute at in xmlNode.Attributes)
-                            {
-                                attributes.Add(at.Name, at.Value);
-                            }
-                            Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                            return new Element(this, device, cord, attributes);
-                        }
-                    }
-                }
-                if (timeout == TimeSpan.Zero)
-                {
-                    break;
-                }
-            }
-            return null;
-        }
-        
-        /// <inheritdoc/>
         public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default)
         {
             Stopwatch stopwatch = new();
@@ -987,46 +827,6 @@ namespace AdvancedSharpAdbClient
         }
         
         /// <inheritdoc/>
-        public async Task<Element[]> FindElementsAsync(DeviceData device, string xpath, TimeSpan timeout = default)
-        {
-            Stopwatch stopwatch = new();
-            stopwatch.Start();
-            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
-            {
-                XmlDocument doc = await DumpScreenAsync(device);
-                if (doc != null)
-                {
-                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
-                    if (xmlNodes != null)
-                    {
-                        Element[] elements = new Element[xmlNodes.Count];
-                        for (int i = 0; i < elements.Length; i++)
-                        {
-                            string bounds = xmlNodes[i].Attributes["bounds"].Value;
-                            if (bounds != null)
-                            {
-                                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                Dictionary<string, string> attributes = new();
-                                foreach (XmlAttribute at in xmlNodes[i].Attributes)
-                                {
-                                    attributes.Add(at.Name, at.Value);
-                                }
-                                Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                                elements[i] = new Element(this, device, cord, attributes);
-                            }
-                        }
-                        return elements.Length == 0 ? null : elements;
-                    }
-                }
-                if (timeout == TimeSpan.Zero)
-                {
-                    break;
-                }
-            }
-            return null;
-        }
-
-        /// <inheritdoc/>
         public void SendKeyEvent(DeviceData device, string key)
         {
             EnsureDevice(device);
@@ -1066,12 +866,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task StartApp(DeviceData device, string packagename) =>
-            await ExecuteRemoteCommandAsync($"monkey -p {packagename} 1", device, null, CancellationToken.None);
+        public void StartApp(DeviceData device, string packagename) =>
+            ExecuteRemoteCommand($"monkey -p {packagename} 1", device, null);
 
         /// <inheritdoc/>
-        public async Task StopApp(DeviceData device, string packagename) =>
-            await ExecuteRemoteCommandAsync($"am force-stop {packagename}", device, null, CancellationToken.None);
+        public void StopApp(DeviceData device, string packagename) =>
+            ExecuteRemoteCommand($"am force-stop {packagename}", device, null);
 
         /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
@@ -1084,21 +884,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="encoding"></param>
         public static void SetEncoding(Encoding encoding) => Encoding = encoding;
-
-        /// <inheritdoc/>
-        public string Disconnect(DnsEndPoint endpoint)
-        {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
-
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
-            AdbResponse response = socket.ReadAdbResponse();
-            string results = socket.ReadString();
-            return results;
-        }
 
         /// <summary>
         /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>

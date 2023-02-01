@@ -40,43 +40,6 @@ namespace AdvancedSharpAdbClient
             client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
 
         /// <summary>
-        /// Executes a shell command on the remote device
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="command">The command to execute</param>
-        /// <param name="device">The device to execute on</param>
-        /// <param name="rcvr">The shell output receiver</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr) =>
-            ExecuteRemoteCommand(client, command, device, rcvr, AdbClient.Encoding);
-
-        /// <summary>
-        /// Executes a shell command on the remote device
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="command">The command to execute</param>
-        /// <param name="device">The device to execute on</param>
-        /// <param name="rcvr">The shell output receiver</param>
-        /// <param name="encoding">The encoding to use.</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver rcvr, Encoding encoding)
-        {
-            try
-            {
-                client.ExecuteRemoteCommandAsync(command, device, rcvr, encoding, CancellationToken.None).Wait();
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.InnerExceptions.Count == 1)
-                {
-                    throw ex.InnerException;
-                }
-                else
-                {
-                    throw ex;
-                }
-            }
-        }
-
-        /// <summary>
         /// Reboots the specified adb socket address.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
@@ -135,10 +98,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="address">The IP address of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, IPAddress address, string code) =>
+        public static Task<string> PairAsync(this IAdbClient client, IPAddress address, string code, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
-                : client.PairAsync(new IPEndPoint(address, AdbClient.DefaultPort), code);
+                : client.PairAsync(new IPEndPoint(address, AdbClient.DefaultPort), code, cancellationToken);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication
@@ -147,10 +110,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, IPEndPoint endpoint, string code) =>
+        public static Task<string> PairAsync(this IAdbClient client, IPEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
-                : client.PairAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), code);
+                : client.PairAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), code, cancellationToken);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication
@@ -159,7 +122,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, string host, string code)
+        public static Task<string> PairAsync(this IAdbClient client, string host, string code, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(host))
             {
@@ -170,7 +133,7 @@ namespace AdvancedSharpAdbClient
 
             return values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
-                : client.PairAsync(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), code);
+                : client.PairAsync(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), code, cancellationToken);
         }
 
         /// <summary>

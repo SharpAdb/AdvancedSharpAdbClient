@@ -272,7 +272,24 @@ namespace AdvancedSharpAdbClient.Tests
                 responseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
+                () =>
+                {
+                    try
+                    {
+                        TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None).Wait();
+                    }
+                    catch (AggregateException ex)
+                    {
+                        if (ex.InnerExceptions.Count == 1)
+                        {
+                            throw ex.InnerException;
+                        }
+                        else
+                        {
+                            throw ex;
+                        }
+                    }
+                }));
         }
 
         [Fact]
