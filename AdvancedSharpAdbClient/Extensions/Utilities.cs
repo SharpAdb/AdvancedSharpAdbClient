@@ -1,7 +1,14 @@
-﻿using System;
+﻿// <copyright file="Utilities.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Threading.Tasks;
+
+#if NETSTANDARD1_3
+using System.Net.Sockets;
+#endif
 
 namespace AdvancedSharpAdbClient
 {

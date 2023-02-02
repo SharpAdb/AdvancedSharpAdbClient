@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="CrossPlatformFunc.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,7 +10,7 @@ using System.IO;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// CrossPlatformFunc
+    /// Cross Platform Functions
     /// </summary>
     public static class CrossPlatformFunc
     {
@@ -16,8 +20,7 @@ namespace AdvancedSharpAdbClient
         public static Func<string, bool> CheckFileExists = File.Exists;
 
         /// <summary>
-        /// Runs process, invoking a specific command/>,
-        /// and reads the standard output and standard error output.
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
         public static Func<string, string, List<string>, List<string>, int> RunProcess = (string filename, string command, List<string> errorOutput, List<string> standardOutput) =>

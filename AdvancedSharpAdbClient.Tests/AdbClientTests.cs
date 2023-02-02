@@ -173,17 +173,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetDeviceOtherException()
         {
-            string[] requests = new string[]
+            lock (FactoriesTests.locker)
             {
-                "host:transport:169.254.109.177:5555"
-            };
+                string[] requests = new string[]
+                {
+                    "host:transport:169.254.109.177:5555"
+                };
 
-            _ = Assert.Throws<AdbException>(() =>
-            RunTest(
-                new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
-                NoResponseMessages,
-                requests,
-                () => Socket.SetDevice(Device)));
+                _ = Assert.Throws<AdbException>(() =>
+                RunTest(
+                    new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
+                    NoResponseMessages,
+                    requests,
+                    () => Socket.SetDevice(Device)));
+            }
         }
 
         [Fact]

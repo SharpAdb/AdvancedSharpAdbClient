@@ -1,8 +1,9 @@
-﻿// <copyright file="LinuxPath.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="LinuxPath.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
-    /// Just like System.IO.Path, except it is geared for Linux
+    /// Just like <see cref="Path"/>, except it is geared for Linux.
     /// </summary>
     public static class LinuxPath
     {
@@ -30,7 +31,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         };
 
         /// <summary>
-        /// Combine the specified paths to form one path
+        /// Combine the specified paths to form one path.
         /// </summary>
         /// <param name="paths">The paths.</param>
         /// <returns>The combined path.</returns>
@@ -105,7 +106,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The path of a file or directory. </param>
         /// <exception cref="ArgumentException">The path parameter contains invalid characters, is empty,
         /// or contains only white spaces, or contains a wildcard character. </exception>
-        /// <exception cref="System.IO.PathTooLongException">The path parameter is longer
+        /// <exception cref="PathTooLongException">The path parameter is longer
         /// than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
         public static string GetDirectoryName(string path)

@@ -1,5 +1,5 @@
-﻿// <copyright file="DateTimeHelper.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="DateTimeHelper.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient
     public static class DateTimeHelper
     {
         /// <summary>
-        /// Gets EPOCH time
+        /// Gets EPOCH time.
         /// </summary>
         public static DateTime Epoch { get; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 

@@ -1,5 +1,5 @@
-﻿// <copyright file="PackageManager.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="PackageManager.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -169,8 +169,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Installs the application package that was pushed to a temporary location on the device.
         /// </summary>
-        /// <param name="remoteFilePath">absolute file path to package file on device</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        /// <param name="remoteFilePath">absolute file path to package file on device.</param>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallRemotePackage(string remoteFilePath, bool reinstall)
         {
             ValidateDevice();
@@ -194,7 +194,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallMultiplePackage(string basePackageFilePath, string[] splitPackageFilePaths, bool reinstall)
         {
             ValidateDevice();
@@ -230,8 +230,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs Android multiple application on device.
         /// </summary>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
-        /// <param name="packageName">The absolute packagename of the base app</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallMultiplePackage(string[] splitPackageFilePaths, string packageName, bool reinstall)
         {
             ValidateDevice();
@@ -259,9 +259,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
-        /// <param name="baseRemoteFilePath">absolute base app file path to package file on device</param>
-        /// <param name="splitRemoteFilePaths">absolute split app file paths to package file on device</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
+        /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallMultipleRemotePackage(string baseRemoteFilePath, string[] splitRemoteFilePaths, bool reinstall)
         {
             ValidateDevice();
@@ -303,9 +303,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
-        /// <param name="splitRemoteFilePaths">absolute split app file paths to package file on device</param>
-        /// <param name="packageName">absolute packagename of the base app</param>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
+        /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
+        /// <param name="packageName">The absolute packagename of the base app.</param>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallMultipleRemotePackage(string[] splitRemoteFilePaths, string packageName, bool reinstall)
         {
             ValidateDevice();
@@ -380,10 +380,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Pushes a file to device
         /// </summary>
-        /// <param name="localFilePath">the absolute path to file on local host</param>
+        /// <param name="localFilePath">The absolute path to file on local host.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
-        /// <returns>destination path on device for file</returns>
-        /// <exception cref="IOException">if fatal error occurred when pushing file</exception>
+        /// <returns>Destination path on device for file.</returns>
+        /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
         private string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress)
         {
             ValidateDevice();
@@ -429,10 +429,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Remove a file from device
+        /// Remove a file from device.
         /// </summary>
-        /// <param name="remoteFilePath">path on device of file to remove</param>
-        /// <exception cref="IOException">if file removal failed</exception>
+        /// <param name="remoteFilePath">Path on device of file to remove.</param>
+        /// <exception cref="IOException">If file removal failed.</exception>
         private void RemoveRemotePackage(string remoteFilePath)
         {
             // now we delete the app we synced
@@ -452,9 +452,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Like "install", but starts an install session.
         /// </summary>
-        /// <param name="reinstall">set to <see langword="true"/> if re-install of app should be performed</param>
-        /// <param name="packageName">absolute packagename of the base app</param>
-        /// <returns>Session ID</returns>
+        /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <returns>Session ID.</returns>
         private string CreateInstallSession(bool reinstall, string packageName = null)
         {
             ValidateDevice();
@@ -483,7 +483,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="session">The session ID of the install session.</param>
         /// <param name="apkname">The name of the application.</param>
-        /// <param name="path">absolute file path to package file on device</param>
+        /// <param name="path">The absolute file path to package file on device.</param>
         private void WriteInstallSession(string session, string apkname, string path)
         {
             ValidateDevice();

@@ -1,8 +1,6 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="AndroidProcessState.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AndroidProcessState.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
-//-----------------------------------------------------------------------
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -17,34 +15,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         Unknown,
 
         /// <summary>
-        /// Uninterruptible sleep (usually IO)
-        /// </summary>
-        D,
-
-        /// <summary>
-        /// Running or runnable (on run queue)
+        /// Running or runnable (on run queue).
         /// </summary>
         R,
 
         /// <summary>
-        /// Interruptible sleep (waiting for an event to complete)
+        /// Interruptible sleep (waiting for an event to complete).
         /// </summary>
         S,
 
         /// <summary>
-        /// Stopped, either by a job control signal or because it is being traced.
+        /// Uninterruptible sleep (usually IO).
         /// </summary>
-        T,
-
-        /// <summary>
-        /// paging (not valid since the 2.6.xx kernel)
-        /// </summary>
-        W,
-
-        /// <summary>
-        /// dead (should never be seen)
-        /// </summary>
-        X,
+        D,
 
         /// <summary>
         /// Defunct ("zombie") process, terminated but not reaped by its parent.
@@ -52,12 +35,27 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         Z,
 
         /// <summary>
-        /// Wakekill
+        /// Stopped, either by a job control signal or because it is being traced.
+        /// </summary>
+        T,
+
+        /// <summary>
+        /// paging (not valid since the 2.6.xx kernel).
+        /// </summary>
+        W,
+
+        /// <summary>
+        /// dead (should never be seen).
+        /// </summary>
+        X,
+
+        /// <summary>
+        /// Wakekill.
         /// </summary>
         K,
 
         /// <summary>
-        /// Parked
+        /// Parked.
         /// </summary>
         P
     }
