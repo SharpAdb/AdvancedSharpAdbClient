@@ -1,5 +1,5 @@
-﻿// <copyright file="ShellStream.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="ShellStream.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -9,14 +9,10 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Logs
 {
-    /// <summary>
-    /// <para>
-    /// Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
+    /// <summary>Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
     /// output from an Android shell command. In the shell output, the LF character is replaced by a
-    /// CR LF character. This stream undoes that change.
-    /// </para>
-    /// </summary>
-    /// <seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/>
+    /// CR LF character. This stream undoes that change.</summary>
+    /// <remarks><seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/></remarks>
     public class ShellStream : Stream
     {
         private readonly bool closeStream;

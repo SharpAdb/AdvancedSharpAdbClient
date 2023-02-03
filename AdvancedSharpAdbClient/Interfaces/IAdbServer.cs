@@ -1,5 +1,5 @@
-﻿// <copyright file="IAdbServer.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="IAdbServer.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -62,10 +62,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the status of the adb server.
         /// </summary>
-        /// <returns>
-        /// A <see cref="AdbServerStatus"/> object that describes the status of the
-        /// adb server.
-        /// </returns>
+        /// <returns>A <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
         AdbServerStatus GetStatus();
     }
 }

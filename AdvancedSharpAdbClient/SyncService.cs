@@ -1,5 +1,5 @@
-﻿// <copyright file="SyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="SyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -12,14 +12,12 @@ using System.Threading;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// <para>
-    ///     Provides access to the sync service running on the Android device. Allows you to
-    ///     list, download and upload files on the device.
-    /// </para>
+    /// Provides access to the sync service running on the Android device. Allows you to
+    /// list, download and upload files on the device.
     /// </summary>
     /// <example>
     /// <para>
-    ///     To send files to or receive files from your Android device, you can use the following code:
+    /// To send files to or receive files from your Android device, you can use the following code:
     /// </para>
     /// <code>
     /// void DownloadFile()

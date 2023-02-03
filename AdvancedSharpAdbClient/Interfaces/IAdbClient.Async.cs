@@ -1,4 +1,8 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
+﻿// <copyright file="IAdbClient.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
@@ -66,11 +70,9 @@ namespace AdvancedSharpAdbClient
         /// connection from <paramref name="local"/>.
         /// </param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>
-        /// A <see cref="Task"/> which represents the asynchronous operation.
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken);
 
         /// <summary>
@@ -107,16 +109,12 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>
-        /// A <see cref="Task"/> which represents the asynchronous operation.
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken);
 
         /// <summary>
@@ -153,15 +151,12 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if if the specified socket is already bound through a previous reverse command.
-        /// </param>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if if the specified
+        /// socket is already bound through a previous reverse command.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>
-        /// A <see cref="Task"/> which represents the asynchronous operation.
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken);
 
         /// <summary>

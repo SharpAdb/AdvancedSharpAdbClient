@@ -235,6 +235,84 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public ulong CumulativeSwappedPagesNumber { get; set; }
 
         /// <summary>
+        /// Gets or sets the signal to be sent to parent when we die.
+        /// </summary>
+        public int ExitSignal { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CPU number last executed on.
+        /// </summary>
+        public int Processor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the real-time scheduling priority, a number in the range 1 to 99 for processes scheduled
+        /// under a real-time policy, or 0, for non-real-time processes (see <c>sched_setscheduler(2)</c>).
+        /// </summary>
+        public uint RealTimePriority { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scheduling policy (see <c>sched_setscheduler(2)</c>).
+        /// Decode using the <c>SCHED_*</c> constants in <c>linux/sched.h</c>.
+        /// </summary>
+        public uint Policy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the aggregated block I/O delays, measured in clock ticks (centiseconds).
+        /// </summary>
+        public ulong IODelays { get; set; }
+
+        /// <summary>
+        /// Gets or sets the guest time of the process (time spent running a virtual CPU for a guest operating system),
+        /// measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
+        /// </summary>
+        public ulong GuestTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the guest time of the process's children, measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
+        /// </summary>
+        public long ChildGuestTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address above which program initialized and uninitialized(BSS) data are placed.
+        /// </summary>
+        public ulong StartData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address below which program initialized and uninitialized(BSS) data are placed.
+        /// </summary>
+        public ulong EndData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address above which program heap can be expanded with <c>brk(2)</c>.
+        /// </summary>
+        public ulong StartBrk { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address above which program command-line arguments (<c>argv</c>) are placed.
+        /// </summary>
+        public ulong ArgStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address below program command-line arguments (<c>argv</c>) are placed.
+        /// </summary>
+        public ulong ArgEnd { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address above which program environment is placed.
+        /// </summary>
+        public ulong EnvStart { get; set; }
+
+        /// <summary>
+        /// Gets or sets the address below which program environment is placed.
+        /// </summary>
+        public ulong EnvEnd { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thread's exit status in the form reported by <c>waitpid(2)</c>.
+        /// </summary>
+        public int ExitCode { get; set; }
+
+        /// <summary>
         /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
@@ -248,6 +326,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 throw new ArgumentNullException(nameof(line));
             }
 
+            AndroidProcess process = new();
+
             // See http://man7.org/linux/man-pages/man5/proc.5.html,
             // section /proc/[pid]/stat, for more information about the file format
 
@@ -258,8 +338,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             int processNameStart = line.IndexOf('(');
             int processNameEnd = line.LastIndexOf(')');
 
-            int pid = 0;
-            string comm = string.Empty;
+            int pid;
+            string comm;
 
             bool parsedCmdLinePrefix = false;
 
@@ -274,7 +354,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 else
                 {
                     pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
+                    process.ProcessId = pid;
+
                     comm = cmdLineParts[0];
+                    process.Name = comm;
 
                     // All the other parts are the command line arguments, skip them.
                     parsedCmdLinePrefix = true;
@@ -284,7 +367,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             if (!parsedCmdLinePrefix)
             {
                 pid = int.Parse(line.Substring(0, processNameStart));
+                process.ProcessId = pid;
+
                 comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
+                process.Name = comm;
             }
 
             string[] parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -297,81 +383,199 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // Only fields in Linux 2.1.10 and earlier are listed here,
             // additional fields exist in newer versions of linux.
             string state = parts[0];
-            int ppid = ParseInt(parts[1]);
-            int pgrp = ParseInt(parts[2]);
-            int session = ParseInt(parts[3]);
-            int tty_nr = ParseInt(parts[4]);
-            int tpgid = ParseInt(parts[5]);
-            uint flags = ParseUInt(parts[6]);
-            ulong minflt = ParseULong(parts[7]);
-            ulong cminflt = ParseULong(parts[8]);
-            ulong majflt = ParseULong(parts[9]);
-            ulong cmajflt = ParseULong(parts[10]);
-            ulong utime = ParseULong(parts[11]);
-            ulong stime = ParseULong(parts[12]);
-            long cutime = ParseLong(parts[13]);
-            long cstime = ParseLong(parts[14]);
-            long priority = ParseLong(parts[15]);
-            long nice = ParseLong(parts[16]);
-            long num_threads = ParseLong(parts[17]);
-            long itrealvalue = ParseLong(parts[18]);
-            ulong starttime = ParseULong(parts[19]);
-            ulong vsize = ParseULong(parts[20]);
-            int rss = int.Parse(parts[21]);
-            ulong rsslim = ParseULong(parts[22]);
-            ulong startcode = ParseULong(parts[23]);
-            ulong endcode = ParseULong(parts[24]);
-            ulong startstack = ParseULong(parts[25]);
-            ulong kstkesp = ParseULong(parts[26]);
-            ulong kstkeip = ParseULong(parts[27]);
-            ulong signal = ParseULong(parts[28]);
-            ulong blocked = ParseULong(parts[29]);
-            ulong sigignore = ParseULong(parts[30]);
-            ulong sigcatch = ParseULong(parts[31]);
-            ulong wchan = ParseULong(parts[32]);
-            ulong nswap = ParseULong(parts[33]);
-            ulong cnswap = ParseULong(parts[34]);
+            process.State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true);
 
-            return new AndroidProcess
+            int ppid = ParseInt(parts[1]);
+            process.ParentProcessId = ppid;
+
+            int pgrp = ParseInt(parts[2]);
+            process.ProcessGroupId = pgrp;
+
+            int session = ParseInt(parts[3]);
+            process.SessionID = session;
+
+            int tty_nr = ParseInt(parts[4]);
+            process.TTYNumber = tty_nr;
+
+            int tpgid = ParseInt(parts[5]);
+            process.TopProcessGroupId = tpgid;
+
+            uint flags = ParseUInt(parts[6]);
+            process.Flags = (PerProcessFlags)flags;
+
+            ulong minflt = ParseULong(parts[7]);
+            process.MinorFaults = minflt;
+
+            ulong cminflt = ParseULong(parts[8]);
+            process.ChildMinorFaults = cminflt;
+
+            ulong majflt = ParseULong(parts[9]);
+            process.MajorFaults = majflt;
+
+            ulong cmajflt = ParseULong(parts[10]);
+            process.ChildMajorFaults = cmajflt;
+
+            ulong utime = ParseULong(parts[11]);
+            process.UserScheduledTime = utime;
+
+            ulong stime = ParseULong(parts[12]);
+            process.ScheduledTime = stime;
+
+            long cutime = ParseLong(parts[13]);
+            process.ChildUserScheduledTime = cutime;
+
+            long cstime = ParseLong(parts[14]);
+            process.ChildScheduledTime = cstime;
+
+            long priority = ParseLong(parts[15]);
+            process.Priority = priority;
+
+            long nice = ParseLong(parts[16]);
+            process.Nice = nice;
+
+            long num_threads = ParseLong(parts[17]);
+            process.ThreadsNumber = num_threads;
+
+            long itrealvalue = ParseLong(parts[18]);
+            process.Interval = itrealvalue;
+
+            ulong starttime = ParseULong(parts[19]);
+            process.StartTime = starttime;
+
+            ulong vsize = ParseULong(parts[20]);
+            process.VirtualSize = vsize;
+
+            int rss = int.Parse(parts[21]);
+            process.ResidentSetSize = rss;
+
+            ulong rsslim = ParseULong(parts[22]);
+            process.ResidentSetSizeLimit = rsslim;
+
+            ulong startcode = ParseULong(parts[23]);
+            process.StartCode = startcode;
+
+            ulong endcode = ParseULong(parts[24]);
+            process.EndCode = endcode;
+
+            ulong startstack = ParseULong(parts[25]);
+            process.StartStack = startstack;
+
+            ulong kstkesp = ParseULong(parts[26]);
+            process.ESP = kstkesp;
+
+            ulong kstkeip = ParseULong(parts[27]);
+            process.EIP = kstkeip;
+
+            ulong signal = ParseULong(parts[28]);
+            process.Signal = signal;
+
+            ulong blocked = ParseULong(parts[29]);
+            process.Blocked = blocked;
+
+            ulong sigignore = ParseULong(parts[30]);
+            process.IgnoredSignals = sigignore;
+
+            ulong sigcatch = ParseULong(parts[31]);
+            process.CaughtSignals = sigcatch;
+
+            ulong wchan = ParseULong(parts[32]);
+            process.WChan = wchan;
+
+            ulong nswap = ParseULong(parts[33]);
+            process.SwappedPagesNumber = nswap;
+
+            ulong cnswap = ParseULong(parts[34]);
+            process.CumulativeSwappedPagesNumber = cnswap;
+
+            if (parts.Length < 36)
             {
-                State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true),
-                Name = comm,
-                ParentProcessId = ppid,
-                ProcessGroupId = pgrp,
-                SessionID = session,
-                TTYNumber = tty_nr,
-                TopProcessGroupId = tpgid,
-                Flags = (PerProcessFlags)flags,
-                MinorFaults = minflt,
-                ChildMinorFaults = cminflt,
-                MajorFaults = majflt,
-                ChildMajorFaults = cmajflt,
-                UserScheduledTime = utime,
-                ScheduledTime = stime,
-                ChildUserScheduledTime = cutime,
-                ChildScheduledTime = cstime,
-                Priority = priority,
-                Nice = nice,
-                ThreadsNumber = num_threads,
-                Interval = itrealvalue,
-                StartTime = starttime,
-                ProcessId = pid,
-                VirtualSize = vsize,
-                ResidentSetSize = rss,
-                ResidentSetSizeLimit = rsslim,
-                StartCode = startcode,
-                EndCode = endcode,
-                StartStack = startstack,
-                ESP = kstkesp,
-                EIP = kstkeip,
-                Signal = signal,
-                Blocked = blocked,
-                IgnoredSignals = sigignore,
-                CaughtSignals = sigcatch,
-                WChan = wchan,
-                SwappedPagesNumber = nswap,
-                CumulativeSwappedPagesNumber = cnswap
-            };
+                return process;
+            }
+
+            // Linux 2.1.22
+            int exit_signal = ParseInt(parts[35]);
+            process.ExitSignal = exit_signal;
+
+            if (parts.Length < 37)
+            {
+                return process;
+            }
+
+            // Linux 2.2.8
+            int processor = ParseInt(parts[36]);
+            process.Processor = processor;
+
+            if (parts.Length < 39)
+            {
+                return process;
+            }
+
+            // Linux 2.5.19
+            uint rt_priority = ParseUInt(parts[37]);
+            process.RealTimePriority = rt_priority;
+
+            uint policy = ParseUInt(parts[38]);
+            process.Policy = policy;
+
+            if (parts.Length < 40)
+            {
+                return process;
+            }
+
+            // Linux 2.6.18
+            ulong delayacct_blkio_ticks = ParseULong(parts[39]);
+
+            process.IODelays = delayacct_blkio_ticks;
+
+            if (parts.Length < 42)
+            {
+                return process;
+            }
+
+            // Linux 2.6.24
+            ulong guest_time = ParseULong(parts[40]);
+            process.GuestTime = guest_time;
+
+            long cguest_time = ParseLong(parts[41]);
+            process.ChildGuestTime = cguest_time;
+
+            if (parts.Length < 45)
+            {
+                return process;
+            }
+
+            // Linux 3.3
+            ulong start_data = ParseULong(parts[42]);
+            process.StartData = start_data;
+
+            ulong end_data = ParseULong(parts[43]);
+            process.EndData = end_data;
+
+            ulong start_brk = ParseULong(parts[44]);
+            process.StartBrk = start_brk;
+
+            if (parts.Length < 50)
+            {
+                return process;
+            }
+
+            // Linux 3.5
+            ulong arg_start = ParseULong(parts[45]);
+            process.ArgStart = arg_start;
+
+            ulong arg_end = ParseULong(parts[46]);
+            process.ArgEnd = arg_end;
+
+            ulong env_start = ParseULong(parts[47]);
+            process.EnvStart = env_start;
+
+            ulong env_end = ParseULong(parts[48]);
+            process.EnvEnd = env_end;
+
+            int exit_code = ParseInt(parts[49]);
+            process.ExitCode = exit_code;
+
+            return process;
         }
 
         /// <summary>

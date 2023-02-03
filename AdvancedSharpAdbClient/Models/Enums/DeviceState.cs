@@ -1,5 +1,5 @@
-﻿// <copyright file="DeviceState.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="DeviceState.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
@@ -7,8 +7,8 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Defines the state of an Android device connected to the Android Debug Bridge.
     /// </summary>
-    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/adb.h"/>
-    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/transport.cpp"/>
+    /// <remarks><para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/adb.h"/></para>
+    /// <para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/transport.cpp"/></para></remarks>
     public enum DeviceState
     {
         /// <summary>

@@ -1,12 +1,11 @@
-﻿// <copyright file="SyncCommand.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="SyncCommand.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Defines a command that can be sent to, or a response that can be received from,
-    /// the sync service.
+    /// Defines a command that can be sent to, or a response that can be received from the sync service.
     /// </summary>
     public enum SyncCommand
     {
@@ -16,17 +15,17 @@ namespace AdvancedSharpAdbClient
         LIST,
 
         /// <summary>
-        /// Retrieve a file from device
+        /// Retrieve a file from device.
         /// </summary>
         RECV,
 
         /// <summary>
-        /// Send a file to device
+        /// Send a file to device.
         /// </summary>
         SEND,
 
         /// <summary>
-        /// Stat a file
+        /// Stat a file.
         /// </summary>
         STAT,
 

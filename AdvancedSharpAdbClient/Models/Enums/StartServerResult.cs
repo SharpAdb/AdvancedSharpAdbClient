@@ -1,12 +1,11 @@
-﻿// <copyright file="StartServerResult.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="StartServerResult.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Gives information about a <see cref="AdbServer.StartServer(string, bool)"/>
-    /// operation.
+    /// Gives information about a <see cref="AdbServer.StartServer(string, bool)"/> operation.
     /// </summary>
     public enum StartServerResult
     {
@@ -22,8 +21,7 @@ namespace AdvancedSharpAdbClient
         RestartedOutdatedDaemon,
 
         /// <summary>
-        /// The adb server was not running, and a new instance of the adb server
-        /// was started.
+        /// The adb server was not running, and a new instance of the adb server was started.
         /// </summary>
         Started
     }

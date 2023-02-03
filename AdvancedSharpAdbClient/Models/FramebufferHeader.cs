@@ -1,5 +1,5 @@
-﻿// <copyright file="FramebufferHeader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="FramebufferHeader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -142,8 +142,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
         /// <returns>
-        /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/> if the framebuffer
-        /// does not contain any data. This can happen when DRM is enabled on the device.
+        /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
 #if NET
         [SupportedOSPlatform("windows")]

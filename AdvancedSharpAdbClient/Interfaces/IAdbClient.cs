@@ -1,5 +1,5 @@
-﻿// <copyright file="IAdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="IAdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -103,14 +103,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
-        /// <returns>
-        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
         /// <summary>
@@ -147,14 +143,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
-        /// <returns>
-        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
 
         /// <summary>
@@ -191,13 +183,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if if the specified socket is already bound through a previous reverse command.
-        /// </param>
-        /// <returns>
-        /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if if the specified socket
+        /// is already bound through a previous reverse command.</param>
+        /// <returns>If your requested to start reverse to remote port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind);
 
 

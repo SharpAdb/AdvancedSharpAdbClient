@@ -1,5 +1,5 @@
-﻿// <copyright file="IAdbSocket.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="IAdbSocket.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -32,14 +32,14 @@ namespace AdvancedSharpAdbClient
         /// Sends a request to the Android Debug Bridge.To read the response, call
         /// <see cref="ReadAdbResponse()"/>.
         /// </summary>
-        /// <param name = "request" >The request to send.</param>
+        /// <param name="request">The request to send.</param>
         void SendAdbRequest(string request);
 
         /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
-        /// <param name = "length" >The number of bytes to send.</param>
+        /// <param name="length">The number of bytes to send.</param>
         void Send(byte[] data, int length);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="offset">The index of the first byte in the array to send.</param>
-        /// <param name = "length" >The number of bytes to send.</param>
+        /// <param name="length">The number of bytes to send.</param>
         void Send(byte[] data, int offset, int length);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="command" >The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
-        /// <param name="permissions" >If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
+        /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
         void SendSyncRequest(SyncCommand command, string path, int permissions);
 
         /// <summary>

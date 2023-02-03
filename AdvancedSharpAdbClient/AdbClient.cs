@@ -1,5 +1,5 @@
-// <copyright file="AdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+// <copyright file="AdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -22,21 +22,21 @@ namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// <para>
-    ///     Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
-    ///     adb server and devices that are connected to that adb server.
+    /// Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
+    /// adb server and devices that are connected to that adb server.
     /// </para>
     /// <para>
-    ///     For example, to fetch a list of all devices that are currently connected to this PC, you can
-    ///     call the <see cref="GetDevices"/> method.
+    /// For example, to fetch a list of all devices that are currently connected to this PC, you can
+    /// call the <see cref="GetDevices"/> method.
     /// </para>
     /// <para>
-    ///     To run a command on a device, you can use the <see cref="ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/>
-    ///     method.
+    /// To run a command on a device, you can use the <see cref="ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/>
+    /// method.
     /// </para>
     /// </summary>
-    /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso>
-    /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso>
-    /// <seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso>
+    /// <remarks><para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso></para>
+    /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
+    /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para></remarks>
     public partial class AdbClient : IAdbClient
     {
         /// <summary>

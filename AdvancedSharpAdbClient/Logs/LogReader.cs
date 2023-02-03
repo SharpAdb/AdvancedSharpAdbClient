@@ -1,5 +1,5 @@
-﻿// <copyright file="LogReader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="LogReader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -13,8 +13,7 @@ using System.Threading.Tasks;
 namespace AdvancedSharpAdbClient.Logs
 {
     /// <summary>
-    /// Processes Android log files in binary format. You usually get the binary format by
-    /// running <c>logcat -B</c>.
+    /// Processes Android log files in binary format. You usually get the binary format by running <c>logcat -B</c>.
     /// </summary>
     public class LogReader
     {

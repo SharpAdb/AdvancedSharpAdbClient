@@ -1,5 +1,5 @@
-﻿// <copyright file="AdbServerStatus.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AdbServerStatus.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -22,8 +22,7 @@ namespace AdvancedSharpAdbClient
         public Version Version { get; set; }
 
         /// <summary>
-        /// Gets a <see cref="string"/> that represents the current <see cref="AdbServerStatus"/>
-        /// object.
+        /// Gets a <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.</returns>
         public override string ToString() =>

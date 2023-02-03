@@ -1,5 +1,5 @@
-﻿// <copyright file="DeviceData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="DeviceData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -96,10 +96,10 @@ namespace AdvancedSharpAdbClient
         public override string ToString() => Serial;
 
         /// <summary>
-        /// Get the device state from the string value
+        /// Get the device state from the string value.
         /// </summary>
-        /// <param name="state">The device state string</param>
-        /// <returns>The device state</returns>
+        /// <param name="state">The device state string.</param>
+        /// <returns>The device state.</returns>
         internal static DeviceState GetStateFromString(string state)
         {
             // Default to the unknown state

@@ -1,5 +1,5 @@
-﻿// <copyright file="Priority.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="Priority.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient.Logs
@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Represents a log priority.
     /// </summary>
-    /// <seealso href="https://developer.android.com/reference/android/util/Log.html#ASSERT"/>
+    /// <remarks><seealso href="https://developer.android.com/reference/android/util/Log.html#ASSERT"/></remarks>
     public enum Priority : byte
     {
         /// <summary>
