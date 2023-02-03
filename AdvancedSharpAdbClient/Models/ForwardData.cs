@@ -1,5 +1,5 @@
-﻿// <copyright file="ForwardData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="ForwardData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
@@ -10,8 +10,7 @@ namespace AdvancedSharpAdbClient
     public class ForwardData
     {
         /// <summary>
-        /// Gets or sets the serial number of the device for which the port forwarding is
-        /// configured.
+        /// Gets or sets the serial number of the device for which the port forwarding is configured.
         /// </summary>
         public string SerialNumber { get; set; }
 
@@ -36,8 +35,7 @@ namespace AdvancedSharpAdbClient
         public ForwardSpec RemoteSpec => ForwardSpec.Parse(Remote);
 
         /// <summary>
-        /// Creates a new instance of the <seealso cref="ForwardData"/> class by parsing
-        /// a <see cref="string"/>.
+        /// Creates a new instance of the <seealso cref="ForwardData"/> class by parsing a <see cref="string"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> value to parse.</param>
         /// <returns>A <see cref="ForwardData"/> object that represents the port forwarding information contained in <paramref name="value"/>.</returns>

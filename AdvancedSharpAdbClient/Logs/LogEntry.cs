@@ -1,5 +1,5 @@
-﻿// <copyright file="LogEntry.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="LogEntry.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// This structure is returned to userspace by the kernel logger
     /// driver unless an upgrade to a newer ABI version is requested.
     /// </summary>
-    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h"/>
+    /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h"/></remarks>
     public class LogEntry
     {
         /// <summary>
@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Logs
         public uint Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the entry's payload
+        /// Gets or sets the entry's payload.
         /// </summary>
         public byte[] Data { get; set; }
     }

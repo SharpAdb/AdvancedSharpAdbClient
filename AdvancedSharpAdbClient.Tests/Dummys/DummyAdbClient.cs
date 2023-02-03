@@ -35,11 +35,23 @@ namespace AdvancedSharpAdbClient.Tests
         public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
             throw new NotImplementedException();
 
+        public Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind) =>
+            throw new NotImplementedException();
+
+        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind) =>
             throw new NotImplementedException();
+
+        public Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver) =>
+            ExecuteRemoteCommand(command, device, receiver, Encoding.Default);
 
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken) =>
             ExecuteRemoteCommandAsync(command, device, receiver, Encoding.Default, cancellationToken);
@@ -70,10 +82,40 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.FromResult(true);
         }
 
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
+        {
+            ReceivedCommands.Add(command);
+
+            if (Commands.ContainsKey(command))
+            {
+                if (receiver != null)
+                {
+                    StringReader reader = new(Commands[command]);
+
+                    while (reader.Peek() != -1)
+                    {
+                        receiver.AddOutput(reader.ReadLine());
+                    }
+
+                    receiver.Flush();
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
+            }
+        }
+
         public int GetAdbVersion() =>
             throw new NotImplementedException();
 
+        public Task<int> GetAdbVersionAsync(CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
         public List<DeviceData> GetDevices() =>
+            throw new NotImplementedException();
+
+        public Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) =>
@@ -88,7 +130,13 @@ namespace AdvancedSharpAdbClient.Tests
         public IEnumerable<ForwardData> ListReverseForward(DeviceData device) =>
             throw new NotImplementedException();
 
+        public Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
         public IEnumerable<ForwardData> ListForward(DeviceData device) =>
+            throw new NotImplementedException();
+
+        public Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public void Reboot(string into, DeviceData device) =>
@@ -106,10 +154,10 @@ namespace AdvancedSharpAdbClient.Tests
         public void RemoveReverseForward(DeviceData device, string remote) =>
             throw new NotImplementedException();
 
-        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> sink, CancellationToken cancellationToken, params LogId[] logNames) =>
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames) =>
             throw new NotImplementedException();
 
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames) =>
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> sink, CancellationToken cancellationToken, params LogId[] logNames) =>
             throw new NotImplementedException();
 
         public void Root(DeviceData device) =>
@@ -121,10 +169,10 @@ namespace AdvancedSharpAdbClient.Tests
         public string Disconnect(DnsEndPoint endpoint) =>
             throw new NotImplementedException();
 
-        public void Install(DeviceData device, Stream apk, params string[] arguments) =>
+        public Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
-        public List<string> GetFeatureSet(DeviceData device) =>
+        public void Install(DeviceData device, Stream apk, params string[] arguments) =>
             throw new NotImplementedException();
 
         public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments) =>
@@ -142,6 +190,12 @@ namespace AdvancedSharpAdbClient.Tests
         public void InstallCommit(DeviceData device, string session) =>
             throw new NotImplementedException();
 
+        public List<string> GetFeatureSet(DeviceData device) =>
+            throw new NotImplementedException();
+
+        public Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
         public XmlDocument DumpScreen(DeviceData device) =>
             throw new NotImplementedException();
         
@@ -151,46 +205,79 @@ namespace AdvancedSharpAdbClient.Tests
         public void Click(DeviceData device, Cords cords) =>
             throw new NotImplementedException();
 
+        public Task ClickAsync(DeviceData device, Cords cords) =>
+            throw new NotImplementedException();
+
         public void Click(DeviceData device, int x, int y) =>
+            throw new NotImplementedException();
+
+        public Task ClickAsync(DeviceData device, int x, int y) =>
             throw new NotImplementedException();
 
         public void Swipe(DeviceData device, Element first, Element second, long speed) =>
             throw new NotImplementedException();
 
+        public Task SwipeAsync(DeviceData device, Element first, Element second, long speed) =>
+            throw new NotImplementedException();
+
         public void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed) =>
+            throw new NotImplementedException();
+
+        public Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed) =>
             throw new NotImplementedException();
 
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default) =>
             throw new NotImplementedException();
-        
-        public Task<Element> FindElementAsync(DeviceData device, string xpath, TimeSpan timeout = default) =>
+
+        public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default) =>
             throw new NotImplementedException();
-        
-        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, TimeSpan timeout = default) =>
+
+        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public void SendKeyEvent(DeviceData device, string key) =>
             throw new NotImplementedException();
 
+        public Task SendKeyEventAsync(DeviceData device, string key) =>
+            throw new NotImplementedException();
+
         public void SendText(DeviceData device, string text) =>
+            throw new NotImplementedException();
+
+        public Task SendTextAsync(DeviceData device, string text) =>
             throw new NotImplementedException();
 
         public void ClearInput(DeviceData device, int charcount) =>
             throw new NotImplementedException();
 
-        public Task StartApp(DeviceData device, string packagename) =>
+        public Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
-        public Task StopApp(DeviceData device, string packagename) =>
+        public void StartApp(DeviceData device, string packagename) =>
+            throw new NotImplementedException();
+
+        public Task StartAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) =>
+            throw new NotImplementedException();
+
+        public void StopApp(DeviceData device, string packagename) =>
+            throw new NotImplementedException();
+
+        public Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) =>
             throw new NotImplementedException();
 
         public void BackBtn(DeviceData device) =>
             throw new NotImplementedException();
 
+        public Task BackBtnAsync(DeviceData device) =>
+            throw new NotImplementedException();
+
         public void HomeBtn(DeviceData device) =>
+            throw new NotImplementedException();
+
+        public Task HomeBtnAsync(DeviceData device) =>
             throw new NotImplementedException();
     }
 }

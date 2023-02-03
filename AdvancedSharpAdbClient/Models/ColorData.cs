@@ -1,5 +1,5 @@
-﻿// <copyright file="ColorData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="ColorData.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
@@ -27,5 +27,17 @@ namespace AdvancedSharpAdbClient
         /// bytes that contain information for this color are stored.
         /// </summary>
         public uint Offset { get; set; }
+
+        /// <summary>
+        /// Deconstruct the <see cref="Cords"/> class.
+        /// </summary>
+        /// <param name="length">The number of bits that contain information for this color.</param>
+        /// <param name="offset">The offset, in bits, within the byte array for a pixel, at which the
+        /// bytes that contain information for this color are stored.</param>
+        public void Deconstruct(out uint length, out uint offset)
+        {
+            length = Length;
+            offset = Offset;
+        }
     }
 }

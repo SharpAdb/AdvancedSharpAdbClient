@@ -1,5 +1,5 @@
-﻿// <copyright file="LogId.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="LogId.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient.Logs
@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Identifies the various Android log buffers.
     /// </summary>
-    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/log.h#596"/>
+    /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/log.h#596"/></remarks>
     public enum LogId : uint
     {
         /// <summary>

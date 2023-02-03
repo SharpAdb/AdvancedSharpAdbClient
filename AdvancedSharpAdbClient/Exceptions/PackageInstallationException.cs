@@ -1,5 +1,5 @@
-﻿// <copyright file="PackageInstallationException.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="PackageInstallationException.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
-    /// An exception while installing a package on the device
+    /// An exception while installing a package on the device.
     /// </summary>
     [Serializable]
     public class PackageInstallationException : Exception

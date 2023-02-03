@@ -1,5 +1,5 @@
-﻿// <copyright file="DeviceMonitor.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="DeviceMonitor.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -18,13 +18,13 @@ namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// <para>
-    ///     A Device monitor. This connects to the Android Debug Bridge and get device and
-    ///     debuggable process information from it.
+    /// A Device monitor. This connects to the Android Debug Bridge and get device and
+    /// debuggable process information from it.
     /// </para>
     /// </summary>
     /// <example>
     /// <para>
-    ///     To receive notifications when devices connect to or disconnect from your PC, you can use the following code:
+    /// To receive notifications when devices connect to or disconnect from your PC, you can use the following code:
     /// </para>
     /// <code>
     /// void Test()

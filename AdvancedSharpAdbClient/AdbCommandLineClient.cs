@@ -1,5 +1,5 @@
-﻿// <copyright file="AdbCommandLineClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AdbCommandLineClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -163,8 +163,7 @@ namespace AdvancedSharpAdbClient
         public virtual bool IsValidAdbFile(string adbPath) => CrossPlatformFunc.CheckFileExists(adbPath);
 
         /// <summary>
-        /// Parses the output of the <c>adb.exe version</c> command and determines the
-        /// adb version.
+        /// Parses the output of the <c>adb.exe version</c> command and determines the adb version.
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
@@ -197,25 +196,13 @@ namespace AdvancedSharpAdbClient
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
-        /// <param name="errorOutput">
-        /// A list in which to store the standard error output. Each line is added as a new entry.
-        /// This value can be <see langword="null"/> if you are not interested in the standard
-        /// error.
-        /// </param>
-        /// <param name="standardOutput">
-        /// A list in which to store the standard output. Each line is added as a new entry.
-        /// This value can be <see langword="null"/> if you are not interested in the standard
-        /// output.
-        /// </param>
-        /// <remarks>
-        /// <para>
-        /// Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.
-        /// </para>
-        /// </remarks>
-        /// <exception cref="AdbException">
-        /// The process exited with an exit code other than <c>0</c>.
-        /// </exception>
+        /// <param name="errorOutput">A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
+        /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
+        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
+        /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
         protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
@@ -231,25 +218,13 @@ namespace AdvancedSharpAdbClient
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
-        /// <param name="errorOutput">
-        /// A list in which to store the standard error output. Each line is added as a new entry.
-        /// This value can be <see langword="null"/> if you are not interested in the standard
-        /// error.
-        /// </param>
-        /// <param name="standardOutput">
-        /// A list in which to store the standard output. Each line is added as a new entry.
-        /// This value can be <see langword="null"/> if you are not interested in the standard
-        /// output.
-        /// </param>
-        /// <returns>
-        /// The return code of the <c>adb</c> process.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        /// Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.
-        /// </para>
-        /// </remarks>
+        /// <param name="errorOutput">A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
+        /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <returns>The return code of the <c>adb</c> process.</returns>
+        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
+        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {
             if (command == null)

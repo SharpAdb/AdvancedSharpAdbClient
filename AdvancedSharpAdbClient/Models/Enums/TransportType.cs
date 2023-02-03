@@ -1,5 +1,5 @@
-﻿// <copyright file="TransportType.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="TransportType.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
     public enum TransportType
     {
         /// <summary>
-        /// The device is connected through USB
+        /// The device is connected through USB.
         /// </summary>
         Usb,
 

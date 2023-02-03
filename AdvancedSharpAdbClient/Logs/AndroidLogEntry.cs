@@ -1,5 +1,5 @@
-﻿// <copyright file="AndroidLogEntry.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AndroidLogEntry.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System.Collections.Generic;
@@ -7,10 +7,9 @@ using System.Collections.Generic;
 namespace AdvancedSharpAdbClient.Logs
 {
     /// <summary>
-    /// Represents a standard Android log entry (an entry in any Android log buffer
-    /// except the Event buffer).
+    /// Represents a standard Android log entry (an entry in any Android log buffer except the Event buffer).
     /// </summary>
-    /// <seealso href="https://android.googlesource.com/platform/system/core/+/master/liblog/logprint.c#442"/>
+    /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/liblog/logprint.c#442"/></remarks>
     public class AndroidLogEntry : LogEntry
     {
         /// <summary>

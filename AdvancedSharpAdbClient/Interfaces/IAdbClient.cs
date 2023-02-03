@@ -1,17 +1,12 @@
-﻿// <copyright file="IAdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="IAdbClient.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace AdvancedSharpAdbClient
@@ -20,7 +15,7 @@ namespace AdvancedSharpAdbClient
     /// A common interface for any class that allows you to interact with the
     /// adb server and devices that are connected to that adb server.
     /// </summary>
-    public interface IAdbClient
+    public partial interface IAdbClient
     {
         /// <summary>
         /// Gets the <see cref="EndPoint"/> at which the Android Debug Bridge server is listening.
@@ -108,14 +103,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
-        /// <returns>
-        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
         /// <summary>
@@ -152,14 +143,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
-        /// <returns>
-        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
 
         /// <summary>
@@ -196,13 +183,10 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if if the specified socket is already bound through a previous reverse command.
-        /// </param>
-        /// <returns>
-        /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.
-        /// </returns>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if if the specified socket
+        /// is already bound through a previous reverse command.</param>
+        /// <returns>If your requested to start reverse to remote port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind);
 
 
@@ -242,7 +226,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// List all existing reverse forward connections from this server.
         /// </summary>
-        /// <param name = "device">The device for which to list the existing reverse foward connections.</param>
+        /// <param name="device">The device for which to list the existing reverse foward connections.</param>
         /// <returns>A <see cref="ForwardData"/> entry for each existing reverse forward connection.</returns>
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
@@ -252,9 +236,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="receiver">The receiver which will get the command output.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken);
+        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver);
 
         /// <summary>
         /// Executes a command on the device.
@@ -263,9 +245,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="receiver">The receiver which will get the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
+        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 
         // shell: not implemented
         // remount: not implemented
@@ -284,30 +264,10 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Framebuffer"/> object which can be used to get the framebuffer of the device.</returns>
         Framebuffer CreateRefreshableFramebuffer(DeviceData device);
 
-        /// <summary>
-        /// Gets the frame buffer from the specified end point.
-        /// </summary>
-        /// <param name="device">The device for which to get the framebuffer.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="Task"/> which returns the raw frame buffer.</returns>
-        /// <exception cref="AdbException">failed asking for frame buffer</exception>
-        /// <exception cref="AdbException">failed nudging</exception>
-        Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
-
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented
         // sync: not implemented
         // reverse:<forward-command>: not implemented
-
-        /// <summary>
-        /// Asynchronously runs the event log service on a device.
-        /// </summary>
-        /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this to stop reading from the event log.</param>
-        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        /// <returns>An <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
 
         /// <summary>
         /// Reboots the specified device in to the specified mode.
@@ -325,28 +285,11 @@ namespace AdvancedSharpAdbClient
         string Pair(DnsEndPoint endpoint, string code);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication
-        /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
-        /// <param name="code">The pairing code.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
-        Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
         string Connect(DnsEndPoint endpoint);
-
-        /// <summary>
-        /// Connect to a device via TCP/IP.
-        /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
-        Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
         /// Disconnects a remote device from this local ADB server.
@@ -433,13 +376,6 @@ namespace AdvancedSharpAdbClient
         XmlDocument DumpScreen(DeviceData device);
 
         /// <summary>
-        /// Gets the current device screen snapshot asynchronously.
-        /// </summary>
-        /// <param name="device">The device for which to get the screen snapshot.</param>
-        /// <returns>Xml containing current hierarchy.</returns>
-        Task<XmlDocument> DumpScreenAsync(DeviceData device);
-
-        /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
         /// <param name="device"></param>
@@ -484,15 +420,6 @@ namespace AdvancedSharpAdbClient
         Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
-        /// Get element by xpath asynchronously. You can specify the waiting time in timeout.
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="xpath"></param>
-        /// <param name="timeout"></param>
-        /// <returns>The <see cref="Element"/> class</returns>
-        Task<Element> FindElementAsync(DeviceData device, string xpath, TimeSpan timeout = default);
-
-        /// <summary>
         /// Get elements by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="device"></param>
@@ -500,15 +427,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="timeout"></param>
         /// <returns>The <see cref="Element"/> class</returns>
         Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
-
-        /// <summary>
-        /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="xpath"></param>
-        /// <param name="timeout"></param>
-        /// <returns>The <see cref="Element"/> class</returns>
-        Task<Element[]> FindElementsAsync(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Send keyevent to specific. You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent.
@@ -534,14 +452,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packagename"></param>
-        Task StartApp(DeviceData device, string packagename);
+        void StartApp(DeviceData device, string packagename);
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packagename"></param>
-        Task StopApp(DeviceData device, string packagename);
+        void StopApp(DeviceData device, string packagename);
 
         /// <summary>
         /// Click BACK button.

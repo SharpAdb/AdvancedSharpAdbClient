@@ -1,5 +1,5 @@
-﻿// <copyright file="MultilineReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="MultiLineReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System.Collections.Generic;
@@ -14,10 +14,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.
         /// </summary>
-        public MultiLineReceiver()
-        {
-            this.Lines = new List<string>();
-        }
+        public MultiLineReceiver() => Lines = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether [trim lines].
@@ -67,7 +64,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Finishes the receiver
+        /// Finishes the receiver.
         /// </summary>
         protected virtual void Done()
         {

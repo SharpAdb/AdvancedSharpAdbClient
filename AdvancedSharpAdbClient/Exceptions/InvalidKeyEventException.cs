@@ -1,9 +1,13 @@
-﻿using System;
+﻿// <copyright file="InvalidKeyEventException.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using System;
 
 namespace AdvancedSharpAdbClient.Exceptions
 {
     /// <summary>
-    /// Represents an exception with keyevent
+    /// Represents an exception with keyevent.
     /// </summary>
     public class InvalidKeyEventException : Exception
     {

@@ -1,5 +1,5 @@
-﻿// <copyright file="AdbServer.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AdbServer.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
@@ -14,9 +14,9 @@ namespace AdvancedSharpAdbClient
     /// the rest of the <c>Managed.Adb</c> library to work.
     /// </para>
     /// <para>
-    /// The adb server is a background process
-    /// that runs on the host machine. Its purpose if to sense the USB ports to know when devices are
-    /// attached/removed, as well as when emulator instances start/stop. The ADB server is really one
+    /// The adb server is a background process that runs on the host machine.
+    /// Its purpose if to sense the USB ports to know when devices are attached/removed,
+    /// as well as when emulator instances start/stop. The ADB server is really one
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.
     /// </para>
@@ -24,31 +24,25 @@ namespace AdvancedSharpAdbClient
     public class AdbServer : IAdbServer
     {
         /// <summary>
-        /// The minum version of <c>adb.exe</c> that is supported by this library.
+        /// The minimum version of <c>adb.exe</c> that is supported by this library.
         /// </summary>
         public static readonly Version RequiredAdbVersion = new(1, 0, 20);
 
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection is refused.
         /// </summary>
-        /// <remarks>
-        /// No connection could be made because the target computer actively refused it.This usually
+        /// <remarks>No connection could be made because the target computer actively refused it.This usually
         /// results from trying to connect to a service that is inactive on the foreign host—that is,
-        ///  one with no server application running.
-        /// </remarks>
-        /// <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/>
+        ///  one with no server application running. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
         internal const int ConnectionRefused = 10061;
 
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection was reset by the peer.
         /// </summary>
-        /// <remarks>
-        /// An existing connection was forcibly closed by the remote host. This normally results if the peer application on the
+        /// <remarks>An existing connection was forcibly closed by the remote host. This normally results if the peer application on the
         /// remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote
         /// host uses a hard close. This error may also result if a connection was broken due to keep-alive activity detecting
-        /// a failure while one or more operations are in progress.
-        /// </remarks>
-        /// <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/>
+        /// a failure while one or more operations are in progress. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
         internal const int ConnectionReset = 10054;
 
         /// <summary>

@@ -1,24 +1,20 @@
-﻿// <copyright file="IShellOutputReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="IShellOutputReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Shell Output Receiver
+    /// Shell Output Receiver.
     /// </summary>
     public interface IShellOutputReceiver
     {
         /// <summary>
         /// Gets a value indicating whether the receiver parses error messages.
         /// </summary>
-        /// <value>
-        ///     <see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.
-        /// </value>
-        /// <remarks>
-        /// The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
-        /// will detect common error messages and throw an exception.
-        /// </remarks>
+        /// <value><see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.</value>
+        /// <remarks>The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
+        /// will detect common error messages and throw an exception.</remarks>
         bool ParsesErrors { get; }
 
         /// <summary>

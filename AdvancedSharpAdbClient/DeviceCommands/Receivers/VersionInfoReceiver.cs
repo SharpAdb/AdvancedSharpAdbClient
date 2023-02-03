@@ -1,8 +1,6 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="VersionInfoReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="VersionInfoReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
-//-----------------------------------------------------------------------
 
 using System;
 using System.Text.RegularExpressions;
@@ -39,7 +37,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the version code of the specified package
+        /// Gets the version code of the specified package.
         /// </summary>
         public VersionInfo VersionInfo =>
             GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null

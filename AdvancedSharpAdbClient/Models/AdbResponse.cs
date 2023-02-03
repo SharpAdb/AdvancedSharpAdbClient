@@ -1,5 +1,5 @@
-﻿// <copyright file="AdbResponse.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="AdbResponse.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -7,7 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// An Adb Communication Response
+    /// An Adb Communication Response.
     /// </summary>
     public class AdbResponse
     {
@@ -30,9 +30,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets a value indicating whether the IO communication was a success.
         /// </summary>
-        /// <value>
-        ///   <see langword="true"/> if successful; otherwise, <see langword="false"/>.
-        /// </value>
+        /// <value><see langword="true"/> if successful; otherwise, <see langword="false"/>.</value>
         public bool IOSuccess { get; set; }
 
         /// <summary>
@@ -68,8 +66,7 @@ namespace AdvancedSharpAdbClient
         };
 
         /// <summary>
-        /// Determines whether the specified <see cref="object"/> is equal to the current
-        /// <see cref="AdbResponse"/> object.
+        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="AdbResponse"/> object.
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>

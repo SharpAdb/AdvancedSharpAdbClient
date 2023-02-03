@@ -1,5 +1,5 @@
-﻿// <copyright file="NamespaceDoc.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion">
-// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion. All rights reserved.
+﻿// <copyright file="NamespaceDoc.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
@@ -10,6 +10,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// The classes in this namespace provide <see cref="Exception"/>s.
     /// </summary>
+    /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGeneratedAttribute]
     internal class NamespaceDoc { }
 }
