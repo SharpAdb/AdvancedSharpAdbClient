@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdvancedSharpAdbClient.SampleApp.Common;
+using System;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -21,17 +22,11 @@ namespace AdvancedSharpAdbClient.SampleApp.ControlPages
 
         private async void Control1_Click(object sender, RoutedEventArgs e)
         {
+            CrossPlatformFunc.RunProcess = UWPPlatformFunc.RunProcess;
             Control1Progress.Visibility = Visibility.Visible;
             Control1.Content = "Starting";
-            FileOpenPicker FileOpen = new();
-            FileOpen.FileTypeFilter.Add(".exe");
-            FileOpen.SuggestedStartLocation = PickerLocationId.ComputerFolder;
-            Control1Output.Text = "Choose ADB ...";
-            StorageFile file = await FileOpen.PickSingleFileAsync();
-            if (file != null)
-            {
-                StartServerResult result = new AdbServer().StartServer(file.Path, false);
-            }
+            StorageFile adb = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/ADB/adb.exe"));
+            StartServerResult result = new AdbServer().StartServer(adb.Path, false);
             AdbServerStatus status = await Task.Run(AdbServer.Instance.GetStatus);
             Control1Output.Text = status.IsRunning ? "Succeed" : "Failed";
             Control1.Content = "Restart";

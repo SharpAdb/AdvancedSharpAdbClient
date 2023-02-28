@@ -123,7 +123,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Common\UWPPlatformFunc.cs" />
     <Compile Include="Common\BooleanToValueConverter.cs" />
     <Compile Include="Common\DeviceFamilyTrigger.cs" />
     <Compile Include="Common\DoubleToThicknessConverter.cs" />
@@ -131,6 +130,7 @@
     <Compile Include="Common\NullableBooleanToBooleanConverter.cs" />
     <Compile Include="Common\NullToVisibilityConverter.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Common\UWPPlatformFunc.cs" />
     <Compile Include="ControlPages\ADBServerPage.xaml.cs">
       <DependentUpon>ADBServerPage.xaml</DependentUpon>
     </Compile>
@@ -177,6 +177,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\ADB\adb.exe" />
+    <Content Include="Assets\ADB\AdbWinApi.dll" />
+    <Content Include="Assets\ADB\AdbWinUsbApi.dll" />
     <Content Include="Assets\gettingStarted.png" />
     <Content Include="Assets\githubTile.png" />
     <Content Include="Assets\MainPage_Banner.png" />
@@ -258,7 +261,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient">
-      <Version>2.5.3</Version>
+      <Version>2.5.4</Version>
     </PackageReference>
     <PackageReference Include="ColorCode.UWP">
       <Version>2.0.14</Version>
@@ -268,12 +271,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.8.2</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts">
-      <Version>10.0.22621.755</Version>
-    </PackageReference>
-    <PackageReference Include="ProcessForUWP.UWP">
-      <Version>0.0.3</Version>
     </PackageReference>
     <PackageReference Include="Win2D.uwp">
       <Version>1.26.0</Version>
@@ -292,6 +289,7 @@
       <Name>Windows Desktop Extensions for the UWP</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

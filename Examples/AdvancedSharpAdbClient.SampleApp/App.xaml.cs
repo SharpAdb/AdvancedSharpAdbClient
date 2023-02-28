@@ -1,10 +1,7 @@
 ﻿using AdvancedSharpAdbClient.SampleApp.Common;
 using AdvancedSharpAdbClient.SampleApp.Data;
 using AdvancedSharpAdbClient.SampleApp.Helpers;
-using Newtonsoft.Json;
-using ProcessForUWP.UWP.Helpers;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -14,7 +11,6 @@ using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
-using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.System.Profile;
 using Windows.UI.Xaml;
@@ -64,8 +60,6 @@ namespace AdvancedSharpAdbClient.SampleApp
 
         private async Task EnsureWindow(IActivatedEventArgs args)
         {
-            await InitializeConnection();
-
             // No matter what our destination is, we're going to need control data loaded - let's knock that out now.
             // We'll never need to do this again.
             await ControlInfoDataSource.Instance.GetGroupsAsync();
@@ -196,44 +190,6 @@ namespace AdvancedSharpAdbClient.SampleApp
             }
 
             return rootFrame;
-        }
-
-        private async Task InitializeConnection()
-        {
-            if (Connection == null)
-            {
-                if (ApiInformation.IsApiContractPresent("Windows.ApplicationModel.FullTrustAppContract", 1, 0))
-                {
-                    try
-                    {
-                        await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
-                        AppServiceConnected += (sender, e) =>
-                        {
-                            Connection.RequestReceived += ProcessHelper.Connection_RequestReceived;
-                            ProcessHelper.SendMessage = (value) =>
-                            {
-                                string json = JsonConvert.SerializeObject(value);
-                                try
-                                {
-                                    ValueSet message = new() { { "UWP", json } };
-                                    _ = Connection.SendMessageAsync(message);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine(ex);
-                                    Debug.WriteLine(json);
-                                }
-                            };
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex);
-                    }
-                }
-            }
-            CrossPlatformFunc.RunProcess = UWPPlatformFunc.RunProcess;
-            CrossPlatformFunc.CheckFileExists = UWPPlatformFunc.CheckFileExists;
         }
 
         /// <summary>

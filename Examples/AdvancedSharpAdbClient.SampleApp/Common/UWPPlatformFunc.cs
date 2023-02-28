@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
-using DataReceivedEventArgs = ProcessForUWP.UWP.DataReceivedEventArgs;
-using Process = ProcessForUWP.UWP.Process;
 
 namespace AdvancedSharpAdbClient.SampleApp.Common
 {
@@ -17,8 +14,6 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
 
         public static int RunProcess(string filename, string command, List<string> errorOutput, List<string> standardOutput)
         {
-            int code = 1;
-
             ProcessStartInfo psi = new(filename, command)
             {
                 CreateNoWindow = true,
@@ -28,55 +23,21 @@ namespace AdvancedSharpAdbClient.SampleApp.Common
                 RedirectStandardOutput = true
             };
 
-            using (Process process = Process.Start(psi))
+            using Process process = Process.Start(psi);
+            string standardErrorString = process.StandardError.ReadToEnd();
+            string standardOutputString = process.StandardOutput.ReadToEnd();
+
+            errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
             {
-                CancellationTokenSource Token = new();
-
-                process.BeginOutputReadLine();
-
-                process.EnableRaisingEvents = true;
-
-                void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
-                {
-                    if (e.Data == null)
-                    {
-                        code = 0;
-                        Token.Cancel();
-                        return;
-                    }
-                    string line = e.Data ?? string.Empty;
-
-                    standardOutput?.Add(line);
-                }
-
-                void ErrorDataReceived(object sender, DataReceivedEventArgs e)
-                {
-                    string line = e.Data ?? string.Empty;
-
-                    errorOutput?.Add(line);
-                }
-
-                try
-                {
-                    process.OutputDataReceived += OnOutputDataReceived;
-                    process.ErrorDataReceived += ErrorDataReceived;
-                    while (!process.IsExited)
-                    {
-                        Token.Token.ThrowIfCancellationRequested();
-                    }
-                }
-                catch (Exception)
-                {
-                    process.Kill();
-                }
-                finally
-                {
-                    process.Close();
-                    process.OutputDataReceived -= OnOutputDataReceived;
-                }
+                process.Kill();
             }
 
-            return code;
+            return process.ExitCode;
         }
 
         public static TResult AwaitByTaskCompleteSource<TResult>(Func<Task<TResult>> func)
