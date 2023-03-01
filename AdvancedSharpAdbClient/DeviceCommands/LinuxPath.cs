@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
         private static readonly char[] InvalidCharacters = new char[]
         {
-            '|', '\\', '?', '*', '<', '\"', ':', '>', '+', '[', ']'
+            '|', '\\', '?', '*', '<', '\"', ':', '>'
         };
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private static string FixupPath(string path)
         {
             string sb = path;
-            sb = sb.Replace(System.IO.Path.DirectorySeparatorChar, DirectorySeparatorChar);
+            sb = sb.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
 
             if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
             {

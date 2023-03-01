@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
 
                 adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
                 adbClient.Commands.Add("pm install \"/data/local/tmp/test.txt\"", string.Empty);
-                adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
+                adbClient.Commands.Add("rm \"/data/local/tmp/test.txt\"", string.Empty);
 
                 DeviceData device = new()
                 {
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
                 manager.InstallPackage("Assets/test.txt", false);
                 Assert.Equal(3, adbClient.ReceivedCommands.Count);
                 Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
-                Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[2]);
+                Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
 
                 Assert.Single(syncService.UploadedFiles);
                 Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
@@ -161,9 +161,9 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
                 adbClient.Commands.Add("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", string.Empty);
                 adbClient.Commands.Add("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", string.Empty);
                 adbClient.Commands.Add("pm install-commit 936013062", string.Empty);
-                adbClient.Commands.Add("rm /data/local/tmp/test.txt", string.Empty);
-                adbClient.Commands.Add("rm /data/local/tmp/gapps.txt", string.Empty);
-                adbClient.Commands.Add("rm /data/local/tmp/logcat.bin", string.Empty);
+                adbClient.Commands.Add("rm \"/data/local/tmp/test.txt\"", string.Empty);
+                adbClient.Commands.Add("rm \"/data/local/tmp/gapps.txt\"", string.Empty);
+                adbClient.Commands.Add("rm \"/data/local/tmp/logcat.bin\"", string.Empty);
 
                 DeviceData device = new()
                 {
@@ -178,9 +178,9 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
                 Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[3]);
                 Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[4]);
                 Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
-                Assert.Equal("rm /data/local/tmp/gapps.txt", adbClient.ReceivedCommands[6]);
-                Assert.Equal("rm /data/local/tmp/logcat.bin", adbClient.ReceivedCommands[7]);
-                Assert.Equal("rm /data/local/tmp/test.txt", adbClient.ReceivedCommands[8]);
+                Assert.Equal("rm \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[6]);
+                Assert.Equal("rm \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[7]);
+                Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[8]);
 
                 Assert.Equal(3, syncService.UploadedFiles.Count);
                 Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));

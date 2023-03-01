@@ -39,16 +39,14 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net3.5-client'">
     <PackageReference Include="AsyncBridge" Version="0.3.1" />
-    <PackageReference Include="mscorlib.Polyfill.NET35" Version="0.0.3" />
-    <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.3" />
-    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.3" />
+    <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.4" />
+    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.0-client'">
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
-    <PackageReference Include="mscorlib.Polyfill.NET40" Version="0.0.2" />
-    <PackageReference Include="Polyfill.System.Buffers.NET40" Version="0.0.2" />
-    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET40" Version="0.0.2" />
+    <PackageReference Include="Polyfill.System.Buffers.NET40" Version="0.0.3" />
+    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET40" Version="0.0.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'">
