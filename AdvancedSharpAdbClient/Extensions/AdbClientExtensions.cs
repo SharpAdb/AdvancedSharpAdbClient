@@ -87,7 +87,29 @@ namespace AdvancedSharpAdbClient
 
             return values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
-                : client.Pair(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), code);
+                : client.Pair(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int port) ? port : AdbClient.DefaultPort), code);
+        }
+
+        /// <summary>
+        /// Pair with a device for secure TCP/IP communication.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Pair(this IAdbClient client, string host, int port, string code)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            return values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : client.Pair(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code);
         }
 
         /// <summary>
@@ -135,7 +157,30 @@ namespace AdvancedSharpAdbClient
 
             return values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
-                : client.PairAsync(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), code, cancellationToken);
+                : client.PairAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int port) ? port : AdbClient.DefaultPort), code, cancellationToken);
+        }
+
+        /// <summary>
+        /// Pair with a device for secure TCP/IP communication.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The results from adb.</returns>
+        public static Task<string> PairAsync(this IAdbClient client, string host, int port, string code, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            return values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : client.PairAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code, cancellationToken);
         }
 
         /// <summary>
@@ -165,8 +210,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <returns>The results from adb.</returns>
-        public static string Connect(this IAdbClient client, string host)
+        public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort)
         {
             if (string.IsNullOrEmpty(host))
             {
@@ -177,7 +223,7 @@ namespace AdvancedSharpAdbClient
 
             return values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
-                : client.Connect(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])));
+                : client.Connect(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port));
         }
 
         /// <summary>
@@ -209,9 +255,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
-        public static Task<string> ConnectAsync(this IAdbClient client, string host, CancellationToken cancellationToken = default)
+        public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(host))
             {
@@ -222,7 +269,7 @@ namespace AdvancedSharpAdbClient
 
             return values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
-                : client.ConnectAsync(new DnsEndPoint(values[0], values.Length == 1 ? AdbClient.DefaultPort : int.Parse(values[1])), cancellationToken);
+                : client.ConnectAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), cancellationToken);
         }
     }
 }
