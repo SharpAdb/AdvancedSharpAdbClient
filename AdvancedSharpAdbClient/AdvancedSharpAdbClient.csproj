@@ -17,7 +17,8 @@
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0;uap10.0</TargetFrameworks>
+    <TargetFramework Condition="'$(GITHUB_ACTIONS)' == 'true'">netstandard2.0</TargetFramework>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true'">net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0;uap10.0</TargetFrameworks>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
     <VersionPrefix>2.5.4</VersionPrefix>
   </PropertyGroup>
