@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Xunit;
 
@@ -59,6 +60,8 @@ namespace AdvancedSharpAdbClient.Tests
         [SupportedOSPlatform("windows")]
         public void ToImageTest()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { return; }
+
             byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
             header.Width = 1;
@@ -83,6 +86,8 @@ namespace AdvancedSharpAdbClient.Tests
         [SupportedOSPlatform("windows")]
         public void ToImageEmptyTest()
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { return; }
+
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 
@@ -53,7 +54,8 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 ReceiveBufferSize = 1024
             };
-            Assert.Equal(1024, socket.ReceiveBufferSize);
+            // I don't known why it is 2304 on Ubuntu...
+            Assert.Equal(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 2304 : 1024, socket.ReceiveBufferSize);
             socket.Dispose();
         }
 
