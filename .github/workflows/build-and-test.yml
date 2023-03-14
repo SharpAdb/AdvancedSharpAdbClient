@@ -28,7 +28,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build AdvancedSharpAdbClient/AdvancedSharpAdbClient.csproj --no-restore
+      run: dotnet build --no-restore
     
     - name: Test
-      run: dotnet test AdvancedSharpAdbClient.Tests/AdvancedSharpAdbClient.Tests.csproj --no-restore
+      run: dotnet test --no-restore
