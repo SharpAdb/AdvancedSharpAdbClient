@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 ReceiveBufferSize = 1024
             };
-            // I don't known why it is 2304 on Ubuntu...
+            // https://stackoverflow.com/questions/29356626/is-there-a-way-to-reduce-the-minimum-lower-limit-of-the-socket-send-buffer-size
             Assert.Equal(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 2304 : 1024, socket.ReceiveBufferSize);
             socket.Dispose();
         }
