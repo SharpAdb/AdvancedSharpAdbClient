@@ -38,7 +38,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
         {
-            throw new NotImplementedException();
+            var result = Send(buffer, offset, size, socketFlags);
+            var tcs = new TaskCompletionSource<int>();
+            tcs.SetResult(result);
+            return tcs.Task;
         }
 
         public int Receive(byte[] buffer, int size, SocketFlags socketFlags) => InputStream.Read(buffer, 0, size);
