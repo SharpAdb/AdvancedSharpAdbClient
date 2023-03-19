@@ -115,6 +115,10 @@ namespace AdvancedSharpAdbClient
             {
                 value = DeviceState.NoPermissions;
             }
+            else if (string.Equals(state, "unauthorized", StringComparison.OrdinalIgnoreCase))
+            {
+                value = DeviceState.Unauthorized;
+            }
             else
             {
                 // Else, we try to match a value of the DeviceState enumeration.
