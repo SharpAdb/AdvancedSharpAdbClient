@@ -185,5 +185,31 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
         }
+
+        public Task SendAsync(byte[] data, int length)
+        {
+            Send(data, length);
+            return Task.CompletedTask;
+        }
+
+        public Task SendAsync(byte[] data, int offset, int length)
+        {
+            Send(data, offset, length);
+            return Task.CompletedTask;
+        }
+
+        public Task SendAdbRequestAsync(string request)
+        {
+            SendAdbRequest(request);
+            return Task.CompletedTask;
+        }
+
+        public Task<AdbResponse> ReadAdbResponseAsync()
+        {
+            var response = ReadAdbResponse();
+            var tcs = new TaskCompletionSource<AdbResponse>();
+            tcs.SetResult(response);
+            return tcs.Task;
+        }
     }
 }

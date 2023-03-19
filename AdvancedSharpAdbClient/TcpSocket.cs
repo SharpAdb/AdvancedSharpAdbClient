@@ -79,9 +79,19 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
             socket.Receive(buffer, offset, socketFlags);
-
+        
+#if NET6_0_OR_GREATER
+        /// <inheritdoc/>
+        public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+            await socket.SendAsync(buffer.AsMemory().Slice(offset, size), socketFlags);
+        
+        /// <inheritdoc/>
+        public async Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => 
+            await socket.ReceiveAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
+#else
         /// <inheritdoc/>
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+#endif
     }
 }

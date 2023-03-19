@@ -26,10 +26,20 @@ namespace AdvancedSharpAdbClient.Tests
         public void Close() => Connected = false;
 
         public void Connect(EndPoint endPoint) => Connected = true;
+        public Task ConnectAsync(EndPoint endPoint)
+        {
+            Connected = true;
+            return Task.CompletedTask;
+        }
 
         public void Dispose() => Connected = false;
 
         public Stream GetStream() => OutputStream;
+
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        {
+            throw new NotImplementedException();
+        }
 
         public int Receive(byte[] buffer, int size, SocketFlags socketFlags) => InputStream.Read(buffer, 0, size);
 

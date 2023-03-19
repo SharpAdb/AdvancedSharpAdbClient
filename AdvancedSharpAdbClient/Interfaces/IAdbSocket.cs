@@ -159,5 +159,36 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device to which to connect.</param>
         /// <remarks>If <paramref name="device"/> is <see langword="null"/>, this method does nothing.</remarks>
         void SetDevice(DeviceData device);
+        
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        /// <param name="length">The number of bytes to send.</param>
+        Task SendAsync(byte[] data, int length);
+
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        /// <param name="offset">The index of the first byte in the array to send.</param>
+        /// <param name="length">The number of bytes to send.</param>
+        Task SendAsync(byte[] data, int offset, int length);
+        
+        /// <summary>
+        /// Asynchronously sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="ReadAdbResponseAsync()"/>.
+        /// </summary>
+        /// <param name="request">The request to send.</param>
+        Task SendAdbRequestAsync(string request);
+        
+        /// <summary>
+        /// Asynchronously receives an <see cref="AdbResponse"/> message, and throws an error
+        /// if the message does not indicate success.
+        /// </summary>
+        /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
+        Task<AdbResponse> ReadAdbResponseAsync();
+#endif
     }
 }

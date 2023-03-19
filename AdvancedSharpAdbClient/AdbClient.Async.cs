@@ -24,6 +24,7 @@ namespace AdvancedSharpAdbClient
 {
     public partial class AdbClient
     {
+#if !NET6_0_OR_GREATER 
         /// <inheritdoc/>
         public async Task<int> GetAdbVersionAsync(CancellationToken cancellationToken = default)
         {
@@ -83,10 +84,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
-            CreateForwardAsync(device, local?.ToString(), remote?.ToString(), allowRebind, cancellationToken);
-
-        /// <inheritdoc/>
         public async Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -119,10 +116,6 @@ namespace AdvancedSharpAdbClient
 
             return parts.Select(ForwardData.FromString);
         }
-
-        /// <inheritdoc/>
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
 
         /// <inheritdoc/>
         public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
@@ -171,21 +164,6 @@ namespace AdvancedSharpAdbClient
             {
                 receiver?.Flush();
             }
-        }
-
-        /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("windows")]
-#endif
-        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
-        {
-            EnsureDevice(device);
-
-            using Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
-            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
-
-            // Convert the framebuffer to an image, and return that.
-            return framebuffer.ToImage();
         }
 
         /// <inheritdoc/>
@@ -405,6 +383,30 @@ namespace AdvancedSharpAdbClient
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
         }
+#endif
+        
+        /// <inheritdoc/>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
+        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+
+            using Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
+            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
+
+            // Convert the framebuffer to an image, and return that.
+            return framebuffer.ToImage();
+        }
+        
+        /// <inheritdoc/>
+        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
+            CreateForwardAsync(device, local?.ToString(), remote?.ToString(), allowRebind, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
+            ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
 
         /// <inheritdoc/>
         public async Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
@@ -495,6 +497,7 @@ namespace AdvancedSharpAdbClient
             return null;
         }
 
+#if !NET6_0_OR_GREATER
         /// <inheritdoc/>
         public async Task SendKeyEventAsync(DeviceData device, string key)
         {
@@ -536,11 +539,11 @@ namespace AdvancedSharpAdbClient
                 throw new InvalidTextException();
             }
         }
-
+#endif
         /// <inheritdoc/>
         public async Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken = default)
         {
-            SendKeyEvent(device, "KEYCODE_MOVE_END");
+            await SendKeyEventAsync(device, "KEYCODE_MOVE_END");
             await ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, cancellationToken);
         }
 

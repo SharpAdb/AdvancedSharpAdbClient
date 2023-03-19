@@ -18,6 +18,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Collection<string> ReceivedCommands { get; private set; } = new Collection<string>();
 
+        public Task InstallAsync(DeviceData device, Stream apk, CancellationToken ct = default, params string[] arguments) => 
+            throw new NotImplementedException();
+
         public EndPoint EndPoint { get; private set; }
 
         public string Pair(DnsEndPoint endpoint, string code) =>

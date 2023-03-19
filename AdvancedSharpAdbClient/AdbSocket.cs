@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient
     /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.
     /// </para>
     /// </summary>
-    public class AdbSocket : IAdbSocket, IDisposable
+    public partial class AdbSocket : IAdbSocket, IDisposable
     {
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
@@ -282,65 +282,6 @@ namespace AdvancedSharpAdbClient
 #endif
                 throw sex;
             }
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
-        {
-            if (length < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length));
-            }
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (data.Length < length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(data));
-            }
-
-            int count = -1;
-            int totalRead = 0;
-
-            while (count != 0 && totalRead < length)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                try
-                {
-                    int left = length - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
-
-                    count = await socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
-                    if (count < 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogError("read: channel EOF");
-#endif
-                        throw new AdbException("EOF");
-                    }
-                    else if (count == 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogInformation("DONE with Read");
-#endif
-                    }
-                    else
-                    {
-                        totalRead += count;
-                    }
-                }
-                catch (SocketException ex)
-                {
-                    throw new AdbException($"An error occurred while receiving data from the adb server: {ex.Message}.", ex);
-                }
-            }
-
-            return totalRead;
         }
 
         /// <inheritdoc/>

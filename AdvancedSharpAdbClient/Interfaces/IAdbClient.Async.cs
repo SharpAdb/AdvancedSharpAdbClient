@@ -7,6 +7,7 @@ using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -369,5 +370,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task HomeBtnAsync(DeviceData device);
+        
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Asynchronously installs an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="cancellationToken">A cancellation token</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments);
+#endif
     }
 }

@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -50,6 +51,11 @@ namespace AdvancedSharpAdbClient
         /// Clicks on this coordinates.
         /// </summary>
         public void Click() => Client.Click(Device, Cords);
+        
+        /// <summary>
+        /// Clicks on this coordinates.
+        /// </summary>
+        public async Task ClickAsync() => await Client.ClickAsync(Device, Cords);
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
