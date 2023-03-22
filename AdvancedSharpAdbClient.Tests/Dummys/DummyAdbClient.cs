@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Collection<string> ReceivedCommands { get; private set; } = new Collection<string>();
 
-        public Task InstallAsync(DeviceData device, Stream apk, CancellationToken ct = default, params string[] arguments) => 
+        public Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken = default, params string[] arguments) => 
             throw new NotImplementedException();
 
         public EndPoint EndPoint { get; private set; }
@@ -32,34 +32,34 @@ namespace AdvancedSharpAdbClient.Tests
         public string Connect(DnsEndPoint endpoint) =>
             throw new NotImplementedException();
 
-        public Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken) =>
+        public Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
             throw new NotImplementedException();
 
-        public Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken) =>
+        public Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind) =>
             throw new NotImplementedException();
 
-        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken) =>
+        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind) =>
             throw new NotImplementedException();
 
-        public Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken) =>
+        public Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver) =>
             ExecuteRemoteCommand(command, device, receiver, Encoding.Default);
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken) =>
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
             ExecuteRemoteCommandAsync(command, device, receiver, Encoding.Default, cancellationToken);
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             ReceivedCommands.Add(command);
 
@@ -112,16 +112,16 @@ namespace AdvancedSharpAdbClient.Tests
         public int GetAdbVersion() =>
             throw new NotImplementedException();
 
-        public Task<int> GetAdbVersionAsync(CancellationToken cancellationToken) =>
+        public Task<int> GetAdbVersionAsync(CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public List<DeviceData> GetDevices() =>
             throw new NotImplementedException();
 
-        public Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken) =>
+        public Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) =>
+        public Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public Framebuffer CreateRefreshableFramebuffer(DeviceData device) =>
@@ -133,13 +133,13 @@ namespace AdvancedSharpAdbClient.Tests
         public IEnumerable<ForwardData> ListReverseForward(DeviceData device) =>
             throw new NotImplementedException();
 
-        public Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken) =>
+        public Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public IEnumerable<ForwardData> ListForward(DeviceData device) =>
             throw new NotImplementedException();
 
-        public Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken) =>
+        public Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Reboot(string into, DeviceData device) =>
@@ -157,10 +157,10 @@ namespace AdvancedSharpAdbClient.Tests
         public void RemoveReverseForward(DeviceData device, string remote) =>
             throw new NotImplementedException();
 
-        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames) =>
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, CancellationToken cancellationToken = default, params LogId[] logNames) =>
             throw new NotImplementedException();
 
-        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> sink, CancellationToken cancellationToken, params LogId[] logNames) =>
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> sink, CancellationToken cancellationToken = default, params LogId[] logNames) =>
             throw new NotImplementedException();
 
         public void Root(DeviceData device) =>
@@ -172,7 +172,7 @@ namespace AdvancedSharpAdbClient.Tests
         public string Disconnect(DnsEndPoint endpoint) =>
             throw new NotImplementedException();
 
-        public Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken) =>
+        public Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Install(DeviceData device, Stream apk, params string[] arguments) =>
@@ -196,79 +196,79 @@ namespace AdvancedSharpAdbClient.Tests
         public List<string> GetFeatureSet(DeviceData device) =>
             throw new NotImplementedException();
 
-        public Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) =>
+        public Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public XmlDocument DumpScreen(DeviceData device) =>
             throw new NotImplementedException();
         
-        public Task<XmlDocument> DumpScreenAsync(DeviceData device) =>
+        public Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Click(DeviceData device, Cords cords) =>
             throw new NotImplementedException();
 
-        public Task ClickAsync(DeviceData device, Cords cords) =>
+        public Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Click(DeviceData device, int x, int y) =>
             throw new NotImplementedException();
 
-        public Task ClickAsync(DeviceData device, int x, int y) =>
+        public Task ClickAsync(DeviceData device, int x, int y, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Swipe(DeviceData device, Element first, Element second, long speed) =>
             throw new NotImplementedException();
 
-        public Task SwipeAsync(DeviceData device, Element first, Element second, long speed) =>
+        public Task SwipeAsync(DeviceData device, Element first, Element second, long speed, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed) =>
             throw new NotImplementedException();
 
-        public Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed) =>
+        public Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default) =>
             throw new NotImplementedException();
 
-        public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken) =>
+        public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default) =>
             throw new NotImplementedException();
 
-        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) =>
+        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void SendKeyEvent(DeviceData device, string key) =>
             throw new NotImplementedException();
 
-        public Task SendKeyEventAsync(DeviceData device, string key) =>
+        public Task SendKeyEventAsync(DeviceData device, string key, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void SendText(DeviceData device, string text) =>
             throw new NotImplementedException();
 
-        public Task SendTextAsync(DeviceData device, string text) =>
+        public Task SendTextAsync(DeviceData device, string text, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void ClearInput(DeviceData device, int charcount) =>
             throw new NotImplementedException();
 
-        public Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken) =>
+        public Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void StartApp(DeviceData device, string packagename) =>
             throw new NotImplementedException();
 
-        public Task StartAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) =>
+        public Task StartAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void StopApp(DeviceData device, string packagename) =>
             throw new NotImplementedException();
 
-        public Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) =>
+        public Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void BackBtn(DeviceData device) =>

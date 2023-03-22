@@ -10,8 +10,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 #if HAS_LOGGER
 using Microsoft.Extensions.Logging;
@@ -120,10 +118,6 @@ namespace AdvancedSharpAdbClient
         public virtual int Read(byte[] data) => Read(data, data.Length);
 
         /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-            ReadAsync(data, data.Length, cancellationToken);
-
-        /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path, int permissions) =>
             SendSyncRequest(command, $"{path},{permissions}");
 
@@ -212,25 +206,6 @@ namespace AdvancedSharpAdbClient
             // And get the string
             reply = new byte[len];
             _ = Read(reply);
-
-            string value = AdbClient.Encoding.GetString(reply);
-            return value;
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
-        {
-            // The first 4 bytes contain the length of the string
-            byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-            // Convert the bytes to a hex string
-            string lenHex = AdbClient.Encoding.GetString(reply);
-            int len = int.Parse(lenHex, NumberStyles.HexNumber);
-
-            // And get the string
-            reply = new byte[len];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;

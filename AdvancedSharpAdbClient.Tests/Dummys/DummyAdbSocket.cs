@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public Task ReadAsync(byte[] data, CancellationToken cancellationToken)
+        public Task ReadAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             Read(data);
 
@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public string ReadSyncString() => ResponseMessages.Dequeue();
 
-        public async Task<string> ReadStringAsync(CancellationToken cancellationToken)
+        public async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
             if (WaitForNewData)
             {
@@ -146,7 +146,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Reconnect() => DidReconnect = true;
 
-        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
         public void Send(byte[] data, int offset, int length)
         {
@@ -186,25 +186,25 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public Task SendAsync(byte[] data, int length)
+        public Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
             Send(data, length);
             return Task.CompletedTask;
         }
 
-        public Task SendAsync(byte[] data, int offset, int length)
+        public Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
             Send(data, offset, length);
             return Task.CompletedTask;
         }
 
-        public Task SendAdbRequestAsync(string request)
+        public Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
             SendAdbRequest(request);
             return Task.CompletedTask;
         }
 
-        public Task<AdbResponse> ReadAdbResponseAsync()
+        public Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
         {
             var response = ReadAdbResponse();
             var tcs = new TaskCompletionSource<AdbResponse>();

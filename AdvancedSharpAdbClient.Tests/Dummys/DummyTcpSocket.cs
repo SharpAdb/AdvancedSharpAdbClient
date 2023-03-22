@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Stream GetStream() => OutputStream;
 
-        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags)
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
             var result = Send(buffer, offset, size, socketFlags);
             var tcs = new TaskCompletionSource<int>();

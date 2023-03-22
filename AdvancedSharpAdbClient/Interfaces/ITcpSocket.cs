@@ -54,6 +54,19 @@ namespace AdvancedSharpAdbClient
         int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags);
 
         /// <summary>
+        /// Asynchronously sends the specified number of bytes of data to a connected
+        /// <see cref="ITcpSocket"/>, starting at the specified <paramref name="offset"/>,
+        /// and using the specified <paramref name="socketFlags"/>.
+        /// </summary>
+        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
+        /// <param name="offset">The position in the data buffer at which to begin sending data.</param>
+        /// <param name="size">The number of bytes to send.</param>
+        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>The number of bytes sent to the Socket.</returns>
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/> into the specified offset position of the
         /// receive buffer, using the specified SocketFlags.
         /// </summary>
@@ -81,19 +94,5 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <returns>The underlying stream.</returns>
         Stream GetStream();
-        
-#if NET6_0_OR_GREATER
-        /// <summary>
-        /// Asynchronously sends the specified number of bytes of data to a connected
-        /// <see cref="ITcpSocket"/>, starting at the specified <paramref name="offset"/>,
-        /// and using the specified <paramref name="socketFlags"/>.
-        /// </summary>
-        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
-        /// <param name="offset">The position in the data buffer at which to begin sending data.</param>
-        /// <param name="size">The number of bytes to send.</param>
-        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
-        /// <returns>The number of bytes sent to the Socket.</returns>
-        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags);
-#endif
     }
 }

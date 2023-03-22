@@ -243,6 +243,15 @@ namespace AdvancedSharpAdbClient
         Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Asynchronously installs an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="cancellationToken">A cancellation token</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments);
+
+        /// <summary>
         /// Lists all features supported by the current device.
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>
@@ -254,16 +263,18 @@ namespace AdvancedSharpAdbClient
         /// Gets the current device screen snapshot asynchronously.
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>An <see cref="Task"/> which return the Xml containing current hierarchy.</returns>
-        Task<XmlDocument> DumpScreenAsync(DeviceData device);
+        Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
         /// <param name="device"></param>
         /// <param name="cords"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ClickAsync(DeviceData device, Cords cords);
+        Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken);
 
         /// <summary>
         /// Clicks on the specified coordinates.
@@ -271,8 +282,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="x"></param>
         /// <param name="y"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ClickAsync(DeviceData device, int x, int y);
+        Task ClickAsync(DeviceData device, int x, int y, CancellationToken cancellationToken);
 
         /// <summary>
         /// Generates a swipe gesture from first element to second element Specify the speed in ms.
@@ -281,8 +293,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <param name="speed"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SwipeAsync(DeviceData device, Element first, Element second, long speed);
+        Task SwipeAsync(DeviceData device, Element first, Element second, long speed, CancellationToken cancellationToken);
 
         /// <summary>
         /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed Specify the speed in ms.
@@ -293,8 +306,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="speed"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed);
+        Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get element by xpath asynchronously. You can specify the waiting time in timeout.
@@ -319,16 +333,18 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="key"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SendKeyEventAsync(DeviceData device, string key);
+        Task SendKeyEventAsync(DeviceData device, string key, CancellationToken cancellationToken);
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
         /// <param name="device"></param>
         /// <param name="text"></param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SendTextAsync(DeviceData device, string text);
+        Task SendTextAsync(DeviceData device, string text, CancellationToken cancellationToken);
 
         /// <summary>
         /// Clear the input text. The input should be in focus. Use el.ClearInput() if the element isn't focused.
@@ -370,16 +386,5 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task HomeBtnAsync(DeviceData device);
-        
-#if NET6_0_OR_GREATER
-        /// <summary>
-        /// Asynchronously installs an Android application on an device.
-        /// </summary>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="cancellationToken">A cancellation token</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments);
-#endif
     }
 }
