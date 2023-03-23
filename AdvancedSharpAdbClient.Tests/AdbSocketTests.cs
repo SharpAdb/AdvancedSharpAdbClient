@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.Tests
                 new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
 
         [Fact]
-        public void SendSyncRequest3() =>
+        public void SendSyncRequestTest3() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
                 new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });

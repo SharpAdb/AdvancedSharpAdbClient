@@ -3,6 +3,8 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -50,6 +52,13 @@ namespace AdvancedSharpAdbClient
         /// Clicks on this coordinates.
         /// </summary>
         public void Click() => Client.Click(Device, Cords);
+
+        /// <summary>
+        /// Clicks on this coordinates.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        public async Task ClickAsync(CancellationToken cancellationToken = default) =>
+            await Client.ClickAsync(Device, Cords, cancellationToken);
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.

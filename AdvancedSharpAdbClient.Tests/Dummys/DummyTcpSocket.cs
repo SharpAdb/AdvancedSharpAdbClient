@@ -26,10 +26,23 @@ namespace AdvancedSharpAdbClient.Tests
         public void Close() => Connected = false;
 
         public void Connect(EndPoint endPoint) => Connected = true;
+        public Task ConnectAsync(EndPoint endPoint)
+        {
+            Connected = true;
+            return Task.CompletedTask;
+        }
 
         public void Dispose() => Connected = false;
 
         public Stream GetStream() => OutputStream;
+
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
+        {
+            var result = Send(buffer, offset, size, socketFlags);
+            var tcs = new TaskCompletionSource<int>();
+            tcs.SetResult(result);
+            return tcs.Task;
+        }
 
         public int Receive(byte[] buffer, int size, SocketFlags socketFlags) => InputStream.Read(buffer, 0, size);
 
