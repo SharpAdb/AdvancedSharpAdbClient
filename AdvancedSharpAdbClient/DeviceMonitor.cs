@@ -158,7 +158,7 @@ namespace AdvancedSharpAdbClient
                 monitorTaskCancellationTokenSource.Cancel();
                 monitorTask.Wait();
 
-#if !NETSTANDARD1_3
+#if HAS_Process
                 monitorTask.Dispose();
 #endif
                 monitorTask = null;

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 
-#if NETSTANDARD1_3
+#if !HAS_Process
 using System.Net.Sockets;
 #endif
 
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient
             (int)dateTimeOffset.ToUnixTimeSeconds();
 #endif
 
-#if NETSTANDARD1_3
+#if !HAS_Process
         /// <summary>
         /// Begins to asynchronously receive data from a connected <see cref="Socket"/>.
         /// </summary>
@@ -166,7 +166,7 @@ namespace AdvancedSharpAdbClient
             TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
 #endif
 
-#if NETSTANDARD1_3
+#if !HAS_Process
         /// <summary>
         /// Ends a pending asynchronous read.
         /// </summary>

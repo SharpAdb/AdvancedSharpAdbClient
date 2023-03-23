@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <FullTargets Condition="'$(FullTargets)' == ''">False</FullTargets>
     <IsWindows Condition="'$(IsWindows)' == ''">False</IsWindows>
     <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
   </PropertyGroup>

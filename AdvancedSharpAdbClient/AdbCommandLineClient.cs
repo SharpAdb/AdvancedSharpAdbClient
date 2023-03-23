@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient
                 return;
             }
 
-#if !NETSTANDARD1_3
+#if HAS_Process
             // Starting the adb server failed for whatever reason. This can happen if adb.exe
             // is running but is not accepting requests. In that case, try to kill it & start again.
             // It kills all processes named "adb", so let's hope nobody else named their process that way.
