@@ -27,13 +27,6 @@ namespace AdvancedSharpAdbClient
         void Reconnect();
 
         /// <summary>
-        /// Sends a request to the Android Debug Bridge.To read the response, call
-        /// <see cref="ReadAdbResponse()"/>.
-        /// </summary>
-        /// <param name="request">The request to send.</param>
-        void SendAdbRequest(string request);
-
-        /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
@@ -60,28 +53,22 @@ namespace AdvancedSharpAdbClient
         /// Sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
-        /// <param name="length">The length of the data packet that follows.</param>
-        void SendSyncRequest(SyncCommand command, int length);
+        /// <param name="path">The path of the file on which the command should operate.</param>
+        void SendSyncRequest(SyncCommand command, string path);
 
         /// <summary>
         /// Sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
-        /// <param name="path">The path of the file on which the command should operate.</param>
-        void SendSyncRequest(SyncCommand command, string path);
+        /// <param name="length">The length of the data packet that follows.</param>
+        void SendSyncRequest(SyncCommand command, int length);
 
         /// <summary>
-        /// Reads the response to a sync command.
+        /// Sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="ReadAdbResponse()"/>.
         /// </summary>
-        /// <returns>The response that was sent by the device.</returns>
-        SyncCommand ReadSyncResponse();
-
-        /// <summary>
-        /// Receives an <see cref="AdbResponse"/> message, and throws an error
-        /// if the message does not indicate success.
-        /// </summary>
-        /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
-        AdbResponse ReadAdbResponse();
+        /// <param name="request">The request to send.</param>
+        void SendAdbRequest(string request);
 
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
@@ -91,6 +78,17 @@ namespace AdvancedSharpAdbClient
         /// <returns>The total number of bytes read.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         int Read(byte[] data);
+
+        /// <summary>
+        /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
+        /// is reached, or no more data is coming (because the socket closed or the
+        /// timeout expired).
+        /// </summary>
+        /// <param name="data">The buffer to store the read data into.</param>
+        /// <param name="length">The length to read or -1 to fill the data buffer completely</param>
+        /// <returns>The total number of bytes read.</returns>
+        /// <exception cref="AdbException">EOF or No Data to read: exception.Message</exception>
+        int Read(byte[] data, int length);
 
         /// <summary>
         /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
@@ -106,15 +104,17 @@ namespace AdvancedSharpAdbClient
         string ReadSyncString();
 
         /// <summary>
-        /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
-        /// is reached, or no more data is coming (because the socket closed or the
-        /// timeout expired).
+        /// Reads the response to a sync command.
         /// </summary>
-        /// <param name="data">The buffer to store the read data into.</param>
-        /// <param name="length">The length to read or -1 to fill the data buffer completely</param>
-        /// <returns>The total number of bytes read.</returns>
-        /// <exception cref="AdbException">EOF or No Data to read: exception.Message</exception>
-        int Read(byte[] data, int length);
+        /// <returns>The response that was sent by the device.</returns>
+        SyncCommand ReadSyncResponse();
+
+        /// <summary>
+        /// Receives an <see cref="AdbResponse"/> message, and throws an error
+        /// if the message does not indicate success.
+        /// </summary>
+        /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
+        AdbResponse ReadAdbResponse();
 
         /// <summary>
         /// Gets a <see cref="Stream"/> that can be used to send and receive shell output to and

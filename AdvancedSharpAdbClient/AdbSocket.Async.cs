@@ -15,54 +15,6 @@ namespace AdvancedSharpAdbClient
     public partial class AdbSocket
     {
         /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-            ReadAsync(data, data.Length, cancellationToken);
-
-        /// <inheritdoc/>
-        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
-        {
-            // The first 4 bytes contain the length of the string
-            byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-            // Convert the bytes to a hex string
-            string lenHex = AdbClient.Encoding.GetString(reply);
-            int len = int.Parse(lenHex, NumberStyles.HexNumber);
-
-            // And get the string
-            reply = new byte[len];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-            string value = AdbClient.Encoding.GetString(reply);
-            return value;
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
-        {
-            AdbResponse response = await ReadAdbResponseInnerAsync(cancellationToken);
-
-            if (!response.IOSuccess || !response.Okay)
-            {
-                socket.Dispose();
-                throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
-            }
-
-            return response;
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
-        {
-            byte[] data = AdbClient.FormAdbRequest(request);
-
-            if (!await WriteAsync(data, cancellationToken))
-            {
-                throw new IOException($"Failed sending the request '{request}' to ADB");
-            }
-        }
-
-        /// <inheritdoc/>
         public virtual Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default) => SendAsync(data, 0, length, cancellationToken);
 
         /// <inheritdoc/>
@@ -84,6 +36,21 @@ namespace AdvancedSharpAdbClient
                 throw ex;
             }
         }
+
+        /// <inheritdoc/>
+        public virtual async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
+        {
+            byte[] data = AdbClient.FormAdbRequest(request);
+
+            if (!await WriteAsync(data, cancellationToken))
+            {
+                throw new IOException($"Failed sending the request '{request}' to ADB");
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+            ReadAsync(data, data.Length, cancellationToken);
 
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
@@ -142,6 +109,66 @@ namespace AdvancedSharpAdbClient
             }
 
             return totalRead;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
+        {
+            // The first 4 bytes contain the length of the string
+            byte[] reply = new byte[4];
+            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+
+            // Convert the bytes to a hex string
+            string lenHex = AdbClient.Encoding.GetString(reply);
+            int len = int.Parse(lenHex, NumberStyles.HexNumber);
+
+            // And get the string
+            reply = new byte[len];
+            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+
+            string value = AdbClient.Encoding.GetString(reply);
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
+        {
+            AdbResponse response = await ReadAdbResponseInnerAsync(cancellationToken);
+
+            if (!response.IOSuccess || !response.Okay)
+            {
+                socket.Dispose();
+                throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
+            }
+
+            return response;
+        }
+
+        /// <inheritdoc/>
+        public async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
+        {
+            // if the device is not null, then we first tell adb we're looking to talk
+            // to a specific device
+            if (device != null)
+            {
+                await SendAdbRequestAsync($"host:transport:{device.Serial}", cancellationToken);
+
+                try
+                {
+                    AdbResponse response = await ReadAdbResponseAsync(cancellationToken);
+                }
+                catch (AdbException e)
+                {
+                    if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new DeviceNotFoundException(device.Serial);
+                    }
+                    else
+                    {
+                        throw e;
+                    }
+                }
+            }
         }
 
         /// <summary>

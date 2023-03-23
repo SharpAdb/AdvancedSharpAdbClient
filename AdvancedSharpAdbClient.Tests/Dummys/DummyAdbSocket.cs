@@ -211,5 +211,11 @@ namespace AdvancedSharpAdbClient.Tests
             tcs.SetResult(response);
             return tcs.Task;
         }
+
+        public Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken)
+        {
+            SetDevice(device);
+            return Task.CompletedTask;
+        }
     }
 }

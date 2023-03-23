@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which functon is gets a new instance instead of gets or sets the default instance.")]
+        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
         public static IAdbClient Instance => new AdbClient();
 
         private readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
@@ -162,6 +162,26 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            string rebind = allowRebind ? string.Empty : "norebind:";
+
+            socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
+            _ = socket.ReadAdbResponse();
+            _ = socket.ReadAdbResponse();
+            string portString = socket.ReadString();
+
+            return portString != null && int.TryParse(portString, out int port) ? port : 0;
+        }
+
+        /// <inheritdoc/>
+        public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
+            CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
+
+        /// <inheritdoc/>
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
         {
             EnsureDevice(device);
@@ -202,26 +222,6 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"reverse:killforward-all");
             AdbResponse response = socket.ReadAdbResponse();
         }
-
-        /// <inheritdoc/>
-        public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
-        {
-            EnsureDevice(device);
-
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            string rebind = allowRebind ? string.Empty : "norebind:";
-
-            socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
-            _ = socket.ReadAdbResponse();
-            _ = socket.ReadAdbResponse();
-            string portString = socket.ReadString();
-
-            return portString != null && int.TryParse(portString, out int port) ? port : 0;
-        }
-
-        /// <inheritdoc/>
-        public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
-            CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
 
         /// <inheritdoc/>
         public void RemoveForward(DeviceData device, int localPort)
@@ -386,7 +386,11 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Unroot(DeviceData device) => Root("unroot:", device);
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Restarts the ADB daemon running on the device with or without root privileges.
+        /// </summary>
+        /// <param name="request">The command of root or unroot.</param>
+        /// <param name="device">The device on which to restart ADB with root privileges.</param>
         protected void Root(string request, DeviceData device)
         {
             EnsureDevice(device);
@@ -414,19 +418,6 @@ namespace AdvancedSharpAdbClient
                 // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
                 Utilities.Delay(3000).GetAwaiter().GetResult();
             }
-        }
-
-        /// <inheritdoc/>
-        public List<string> GetFeatureSet(DeviceData device)
-        {
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host-serial:{device.Serial}:features");
-
-            AdbResponse response = socket.ReadAdbResponse();
-            string features = socket.ReadString();
-
-            List<string> featureList = features.Split(new char[] { '\n', ',' }).ToList();
-            return featureList;
         }
 
         /// <inheritdoc/>
@@ -484,7 +475,82 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string InstallCreated(DeviceData device, string packageName = null, params string[] arguments)
+        public void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments)
+        {
+            EnsureDevice(device);
+
+            if (packageName == null)
+            {
+                throw new ArgumentNullException(nameof(packageName));
+            }
+
+            string session = InstallCreate(device, packageName, arguments);
+
+            int i = 0;
+            foreach (Stream splitAPK in splitAPKs)
+            {
+                if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
+                {
+                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
+                    continue;
+                }
+
+                try
+                {
+                    InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            InstallCommit(device, session);
+        }
+
+        /// <inheritdoc/>
+        public void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments)
+        {
+            EnsureDevice(device);
+
+            if (baseAPK == null)
+            {
+                throw new ArgumentNullException(nameof(baseAPK));
+            }
+
+            if (!baseAPK.CanRead || !baseAPK.CanSeek)
+            {
+                throw new ArgumentOutOfRangeException(nameof(baseAPK), "The apk stream must be a readable and seekable stream");
+            }
+
+            string session = InstallCreate(device, null, arguments);
+
+            InstallWrite(device, baseAPK, nameof(baseAPK), session);
+
+            int i = 0;
+            foreach (Stream splitAPK in splitAPKs)
+            {
+                if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
+                {
+                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
+                    continue;
+                }
+
+                try
+                {
+                    InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
+            InstallCommit(device, session);
+        }
+
+        /// <inheritdoc/>
+        public string InstallCreate(DeviceData device, string packageName = null, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -521,7 +587,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallWrite(DeviceData device, Stream apk, string apkname, string session)
+        public void InstallWrite(DeviceData device, Stream apk, string apkName, string session)
         {
             EnsureDevice(device);
 
@@ -540,9 +606,9 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(session));
             }
 
-            if (apkname == null)
+            if (apkName == null)
             {
-                throw new ArgumentNullException(nameof(apkname));
+                throw new ArgumentNullException(nameof(apkName));
             }
 
             StringBuilder requestBuilder = new();
@@ -552,7 +618,7 @@ namespace AdvancedSharpAdbClient
             // do last to override any user specified value
             requestBuilder.Append($" -S {apk.Length}");
 
-            requestBuilder.Append($" {session} {apkname}.apk");
+            requestBuilder.Append($" {session} {apkName}.apk");
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -595,78 +661,16 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments)
+        public List<string> GetFeatureSet(DeviceData device)
         {
-            EnsureDevice(device);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SendAdbRequest($"host-serial:{device.Serial}:features");
 
-            if (baseapk == null)
-            {
-                throw new ArgumentNullException(nameof(baseapk));
-            }
+            AdbResponse response = socket.ReadAdbResponse();
+            string features = socket.ReadString();
 
-            if (!baseapk.CanRead || !baseapk.CanSeek)
-            {
-                throw new ArgumentOutOfRangeException(nameof(baseapk), "The apk stream must be a readable and seekable stream");
-            }
-
-            string session = InstallCreated(device, null, arguments);
-
-            InstallWrite(device, baseapk, nameof(baseapk), session);
-
-            int i = 0;
-            foreach (Stream splitapk in splitapks)
-            {
-                if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
-                {
-                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
-                }
-
-                try
-                {
-                    InstallWrite(device, splitapk, $"{nameof(splitapk)}{i++}", session);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            }
-
-            InstallCommit(device, session);
-        }
-
-        /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments)
-        {
-            EnsureDevice(device);
-
-            if (packageName == null)
-            {
-                throw new ArgumentNullException(nameof(packageName));
-            }
-
-            string session = InstallCreated(device, packageName, arguments);
-
-            int i = 0;
-            foreach (Stream splitapk in splitapks)
-            {
-                if (splitapk == null || !splitapk.CanRead || !splitapk.CanSeek)
-                {
-                    Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
-                }
-
-                try
-                {
-                    InstallWrite(device, splitapk, $"{nameof(splitapk)}{i++}", session);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            }
-
-            InstallCommit(device, session);
+            List<string> featureList = features.Split(new char[] { '\n', ',' }).ToList();
+            return featureList;
         }
 
         /// <inheritdoc/>
@@ -859,19 +863,19 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void ClearInput(DeviceData device, int charcount)
+        public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charcount)), device, null, CancellationToken.None).Wait();
+            ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, CancellationToken.None).Wait();
         }
 
         /// <inheritdoc/>
-        public void StartApp(DeviceData device, string packagename) =>
-            ExecuteRemoteCommand($"monkey -p {packagename} 1", device, null);
+        public void StartApp(DeviceData device, string packageName) =>
+            ExecuteRemoteCommand($"monkey -p {packageName} 1", device, null);
 
         /// <inheritdoc/>
-        public void StopApp(DeviceData device, string packagename) =>
-            ExecuteRemoteCommand($"am force-stop {packagename}", device, null);
+        public void StopApp(DeviceData device, string packageName) =>
+            ExecuteRemoteCommand($"am force-stop {packageName}", device, null);
 
         /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
