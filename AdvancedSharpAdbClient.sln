@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedSharpAdbClient", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedSharpAdbClient.Tests", "AdvancedSharpAdbClient.Tests\AdvancedSharpAdbClient.Tests.csproj", "{F1B44867-B64E-4813-8F13-0B0918AEC202}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedSharpAdbClient.WinRT", "AdvancedSharpAdbClient.WinRT\AdvancedSharpAdbClient.WinRT.csproj", "{083CDC04-9CC2-46E4-84C2-55B645BE9D50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{315B571C-3CCD-40F5-9C1A-FA82C05159A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,9 +65,32 @@ Global
 		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x64.Build.0 = Release|Any CPU
 		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x86.ActiveCfg = Release|Any CPU
 		{F1B44867-B64E-4813-8F13-0B0918AEC202}.Release|x86.Build.0 = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|ARM.Build.0 = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|x64.Build.0 = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Debug|x86.Build.0 = Debug|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|ARM.ActiveCfg = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|ARM.Build.0 = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|ARM64.Build.0 = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|x64.ActiveCfg = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|x64.Build.0 = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|x86.ActiveCfg = Release|Any CPU
+		{083CDC04-9CC2-46E4-84C2-55B645BE9D50}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F1B44867-B64E-4813-8F13-0B0918AEC202} = {315B571C-3CCD-40F5-9C1A-FA82C05159A8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0ACB9022-5726-46AD-868D-C43F8A25BD23}

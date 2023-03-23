@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.2" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'native' or '$(TargetFramework)' == 'uap10.0'">
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>
 

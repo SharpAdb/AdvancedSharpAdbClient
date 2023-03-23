@@ -27,6 +27,16 @@
     <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'native'">
+    <DebugType>Full</DebugType>
+    <DefineConstants>$(DefineConstants);WINDOWS_UWP;WINRT</DefineConstants>
+    <NuGetTargetMoniker Condition="'$(DesignTimeBuild)' == 'true'">native</NuGetTargetMoniker>
+    <NuGetTargetMoniker Condition="'$(DesignTimeBuild)' != 'true'">UAP,Version=v10.0</NuGetTargetMoniker>
+    <OutputType>winmdobj</OutputType>
+    <PackageTargetFallback>uap10.0</PackageTargetFallback>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
     <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
   </PropertyGroup>
@@ -36,15 +46,18 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
-    <DefaultLanguage>en-US</DefaultLanguage>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
-    <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'native' or '$(TargetFramework)' == 'uap10.0'">
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
     <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
     <TargetPlatformVersion>10.0.22621.0</TargetPlatformVersion>
   </PropertyGroup>
 

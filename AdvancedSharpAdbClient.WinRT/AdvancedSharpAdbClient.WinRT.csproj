@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Condition="'$(FullTargets)' == 'true'">
+    <NoWarn>NU1603</NoWarn>
+    <TargetFrameworks>native;net6.0-windows10.0.18362.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FullTargets)' != 'true'">
+    <TargetFrameworks>net6.0-windows10.0.18362.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows10.0.18362.0'">
+    <CsWinRTComponent>true</CsWinRTComponent>
+    <CsWinRTWindowsMetadata>10.0.19041.0</CsWinRTWindowsMetadata>
+    <Platforms>x64;x86;arm64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="AdvancedSharpAdbClient" Version="2.5.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows10.0.18362.0'">
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.0.1" />
+  </ItemGroup>
+
+</Project>
