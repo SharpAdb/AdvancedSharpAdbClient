@@ -35,7 +35,8 @@ namespace AdvancedSharpAdbClient
             this.client = client ?? throw new ArgumentNullException(nameof(client));
 
             // Initialize the headerData buffer
-            headerData = new byte[52];
+            var size = Marshal.SizeOf<FramebufferHeader>();
+            headerData = new byte[size];
         }
 
         /// <summary>
