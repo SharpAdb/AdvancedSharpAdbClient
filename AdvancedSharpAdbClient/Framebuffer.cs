@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 #if NET
 using System.Runtime.Versioning;
