@@ -168,7 +168,7 @@ namespace AdvancedSharpAdbClient
 #if !NETSTANDARD1_3
             Bitmap bitmap = new((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
-            Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
+            Marshal.Copy(buffer, 0, bitmapData.Scan0, (int)Size);
             bitmap.UnlockBits(bitmapData);
 
             return bitmap;
@@ -196,9 +196,9 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            if (buffer.Length != Width * Height * (Bpp / 8))
+            if (buffer.Length < Width * Height * (Bpp / 8))
             {
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} is not equal to expected buffer " +
+                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} is less than expected buffer " +
                     $"length ({Width * Height * (Bpp / 8)}) for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
             }
 
