@@ -198,8 +198,8 @@ namespace AdvancedSharpAdbClient
 
             if (buffer.Length != Width * Height * (Bpp / 8))
             {
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} does not match the expected buffer " +
-                    $"length for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
+                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} is not equal to expected buffer " +
+                    $"length ({Width * Height * (Bpp / 8)}) for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
             }
 
             if (Width == 0 || Height == 0 || Bpp == 0)
