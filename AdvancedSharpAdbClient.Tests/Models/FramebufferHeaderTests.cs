@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -66,7 +67,7 @@ namespace AdvancedSharpAdbClient.Tests
             FramebufferHeader header = FramebufferHeader.Read(data);
             header.Width = 1;
             header.Height = 1;
-            header.Size = (uint)data.Length;
+            header.Size = Convert.ToUInt32(data.Length);
 
             byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
             using Bitmap image = (Bitmap)header.ToImage(framebuffer);
