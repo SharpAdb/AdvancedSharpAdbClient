@@ -45,13 +45,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="ArgumentNullException">The <paramref name="info"/> parameter is null.</exception>
         /// <exception cref="SerializationException">The class name is null or <see cref="Exception.HResult"/> is zero (0).</exception>
         protected PackageInstallationException(SerializationInfo info, StreamingContext context) :
-#if !NETSTANDARD1_3
+#if HAS_Process
             base(info, context)
 #else
             base(info.GetString("Message"))
 #endif
         {
-#if NETSTANDARD1_3
+#if !HAS_Process
             HelpLink = info.GetString("HelpURL"); // Do not rename (binary serialization)
             HResult = info.GetInt32("HResult"); // Do not rename (binary serialization)
             Source = info.GetString("Source"); // Do not rename (binary serialization)

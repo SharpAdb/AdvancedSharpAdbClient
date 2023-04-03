@@ -68,20 +68,35 @@ namespace AdvancedSharpAdbClient
             socket.Close();
 #endif
 
-
         /// <inheritdoc/>
         public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
             socket.Send(buffer, offset, size, socketFlags);
 
         /// <inheritdoc/>
-        public Stream GetStream() => new NetworkStream(socket);
-
-        /// <inheritdoc/>
         public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
             socket.Receive(buffer, offset, socketFlags);
 
+#if NET || NETCOREAPP
+        /// <inheritdoc/>
+        public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+            await socket.SendAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
+#else
+        /// <inheritdoc/>
+        public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+            await Utilities.Run(() => Send(buffer, offset, size, socketFlags), cancellationToken);
+#endif
+
+#if NET || NETCOREAPP
+        /// <inheritdoc/>
+        public async Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => 
+            await socket.ReceiveAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
+#else
         /// <inheritdoc/>
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+#endif
+
+        /// <inheritdoc/>
+        public Stream GetStream() => new NetworkStream(socket);
     }
 }
