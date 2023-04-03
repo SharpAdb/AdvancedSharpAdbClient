@@ -52,13 +52,13 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
         public AdbException(SerializationInfo serializationInfo, StreamingContext context) :
-#if !NETSTANDARD1_3
+#if HAS_Process
             base(serializationInfo, context)
 #else
             base(serializationInfo.GetString("Message"))
 #endif
         {
-#if NETSTANDARD1_3
+#if !HAS_Process
             HelpLink = serializationInfo.GetString("HelpURL"); // Do not rename (binary serialization)
             HResult = serializationInfo.GetInt32("HResult"); // Do not rename (binary serialization)
             Source = serializationInfo.GetString("Source"); // Do not rename (binary serialization)

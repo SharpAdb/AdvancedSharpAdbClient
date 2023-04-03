@@ -10,8 +10,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 #if HAS_LOGGER
 using Microsoft.Extensions.Logging;
@@ -37,7 +35,7 @@ namespace AdvancedSharpAdbClient
     /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.
     /// </para>
     /// </summary>
-    public class AdbSocket : IAdbSocket, IDisposable
+    public partial class AdbSocket : IAdbSocket, IDisposable
     {
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
@@ -98,9 +96,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static int WriteBufferSize { get; set; } = 1024;
 
-        /// <inheritdoc/>
-        public bool Connected => socket.Connected;
-
         /// <summary>
         /// Determines whether the specified reply is okay.
         /// </summary>
@@ -109,19 +104,33 @@ namespace AdvancedSharpAdbClient
         public static bool IsOkay(byte[] reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
 
         /// <inheritdoc/>
+        public bool Connected => socket.Connected;
+
+        /// <inheritdoc/>
         public virtual void Reconnect() => socket.Reconnect();
 
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
-        /// </summary>
-        public virtual void Dispose() => socket.Dispose();
+        /// <inheritdoc/>
+        public virtual void Send(byte[] data, int length) => Send(data, 0, length);
 
         /// <inheritdoc/>
-        public virtual int Read(byte[] data) => Read(data, data.Length);
-
-        /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-            ReadAsync(data, data.Length, cancellationToken);
+        public virtual void Send(byte[] data, int offset, int length)
+        {
+            try
+            {
+                int count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException sex)
+            {
+#if HAS_LOGGER
+                logger.LogError(sex, sex.Message);
+#endif
+                throw sex;
+            }
+        }
 
         /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path, int permissions) =>
@@ -162,12 +171,61 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual SyncCommand ReadSyncResponse()
+        public virtual void SendAdbRequest(string request)
         {
-            byte[] data = new byte[4];
-            _ = Read(data);
+            byte[] data = AdbClient.FormAdbRequest(request);
 
-            return SyncCommandConverter.GetCommand(data);
+            if (!Write(data))
+            {
+                throw new IOException($"Failed sending the request '{request}' to ADB");
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual int Read(byte[] data) => Read(data, data.Length);
+
+        /// <inheritdoc/>
+        public virtual int Read(byte[] data, int length)
+        {
+            int expLen = length != -1 ? length : data.Length;
+            int count = -1;
+            int totalRead = 0;
+
+            while (count != 0 && totalRead < expLen)
+            {
+                try
+                {
+                    int left = expLen - totalRead;
+                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
+
+                    byte[] buffer = new byte[buflen];
+                    count = socket.Receive(buffer, buflen, SocketFlags.None);
+                    if (count < 0)
+                    {
+#if HAS_LOGGER
+                        logger.LogError("read: channel EOF");
+#endif
+                        throw new AdbException("EOF");
+                    }
+                    else if (count == 0)
+                    {
+#if HAS_LOGGER
+                        logger.LogInformation("DONE with Read");
+#endif
+                    }
+                    else
+                    {
+                        Array.Copy(buffer, 0, data, totalRead, count);
+                        totalRead += count;
+                    }
+                }
+                catch (SocketException sex)
+                {
+                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
+                }
+            }
+
+            return totalRead;
         }
 
         /// <inheritdoc/>
@@ -218,22 +276,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
+        public virtual SyncCommand ReadSyncResponse()
         {
-            // The first 4 bytes contain the length of the string
-            byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            byte[] data = new byte[4];
+            _ = Read(data);
 
-            // Convert the bytes to a hex string
-            string lenHex = AdbClient.Encoding.GetString(reply);
-            int len = int.Parse(lenHex, NumberStyles.HexNumber);
-
-            // And get the string
-            reply = new byte[len];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-            string value = AdbClient.Encoding.GetString(reply);
-            return value;
+            return SyncCommandConverter.GetCommand(data);
         }
 
         /// <inheritdoc/>
@@ -251,140 +299,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void SendAdbRequest(string request)
+        public Stream GetShellStream()
         {
-            byte[] data = AdbClient.FormAdbRequest(request);
-
-            if (!Write(data))
-            {
-                throw new IOException($"Failed sending the request '{request}' to ADB");
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual void Send(byte[] data, int length) => Send(data, 0, length);
-
-        /// <inheritdoc/>
-        public virtual void Send(byte[] data, int offset, int length)
-        {
-            try
-            {
-                int count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
-                if (count < 0)
-                {
-                    throw new AdbException("channel EOF");
-                }
-            }
-            catch (SocketException sex)
-            {
-#if HAS_LOGGER
-                logger.LogError(sex, sex.Message);
-#endif
-                throw sex;
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
-        {
-            if (length < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length));
-            }
-
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (data.Length < length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(data));
-            }
-
-            int count = -1;
-            int totalRead = 0;
-
-            while (count != 0 && totalRead < length)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                try
-                {
-                    int left = length - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
-
-                    count = await socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
-                    if (count < 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogError("read: channel EOF");
-#endif
-                        throw new AdbException("EOF");
-                    }
-                    else if (count == 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogInformation("DONE with Read");
-#endif
-                    }
-                    else
-                    {
-                        totalRead += count;
-                    }
-                }
-                catch (SocketException ex)
-                {
-                    throw new AdbException($"An error occurred while receiving data from the adb server: {ex.Message}.", ex);
-                }
-            }
-
-            return totalRead;
-        }
-
-        /// <inheritdoc/>
-        public virtual int Read(byte[] data, int length)
-        {
-            int expLen = length != -1 ? length : data.Length;
-            int count = -1;
-            int totalRead = 0;
-
-            while (count != 0 && totalRead < expLen)
-            {
-                try
-                {
-                    int left = expLen - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
-
-                    byte[] buffer = new byte[buflen];
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
-                    if (count < 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogError("read: channel EOF");
-#endif
-                        throw new AdbException("EOF");
-                    }
-                    else if (count == 0)
-                    {
-#if HAS_LOGGER
-                        logger.LogInformation("DONE with Read");
-#endif
-                    }
-                    else
-                    {
-                        Array.Copy(buffer, 0, data, totalRead, count);
-                        totalRead += count;
-                    }
-                }
-                catch (SocketException sex)
-                {
-                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
-                }
-            }
-
-            return totalRead;
+            Stream stream = socket.GetStream();
+            return new ShellStream(stream, closeStream: true);
         }
 
         /// <inheritdoc/>
@@ -412,13 +330,6 @@ namespace AdvancedSharpAdbClient
                     }
                 }
             }
-        }
-
-        /// <inheritdoc/>
-        public Stream GetShellStream()
-        {
-            Stream stream = socket.GetStream();
-            return new ShellStream(stream, closeStream: true);
         }
 
         /// <summary>
@@ -499,5 +410,10 @@ namespace AdvancedSharpAdbClient
 
             return result;
         }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
+        /// </summary>
+        public virtual void Dispose() => socket.Dispose();
     }
 }

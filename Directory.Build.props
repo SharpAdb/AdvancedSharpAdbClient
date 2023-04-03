@@ -1,0 +1,51 @@
+<Project>
+
+  <PropertyGroup>
+    <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
+    <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat, wherewhere</Authors>
+    <Copyright>https://github.com/quamotion/madb</Copyright>
+    <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <IncludeSymbols>True</IncludeSymbols>
+    <LangVersion>latest</LangVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
+    <PublishRepositoryUrl>True</PublishRepositoryUrl>
+    <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
+    <VersionPrefix>2.5.4</VersionPrefix>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <FullTargets Condition="'$(FullTargets)' == ''">False</FullTargets>
+    <IsWindows Condition="'$(IsWindows)' == ''">False</IsWindows>
+    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
+    <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <SuppressTfmSupportBuildWarnings>True</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <DefineConstants>$(DefineConstants);WINDOWS_UWP</DefineConstants>
+    <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
+    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
+    <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.22621.0</TargetPlatformVersion>
+  </PropertyGroup>
+
+</Project>

@@ -5,8 +5,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading;
 
-#if NETSTANDARD1_3
+#if !HAS_Process
 using System.Net.Sockets;
 #endif
 
@@ -71,30 +72,32 @@ namespace AdvancedSharpAdbClient
         /// Creates a task that completes after a specified number of milliseconds.
         /// </summary>
         /// <param name="dueTime">The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.</param>
+        /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
         /// <returns>A task that represents the time delay.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
-        public static Task Delay(int dueTime) =>
+        public static Task Delay(int dueTime, CancellationToken cancellationToken = default) =>
 #if NET35 || NET40
             TaskEx
 #else
             Task
 #endif
-            .Delay(dueTime);
+            .Delay(dueTime, cancellationToken);
 
         /// <summary>
         /// Queues the specified work to run on the thread pool and returns a proxy for the task returned by <paramref name="function"/>.
         /// </summary>
         /// <param name="function">The work to execute asynchronously.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         /// <returns>A task that represents a proxy for the task returned by <paramref name="function"/>.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
         /// <remarks>For information on handling exceptions thrown by task operations, see <see href="https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library">Exception Handling</see>.</remarks>
-        public static Task Run(Func<Task> function) =>
+        public static Task Run(Func<Task> function, CancellationToken cancellationToken = default) =>
 #if NET35 || NET40
             TaskEx
 #else
             Task
 #endif
-            .Run(function);
+            .Run(function, cancellationToken);
 
         /// <summary>
         /// Queues the specified work to run on the thread pool and returns a proxy for the <see cref="Task{TResult}"/>
@@ -102,16 +105,17 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <typeparam name="TResult">The type of the result returned by the proxy task.</typeparam>
         /// <param name="function">The work to execute asynchronously.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         /// <returns>A <see cref="Task{TResult}"/> that represents a proxy for the
         /// <see cref="Task{TResult}"/> returned by <paramref name="function"/>.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
-        public static Task<TResult> Run<TResult>(Func<TResult> function) =>
+        public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken = default) =>
 #if NET35 || NET40
             TaskEx
 #else
             Task
 #endif
-            .Run(function);
+            .Run(function, cancellationToken);
 
         /// <summary>
         /// Converts a Unix time expressed as the number of seconds that have elapsed
@@ -145,7 +149,7 @@ namespace AdvancedSharpAdbClient
             (int)dateTimeOffset.ToUnixTimeSeconds();
 #endif
 
-#if NETSTANDARD1_3
+#if !HAS_Process
         /// <summary>
         /// Begins to asynchronously receive data from a connected <see cref="Socket"/>.
         /// </summary>
@@ -162,7 +166,7 @@ namespace AdvancedSharpAdbClient
             TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
 #endif
 
-#if NETSTANDARD1_3
+#if !HAS_Process
         /// <summary>
         /// Ends a pending asynchronous read.
         /// </summary>

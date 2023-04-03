@@ -226,7 +226,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// List all existing reverse forward connections from this server.
         /// </summary>
-        /// <param name="device">The device for which to list the existing reverse foward connections.</param>
+        /// <param name="device">The device for which to list the existing reverse forward connections.</param>
         /// <returns>A <see cref="ForwardData"/> entry for each existing reverse forward connection.</returns>
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
@@ -322,37 +322,37 @@ namespace AdvancedSharpAdbClient
         /// Push multiple APKs to the device and install them.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
-        /// <param name="packageName">The packagename of the baseapk to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream[] splitapks, string packageName, params string[] arguments);
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The packageName of the base APK to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="baseapk">A <see cref="Stream"/> which represents the baseapk to install.</param>
-        /// <param name="splitapks"><see cref="Stream"/>s which represents the splitapks to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream baseapk, Stream[] splitapks, params string[] arguments);
+        /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="packageName">The packagename of the baseapk to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb instal-create</c>.</param>
+        /// <param name="packageName">The packageName of the baseAPK to install.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>Session ID</returns>
-        string InstallCreated(DeviceData device, string packageName = null, params string[] arguments);
+        string InstallCreate(DeviceData device, string packageName = null, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="apkname">The name of the application.</param>
+        /// <param name="apkName">The name of the application.</param>
         /// <param name="session">The session ID of the install session.</param>
-        void InstallWrite(DeviceData device, Stream apk, string apkname, string session);
+        void InstallWrite(DeviceData device, Stream apk, string apkName, string session);
 
         /// <summary>
         /// Commit the given active install session, installing the app.
@@ -429,7 +429,7 @@ namespace AdvancedSharpAdbClient
         Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
-        /// Send keyevent to specific. You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent.
+        /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
         /// </summary>
         /// <param name="device"></param>
         /// <param name="key"></param>
@@ -441,25 +441,25 @@ namespace AdvancedSharpAdbClient
         void SendText(DeviceData device, string text);
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use el.ClearInput() if the element isn't focused.
+        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
         /// </summary>
         /// <param name="device"></param>
-        /// <param name="charcount"></param>
-        void ClearInput(DeviceData device, int charcount);
+        /// <param name="charCount"></param>
+        void ClearInput(DeviceData device, int charCount);
 
         /// <summary>
         /// Start an Android application on device.
         /// </summary>
         /// <param name="device"></param>
-        /// <param name="packagename"></param>
-        void StartApp(DeviceData device, string packagename);
+        /// <param name="packageName"></param>
+        void StartApp(DeviceData device, string packageName);
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
         /// <param name="device"></param>
-        /// <param name="packagename"></param>
-        void StopApp(DeviceData device, string packagename);
+        /// <param name="packageName"></param>
+        void StopApp(DeviceData device, string packageName);
 
         /// <summary>
         /// Click BACK button.

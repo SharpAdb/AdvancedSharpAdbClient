@@ -1,12 +1,6 @@
 name: build and test
 
-on:
-  push:
-  pull_request:
-    branches: [main, dev]
-    paths:
-    - 'AdvancedSharpAdbClient/**'
-    - 'AdvancedSharpAdbClient.Tests/**'
+on: [push, pull_request]
 
 env:
   DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
@@ -14,8 +8,11 @@ env:
 jobs:
   build-and-test:
 
-    name: build-and-test
-    runs-on: windows-latest
+    name: build-and-test-${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v3
@@ -28,7 +25,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build AdvancedSharpAdbClient/AdvancedSharpAdbClient.csproj --no-restore
+      run: dotnet build --no-restore
     
     - name: Test
-      run: dotnet test AdvancedSharpAdbClient.Tests/AdvancedSharpAdbClient.Tests.csproj --no-restore
+      run: dotnet test --no-restore
