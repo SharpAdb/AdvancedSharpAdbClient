@@ -878,14 +878,6 @@ namespace AdvancedSharpAdbClient
             ExecuteRemoteCommand($"am force-stop {packageName}", device, null);
 
         /// <inheritdoc/>
-        public enum AppStatus
-        {
-            STOPPED = 0,
-            RUNNING = 1,
-            RUNNING_BACKGROUND = 2,
-        }
-
-        /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
 
         /// <inheritdoc/>

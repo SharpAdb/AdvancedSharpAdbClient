@@ -4,6 +4,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
+using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -552,7 +553,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="packageName"></param>
         /// <returns>App status. Running, stopped or running in background.</returns>
-        AdbClient.AppStatus GetpAppStatusAsync(DeviceData device, global::System.String packageName);
+        AppStatus GetpAppStatusAsync(DeviceData device, global::System.String packageName);
 
         /// <summary>
         /// Click BACK button.

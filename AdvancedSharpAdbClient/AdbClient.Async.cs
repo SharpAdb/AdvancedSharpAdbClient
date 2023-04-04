@@ -4,6 +4,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
+using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
