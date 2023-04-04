@@ -885,6 +885,8 @@ namespace AdvancedSharpAdbClient
             RUNNING_BACKGROUND = 2,
         }
 
+
+        // TODO: Move these to async partial
         /// <inheritdoc/>
         public async Task<bool> IsCurrentApp(DeviceData device, string packageName)
         {
