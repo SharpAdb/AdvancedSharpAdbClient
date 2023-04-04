@@ -822,7 +822,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName)
+        public async Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName)
         {
             // Check if the app is in front
             var currentApp = await IsCurrentAppAsync(device, packageName);
