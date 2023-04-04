@@ -803,7 +803,7 @@ namespace AdvancedSharpAdbClient
         public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName)
         {
             ConsoleOutputReceiver receiver = new();
-            await Client.ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, CancellationToken.None);
+            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, CancellationToken.None);
             var response = receiver.ToString().Trim();
             return receiver.ToString().Contains(packageName);
         }
@@ -812,7 +812,7 @@ namespace AdvancedSharpAdbClient
         public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName)
         {
             ConsoleOutputReceiver receiver = new();
-            await Client.ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, CancellationToken.None);
+            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, CancellationToken.None);
 
             var response = receiver.ToString().Trim();
 
