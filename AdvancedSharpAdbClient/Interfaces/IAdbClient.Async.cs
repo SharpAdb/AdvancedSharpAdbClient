@@ -533,6 +533,28 @@ namespace AdvancedSharpAdbClient
         Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Is current app
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="packageName"></param>
+        Task<global::System.Boolean> IsCurrentAppAsync(DeviceData device, global::System.String packageName);
+
+        /// <summary>
+        /// Is App running?
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="packageName"></param>
+        Task<global::System.Boolean> IsAppRunningAsync(DeviceData device, global::System.String packageName);
+
+        /// <summary>
+        /// Get App Status
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="packageName"></param>
+        /// <returns>App status. Running, stopped or running in background.</returns>
+        AdbClient.AppStatus GetpAppStatusAsync(DeviceData device, global::System.String packageName);
+
+        /// <summary>
         /// Click BACK button.
         /// </summary>
         /// <param name="device"></param>

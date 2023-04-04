@@ -472,28 +472,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         void HomeBtn(DeviceData device);
-
-        /// <summary>
-        /// Is current app
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsCurrentAppAsync(DeviceData device, global::System.String packageName);
-
-        /// <summary>
-        /// Is App running?
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsAppRunningAsync(DeviceData device, global::System.String packageName);
-
-        /// <summary>
-        /// Get App Status
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        /// <returns>App status. Running, stopped or running in background.</returns>
-        AdbClient.AppStatus GetpAppStatusAsync(DeviceData device, global::System.String packageName);
     }
 
     /// <summary>
