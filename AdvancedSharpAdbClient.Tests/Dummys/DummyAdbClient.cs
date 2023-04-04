@@ -1,4 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Logs;
+using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -247,6 +248,12 @@ namespace AdvancedSharpAdbClient.Tests
         public void Unroot(DeviceData device) => throw new NotImplementedException();
 
         public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        public Task<bool> IsCurrentAppAsync(DeviceData device, string packageName) => throw new NotImplementedException();
+
+        public Task<bool> IsAppRunningAsync(DeviceData device, string packageName) => throw new NotImplementedException();
+
+        public Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName) => throw new NotImplementedException();
 
         #endregion
     }
