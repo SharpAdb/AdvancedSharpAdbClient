@@ -885,50 +885,6 @@ namespace AdvancedSharpAdbClient
             RUNNING_BACKGROUND = 2,
         }
 
-
-        // TODO: Move these to async partial
-        /// <inheritdoc/>
-        public async Task<bool> IsCurrentApp(DeviceData device, string packageName)
-        {
-            ConsoleOutputReceiver receiver = new();
-            await Client.ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, CancellationToken.None);
-            var response = receiver.ToString().Trim();
-            return receiver.ToString().Contains(packageName);
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> IsAppRunning(DeviceData device, string packageName)
-        {
-            ConsoleOutputReceiver receiver = new();
-            await Client.ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, CancellationToken.None);
-
-            var response = receiver.ToString().Trim();
-
-            int pid;
-            var intParsed = int.TryParse(response, out pid);
-            return intParsed && pid > 0;
-        }
-
-        /// <inheritdoc/>
-        public AppStatus GetpAppStatus(DeviceData device, string packageName)
-        {
-            // Check if the app is in front
-            var currentApp = await IsCurrentApp(device, packageName);
-            if (currentApp)
-            {
-                return AppStatus.RUNNING;
-            }
-
-            // Check if the app is running in background
-            var isAppRunning = await IsAppRunning(device, packageName);
-            if (isAppRunning)
-            {
-                return AppStatus.RUNNING_BACKGROUND;
-            }
-
-            return AppStatus.STOPPED;
-        }
-
         /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
 

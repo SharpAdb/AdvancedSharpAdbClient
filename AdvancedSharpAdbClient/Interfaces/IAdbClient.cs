@@ -493,7 +493,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device"></param>
         /// <param name="packageName"></param>
         /// <returns>App status. Running, stopped or running in background.</returns>
-        AdbClient.AppStatus GetpAppStatus(DeviceData device, global::System.String packageName);
+        AdbClient.AppStatus GetpAppStatusAsync(DeviceData device, global::System.String packageName);
     }
 
     /// <summary>

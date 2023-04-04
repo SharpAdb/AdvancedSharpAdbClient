@@ -456,9 +456,9 @@ namespace AdvancedSharpAdbClient
                 throw new AdbException(value);
             }
         }
-        
+
         /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments)=>
+        public Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments) =>
             InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
 
         /// <inheritdoc/>
@@ -713,7 +713,7 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
-        
+
         /// <inheritdoc/>
         public async Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken = default)
         {
@@ -797,7 +797,49 @@ namespace AdvancedSharpAdbClient
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
         }
-        
+
+        /// <inheritdoc/>
+        public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName)
+        {
+            ConsoleOutputReceiver receiver = new();
+            await Client.ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, CancellationToken.None);
+            var response = receiver.ToString().Trim();
+            return receiver.ToString().Contains(packageName);
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName)
+        {
+            ConsoleOutputReceiver receiver = new();
+            await Client.ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, CancellationToken.None);
+
+            var response = receiver.ToString().Trim();
+
+            int pid;
+            var intParsed = int.TryParse(response, out pid);
+            return intParsed && pid > 0;
+        }
+
+        /// <inheritdoc/>
+        public Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName)
+        {
+            // Check if the app is in front
+            var currentApp = await IsCurrentAppAsync(device, packageName);
+            if (currentApp)
+            {
+                return AppStatus.RUNNING;
+            }
+
+            // Check if the app is running in background
+            var isAppRunning = await IsAppRunningAsync(device, packageName);
+            if (isAppRunning)
+            {
+                return AppStatus.RUNNING_BACKGROUND;
+            }
+
+            return AppStatus.STOPPED;
+        }
+
         /// <inheritdoc/>
         public async Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
         {
