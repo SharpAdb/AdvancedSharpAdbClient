@@ -478,14 +478,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsCurrentApp(DeviceData device, global::System.String packageName);
+        Task<global::System.Boolean> IsCurrentAppAsync(DeviceData device, global::System.String packageName);
 
         /// <summary>
         /// Is App running?
         /// </summary>
         /// <param name="device"></param>
         /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsAppRunning(DeviceData device, global::System.String packageName);
+        Task<global::System.Boolean> IsAppRunningAsync(DeviceData device, global::System.String packageName);
 
         /// <summary>
         /// Get App Status
