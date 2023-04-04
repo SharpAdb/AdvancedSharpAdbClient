@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
                 uint alphaIndex = Alpha.Offset / 8;
 
                 // Loop over the array and re-order as required
-                for (int i = 0; i < buffer.Length; i += 4)
+                for (int i = 0; i < (int)Size; i += 4)
                 {
                     byte red = buffer[i + redIndex];
                     byte blue = buffer[i + blueIndex];
