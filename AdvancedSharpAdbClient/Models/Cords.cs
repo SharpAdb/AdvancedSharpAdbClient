@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cx">The horizontal "X" coordinate.</param>
         /// <param name="cy">The vertical "Y" coordinate.</param>
-        public void Deconstruct(out int cx, out int cy)
+        public readonly void Deconstruct(out int cx, out int cy)
         {
             cx = X;
             cy = Y;

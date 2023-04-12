@@ -4,7 +4,10 @@
 
 using System;
 using System.Net.Sockets;
+
+#if HAS_Serialization
 using System.Runtime.Serialization;
+#endif
 
 namespace AdvancedSharpAdbClient.Exceptions
 {
@@ -46,24 +49,16 @@ namespace AdvancedSharpAdbClient.Exceptions
             Response = response;
         }
 
+#if HAS_Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public AdbException(SerializationInfo serializationInfo, StreamingContext context) :
-#if HAS_Process
-            base(serializationInfo, context)
-#else
-            base(serializationInfo.GetString("Message"))
-#endif
+        public AdbException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
-#if !HAS_Process
-            HelpLink = serializationInfo.GetString("HelpURL"); // Do not rename (binary serialization)
-            HResult = serializationInfo.GetInt32("HResult"); // Do not rename (binary serialization)
-            Source = serializationInfo.GetString("Source"); // Do not rename (binary serialization)
-#endif
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.

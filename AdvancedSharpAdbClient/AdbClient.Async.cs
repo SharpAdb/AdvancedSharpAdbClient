@@ -7,7 +7,6 @@ using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -229,10 +228,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("windows")]
-#endif
-        public async Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -240,7 +236,7 @@ namespace AdvancedSharpAdbClient
             await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
 
             // Convert the framebuffer to an image, and return that.
-            return framebuffer.ToImage();
+            return framebuffer;
         }
 
         /// <inheritdoc/>

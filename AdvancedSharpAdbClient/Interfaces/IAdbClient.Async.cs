@@ -6,7 +6,6 @@ using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -248,7 +247,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which returns the raw frame buffer.</returns>
         /// <exception cref="AdbException">failed asking for frame buffer</exception>
         /// <exception cref="AdbException">failed nudging</exception>
-        Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
+        Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously runs the event log service on a device.

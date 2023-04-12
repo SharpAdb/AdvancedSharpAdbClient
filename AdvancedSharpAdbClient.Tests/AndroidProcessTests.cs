@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Tests
     public class AndroidProcessTests
     {
         /// <summary>
-        /// Tests the <see cref="AndroidProcess.Parse(string)"/> method.
+        /// Tests the <see cref="AndroidProcess.Parse(string, bool)"/> method.
         /// </summary>
         [Fact]
         public void ParseTest()
