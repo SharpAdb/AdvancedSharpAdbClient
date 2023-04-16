@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient.WinRT
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbResponse"/> class.
+        /// Initializes a new instance of the <see cref="AdbServerStatus"/> class.
         /// </summary>
         public AdbServerStatus() => adbServerStatus = new();
 
@@ -45,7 +45,6 @@ namespace AdvancedSharpAdbClient.WinRT
         /// Gets a <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="AdbServerStatus"/> object.</returns>
-        public override string ToString() =>
-            IsRunning ? $"Version {adbServerStatus.Version} of the adb daemon is running." : "The adb daemon is not running.";
+        public override string ToString() => adbServerStatus.ToString();
     }
 }

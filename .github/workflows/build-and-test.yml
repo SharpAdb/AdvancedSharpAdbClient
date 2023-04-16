@@ -22,10 +22,10 @@ jobs:
         dotnet-version: ${{env.DOTNET_VERSION}}
 
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore AdvancedSharpAdbClient.sln -p:FullTargets=false
       
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build AdvancedSharpAdbClient.sln --no-restore -p:FullTargets=false
     
     - name: Test
-      run: dotnet test --no-restore
+      run: dotnet test AdvancedSharpAdbClient.sln --no-restore -p:FullTargets=false

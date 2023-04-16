@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.WinRT
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbResponse"/> class.
+        /// Initializes a new instance of the <see cref="DeviceData"/> class.
         /// </summary>
         public DeviceData() => deviceData = new();
 

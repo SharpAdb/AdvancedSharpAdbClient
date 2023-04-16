@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient.WinRT
     /// </summary>
     public sealed class AdbServer
     {
-        private AdvancedSharpAdbClient.AdbServer _adbServer { get; set; }
+        internal readonly AdvancedSharpAdbClient.AdbServer adbServer;
 
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.WinRT
         /// </summary>
         public AdbServer()
         {
-            _adbServer = new(new AdvancedSharpAdbClient.AdbClient(), Factories.AdbCommandLineClientFactory);
+            adbServer = new(new AdvancedSharpAdbClient.AdbClient(), Factories.AdbCommandLineClientFactory);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace AdvancedSharpAdbClient.WinRT
         /// The server was not running, or an outdated version of the server was running,
         /// and the <paramref name="adbPath"/> parameter was not specified.
         /// </exception>
-        public StartServerResult StartServer(string adbPath, bool restartServerIfNewer) => (StartServerResult)_adbServer.StartServer(adbPath, restartServerIfNewer);
+        public StartServerResult StartServer(string adbPath, bool restartServerIfNewer) => (StartServerResult)adbServer.StartServer(adbPath, restartServerIfNewer);
 
         /// <summary>
         /// Restarts the adb server if it suddenly became unavailable. Call this class if, for example,
@@ -92,12 +92,12 @@ namespace AdvancedSharpAdbClient.WinRT
         /// You can only call this method if you have previously started the adb server via
         /// <see cref="StartServer(string, bool)"/> and passed the full path to the adb server.
         /// </remarks>
-        public void RestartServer() => _adbServer.RestartServer();
+        public void RestartServer() => adbServer.RestartServer();
 
         /// <summary>
         /// Gets the status of the adb server.
         /// </summary>
         /// <returns>A <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
-        public AdbServerStatus GetStatus() => AdbServerStatus.GetAdbServerStatus(_adbServer.GetStatus());
+        public AdbServerStatus GetStatus() => AdbServerStatus.GetAdbServerStatus(adbServer.GetStatus());
     }
 }

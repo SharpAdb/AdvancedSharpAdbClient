@@ -8,9 +8,15 @@ using namespace AdvancedSharpAdbClient::WinRT;
 int main()
 {
     init_apartment();
-    auto a = AdbServer::AdbServer();
-    a.StartServer(L"C:\\Program Files (x86)\\Android\\android-sdk\\platform-tools\\adb.exe", true);
-    auto b = a.GetStatus();
-    printf("%ls\n", b.ToString().c_str());
+    auto adbServer = AdbServer::AdbServer();
+    adbServer.StartServer(L"C:\\Program Files (x86)\\Android\\android-sdk\\platform-tools\\adb.exe", true);
+    auto status = adbServer.GetStatus();
+    printf("%ls\n", status.ToString().c_str());
+    if (status.IsRunning())
+    {
+        auto adbClient = AdbClient::AdbClient();
+        auto devices = adbClient.GetDevices();
+        adbClient.KillAdb();
+    }
     system("pause");
 }
