@@ -14,47 +14,83 @@ namespace AdvancedSharpAdbClient.WinRT
         /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
-        public string Serial => deviceData.Serial;
+        public string Serial
+        {
+            get => deviceData.Serial;
+            set => deviceData.Serial = value;
+        }
 
         /// <summary>
         /// Gets or sets the device state.
         /// </summary>
-        public DeviceState State => (DeviceState)deviceData.State;
+        public DeviceState State
+        {
+            get => (DeviceState)deviceData.State;
+            set => deviceData.State = (AdvancedSharpAdbClient.DeviceState)value;
+        }
 
         /// <summary>
         /// Gets or sets the device model name.
         /// </summary>
-        public string Model => deviceData.Model;
+        public string Model
+        {
+            get => deviceData.Model;
+            set => deviceData.Model = value;
+        }
 
         /// <summary>
         /// Gets or sets the device product name.
         /// </summary>
-        public string Product => deviceData.Product;
+        public string Product
+        {
+            get => deviceData.Product;
+            set => deviceData.Product = value;
+        }
 
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string Name => deviceData.Name;
+        public string Name
+        {
+            get => deviceData.Name;
+            set => deviceData.Name = value;
+        }
 
         /// <summary>
         /// Gets or sets the features available on the device.
         /// </summary>
-        public string Features => deviceData.Features;
+        public string Features
+        {
+            get => deviceData.Features;
+            set => deviceData.Features = value;
+        }
 
         /// <summary>
         /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
         /// </summary>
-        public string Usb => deviceData.Usb;
+        public string Usb
+        {
+            get => deviceData.Usb;
+            set => deviceData.Usb = value;
+        }
 
         /// <summary>
         /// Gets or sets the transport ID for this device.
         /// </summary>
-        public string TransportId => deviceData.TransportId;
+        public string TransportId
+        {
+            get => deviceData.TransportId;
+            set => deviceData.TransportId = value;
+        }
 
         /// <summary>
         /// Gets or sets the device info message. Currently only seen for NoPermissions state.
         /// </summary>
-        public string Message => deviceData.Message;
+        public string Message
+        {
+            get => deviceData.Message;
+            set => deviceData.Message = value;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> class.

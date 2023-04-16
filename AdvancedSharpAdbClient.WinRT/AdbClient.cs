@@ -4,11 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Text;
-using static AdvancedSharpAdbClient.AdbClient;
 
 namespace AdvancedSharpAdbClient.WinRT
 {
@@ -46,18 +43,9 @@ namespace AdvancedSharpAdbClient.WinRT
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        public AdbClient() : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+        public AdbClient()
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbClient"/> class.
-        /// </summary>
-        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
-        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
-        internal AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
-        {
-            _adbClient = new(endPoint, adbSocketFactory);
+            _adbClient = new(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory);
         }
 
         /// <summary>
