@@ -3,14 +3,17 @@
 // </copyright>
 
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 #if NET
 using System.Runtime.Versioning;
+#endif
+
+#if HAS_Drawing
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 #endif
 
 namespace AdvancedSharpAdbClient
@@ -23,7 +26,7 @@ namespace AdvancedSharpAdbClient
     public struct FramebufferHeader
     {
         /// <summary>
-        /// Gets or sets the version of the framebuffer sturcture.
+        /// Gets or sets the version of the framebuffer structure.
         /// </summary>
         public uint Version { get; set; }
 
@@ -73,7 +76,7 @@ namespace AdvancedSharpAdbClient
         public ColorData Alpha { get; set; }
 
         /// <summary>
-        /// Creates a new <see cref="FramebufferHeader"/> object based on a byte arra which contains the data.
+        /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> structure.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
@@ -137,6 +140,7 @@ namespace AdvancedSharpAdbClient
             return header;
         }
 
+#if HAS_Drawing
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Image"/>.
         /// </summary>
@@ -148,7 +152,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public Image ToImage(byte[] buffer)
+        public readonly Image ToImage(byte[] buffer)
         {
             if (buffer == null)
             {
@@ -165,16 +169,12 @@ namespace AdvancedSharpAdbClient
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
             PixelFormat pixelFormat = StandardizePixelFormat(buffer);
 
-#if HAS_Process
             Bitmap bitmap = new((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
-            Marshal.Copy(buffer, 0, bitmapData.Scan0, buffer.Length);
+            Marshal.Copy(buffer, 0, bitmapData.Scan0, (int)Size);
             bitmap.UnlockBits(bitmapData);
 
             return bitmap;
-#else
-            throw new PlatformNotSupportedException();
-#endif
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        private PixelFormat StandardizePixelFormat(byte[] buffer)
+        private readonly PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.
             if (buffer == null)
@@ -196,10 +196,10 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            if (buffer.Length != Width * Height * (Bpp / 8))
+            if (buffer.Length < Width * Height * (Bpp / 8))
             {
-                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} does not match the expected buffer " +
-                    $"length for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
+                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} is less than expected buffer " +
+                    $"length ({Width * Height * (Bpp / 8)}) for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
             }
 
             if (Width == 0 || Height == 0 || Bpp == 0)
@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
                 uint alphaIndex = Alpha.Offset / 8;
 
                 // Loop over the array and re-order as required
-                for (int i = 0; i < buffer.Length; i += 4)
+                for (int i = 0; i < (int)Size; i += 4)
                 {
                     byte red = buffer[i + redIndex];
                     byte blue = buffer[i + blueIndex];
@@ -290,5 +290,6 @@ namespace AdvancedSharpAdbClient
             // If not caught by any of the statements before, the format is not supported.
             throw new NotSupportedException($"Pixel depths of {Bpp} are not supported");
         }
+#endif
     }
 }

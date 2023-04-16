@@ -3,7 +3,10 @@
 // </copyright>
 
 using System;
+
+#if HAS_Serialization
 using System.Runtime.Serialization;
+#endif
 
 namespace AdvancedSharpAdbClient.Exceptions
 {
@@ -48,6 +51,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 
+#if HAS_Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellCommandUnresponsiveException"/> class with serialized
         /// data.
@@ -57,5 +61,6 @@ namespace AdvancedSharpAdbClient.Exceptions
         internal ShellCommandUnresponsiveException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+#endif
     }
 }

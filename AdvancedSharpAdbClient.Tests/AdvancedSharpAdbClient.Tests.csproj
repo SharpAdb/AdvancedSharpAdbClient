@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <NoWarn>CS1591</NoWarn>
     <LangVersion>latest</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>

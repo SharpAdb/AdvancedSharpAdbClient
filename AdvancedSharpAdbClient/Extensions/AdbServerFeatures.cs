@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Lists features which an Android Debug Bridge can support.
     /// </summary>
-    public class AdbServerFeatures
+    public static class AdbServerFeatures
     {
         /// <summary>
         /// The server supports the shell protocol.

@@ -3,7 +3,10 @@
 // </copyright>
 
 using System;
+
+#if HAS_Serialization
 using System.Runtime.Serialization;
+#endif
 
 namespace AdvancedSharpAdbClient.Exceptions
 {
@@ -27,24 +30,16 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 
+#if HAS_Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         /// <param name="serializationInfo">The serialization info.</param>
         /// <param name="context">The context.</param>
-        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context) :
-#if HAS_Process
-            base(serializationInfo, context)
-#else
-            base(serializationInfo.GetString("Message"))
-#endif
+        public CommandAbortingException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
-#if !HAS_Process
-            HelpLink = serializationInfo.GetString("HelpURL"); // Do not rename (binary serialization)
-            HResult = serializationInfo.GetInt32("HResult"); // Do not rename (binary serialization)
-            Source = serializationInfo.GetString("Source"); // Do not rename (binary serialization)
-#endif
         }
+#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.

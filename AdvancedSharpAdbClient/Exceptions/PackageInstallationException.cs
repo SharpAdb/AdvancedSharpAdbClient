@@ -3,14 +3,19 @@
 // </copyright>
 
 using System;
+
+#if HAS_Serialization
 using System.Runtime.Serialization;
+#endif
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
     /// An exception while installing a package on the device.
     /// </summary>
+#if HAS_Serialization
     [Serializable]
+#endif
     public class PackageInstallationException : Exception
     {
         /// <summary>
@@ -37,6 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
         }
 
+#if HAS_Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
@@ -44,18 +50,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="context">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="info"/> parameter is null.</exception>
         /// <exception cref="SerializationException">The class name is null or <see cref="Exception.HResult"/> is zero (0).</exception>
-        protected PackageInstallationException(SerializationInfo info, StreamingContext context) :
-#if HAS_Process
-            base(info, context)
-#else
-            base(info.GetString("Message"))
-#endif
+        protected PackageInstallationException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
-#if !HAS_Process
-            HelpLink = info.GetString("HelpURL"); // Do not rename (binary serialization)
-            HResult = info.GetInt32("HResult"); // Do not rename (binary serialization)
-            Source = info.GetString("Source"); // Do not rename (binary serialization)
-#endif
         }
+#endif
     }
 }

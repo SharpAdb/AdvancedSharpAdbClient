@@ -8,6 +8,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if NET
+using System.Runtime.Versioning;
+#endif
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
