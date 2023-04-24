@@ -2,13 +2,16 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.WinRT.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Data.Xml.Dom;
+using Windows.Foundation;
 using Windows.Foundation.Metadata;
 using Windows.Storage.Streams;
 
@@ -77,11 +80,41 @@ namespace AdvancedSharpAdbClient.WinRT
         public int GetAdbVersion() => adbClient.GetAdbVersion();
 
         /// <summary>
+        /// Ask the ADB server for its internal version number.
+        /// </summary>
+        /// <returns>An <see cref="IAsyncOperation{TResult}"/> which return the ADB version number.</returns>
+        public IAsyncOperation<int> GetAdbVersionAsync() => adbClient.GetAdbVersionAsync().AsAsyncOperation();
+
+        /// <summary>
+        /// Ask the ADB server for its internal version number.
+        /// </summary>
+        /// <param name="timeout">A <see cref="System.TimeSpan"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="IAsyncOperation{TResult}"/> which return the ADB version number.</returns>
+        public IAsyncOperation<int> GetAdbVersionAsync(TimeSpan timeout) => adbClient.GetAdbVersionAsync(timeout.GetCancellationToken()).AsAsyncOperation();
+
+        /// <summary>
         /// Ask the ADB server to quit immediately. This is used when the
         /// ADB client detects that an obsolete server is running after an
         /// upgrade.
         /// </summary>
         public void KillAdb() => adbClient.KillAdb();
+
+        /// <summary>
+        /// Ask the ADB server to quit immediately. This is used when the
+        /// ADB client detects that an obsolete server is running after an
+        /// upgrade.
+        /// </summary>
+        /// <returns>A <see cref="IAsyncAction"/> which represents the asynchronous operation.</returns>
+        public IAsyncAction KillAdbAsync() => adbClient.KillAdbAsync().AsAsyncAction();
+
+        /// <summary>
+        /// Ask the ADB server to quit immediately. This is used when the
+        /// ADB client detects that an obsolete server is running after an
+        /// upgrade.
+        /// </summary>
+        /// <param name="timeout">A <see cref="System.TimeSpan"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncAction"/> which represents the asynchronous operation.</returns>
+        public IAsyncAction KillAdbAsync(TimeSpan timeout) => adbClient.KillAdbAsync(timeout.GetCancellationToken()).AsAsyncAction();
 
         /// <summary>
         /// Gets the devices that are available for communication.
@@ -101,6 +134,19 @@ namespace AdvancedSharpAdbClient.WinRT
         /// </code>
         /// </example>
         public IEnumerable<DeviceData> GetDevices() => adbClient.GetDevices().Select(DeviceData.GetDeviceData);
+
+        /// <summary>
+        /// Gets the devices that are available for communication.
+        /// </summary>
+        /// <returns>An <see cref="IAsyncOperation{TResult}"/> which return the list of devices that are connected.</returns>
+        public IAsyncOperation<IEnumerable<DeviceData>> GetDevicesAsync() => Task.Run(async () => (await adbClient.GetDevicesAsync()).Select(DeviceData.GetDeviceData)).AsAsyncOperation();
+
+        /// <summary>
+        /// Gets the devices that are available for communication.
+        /// </summary>
+        /// <param name="timeout">A <see cref="System.TimeSpan"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="IAsyncOperation{TResult}"/> which return the list of devices that are connected.</returns>
+        public IAsyncOperation<IEnumerable<DeviceData>> GetDevicesAsync(TimeSpan timeout) => Task.Run(async () => (await adbClient.GetDevicesAsync(timeout.GetCancellationToken())).Select(DeviceData.GetDeviceData)).AsAsyncOperation();
 
         /// <summary>
         /// Asks the ADB server to forward local connections from <paramref name="local"/>

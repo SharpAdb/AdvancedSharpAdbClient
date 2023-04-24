@@ -2,11 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.WinRT.Extensions;
 using System;
-using System.Buffers;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.Foundation;
 
 namespace AdvancedSharpAdbClient.WinRT
@@ -59,7 +56,7 @@ namespace AdvancedSharpAdbClient.WinRT
         /// </summary>
         /// <param name="timeout">A <see cref="Windows.Foundation.TimeSpan"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="IAsyncAction"/> which represents the asynchronous operation.</returns>
-        public IAsyncAction RefreshAsync(TimeSpan timeout) => framebuffer.RefreshAsync(new CancellationTokenSource(timeout).Token).AsAsyncAction();
+        public IAsyncAction RefreshAsync(TimeSpan timeout) => framebuffer.RefreshAsync(timeout.GetCancellationToken()).AsAsyncAction();
 
         /// <inheritdoc/>
         private void Dispose(bool disposing) => framebuffer?.Dispose();

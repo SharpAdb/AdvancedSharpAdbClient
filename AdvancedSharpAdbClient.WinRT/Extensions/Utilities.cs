@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Xml.Linq;
 using Windows.ApplicationModel;
 
@@ -23,14 +24,26 @@ namespace AdvancedSharpAdbClient.WinRT.Extensions
             };
         }
 
-        public static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> enumerable)
+        public static Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(this IDictionary<TKey, TValue> enumerable)
         {
-            Dictionary<TKey, TValue> dictionary = new();
-            foreach (KeyValuePair<TKey, TValue> keyValuePair in enumerable)
+            if (enumerable is Dictionary<TKey, TValue> dictionary)
             {
-                dictionary.Add(keyValuePair.Key, keyValuePair.Value);
+                return dictionary;
             }
-            return dictionary;
+            else
+            {
+                dictionary = new();
+                foreach (KeyValuePair<TKey, TValue> keyValuePair in enumerable)
+                {
+                    dictionary.Add(keyValuePair.Key, keyValuePair.Value);
+                }
+                return dictionary;
+            }
+        }
+
+        public static CancellationToken GetCancellationToken(this TimeSpan timeSpan)
+        {
+            return new CancellationTokenSource(timeSpan).Token;
         }
     }
 }

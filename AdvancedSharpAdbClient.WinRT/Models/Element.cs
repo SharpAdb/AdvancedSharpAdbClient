@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient.WinRT
         /// <summary>
         /// Gets or sets element attributes.
         /// </summary>
-        public IEnumerable<KeyValuePair<string, string>> Attributes
+        public IDictionary<string, string> Attributes
         {
             get => element.Attributes;
             set => element.Attributes = value.GetDictionary();
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.WinRT
         /// <param name="device">The current device containing the element.</param>
         /// <param name="cords">Contains element coordinates .</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(AdbClient client, DeviceData device, Cords cords, IEnumerable<KeyValuePair<string, string>> attributes) =>
+        public Element(AdbClient client, DeviceData device, Cords cords, IDictionary<string, string> attributes) =>
             element = new(client.adbClient, device.deviceData, cords.cords, attributes.GetDictionary());
 
         internal Element(AdvancedSharpAdbClient.Element element) => this.element = element;
@@ -62,8 +62,8 @@ namespace AdvancedSharpAdbClient.WinRT
         /// <summary>
         /// Clicks on this coordinates.
         /// </summary>
-        /// <param name="timeout">A <see cref="Windows.Foundation.TimeSpan"/> which can be used to cancel the asynchronous task.</param>
-        public IAsyncAction ClickAsync(TimeSpan timeout) => element.ClickAsync(new CancellationTokenSource(timeout).Token).AsAsyncAction();
+        /// <param name="timeout">A <see cref="System.TimeSpan"/> which can be used to cancel the asynchronous task.</param>
+        public IAsyncAction ClickAsync(TimeSpan timeout) => element.ClickAsync(timeout.GetCancellationToken()).AsAsyncAction();
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.

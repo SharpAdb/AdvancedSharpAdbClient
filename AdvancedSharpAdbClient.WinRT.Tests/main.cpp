@@ -16,6 +16,10 @@ int main()
     {
         auto adbClient = AdbClient::AdbClient();
         auto devices = adbClient.GetDevices();
+        for (auto device : devices)
+        {
+
+        }
         adbClient.KillAdb();
     }
     system("pause");
