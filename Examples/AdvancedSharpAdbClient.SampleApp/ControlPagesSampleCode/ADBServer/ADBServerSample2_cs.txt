@@ -1,1 +1,0 @@
-﻿AdbServerStatus status = new AdbServer().GetStatus();
