@@ -324,7 +324,7 @@ namespace AdvancedSharpAdbClient
                         this.devices.Add(device);
                         OnDeviceConnected(new DeviceDataEventArgs(device));
                     }
-                    else
+                    else if (existingDevice.State != device.State)
                     {
                         existingDevice.State = device.State;
                         OnDeviceChanged(new DeviceDataEventArgs(existingDevice));

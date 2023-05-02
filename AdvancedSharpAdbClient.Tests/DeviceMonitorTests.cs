@@ -157,7 +157,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void DeviceChangedTest()
+        public void DeviceChanged_TriggeredWhenStatusChanged()
         {
             Socket.WaitForNewData = true;
 
@@ -186,6 +186,8 @@ namespace AdvancedSharpAdbClient.Tests
             Socket.Responses.Clear();
             Socket.Requests.Clear();
 
+            sink.ResetSignals();
+
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
@@ -199,10 +201,61 @@ namespace AdvancedSharpAdbClient.Tests
 
                 Assert.Equal(1, monitor.Devices.Count);
                 Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
-                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ConnectedEvents);
                 Assert.Single(sink.ChangedEvents);
                 Assert.Empty(sink.DisconnectedEvents);
                 Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+            });
+        }
+
+        [Fact]
+        public void DeviceChanged_NoTriggerIfStatusIsSame()
+        {
+            Socket.WaitForNewData = true;
+
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
+
+            Assert.Equal(0, monitor.Devices.Count);
+
+            // Start the monitor, detect the initial device.
+            RunTest(
+            OkResponse,
+            ResponseMessages("169.254.109.177:5555\toffline\n"),
+            Requests("host:track-devices"),
+            () =>
+            {
+                monitor.Start();
+
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+                Assert.Single(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
+            });
+
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
+
+            sink.ResetSignals();
+
+            // Something happens but device does not change
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
+
+            RunTest(
+            NoResponses,
+            ResponseMessages("169.254.109.177:5555\toffline\n"),
+            Requests(),
+            () =>
+            {
+                eventWaiter.WaitOne(1000);
+
+                Assert.Equal(1, monitor.Devices.Count);
+                Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+                Assert.Empty(sink.ConnectedEvents);
+                Assert.Empty(sink.ChangedEvents);
+                Assert.Empty(sink.DisconnectedEvents);
             });
         }
 
