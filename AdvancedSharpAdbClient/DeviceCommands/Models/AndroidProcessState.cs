@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         Unknown,
 
         /// <summary>
-        /// Running or runnable (on run queue).
+        /// Foreground or runnable (on run queue).
         /// </summary>
         R,
 

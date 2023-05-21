@@ -4,7 +4,6 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
-using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -471,6 +470,33 @@ namespace AdvancedSharpAdbClient
         Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Check if the app is running in foreground.
+        /// </summary>
+        /// <param name="device">The device on which to check.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
+        Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Check if the app is running in background.
+        /// </summary>
+        /// <param name="device">The device on which to check.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
+        Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Get the <see cref="AppStatus"/> of the app.
+        /// </summary>
+        /// <param name="device">The device on which to get status.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Get element by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="device"></param>
@@ -532,28 +558,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Is current app
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsCurrentAppAsync(DeviceData device, global::System.String packageName);
-
-        /// <summary>
-        /// Is App running?
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        Task<global::System.Boolean> IsAppRunningAsync(DeviceData device, global::System.String packageName);
-
-        /// <summary>
-        /// Get App Status
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
-        /// <returns>App status. Running, stopped or running in background.</returns>
-        Task<AppStatus> GetpAppStatusAsync(DeviceData device, global::System.String packageName);
 
         /// <summary>
         /// Click BACK button.

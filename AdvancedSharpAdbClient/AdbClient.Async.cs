@@ -4,7 +4,6 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
-using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -800,45 +799,42 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName)
+        public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, CancellationToken.None);
-            var response = receiver.ToString().Trim();
-            return receiver.ToString().Contains(packageName);
+            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, cancellationToken);
+            string response = receiver.ToString().Trim();
+            return response.ToString().Contains(packageName);
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName)
+        public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, CancellationToken.None);
-
-            var response = receiver.ToString().Trim();
-
-            int pid;
-            var intParsed = int.TryParse(response, out pid);
+            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, cancellationToken);
+            string response = receiver.ToString().Trim();
+            bool intParsed = int.TryParse(response, out int pid);
             return intParsed && pid > 0;
         }
 
         /// <inheritdoc/>
-        public async Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName)
+        public async Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            // Check if the app is in front
-            var currentApp = await IsCurrentAppAsync(device, packageName);
+            // Check if the app is in foreground
+            bool currentApp = await IsCurrentAppAsync(device, packageName, cancellationToken);
             if (currentApp)
             {
-                return AppStatus.RUNNING;
+                return AppStatus.Foreground;
             }
 
             // Check if the app is running in background
-            var isAppRunning = await IsAppRunningAsync(device, packageName);
+            bool isAppRunning = await IsAppRunningAsync(device, packageName, cancellationToken);
             if (isAppRunning)
             {
-                return AppStatus.RUNNING_BACKGROUND;
+                return AppStatus.Background;
             }
 
-            return AppStatus.STOPPED;
+            return AppStatus.Stopped;
         }
 
         /// <inheritdoc/>

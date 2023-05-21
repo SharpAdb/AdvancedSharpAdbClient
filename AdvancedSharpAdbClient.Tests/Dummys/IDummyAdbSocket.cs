@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient.Tests
         bool DidReconnect { get; }
 
         /// <summary>
-        /// If <see cref="false"/>, the socket will disconnect as soon as all data has been read. If <see cref="true"/>,
+        /// If <see langword="false"/>, the socket will disconnect as soon as all data has been read. If <see langword="true"/>,
         /// the socket will wait for new messages to appear in the queue.
         /// </summary>
         bool WaitForNewData { get; set; }

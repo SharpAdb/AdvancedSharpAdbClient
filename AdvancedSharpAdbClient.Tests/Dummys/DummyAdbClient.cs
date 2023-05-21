@@ -1,5 +1,4 @@
 ﻿using AdvancedSharpAdbClient.Logs;
-using AdvancedSharpAdbClient.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -85,7 +84,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void ClearInput(DeviceData device, int charCount) => throw new NotImplementedException();
 
-        public Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void Click(DeviceData device, Cords cords) => throw new NotImplementedException();
 
@@ -133,6 +132,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<int> GetAdbVersionAsync(CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public AppStatus GetAppStatus(DeviceData device, string packageName) => throw new NotImplementedException();
+
+        public Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         public List<DeviceData> GetDevices() => throw new NotImplementedException();
 
         public Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken) => throw new NotImplementedException();
@@ -178,6 +181,14 @@ namespace AdvancedSharpAdbClient.Tests
         public void InstallWrite(DeviceData device, Stream apk, string apkName, string session) => throw new NotImplementedException();
 
         public Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        public bool IsAppRunning(DeviceData device, string packageName) => throw new NotImplementedException();
+
+        public Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        public bool IsCurrentApp(DeviceData device, string packageName) => throw new NotImplementedException();
+
+        public Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void KillAdb() => throw new NotImplementedException();
 
@@ -248,12 +259,6 @@ namespace AdvancedSharpAdbClient.Tests
         public void Unroot(DeviceData device) => throw new NotImplementedException();
 
         public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        public Task<bool> IsCurrentAppAsync(DeviceData device, string packageName) => throw new NotImplementedException();
-
-        public Task<bool> IsAppRunningAsync(DeviceData device, string packageName) => throw new NotImplementedException();
-
-        public Task<AppStatus> GetpAppStatusAsync(DeviceData device, string packageName) => throw new NotImplementedException();
 
         #endregion
     }

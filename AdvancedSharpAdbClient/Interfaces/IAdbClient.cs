@@ -411,6 +411,30 @@ namespace AdvancedSharpAdbClient
         void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed);
 
         /// <summary>
+        /// Check if the app is running in foreground.
+        /// </summary>
+        /// <param name="device">The device on which to check.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <returns><see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
+        bool IsCurrentApp(DeviceData device, string packageName);
+
+        /// <summary>
+        /// Check if the app is running in background.
+        /// </summary>
+        /// <param name="device">The device on which to check.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <returns><see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
+        bool IsAppRunning(DeviceData device, string packageName);
+
+        /// <summary>
+        /// Get the <see cref="AppStatus"/> of the app.
+        /// </summary>
+        /// <param name="device">The device on which to get status.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        AppStatus GetAppStatus(DeviceData device, string packageName);
+
+        /// <summary>
         /// Get element by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="device"></param>
