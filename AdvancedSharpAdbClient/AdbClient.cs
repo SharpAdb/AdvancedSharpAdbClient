@@ -756,6 +756,45 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public bool IsCurrentApp(DeviceData device, string packageName)
+        {
+            ConsoleOutputReceiver receiver = new();
+            ExecuteRemoteCommand($"dumpsys activity activities | grep mResumedActivity", device, receiver);
+            string response = receiver.ToString().Trim();
+            return response.ToString().Contains(packageName);
+        }
+
+        /// <inheritdoc/>
+        public bool IsAppRunning(DeviceData device, string packageName)
+        {
+            ConsoleOutputReceiver receiver = new();
+            ExecuteRemoteCommand($"pidof {packageName}", device, receiver);
+            string response = receiver.ToString().Trim();
+            bool intParsed = int.TryParse(response, out int pid);
+            return intParsed && pid > 0;
+        }
+
+        /// <inheritdoc/>
+        public AppStatus GetAppStatus(DeviceData device, string packageName)
+        {
+            // Check if the app is in foreground
+            bool currentApp = IsCurrentApp(device, packageName);
+            if (currentApp)
+            {
+                return AppStatus.Foreground;
+            }
+
+            // Check if the app is running in background
+            bool isAppRunning = IsAppRunning(device, packageName);
+            if (isAppRunning)
+            {
+                return AppStatus.Background;
+            }
+
+            return AppStatus.Stopped;
+        }
+
+        /// <inheritdoc/>
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default)
         {
             Stopwatch stopwatch = new();
@@ -829,7 +868,7 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
-        
+
         /// <inheritdoc/>
         public void SendKeyEvent(DeviceData device, string key)
         {
