@@ -189,7 +189,6 @@ namespace AdvancedSharpAdbClient
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind);
 
-
         /// <summary>
         /// Remove a reverse port forwarding between a remote and a local port.
         /// </summary>

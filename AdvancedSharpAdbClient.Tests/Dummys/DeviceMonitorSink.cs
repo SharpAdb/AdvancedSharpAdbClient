@@ -18,6 +18,13 @@ namespace AdvancedSharpAdbClient.Tests
             ConnectedEvents = new Collection<DeviceDataEventArgs>();
         }
 
+        public void ResetSignals()
+        {
+            ChangedEvents.Clear();
+            DisconnectedEvents.Clear();
+            ConnectedEvents.Clear();
+        }
+
         public Collection<DeviceDataEventArgs> DisconnectedEvents { get; private set; }
 
         public Collection<DeviceDataEventArgs> ConnectedEvents { get; private set; }

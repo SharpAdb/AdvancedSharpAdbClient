@@ -3,14 +3,20 @@
   <PropertyGroup>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat, wherewhere</Authors>
+    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
     <Copyright>https://github.com/quamotion/madb</Copyright>
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
+    <Deterministic>True</Deterministic>
+    <EmbedUntrackedSources>True</EmbedUntrackedSources>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>True</IncludeSymbols>
     <LangVersion>latest</LangVersion>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/yungd1plomat/AdvancedSharpAdbClient/main/nuget.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>https://github.com/wherewhere/DotnetEx/releases</PackageReleaseNotes>
     <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
@@ -18,13 +24,14 @@
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>2.5.4</VersionPrefix>
+    <VersionPrefix>2.5.5</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
     <FullTargets Condition="'$(FullTargets)' == ''">False</FullTargets>
     <IsWindows Condition="'$(IsWindows)' == ''">False</IsWindows>
     <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
+    <IsTestProject Condition="'$(IsTestProject)' == ''">$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">

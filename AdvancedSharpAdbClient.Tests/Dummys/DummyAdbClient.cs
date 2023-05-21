@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -144,7 +143,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public Task<Image> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void HomeBtn(DeviceData device) => throw new NotImplementedException();
 

@@ -3,7 +3,10 @@
 // </copyright>
 
 using System;
+
+#if HAS_Serialization
 using System.Runtime.Serialization;
+#endif
 
 namespace AdvancedSharpAdbClient.Exceptions
 {
@@ -36,6 +39,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 
+#if HAS_Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
@@ -44,5 +48,6 @@ namespace AdvancedSharpAdbClient.Exceptions
         public DeviceNotFoundException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
         {
         }
+#endif
     }
 }

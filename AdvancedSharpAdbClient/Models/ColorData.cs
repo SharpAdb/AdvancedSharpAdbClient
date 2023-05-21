@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="length">The number of bits that contain information for this color.</param>
         /// <param name="offset">The offset, in bits, within the byte array for a pixel, at which the
         /// bytes that contain information for this color are stored.</param>
-        public void Deconstruct(out uint length, out uint offset)
+        public readonly void Deconstruct(out uint length, out uint offset)
         {
             length = Length;
             offset = Offset;
