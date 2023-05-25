@@ -22,6 +22,7 @@ Added important features.
 - .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
 - .NET Core App 3.1
 - .NET 6.0
+- .NET 8.0
 
 ## Installation
 To install AdvancedSharpAdbClient install the [AdvancedSharpAdbClient NuGetPackage](https://www.nuget.org/packages/AdvancedSharpAdbClient). If you're
@@ -98,7 +99,6 @@ And you can find several elements
 ```cs
 Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
-
 
 ### Getting element attributes
 You can get all element attributes
@@ -241,6 +241,7 @@ You can clear text input
 The text field should be in focus
 
 **Recommended**
+
 ```cs
 static void Main(string[] args)
 {
@@ -251,6 +252,7 @@ static void Main(string[] args)
 ```
 
 **It may work unstable**
+
 ```cs
 static void Main(string[] args)
 {
@@ -337,7 +339,7 @@ static void Main(string[] args)
 }
 ```
 
-Or you can use AdbClient.Install
+Or you can use AdbClient.InstallMultiple
 
 ```cs
 static void Main(string[] args)
@@ -348,6 +350,7 @@ static void Main(string[] args)
     ...
 }
 ```
+
 ### Start and stop applications
 
 ```cs

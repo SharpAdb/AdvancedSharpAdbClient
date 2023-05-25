@@ -28,12 +28,15 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException("channel EOF");
                 }
             }
+#if HAS_LOGGER
             catch (SocketException ex)
             {
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
+#else
+            catch (SocketException)
+            {
 #endif
-                throw ex;
+                throw;
             }
         }
 
@@ -165,7 +168,7 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw e;
+                        throw;
                     }
                 }
             }

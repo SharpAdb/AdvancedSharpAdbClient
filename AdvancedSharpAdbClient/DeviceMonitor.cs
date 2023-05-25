@@ -216,7 +216,11 @@ namespace AdvancedSharpAdbClient
 
                     firstDeviceListParsed.Set();
                 }
+#if HAS_LOGGER
                 catch (TaskCanceledException ex)
+#else
+                catch (TaskCanceledException)
+#endif
                 {
                     // We get a TaskCanceledException on Windows
                     if (cancellationToken.IsCancellationRequested)
@@ -231,10 +235,14 @@ namespace AdvancedSharpAdbClient
 #if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw ex;
+                        throw;
                     }
                 }
+#if HAS_LOGGER
                 catch (ObjectDisposedException ex)
+#else
+                catch (ObjectDisposedException)
+#endif
                 {
                     // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
                     if (cancellationToken.IsCancellationRequested)
@@ -249,7 +257,7 @@ namespace AdvancedSharpAdbClient
 #if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
 #endif
-                        throw ex;
+                        throw;
                     }
                 }
                 catch (AdbException adbException)
@@ -263,7 +271,7 @@ namespace AdvancedSharpAdbClient
                     }
                     else
                     {
-                        throw adbException;
+                        throw;
                     }
                 }
 #if HAS_LOGGER

@@ -183,7 +183,7 @@ namespace AdvancedSharpAdbClient
                 else
                 {
                     // An unexpected exception occurred; re-throw the exception
-                    throw ex;
+                    throw;
                 }
             }
         }

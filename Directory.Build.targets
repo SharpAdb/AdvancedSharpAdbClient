@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!$(IsTestProject)">
-    <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="\Icon.png" />
+    <None Include="$(MSBuildThisFileDirectory)logo.png" Pack="true" PackagePath="\Icon.png" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'">

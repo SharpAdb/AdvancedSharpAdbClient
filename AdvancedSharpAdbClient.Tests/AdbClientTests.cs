@@ -289,7 +289,7 @@ namespace AdvancedSharpAdbClient.Tests
                         }
                         else
                         {
-                            throw ex;
+                            throw;
                         }
                     }
                 }));

@@ -419,12 +419,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 return remoteFilePath;
             }
+#if HAS_LOGGER
             catch (IOException e)
             {
-#if HAS_LOGGER
                 logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
+#else
+            catch (IOException)
+            {
 #endif
-                throw e;
+                throw;
             }
         }
 
@@ -440,12 +443,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 client.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"", null);
             }
+#if HAS_LOGGER
             catch (IOException e)
             {
-#if HAS_LOGGER
                 logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
+#else
+            catch (IOException)
+            {
 #endif
-                throw e;
+                throw;
             }
         }
 

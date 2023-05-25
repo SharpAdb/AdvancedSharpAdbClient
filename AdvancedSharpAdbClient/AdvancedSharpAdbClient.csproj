@@ -7,8 +7,8 @@
 
   <PropertyGroup Condition="'$(FullTargets)' != 'true'">
     <TargetFramework Condition="'$(GITHUB_ACTIONS)' == 'true'">netstandard2.0</TargetFramework>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And '$(IsWindows)'">net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And !'$(IsWindows)'">net6.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And '$(IsWindows)'">net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And !'$(IsWindows)'">net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,6 +52,7 @@
                      or '$(TargetFramework)' == 'net4.7.2'
                      or '$(TargetFramework)' == 'net4.8.1'
                      or '$(TargetFramework)' == 'net6.0'
+                     or '$(TargetFramework)' == 'net8.0'
                      or '$(TargetFramework)' == 'netcoreapp3.1'
                      or '$(TargetFramework)' == 'netstandard2.0'
                      or '$(TargetFramework)' == 'uap10.0'">
@@ -59,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
+                     or '$(TargetFramework)' == 'net8.0'
                      or '$(TargetFramework)' == 'netcoreapp3.1'
                      or '$(TargetFramework)' == 'netstandard2.0'
                      or '$(TargetFramework)' == 'uap10.0'">
