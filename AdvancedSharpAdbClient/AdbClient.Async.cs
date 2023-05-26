@@ -696,7 +696,9 @@ namespace AdvancedSharpAdbClient
             string xmlString = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
 #endif
             xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            if (xmlString != "" && !xmlString.StartsWith("ERROR"))
+            if (!string.IsNullOrEmpty(xmlString)
+                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("java.lang.Exception"))
             {
                 doc.LoadXml(xmlString);
                 return doc;

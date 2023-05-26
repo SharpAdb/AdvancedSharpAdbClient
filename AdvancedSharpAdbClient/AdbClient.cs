@@ -657,7 +657,9 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
             string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            if (xmlString != "" && !xmlString.StartsWith("ERROR"))
+            if (!string.IsNullOrEmpty(xmlString)
+                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("java.lang.Exception"))
             {
                 doc.LoadXml(xmlString);
                 return doc;
