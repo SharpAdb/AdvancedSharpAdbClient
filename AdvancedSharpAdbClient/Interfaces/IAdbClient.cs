@@ -73,7 +73,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
         /// <para>
         /// The local address to forward. This value can be in one of:
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
         /// <para>
         /// The local address to forward. This value can be in one of:
@@ -153,7 +153,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to reverse forward the connections.</param>
+        /// <param name="device">The device on which to reverse forward the connections.</param>
         /// <param name="remote">
         /// <para>
         /// The remote address to reverse forward. This value can be in one of:
@@ -341,7 +341,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The packageName of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>Session ID</returns>
+        /// <returns>The session ID of this install session.</returns>
         string InstallCreate(DeviceData device, string packageName = null, params string[] arguments);
 
         /// <summary>
@@ -377,36 +377,36 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="cords"></param>
+        /// <param name="device">The device on which to click.</param>
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
         void Click(DeviceData device, Cords cords);
 
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="device">The device on which to click.</param>
+        /// <param name="x">The X co-ordinate to click.</param>
+        /// <param name="y">The Y co-ordinate to click.</param>
         void Click(DeviceData device, int x, int y);
 
         /// <summary>
         /// Generates a swipe gesture from first element to second element Specify the speed in ms.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="first"></param>
-        /// <param name="second"></param>
-        /// <param name="speed"></param>
+        /// <param name="device">The device on which to swipe.</param>
+        /// <param name="first">The start element.</param>
+        /// <param name="second">The end element.</param>
+        /// <param name="speed">The time spent in swiping.</param>
         void Swipe(DeviceData device, Element first, Element second, long speed);
 
         /// <summary>
         /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed Specify the speed in ms.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="speed"></param>
+        /// <param name="device">The device on which to swipe.</param>
+        /// <param name="x1">The start X co-ordinate.</param>
+        /// <param name="y1">The start Y co-ordinate.</param>
+        /// <param name="x2">The end X co-ordinate.</param>
+        /// <param name="y2">The end Y co-ordinate.</param>
+        /// <param name="speed">The time spent in swiping.</param>
         void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed);
 
         /// <summary>
@@ -436,64 +436,68 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Get element by xpath. You can specify the waiting time in timeout.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="xpath"></param>
-        /// <param name="timeout"></param>
-        /// <returns>The <see cref="Element"/> class</returns>
+        /// <param name="device">The device on which to get element.</param>
+        /// <param name="xpath">The xpath of the element.</param>
+        /// <param name="timeout">The timeout for waiting the element.
+        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
+        /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
         Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Get elements by xpath. You can specify the waiting time in timeout.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="xpath"></param>
-        /// <param name="timeout"></param>
-        /// <returns>The <see cref="Element"/> class</returns>
+        /// <param name="device">The device on which to get elements.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="timeout">The timeout for waiting the elements.
+        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
+        /// <returns>The <see cref="Array"/> of <see cref="Element"/> has got.</returns>
         Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="key"></param>
+        /// <param name="device">The device on which to send key event.</param>
+        /// <param name="key">The key event to send.</param>
         void SendKeyEvent(DeviceData device, string key);
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
+        /// <param name="device">The device on which to send text.</param>
+        /// <param name="text">The text to send.</param>
         void SendText(DeviceData device, string text);
 
         /// <summary>
         /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="charCount"></param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="charCount">The length of text to clear.</param>
         void ClearInput(DeviceData device, int charCount);
 
         /// <summary>
         /// Start an Android application on device.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
+        /// <param name="device">The device on which to start an application.</param>
+        /// <param name="packageName">The package name of the application to start.</param>
         void StartApp(DeviceData device, string packageName);
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packageName"></param>
+        /// <param name="device">The device on which to stop an application.</param>
+        /// <param name="packageName">The package name of the application to stop.</param>
         void StopApp(DeviceData device, string packageName);
 
         /// <summary>
         /// Click BACK button.
         /// </summary>
-        /// <param name="device"></param>
+        /// <param name="device">The device on which to click BACK button.</param>
         void BackBtn(DeviceData device);
 
         /// <summary>
         /// Click HOME button.
         /// </summary>
-        /// <param name="device"></param>
+        /// <param name="device">The device on which to click HOME button.</param>
         void HomeBtn(DeviceData device);
     }
 

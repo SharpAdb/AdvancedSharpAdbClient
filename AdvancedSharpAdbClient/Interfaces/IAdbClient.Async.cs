@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
         /// <para>
         /// The local address to forward. This value can be in one of:
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
         /// <para>
         /// The local address to forward. This value can be in one of:
@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
-        /// <param name="device">The device to which to reverse forward the connections.</param>
+        /// <param name="device">The device on which to reverse forward the connections.</param>
         /// <param name="remote">
         /// <para>
         /// The remote address to reverse forward. This value can be in one of:
@@ -428,8 +428,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="cords"></param>
+        /// <param name="device">The device on which to click.</param>
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken);
@@ -437,9 +437,9 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="device">The device on which to click.</param>
+        /// <param name="x">The X co-ordinate to click.</param>
+        /// <param name="y">The Y co-ordinate to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ClickAsync(DeviceData device, int x, int y, CancellationToken cancellationToken);
@@ -447,10 +447,10 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Generates a swipe gesture from first element to second element Specify the speed in ms.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="first"></param>
-        /// <param name="second"></param>
-        /// <param name="speed"></param>
+        /// <param name="device">The device on which to swipe.</param>
+        /// <param name="first">The start element.</param>
+        /// <param name="second">The end element.</param>
+        /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task SwipeAsync(DeviceData device, Element first, Element second, long speed, CancellationToken cancellationToken);
@@ -458,12 +458,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed Specify the speed in ms.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="speed"></param>
+        /// <param name="device">The device on which to swipe.</param>
+        /// <param name="x1">The start X co-ordinate.</param>
+        /// <param name="y1">The start Y co-ordinate.</param>
+        /// <param name="x2">The end X co-ordinate.</param>
+        /// <param name="y2">The end Y co-ordinate.</param>
+        /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken);
@@ -500,24 +500,26 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device"></param>
         /// <param name="xpath"></param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="xpath"></param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="device">The device on which to get elements.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Send keyevent to specific. You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent.
+        /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="key"></param>
+        /// <param name="device">The device on which to send key event.</param>
+        /// <param name="key">The key event to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task SendKeyEventAsync(DeviceData device, string key, CancellationToken cancellationToken);
@@ -525,50 +527,50 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="text"></param>
+        /// <param name="device">The device on which to send text.</param>
+        /// <param name="text">The text to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task SendTextAsync(DeviceData device, string text, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use el.ClearInput() if the element isn't focused.
+        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="charcount"></param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ClearInputAsync(DeviceData device, int charcount, CancellationToken cancellationToken);
+        Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken);
 
         /// <summary>
         /// Start an Android application on device.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packagename"></param>
+        /// <param name="device">The device on which to start an application.</param>
+        /// <param name="packageName">The package name of the application to start.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task StartAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken);
+        Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
-        /// <param name="device"></param>
-        /// <param name="packagename"></param>
+        /// <param name="device">The device on which to stop an application.</param>
+        /// <param name="packageName">The package name of the application to stop.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken);
+        Task StopAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Click BACK button.
         /// </summary>
-        /// <param name="device"></param>
+        /// <param name="device">The device on which to click BACK button.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task BackBtnAsync(DeviceData device);
 
         /// <summary>
         /// Click HOME button.
         /// </summary>
-        /// <param name="device"></param>
+        /// <param name="device">The device on which to click HOME button.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task HomeBtnAsync(DeviceData device);
     }
