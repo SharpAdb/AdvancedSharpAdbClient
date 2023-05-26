@@ -12,26 +12,26 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// The value is a four-byte signed integer.
         /// </summary>
-        Integer = 0,
+        Integer,
 
         /// <summary>
         /// The value is an eight-byte signed integer.
         /// </summary>
-        Long = 1,
+        Long,
 
         /// <summary>
         /// The value is a string.
         /// </summary>
-        String = 2,
+        String,
 
         /// <summary>
         /// The value is a list of values.
         /// </summary>
-        List = 3,
+        List,
 
         /// <summary>
         /// The value is a four-byte signed floating number.
         /// </summary>
-        Float = 4,
+        Float,
     }
 }

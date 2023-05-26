@@ -13,31 +13,31 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// The main log buffer
         /// </summary>
-        Main = 0,
+        Main,
 
         /// <summary>
         /// The buffer that contains radio/telephony related messages.
         /// </summary>
-        Radio = 1,
+        Radio,
 
         /// <summary>
         /// The buffer containing events-related messages.
         /// </summary>
-        Events = 2,
+        Events,
 
         /// <summary>
         /// The Android system log buffer.
         /// </summary>
-        System = 3,
+        System,
 
         /// <summary>
         /// The Android crash log buffer.
         /// </summary>
-        Crash = 4,
+        Crash,
 
         /// <summary>
         /// The Android kernel log buffer.
         /// </summary>
-        Kernel = 5
+        Kernel
     }
 }

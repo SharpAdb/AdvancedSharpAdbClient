@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The server supports libusb.
         /// </summary>
-        public const string Libusb = "libusb";
+        public const string LibUsb = "libusb";
 
         /// <summary>
         /// The server supports <c>push --sync</c>.

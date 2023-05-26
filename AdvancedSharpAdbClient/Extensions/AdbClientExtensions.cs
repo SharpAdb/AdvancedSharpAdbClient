@@ -15,7 +15,7 @@ using System.Runtime.Versioning;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="IAdbClient"/> interface. Provides overloads for commonly used funtions.
+    /// Provides extension methods for the <see cref="IAdbClient"/> interface. Provides overloads for commonly used functions.
     /// </summary>
     public static class AdbClientExtensions
     {

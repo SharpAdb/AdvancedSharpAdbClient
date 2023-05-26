@@ -71,10 +71,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
-            if (endPoint == null)
-            {
-                throw new ArgumentNullException(nameof(endPoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endPoint);
 
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -164,7 +161,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             string rebind = allowRebind ? string.Empty : "norebind:";
@@ -184,7 +181,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -202,7 +199,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RemoveReverseForward(DeviceData device, string remote)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -214,7 +211,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RemoveAllReverseForwards(DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -226,7 +223,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RemoveForward(DeviceData device, int localPort)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
@@ -236,7 +233,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void RemoveAllForwards(DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
@@ -246,7 +243,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
@@ -262,7 +259,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -284,7 +281,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
 
@@ -317,7 +314,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Framebuffer CreateRefreshableFramebuffer(DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             return new Framebuffer(device, this);
         }
@@ -325,7 +322,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Reboot(string into, DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             string request = $"reboot:{into}";
 
@@ -338,10 +335,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Pair(DnsEndPoint endpoint, string code)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
@@ -353,10 +347,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Connect(DnsEndPoint endpoint)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
@@ -368,10 +359,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Disconnect(DnsEndPoint endpoint)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
@@ -393,7 +381,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
         protected void Root(string request, DeviceData device)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -408,7 +396,11 @@ namespace AdvancedSharpAdbClient
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
+#if NET
+            if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
+#else
             if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
+#endif
             {
                 throw new AdbException(responseMessage);
             }
@@ -423,12 +415,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Install(DeviceData device, Stream apk, params string[] arguments)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
-            if (apk == null)
-            {
-                throw new ArgumentNullException(nameof(apk));
-            }
+            ExceptionExtensions.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
@@ -477,12 +466,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
-            if (packageName == null)
-            {
-                throw new ArgumentNullException(nameof(packageName));
-            }
+            ExceptionExtensions.ThrowIfNull(packageName);
 
             string session = InstallCreate(device, packageName, arguments);
 
@@ -511,12 +497,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
-            if (baseAPK == null)
-            {
-                throw new ArgumentNullException(nameof(baseAPK));
-            }
+            ExceptionExtensions.ThrowIfNull(baseAPK);
 
             if (!baseAPK.CanRead || !baseAPK.CanSeek)
             {
@@ -552,7 +535,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string InstallCreate(DeviceData device, string packageName = null, params string[] arguments)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             StringBuilder requestBuilder = new();
             _ = requestBuilder.Append("exec:cmd package 'install-create' ");
@@ -589,27 +572,18 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallWrite(DeviceData device, Stream apk, string apkName, string session)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
-            if (apk == null)
-            {
-                throw new ArgumentNullException(nameof(apk));
-            }
+            ExceptionExtensions.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            if (session == null)
-            {
-                throw new ArgumentNullException(nameof(session));
-            }
+            ExceptionExtensions.ThrowIfNull(session);
 
-            if (apkName == null)
-            {
-                throw new ArgumentNullException(nameof(apkName));
-            }
+            ExceptionExtensions.ThrowIfNull(apkName);
 
             StringBuilder requestBuilder = new();
             requestBuilder.Append($"exec:cmd package 'install-write' ");
@@ -694,7 +668,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Click(DeviceData device, Cords cords)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -710,7 +684,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Click(DeviceData device, int x, int y)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -726,7 +700,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Swipe(DeviceData device, Element first, Element second, long speed)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -742,7 +716,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -872,7 +846,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void SendKeyEvent(DeviceData device, string key)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -888,7 +862,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void SendText(DeviceData device, string text)
         {
-            EnsureDevice(device);
+            AdbClient.EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -934,12 +908,9 @@ namespace AdvancedSharpAdbClient
         /// if <paramref name="device"/> does not have a valid serial number.
         /// </summary>
         /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
-        protected void EnsureDevice(DeviceData device)
+        protected static void EnsureDevice(DeviceData device)
         {
-            if (device == null)
-            {
-                throw new ArgumentNullException(nameof(device));
-            }
+            ExceptionExtensions.ThrowIfNull(device);
 
             if (string.IsNullOrEmpty(device.Serial))
             {

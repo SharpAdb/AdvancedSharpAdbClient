@@ -227,10 +227,7 @@ namespace AdvancedSharpAdbClient
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
         {
-            if (command == null)
-            {
-                throw new ArgumentNullException(nameof(command));
-            }
+            ExceptionExtensions.ThrowIfNull(command);
 
             int status = CrossPlatformFunc.RunProcess(AdbPath, command, errorOutput, standardOutput);
 

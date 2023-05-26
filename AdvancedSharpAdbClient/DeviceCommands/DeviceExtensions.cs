@@ -2,7 +2,6 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Receivers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -115,7 +114,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static string GetProperty(this IAdbClient client, DeviceData device, string property)
         {
             ConsoleOutputReceiver receiver = new();
-            client.ExecuteRemoteCommand($"{GetPropReceiver.GetpropCommand} {property}", device, receiver);
+            client.ExecuteRemoteCommand($"{GetPropReceiver.GetPropCommand} {property}", device, receiver);
             return receiver.ToString();
         }
 
@@ -128,7 +127,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
             GetPropReceiver receiver = new();
-            client.ExecuteRemoteCommand(GetPropReceiver.GetpropCommand, device, receiver);
+            client.ExecuteRemoteCommand(GetPropReceiver.GetPropCommand, device, receiver);
             return receiver.Properties;
         }
 
@@ -180,7 +179,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
-            // ps differents from Android version to Android version, is not delimited, nor
+            // ps different from Android version to Android version, is not delimited, nor
             // entirely fixed length, and some of the fields can be empty, so it's almost impossible
             // to parse correctly.
             //

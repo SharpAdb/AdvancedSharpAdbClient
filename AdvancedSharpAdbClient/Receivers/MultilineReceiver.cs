@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Multi Line Receiver
+    /// A multiline receiver to receive and process shell output with multi lines.
     /// </summary>
     public abstract class MultiLineReceiver : IShellOutputReceiver
     {

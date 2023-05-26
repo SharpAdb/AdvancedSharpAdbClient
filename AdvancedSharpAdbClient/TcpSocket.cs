@@ -61,12 +61,15 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Dispose() =>
+        public void Dispose()
+        {
 #if !NET35
             socket.Dispose();
 #else
             socket.Close();
 #endif
+            GC.SuppressFinalize(this);
+        }
 
         /// <inheritdoc/>
         public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>

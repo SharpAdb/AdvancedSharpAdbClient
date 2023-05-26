@@ -49,10 +49,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     // package:mwc2015.be
 
                     // Remove the "package:" prefix
+#if NETCOREAPP
+                    string package = line[8..];
+#else
                     string package = line.Substring(8);
-
+#endif
                     //// If there's a '=' included, use the last instance,
-                    //// to accomodate for values like
+                    //// to accommodate for values like
                     //// "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
                     //string[] parts = line.Split(':', '=');
 
@@ -64,9 +67,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
+#if NETCOREAPP
+                        string path = package[..separator];
+                        string name = package[(separator + 1)..];
+#else
                         string path = package.Substring(0, separator);
                         string name = package.Substring(separator + 1);
-
+#endif
                         PackageManager.Packages.Add(name, path);
                     }
                 }

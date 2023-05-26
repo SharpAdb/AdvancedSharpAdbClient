@@ -10,7 +10,7 @@ using System.Threading;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Interface containing methods for file synchronisation.
+    /// Interface containing methods for file synchronization.
     /// </summary>
     public interface ISyncService : IDisposable
     {

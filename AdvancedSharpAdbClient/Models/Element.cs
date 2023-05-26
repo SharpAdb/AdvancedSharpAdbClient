@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text to send.</param>
         public void SendText(string text)
         {
             Click();
@@ -71,9 +71,21 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use el.ClearInput() if the element isn't focused.
+        /// Send text to device. Doesn't support Russian.
         /// </summary>
-        /// <param name="charCount"></param>
+        /// <param name="text">The text to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
+        {
+            await ClickAsync(cancellationToken);
+            await Client.SendTextAsync(Device, text, cancellationToken);
+        }
+
+        /// <summary>
+        /// Clear the input text. Use <see cref="IAdbClient.ClearInput(DeviceData, int)"/> if the element is focused.
+        /// </summary>
+        /// <param name="charCount">The length of text to clear.</param>
         public void ClearInput(int charCount = 0)
         {
             Click(); // focuses
@@ -84,6 +96,25 @@ namespace AdvancedSharpAdbClient
             else
             {
                 Client.ClearInput(Device, charCount);
+            }
+        }
+
+        /// <summary>
+        /// Clear the input text. Use <see cref="IAdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// </summary>
+        /// <param name="charCount">The length of text to clear.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public async Task ClearInputAsync(int charCount = 0, CancellationToken cancellationToken = default)
+        {
+            await ClickAsync(cancellationToken); // focuses
+            if (charCount == 0)
+            {
+                await Client.ClearInputAsync(Device, Attributes["text"].Length, cancellationToken);
+            }
+            else
+            {
+                await Client.ClearInputAsync(Device, charCount, cancellationToken);
             }
         }
     }

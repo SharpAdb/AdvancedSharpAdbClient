@@ -177,6 +177,8 @@ namespace AdvancedSharpAdbClient
             firstDeviceListParsed.Close();
 #endif
             monitorTaskCancellationTokenSource.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

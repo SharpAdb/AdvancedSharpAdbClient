@@ -58,20 +58,11 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
-            if (length < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length));
-            }
+            ExceptionExtensions.ThrowIfNegative(length);
 
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
+            ExceptionExtensions.ThrowIfNull(data);
 
-            if (data.Length < length)
-            {
-                throw new ArgumentOutOfRangeException(nameof(data));
-            }
+            ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
             int totalRead = 0;
@@ -211,7 +202,11 @@ namespace AdvancedSharpAdbClient
             AdbResponse resp = new();
 
             byte[] reply = new byte[4];
-            await ReadAsync(reply);
+            await ReadAsync(reply
+#if NET8_0_OR_GREATER
+                , cancellationToken
+#endif
+                );
 
             resp.IOSuccess = true;
 
@@ -222,7 +217,7 @@ namespace AdvancedSharpAdbClient
                 string message = await ReadStringAsync(cancellationToken);
                 resp.Message = message;
 #if HAS_LOGGER
-                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
+                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{resp.Message}'");
 #endif
             }
 

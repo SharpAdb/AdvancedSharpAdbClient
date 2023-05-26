@@ -2,7 +2,7 @@
 
   <PropertyGroup Condition="'$(FullTargets)' == 'true'">
     <NoWarn>NU1603</NoWarn>
-    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;netcore50;netcoreapp3.1;netstandard1.3;netstandard2.0;uap10.0</TargetFrameworks>
+    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net8.0;netcore50;netcoreapp3.1;netstandard1.3;netstandard2.0;uap10.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' != 'true'">

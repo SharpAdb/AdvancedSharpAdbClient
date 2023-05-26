@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Recieves console output, and makes the console output available as a <see cref="string"/>. To
+    /// Receives console output, and makes the console output available as a <see cref="string"/>. To
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
     public class ConsoleOutputReceiver : MultiLineReceiver

@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Logs
                         // format: <priority:1><tag:N>\0<message:N>\0
                         byte priority = data[0];
 
-                        // Find the first \0 byte in the array. This is the seperator
+                        // Find the first \0 byte in the array. This is the separator
                         // between the tag and the actual message
                         int tagEnd = 1;
 
@@ -129,7 +129,7 @@ namespace AdvancedSharpAdbClient.Logs
                             tagEnd++;
                         }
 
-                        // Message should be null termintated, so remove the last entry, too (-2 instead of -1)
+                        // Message should be null terminated, so remove the last entry, too (-2 instead of -1)
                         string tag = Encoding.ASCII.GetString(data, 1, tagEnd - 1);
                         string message = Encoding.ASCII.GetString(data, tagEnd + 1, data.Length - tagEnd - 2);
 
@@ -256,7 +256,9 @@ namespace AdvancedSharpAdbClient.Logs
             byte[] data = new byte[count];
 
             while ((read =
-#if !NET35
+#if NETCOREAPP
+                await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
+#elif !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
 #else
                 await Utilities.Run(() => stream.Read(data, totalRead, count - totalRead)).ConfigureAwait(false)

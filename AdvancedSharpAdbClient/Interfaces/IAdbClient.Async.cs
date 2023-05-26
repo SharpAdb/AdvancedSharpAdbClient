@@ -333,7 +333,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The packageName of the base APK to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments);
@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The packageName of the base APK to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -374,7 +374,7 @@ namespace AdvancedSharpAdbClient
         /// Like "install", but starts an install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="packageName">The packageName of the baseAPK to install.</param>
+        /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>An <see cref="Task"/> which return the session ID</returns>
         Task<string> InstallCreateAsync(DeviceData device, string packageName, params string[] arguments);
@@ -383,7 +383,7 @@ namespace AdvancedSharpAdbClient
         /// Like "install", but starts an install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="packageName">The packageName of the baseAPK to install.</param>
+        /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>An <see cref="Task"/> which return the session ID</returns>

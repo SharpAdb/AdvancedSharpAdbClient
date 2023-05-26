@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
@@ -317,14 +318,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
         /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
-        /// Becuase <c>stat</c> does not contain the full process name, this can be useful.</param>
+        /// Because <c>stat</c> does not contain the full process name, this can be useful.</param>
         /// <returns>The equivalent <see cref="AndroidProcess"/>.</returns>
         public static AndroidProcess Parse(string line, bool cmdLinePrefix = false)
         {
-            if (line == null)
-            {
-                throw new ArgumentNullException(nameof(line));
-            }
+            ExceptionExtensions.ThrowIfNull(line);
 
             AndroidProcess process = new();
 
@@ -332,7 +330,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // section /proc/[pid]/stat, for more information about the file format
 
             // Space delimited, so normally we would just do a string.split
-            // The process name may contain spaces but is wrapped within parenteses, all other values (we know of) are
+            // The process name may contain spaces but is wrapped within parentheses, all other values (we know of) are
             // numeric.
             // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
             int processNameStart = line.IndexOf('(');
@@ -345,7 +343,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (cmdLinePrefix)
             {
-                string[] cmdLineParts = line.Substring(0, processNameStart).Split(new char[] { '\0' });
+#if NETCOREAPP
+                string[] cmdLineParts = line[..processNameStart]
+#else
+
+                string[] cmdLineParts = line.Substring(0, processNameStart)
+#endif
+                    .Split(new char[] { '\0' });
 
                 if (cmdLineParts.Length <= 1)
                 {
@@ -353,7 +357,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
                 else
                 {
+#if NETCOREAPP
+                    pid = int.Parse(cmdLineParts[^1]);
+#else
                     pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
+#endif
                     process.ProcessId = pid;
 
                     comm = cmdLineParts[0];
@@ -366,14 +374,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (!parsedCmdLinePrefix)
             {
+#if NETCOREAPP
+                pid = int.Parse(line[..processNameStart]);
+#else
                 pid = int.Parse(line.Substring(0, processNameStart));
+#endif
                 process.ProcessId = pid;
 
                 comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
                 process.Name = comm;
             }
 
-            string[] parts = line.Substring(processNameEnd + 1).Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+#if NETCOREAPP
+            string[] parts = line[(processNameEnd + 1)..]
+#else
+            string[] parts = line.Substring(processNameEnd + 1)
+#endif
+                .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 35)
             {
@@ -381,7 +398,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             // Only fields in Linux 2.1.10 and earlier are listed here,
-            // additional fields exist in newer versions of linux.
+            // additional fields exist in newer versions of Linux.
             string state = parts[0];
             process.State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true);
 

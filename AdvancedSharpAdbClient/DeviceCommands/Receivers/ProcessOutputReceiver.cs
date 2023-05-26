@@ -2,12 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.DeviceCommands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace AdvancedSharpAdbClient.Receivers
+namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
