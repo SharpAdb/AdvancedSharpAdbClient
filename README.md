@@ -19,7 +19,10 @@ Added important features.
 - .NET Framework 4.7.2
 - .NET Framework 4.8.1
 - .NET Standard 1.3 (Not fully supported)
-- .NET Standard 2.0 (Support UWP if you don't use unsupport api like Process)
+- .NET Standard 2.0 (Support UWP if you don't use unsupported api like Process)
+- .NET Standard 2.1
+- .NET Core 5.0 (Support UAP 10.0 and UAP 10.0.15138.0)
+- .NET Core App 2.1
 - .NET Core App 3.1
 - .NET 6.0
 - .NET 8.0
