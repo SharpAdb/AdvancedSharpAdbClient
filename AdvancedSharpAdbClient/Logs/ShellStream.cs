@@ -157,7 +157,7 @@ namespace AdvancedSharpAdbClient.Logs
             return read;
         }
 
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
@@ -192,7 +192,7 @@ namespace AdvancedSharpAdbClient.Logs
 
         /// <inheritdoc/>
         public
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
             override
 #endif
             async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
@@ -211,7 +211,7 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 buffer[offset] = pendingByte.Value;
                 read =
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     await Inner.ReadAsync(buffer.AsMemory(offset + 1, count - 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
@@ -224,7 +224,7 @@ namespace AdvancedSharpAdbClient.Logs
             else
             {
                 read =
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     await Inner.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                     int miniRead =
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                         await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                         await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
@@ -291,7 +291,7 @@ namespace AdvancedSharpAdbClient.Logs
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
                 int miniRead =
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);

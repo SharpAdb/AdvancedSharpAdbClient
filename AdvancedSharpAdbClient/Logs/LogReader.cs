@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient.Logs
             byte[] data = new byte[count];
 
             while ((read =
-#if NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                 await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
 #elif !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)

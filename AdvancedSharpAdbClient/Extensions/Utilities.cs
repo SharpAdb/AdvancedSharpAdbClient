@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A task that represents the time delay.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
         public static Task Delay(int dueTime, CancellationToken cancellationToken = default) =>
-#if NET35 || NET40
+#if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
             Task
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
         /// <remarks>For information on handling exceptions thrown by task operations, see <see href="https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library">Exception Handling</see>.</remarks>
         public static Task Run(Func<Task> function, CancellationToken cancellationToken = default) =>
-#if NET35 || NET40
+#if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
             Task
@@ -110,7 +110,7 @@ namespace AdvancedSharpAdbClient
         /// <see cref="Task{TResult}"/> returned by <paramref name="function"/>.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
         public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken = default) =>
-#if NET35 || NET40
+#if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
             Task
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient
         /// <see cref="TimeSpan.Zero"/>, which represents Coordinated Universal Time. You can convert it to the time in
         /// a specific time zone by calling the <see cref="TimeZoneInfo.ConvertTime(DateTimeOffset, TimeZoneInfo)"/> method.</remarks>
         public static DateTimeOffset FromUnixTimeSeconds(long seconds) =>
-#if NET35 || NET40 || NET452
+#if NETFRAMEWORK && !NET46_OR_GREATER
             new(seconds.ToDateTime());
 #else
             DateTimeOffset.FromUnixTimeSeconds(seconds);
@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dateTimeOffset">The DateTimeOffset</param>
         /// <returns>The number of seconds that have elapsed since 1970-01-01T00:00:00Z.</returns>
         public static long ToUnixTimeSeconds(this DateTimeOffset dateTimeOffset) =>
-#if NET35 || NET40 || NET452
+#if NETFRAMEWORK && !NET46_OR_GREATER
             (int)dateTimeOffset.DateTime.ToUnixEpoch();
 #else
             (int)dateTimeOffset.ToUnixTimeSeconds();

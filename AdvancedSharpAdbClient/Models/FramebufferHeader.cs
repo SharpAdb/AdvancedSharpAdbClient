@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
             using (MemoryStream stream = new(data))
             {
                 using BinaryReader reader = new(stream, Encoding.ASCII
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
                 , leaveOpen: true
 #endif
                     );

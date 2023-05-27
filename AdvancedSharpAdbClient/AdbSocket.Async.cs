@@ -202,11 +202,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse resp = new();
 
             byte[] reply = new byte[4];
-            await ReadAsync(reply
-#if NET8_0_OR_GREATER
-                , cancellationToken
-#endif
-                );
+            await ReadAsync(reply, cancellationToken);
 
             resp.IOSuccess = true;
 

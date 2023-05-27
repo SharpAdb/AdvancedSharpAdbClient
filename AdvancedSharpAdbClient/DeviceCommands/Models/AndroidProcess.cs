@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (cmdLinePrefix)
             {
-#if NETCOREAPP
+#if HAS_IndexRange
                 string[] cmdLineParts = line[..processNameStart]
 #else
 
@@ -357,7 +357,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
                 else
                 {
-#if NETCOREAPP
+#if HAS_IndexRange
                     pid = int.Parse(cmdLineParts[^1]);
 #else
                     pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
@@ -374,7 +374,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (!parsedCmdLinePrefix)
             {
-#if NETCOREAPP
+#if HAS_IndexRange
                 pid = int.Parse(line[..processNameStart]);
 #else
                 pid = int.Parse(line.Substring(0, processNameStart));
@@ -385,7 +385,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 process.Name = comm;
             }
 
-#if NETCOREAPP
+#if HAS_IndexRange
             string[] parts = line[(processNameEnd + 1)..]
 #else
             string[] parts = line.Substring(processNameEnd + 1)

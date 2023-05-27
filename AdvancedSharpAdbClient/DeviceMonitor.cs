@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
             IReadOnlyCollection
 #else
             IEnumerable

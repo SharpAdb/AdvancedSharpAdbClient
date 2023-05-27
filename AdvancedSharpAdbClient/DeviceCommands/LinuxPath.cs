@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         capacity += paths[i].Length;
                     }
-#if NETCOREAPP
+#if HAS_IndexRange
                     char ch = paths[i][^1];
 #else
                     char ch = paths[i][paths[i].Length - 1];
@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-#if NETCOREAPP
+#if HAS_IndexRange
                         char ch2 = builder[^1];
 #else
                         char ch2 = builder[builder.Length - 1];
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 string tpath = path;
                 if (tpath.Length > 1)
                 {
-#if NETCOREAPP
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     if (tpath.EndsWith(DirectorySeparatorChar))
 #else
                     if (tpath.EndsWith(new string(new char[] { DirectorySeparatorChar })))
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         return tpath;
                     }
-#if NETCOREAPP
+#if HAS_IndexRange
                     tpath = tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 #else
                     tpath = tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
@@ -237,7 +237,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string sb = path;
             sb = sb.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
 
-#if NETCOREAPP
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (sb != "." && !sb.StartsWith(DirectorySeparatorChar))
 #else
             if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
@@ -246,7 +246,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb);
             }
 
-#if NETCOREAPP
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (!sb.EndsWith(DirectorySeparatorChar))
 #else
             if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))

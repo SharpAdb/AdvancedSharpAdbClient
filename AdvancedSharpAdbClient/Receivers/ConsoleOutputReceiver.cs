@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public class ConsoleOutputReceiver : MultiLineReceiver
     {
-        private const RegexOptions DefaultRegexOptions = RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase;
+        private const RegexOptions DefaultRegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase;
 
 #if HAS_LOGGER
         /// <summary>
@@ -52,7 +52,6 @@ namespace AdvancedSharpAdbClient
             this.logger = logger ?? NullLogger<ConsoleOutputReceiver>.Instance;
 #endif
         }
-
 #if !HAS_LOGGER
 #pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
 #endif

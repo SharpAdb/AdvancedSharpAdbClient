@@ -1,13 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <FullTargets>True</FullTargets>
+    <NoWarn>CA2254</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(FullTargets)' == 'true'">
-    <NoWarn>NU1603</NoWarn>
-    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net8.0;netcore50;netcoreapp3.1;netstandard1.3;netstandard2.0;uap10.0</TargetFrameworks>
+    <NoWarn>NU1603;$(NoWarn)</NoWarn>
+    <TargetFrameworks>net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net8.0;netcore50;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1;uap10.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' != 'true'">
     <TargetFramework Condition="'$(GITHUB_ACTIONS)' == 'true'">netstandard2.0</TargetFramework>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And '$(IsWindows)'">net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And '$(IsWindows)'">net3.5-client;net4.5.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'true' And !'$(IsWindows)'">net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 
@@ -35,34 +40,71 @@
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'&#xD;&#xA;                     or '$(TargetFramework)' == 'netstandard1.3'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'
+                     or '$(TargetFramework)' == 'netcoreapp1.0'
+                     or '$(TargetFramework)' == 'netcoreapp1.1'
+                     or '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'&#xD;&#xA;                     or '$(TargetFramework)' == 'netcore50'&#xD;&#xA;                     or '$(TargetFramework)' == 'netstandard1.3'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+                     or '$(TargetFramework)' == 'netcore50'
+                     or '$(TargetFramework)' == 'netcoreapp1.0'
+                     or '$(TargetFramework)' == 'netcoreapp1.1'
+                     or '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'&#xD;&#xA;                     or '$(TargetFramework)' == 'net4.7.2'&#xD;&#xA;                     or '$(TargetFramework)' == 'net4.8.1'&#xD;&#xA;                     or '$(TargetFramework)' == 'net6.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'net8.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'netcoreapp3.1'&#xD;&#xA;                     or '$(TargetFramework)' == 'netstandard2.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'uap10.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
+                     or '$(TargetFramework)' == 'net4.7.2'
+                     or '$(TargetFramework)' == 'net4.8.1'
+                     or '$(TargetFramework)' == 'net6.0'
+                     or '$(TargetFramework)' == 'net8.0'
+                     or '$(TargetFramework)' == 'netcoreapp2.1'
+                     or '$(TargetFramework)' == 'netcoreapp3.1'
+                     or '$(TargetFramework)' == 'netstandard2.0'
+                     or '$(TargetFramework)' == 'netstandard2.1'
+                     or '$(TargetFramework)' == 'uap10.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'net8.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'netcoreapp3.1'&#xD;&#xA;                     or '$(TargetFramework)' == 'netstandard2.0'&#xD;&#xA;                     or '$(TargetFramework)' == 'uap10.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
+                     or '$(TargetFramework)' == 'net8.0'
+                     or '$(TargetFramework)' == 'netcoreapp2.1'
+                     or '$(TargetFramework)' == 'netcoreapp3.1'
+                     or '$(TargetFramework)' == 'netstandard2.0'
+                     or '$(TargetFramework)' == 'netstandard2.1'
+                     or '$(TargetFramework)' == 'uap10.0'">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'&#xD;&#xA;                        and '$(TargetFramework)' != 'net4.0-client'">
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
+                        and '$(TargetFramework)' != 'net4.0-client'">
     <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'&#xD;&#xA;                         or '$(TargetFramework)' == 'netcore50'&#xD;&#xA;                         or '$(TargetFramework)' == 'netstandard1.3'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+                         or '$(TargetFramework)' == 'netcore50'
+                         or '$(TargetFramework)' == 'netcoreapp1.0'
+                         or '$(TargetFramework)' == 'netcoreapp1.1'
+                         or '$(TargetFramework)' == 'netstandard1.3'">
     <DefineConstants>$(DefineConstants);HAS_OLDLOGGER</DefineConstants>
   </PropertyGroup>
  
-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore50'&#xD;&#xA;                        and '$(TargetFramework)' != 'netstandard1.3'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'net8.0'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+                         or '$(TargetFramework)' == 'netstandard2.1'">
+    <DefineConstants>$(DefineConstants);HAS_IndexRange</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore50'
+                        and '$(TargetFramework)' != 'netcoreapp1.0'
+                        and '$(TargetFramework)' != 'netcoreapp1.1'
+                        and '$(TargetFramework)' != 'netstandard1.3'">
     <DefineConstants>$(DefineConstants);HAS_Process;HAS_Drawing;HAS_Serialization</DefineConstants>
   </PropertyGroup>
- 
+
 </Project>

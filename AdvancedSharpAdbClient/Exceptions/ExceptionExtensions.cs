@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
         public static void ThrowIfNull(object argument, [CallerArgumentExpression(nameof(argument))] string paramName = null)
         {
-#if NET
+#if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(argument, paramName);
 #else
             if (argument is null)
@@ -92,16 +92,16 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="condition">The condition to evaluate.</param>
         /// <param name="instance">The object whose type's full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
         /// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
-#if NET
+#if NET6_0_OR_GREATER
         [StackTraceHidden]
 #endif
         public static void ThrowIf(
-#if NETCOREAPP
+#if HAS_IndexRange
             [DoesNotReturnIf(true)]
 #endif
             bool condition, object instance)
         {
-#if NET8_0_OR_GREATER
+#if NET7_0_OR_GREATER
             ObjectDisposedException.ThrowIf(condition, instance);
 #else
             if (condition)

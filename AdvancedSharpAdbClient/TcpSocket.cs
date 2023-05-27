@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
         public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
             socket.Receive(buffer, offset, socketFlags);
 
-#if NET || NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             await socket.SendAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
             await Utilities.Run(() => Send(buffer, offset, size, socketFlags), cancellationToken);
 #endif
 
-#if NET || NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public async Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => 
             await socket.ReceiveAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
