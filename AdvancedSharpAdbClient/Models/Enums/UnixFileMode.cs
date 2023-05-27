@@ -20,12 +20,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The file is a Unix socket.
         /// </summary>
-        Socket = 0xc000,
+        Socket = 0xC000,
 
         /// <summary>
         /// The file is a symbolic link.
         /// </summary>
-        SymbolicLink = 0xa000,
+        SymbolicLink = 0xA000,
 
         /// <summary>
         /// The file is a regular file.

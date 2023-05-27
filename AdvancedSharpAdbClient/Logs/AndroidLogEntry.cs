@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Logs
 
         /// <summary>
         /// Gets or sets the log tag of the message. Used to identify the source of a log message.
-        /// It usually identifies the class or activity where the log call occured.
+        /// It usually identifies the class or activity where the log call occurred.
         /// </summary>
         public string Tag { get; set; }
 
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.
         /// </summary>
         /// <param name="value">The value to convert.</param>
-        /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the sysem log.</returns>
+        /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the system log.</returns>
         private static char FormatPriority(Priority value) =>
             PriorityFormatters == null || !PriorityFormatters.ContainsKey(value) ? '?' : PriorityFormatters[value];
     }

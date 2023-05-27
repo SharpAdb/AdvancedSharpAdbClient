@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient.Logs
         Info = 4,
 
         /// <summary>
-        /// Reprents a warning.
+        /// Represents a warning.
         /// </summary>
         Warn = 5,
 

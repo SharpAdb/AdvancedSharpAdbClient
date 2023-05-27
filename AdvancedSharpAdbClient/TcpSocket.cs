@@ -61,12 +61,15 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Dispose() =>
+        public void Dispose()
+        {
 #if !NET35
             socket.Dispose();
 #else
             socket.Close();
 #endif
+            GC.SuppressFinalize(this);
+        }
 
         /// <inheritdoc/>
         public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
@@ -76,7 +79,7 @@ namespace AdvancedSharpAdbClient
         public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
             socket.Receive(buffer, offset, socketFlags);
 
-#if NET || NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             await socket.SendAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);
@@ -86,7 +89,7 @@ namespace AdvancedSharpAdbClient
             await Utilities.Run(() => Send(buffer, offset, size, socketFlags), cancellationToken);
 #endif
 
-#if NET || NETCOREAPP
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public async Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => 
             await socket.ReceiveAsync(buffer.AsMemory().Slice(offset, size), socketFlags, cancellationToken);

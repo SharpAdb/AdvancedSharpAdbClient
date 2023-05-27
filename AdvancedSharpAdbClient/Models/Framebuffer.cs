@@ -7,6 +7,7 @@ using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using AdvancedSharpAdbClient.Exceptions;
 
 #if NET
 using System.Runtime.Versioning;
@@ -155,7 +156,7 @@ namespace AdvancedSharpAdbClient
         {
             if (disposed)
             {
-                throw new ObjectDisposedException(nameof(Framebuffer));
+                ExceptionExtensions.ThrowIf(disposed, this);
             }
         }
     }

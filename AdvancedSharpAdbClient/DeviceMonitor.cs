@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
             IReadOnlyCollection
 #else
             IEnumerable
@@ -177,6 +177,8 @@ namespace AdvancedSharpAdbClient
             firstDeviceListParsed.Close();
 #endif
             monitorTaskCancellationTokenSource.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

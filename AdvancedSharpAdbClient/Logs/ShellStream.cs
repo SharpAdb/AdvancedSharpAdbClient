@@ -2,8 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Buffers;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,10 +28,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="closeStream"><see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/> stream when closed; otherwise, <see langword="false"/>.</param>
         public ShellStream(Stream inner, bool closeStream)
         {
-            if (inner == null)
-            {
-                throw new ArgumentNullException(nameof(inner));
-            }
+            ExceptionExtensions.ThrowIfNull(inner);
 
             if (!inner.CanRead)
             {
@@ -157,9 +157,42 @@ namespace AdvancedSharpAdbClient.Logs
             return read;
         }
 
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <inheritdoc/>
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            if (buffer.Length == 0)
+            {
+                return new ValueTask<int>(0);
+            }
+
+            if (MemoryMarshal.TryGetArray(buffer, out ArraySegment<byte> array))
+            {
+                return new ValueTask<int>(ReadAsync(array.Array!, array.Offset, array.Count, cancellationToken));
+            }
+
+            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
+            return FinishReadAsync(ReadAsync(sharedBuffer, 0, buffer.Length, cancellationToken), sharedBuffer, buffer);
+
+            static async ValueTask<int> FinishReadAsync(Task<int> readTask, byte[] localBuffer, Memory<byte> localDestination)
+            {
+                try
+                {
+                    int result = await readTask.ConfigureAwait(false);
+                    new ReadOnlySpan<byte>(localBuffer, 0, result).CopyTo(localDestination.Span);
+                    return result;
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(localBuffer);
+                }
+            }
+        }
+#endif
+
         /// <inheritdoc/>
         public
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
             override
 #endif
             async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
@@ -178,7 +211,9 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 buffer[offset] = pendingByte.Value;
                 read =
-#if !NET35
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                    await Inner.ReadAsync(buffer.AsMemory(offset + 1, count - 1), cancellationToken).ConfigureAwait(false);
+#elif !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
                     await Utilities.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
@@ -189,7 +224,9 @@ namespace AdvancedSharpAdbClient.Logs
             else
             {
                 read =
-#if !NET35
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                    await Inner.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).ConfigureAwait(false);
+#elif !NET35
                     await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
 #else
                     Inner.Read(buffer, offset, count);
@@ -199,7 +236,7 @@ namespace AdvancedSharpAdbClient.Logs
             byte[] minibuffer = new byte[1];
 
             // Loop over the data, and find a LF (0x0d) character. If it is
-            // followed by a CR (0x0a) character, remove the LF chracter and
+            // followed by a CR (0x0a) character, remove the LF character and
             // keep only the LF character intact.
             for (int i = offset; i < offset + read - 1; i++)
             {
@@ -227,7 +264,9 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                     int miniRead =
-#if !NET35
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                        await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+#elif !NET35
                         await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
                         Inner.Read(minibuffer, 0, 1);
@@ -252,7 +291,9 @@ namespace AdvancedSharpAdbClient.Logs
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
                 int miniRead =
-#if !NET35
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                    await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+#elif !NET35
                     await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
                     Inner.Read(minibuffer, 0, 1);

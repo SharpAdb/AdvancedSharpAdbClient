@@ -127,15 +127,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
+            ExceptionExtensions.ThrowIfNull(stream);
 
-            if (remotePath == null)
-            {
-                throw new ArgumentNullException(nameof(remotePath));
-            }
+            ExceptionExtensions.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
             {
@@ -223,26 +217,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilepath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public void Pull(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
-            if (remoteFilepath == null)
-            {
-                throw new ArgumentNullException(nameof(remoteFilepath));
-            }
+            ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
+            ExceptionExtensions.ThrowIfNull(stream);
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = Stat(remoteFilepath);
+            FileStatistics stat = Stat(remoteFilePath);
             long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
-            Socket.SendSyncRequest(SyncCommand.RECV, remoteFilepath);
+            Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
 
             while (true)
             {
@@ -256,7 +244,7 @@ namespace AdvancedSharpAdbClient
                 else if (response == SyncCommand.FAIL)
                 {
                     string message = Socket.ReadSyncString();
-                    throw new AdbException($"Failed to pull '{remoteFilepath}'. {message}");
+                    throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
                 }
                 else if (response != SyncCommand.DATA)
                 {
@@ -358,6 +346,7 @@ namespace AdvancedSharpAdbClient
                 Socket.Dispose();
                 Socket = null;
             }
+            GC.SuppressFinalize(this);
         }
 
         private void ReadStatistics(FileStatistics value)

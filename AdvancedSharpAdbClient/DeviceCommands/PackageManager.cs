@@ -304,7 +304,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
-        /// <param name="packageName">The absolute packagename of the base app.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         public void InstallMultipleRemotePackage(string[] splitRemoteFilePaths, string packageName, bool reinstall)
         {
@@ -413,7 +413,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif
 
-                    // As C# can't use octals, the octal literal 666 (rw-Permission) is here converted to decimal (438)
+                    // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, CancellationToken.None);
                 }
 
@@ -488,14 +488,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Write an apk into the given install session.
         /// </summary>
         /// <param name="session">The session ID of the install session.</param>
-        /// <param name="apkname">The name of the application.</param>
+        /// <param name="apkName">The name of the application.</param>
         /// <param name="path">The absolute file path to package file on device.</param>
-        private void WriteInstallSession(string session, string apkname, string path)
+        private void WriteInstallSession(string session, string apkName, string path)
         {
             ValidateDevice();
 
             InstallReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
+            client.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {

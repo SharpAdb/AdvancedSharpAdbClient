@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
-    public class DeviceData
+    public partial class DeviceData
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
-        private static readonly Regex Regex = new(DeviceDataRegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -126,5 +126,12 @@ namespace AdvancedSharpAdbClient
 
             return value;
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(DeviceDataRegexString, RegexOptions.IgnoreCase)]
+        private static partial Regex DeviceDataRegex();
+#else
+        private static Regex DeviceDataRegex() => new(DeviceDataRegexString, RegexOptions.IgnoreCase);
+#endif
     }
 }

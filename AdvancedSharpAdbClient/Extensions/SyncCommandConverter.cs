@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The corresponding <see cref="SyncCommand"/>.</returns>
         public static SyncCommand GetCommand(byte[] value)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+            ExceptionExtensions.ThrowIfNull(value);
 
             if (value.Length != 4)
             {

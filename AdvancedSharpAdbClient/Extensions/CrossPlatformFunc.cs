@@ -10,20 +10,20 @@ using System.IO;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// Cross Platform Functions
+    /// The functions which are used by the <see cref="IAdbCommandLineClient"/> class, but which are platform-specific.
     /// </summary>
     public static class CrossPlatformFunc
     {
         /// <summary>
         /// Determines whether the specified file exists.
         /// </summary>
-        public static Func<string, bool> CheckFileExists = File.Exists;
+        public static Func<string, bool> CheckFileExists { get; set; } = File.Exists;
 
         /// <summary>
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
-        public static Func<string, string, List<string>, List<string>, int> RunProcess = (string filename, string command, List<string> errorOutput, List<string> standardOutput) =>
+        public static Func<string, string, List<string>, List<string>, int> RunProcess { get; set; } = (string filename, string command, List<string> errorOutput, List<string> standardOutput) =>
         {
 #if HAS_Process
             ProcessStartInfo psi = new(filename, command)

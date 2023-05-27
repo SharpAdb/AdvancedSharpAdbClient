@@ -30,7 +30,7 @@
   <PropertyGroup>
     <FullTargets Condition="'$(FullTargets)' == ''">False</FullTargets>
     <IsWindows Condition="'$(IsWindows)' == ''">False</IsWindows>
-    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
+    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'True' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
     <IsTestProject Condition="'$(IsTestProject)' == ''">$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
   </PropertyGroup>
 
@@ -38,7 +38,8 @@
     <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'">
     <SuppressTfmSupportBuildWarnings>True</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 

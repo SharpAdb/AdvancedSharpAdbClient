@@ -80,7 +80,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             return !inPackagesSection ? null
                 : line != null && line.Trim().StartsWith("versionName=")
+#if HAS_IndexRange
+                ? line.Trim()[12..].Trim() : null;
+#else
                 ? line.Trim().Substring(12).Trim() : null;
+#endif
         }
 
         /// <summary>

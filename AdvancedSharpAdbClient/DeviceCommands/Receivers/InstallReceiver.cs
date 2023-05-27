@@ -10,10 +10,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
-    public class InstallReceiver : MultiLineReceiver
+    public partial class InstallReceiver : MultiLineReceiver
     {
         /// <summary>
-        /// The error message that indicates an unkown error occurred.
+        /// The error message that indicates an unknown error occurred.
         /// </summary>
         public const string UnknownError = "An unknown error occurred.";
 
@@ -56,13 +56,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
+            Regex successRegex = SuccessRegex();
+            Regex failureRegex = FailureRegex();
+
             foreach (string line in lines)
             {
                 if (line.Length > 0)
                 {
                     if (line.StartsWith(SuccessOutput))
                     {
-                        Match m = Regex.Match(line, SuccessPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        Match m = successRegex.Match(line);
                         SuccessMessage = SuccessOutput;
 
                         ErrorMessage = null;
@@ -77,7 +80,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-                        Match m = Regex.Match(line, FailurePattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                        Match m = failureRegex.Match(line);
                         ErrorMessage = UnknownError;
 
                         SuccessMessage = null;
@@ -93,5 +96,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(SuccessPattern, RegexOptions.IgnoreCase)]
+        private static partial Regex SuccessRegex();
+
+        [GeneratedRegex(FailurePattern, RegexOptions.IgnoreCase)]
+        private static partial Regex FailureRegex();
+#else
+        private static Regex SuccessRegex() => new(SuccessPattern, RegexOptions.IgnoreCase);
+
+        private static Regex FailureRegex() => new(FailurePattern, RegexOptions.IgnoreCase);
+#endif
     }
 }

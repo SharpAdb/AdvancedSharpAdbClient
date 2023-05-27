@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The instance is not connected to adb or is not responding.
         /// </summary>
-        Offline = 0,
+        Offline,
 
         /// <summary>
         /// The device is in bootloader mode

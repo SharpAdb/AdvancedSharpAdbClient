@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient
         public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
             this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
-            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(AdbClient));
+            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
         }
 
         /// <summary>
@@ -107,17 +107,14 @@ namespace AdvancedSharpAdbClient
                     ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
                     : serverStatus.Version >= RequiredAdbVersion
                     ? StartServerResult.AlreadyRunning
-                    : throw new AdbException($"The adb deamon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                    : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
             }
 
             if (serverStatus.IsRunning
                 && ((serverStatus.Version < RequiredAdbVersion)
-                     || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
+                    || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
             {
-                if (adbPath == null)
-                {
-                    throw new ArgumentNullException(nameof(adbPath));
-                }
+                ExceptionExtensions.ThrowIfNull(adbPath);
 
                 adbClient.KillAdb();
                 serverStatus.IsRunning = false;
@@ -128,10 +125,7 @@ namespace AdvancedSharpAdbClient
             }
             else if (!serverStatus.IsRunning)
             {
-                if (adbPath == null)
-                {
-                    throw new ArgumentNullException(nameof(adbPath));
-                }
+                ExceptionExtensions.ThrowIfNull(adbPath);
 
                 commandLineClient.StartServer();
                 return StartServerResult.Started;
@@ -164,7 +158,7 @@ namespace AdvancedSharpAdbClient
             {
                 int versionCode = adbClient.GetAdbVersion();
 
-                return new AdbServerStatus()
+                return new AdbServerStatus
                 {
                     IsRunning = true,
                     Version = new Version(1, 0, versionCode)
@@ -174,7 +168,7 @@ namespace AdvancedSharpAdbClient
             {
                 if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
-                    return new AdbServerStatus()
+                    return new AdbServerStatus
                     {
                         IsRunning = false,
                         Version = null

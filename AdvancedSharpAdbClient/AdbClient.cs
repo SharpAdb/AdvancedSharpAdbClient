@@ -71,10 +71,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
-            if (endPoint == null)
-            {
-                throw new ArgumentNullException(nameof(endPoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endPoint);
 
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -338,10 +335,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Pair(DnsEndPoint endpoint, string code)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
@@ -353,10 +347,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Connect(DnsEndPoint endpoint)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
@@ -368,10 +359,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public string Disconnect(DnsEndPoint endpoint)
         {
-            if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
+            ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
@@ -408,7 +396,11 @@ namespace AdvancedSharpAdbClient
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
+#else
             if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
+#endif
             {
                 throw new AdbException(responseMessage);
             }
@@ -425,10 +417,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            if (apk == null)
-            {
-                throw new ArgumentNullException(nameof(apk));
-            }
+            ExceptionExtensions.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
@@ -479,10 +468,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            if (packageName == null)
-            {
-                throw new ArgumentNullException(nameof(packageName));
-            }
+            ExceptionExtensions.ThrowIfNull(packageName);
 
             string session = InstallCreate(device, packageName, arguments);
 
@@ -513,10 +499,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            if (baseAPK == null)
-            {
-                throw new ArgumentNullException(nameof(baseAPK));
-            }
+            ExceptionExtensions.ThrowIfNull(baseAPK);
 
             if (!baseAPK.CanRead || !baseAPK.CanSeek)
             {
@@ -591,25 +574,16 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            if (apk == null)
-            {
-                throw new ArgumentNullException(nameof(apk));
-            }
+            ExceptionExtensions.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            if (session == null)
-            {
-                throw new ArgumentNullException(nameof(session));
-            }
+            ExceptionExtensions.ThrowIfNull(session);
 
-            if (apkName == null)
-            {
-                throw new ArgumentNullException(nameof(apkName));
-            }
+            ExceptionExtensions.ThrowIfNull(apkName);
 
             StringBuilder requestBuilder = new();
             requestBuilder.Append($"exec:cmd package 'install-write' ");
@@ -683,7 +657,9 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
             string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            if (xmlString != "" && !xmlString.StartsWith("ERROR"))
+            if (!string.IsNullOrEmpty(xmlString)
+                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("java.lang.Exception"))
             {
                 doc.LoadXml(xmlString);
                 return doc;
@@ -934,12 +910,9 @@ namespace AdvancedSharpAdbClient
         /// if <paramref name="device"/> does not have a valid serial number.
         /// </summary>
         /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
-        protected void EnsureDevice(DeviceData device)
+        protected static void EnsureDevice(DeviceData device)
         {
-            if (device == null)
-            {
-                throw new ArgumentNullException(nameof(device));
-            }
+            ExceptionExtensions.ThrowIfNull(device);
 
             if (string.IsNullOrEmpty(device.Serial))
             {

@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Just like <see cref="Path"/>, except it is geared for Linux.
     /// </summary>
-    public static class LinuxPath
+    public static partial class LinuxPath
     {
         /// <summary>
         /// The directory separator character.
@@ -37,10 +38,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The combined path.</returns>
         public static string Combine(params string[] paths)
         {
-            if (paths == null)
-            {
-                throw new ArgumentNullException(nameof(paths));
-            }
+            ExceptionExtensions.ThrowIfNull(paths);
 
             int capacity = 0;
             int num2 = 0;
@@ -63,8 +61,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         capacity += paths[i].Length;
                     }
-
+#if HAS_IndexRange
+                    char ch = paths[i][^1];
+#else
                     char ch = paths[i][paths[i].Length - 1];
+#endif
                     if (ch != DirectorySeparatorChar)
                     {
                         capacity++;
@@ -83,7 +84,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
+#if HAS_IndexRange
+                        char ch2 = builder[^1];
+#else
                         char ch2 = builder[builder.Length - 1];
+#endif
                         if (ch2 != DirectorySeparatorChar)
                         {
                             _ = builder.Append(DirectorySeparatorChar);
@@ -118,13 +123,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 string tpath = path;
                 if (tpath.Length > 1)
                 {
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                    if (tpath.EndsWith(DirectorySeparatorChar))
+#else
                     if (tpath.EndsWith(new string(new char[] { DirectorySeparatorChar })))
+#endif
                     {
-                        return tpath.Substring(0, tpath.Length);
+                        return tpath;
                     }
-
+#if HAS_IndexRange
+                    tpath = tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
+#else
                     tpath = tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
-
+#endif
                     return FixupPath(tpath);
                 }
                 else if (tpath.Length == 1)
@@ -193,14 +204,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The entry name.</returns>
-        public static string Escape(string path) => new Regex(EscapePattern).Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
+        public static string Escape(string path) => EscapeRegex().Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
 
         /// <summary>
         /// Quotes the specified path.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The quoted path.</returns>
-        public static string Quote(string path) => path.Contains(" ") ? string.Format("\"{0}\"", path) : path;
+        public static string Quote(string path) => path.Contains(' ') ? string.Format("\"{0}\"", path) : path;
 
         /// <summary>
         /// Checks the invalid path chars.
@@ -208,10 +219,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The path.</param>
         internal static void CheckInvalidPathChars(string path)
         {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            ExceptionExtensions.ThrowIfNull(path);
 
             if (path.ToCharArray().Any(c => c < 0x20 || InvalidCharacters.Contains(c)))
             {
@@ -223,18 +231,26 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Fixups the path.
         /// </summary>
         /// <param name="path">The path.</param>
-        /// <returns>The fixuped path</returns>
+        /// <returns>The fixup path</returns>
         private static string FixupPath(string path)
         {
             string sb = path;
             sb = sb.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
 
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (sb != "." && !sb.StartsWith(DirectorySeparatorChar))
+#else
             if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
+#endif
             {
                 sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb);
             }
 
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            if (!sb.EndsWith(DirectorySeparatorChar))
+#else
             if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
+#endif
             {
                 sb = string.Format("{0}{1}", sb, DirectorySeparatorChar);
             }
@@ -243,5 +259,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             return sb;
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(EscapePattern)]
+        private static partial Regex EscapeRegex();
+#else
+        private static Regex EscapeRegex() => new(EscapePattern);
+#endif
     }
 }

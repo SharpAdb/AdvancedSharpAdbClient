@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
             using (MemoryStream stream = new(data))
             {
                 using BinaryReader reader = new(stream, Encoding.ASCII
-#if !NET35 && !NET40
+#if !NETFRAMEWORK || NET45_OR_GREATER
                 , leaveOpen: true
 #endif
                     );
@@ -204,14 +204,14 @@ namespace AdvancedSharpAdbClient
 
             if (Width == 0 || Height == 0 || Bpp == 0)
             {
-                throw new InvalidOperationException("Cannot caulcate the pixel format of an empty framebuffer");
+                throw new InvalidOperationException("Cannot canulate the pixel format of an empty framebuffer");
             }
 
             // By far, the most common format is a 32-bit pixel format, which is either
             // RGB or RGBA, where each color has 1 byte.
             if (Bpp == 32)
             {
-                // Require at leat RGB to be present; and require them to be exactly one byte (8 bits) long.
+                // Require at least RGB to be present; and require them to be exactly one byte (8 bits) long.
                 if (Red.Length != 8 || Blue.Length != 8 || Green.Length != 8)
                 {
                     throw new ArgumentOutOfRangeException($"The pixel format with with RGB lengths of {Red.Length}:{Blue.Length}:{Green.Length} is not supported");

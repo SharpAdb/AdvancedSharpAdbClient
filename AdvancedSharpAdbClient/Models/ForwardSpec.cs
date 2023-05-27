@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
         public static ForwardSpec Parse(string spec)
         {
-            if (spec == null)
-            {
-                throw new ArgumentNullException(nameof(spec));
-            }
+            ExceptionExtensions.ThrowIfNull(spec);
 
             string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
 

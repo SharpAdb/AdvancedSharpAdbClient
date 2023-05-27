@@ -7,7 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient.Exceptions
 {
     /// <summary>
-    /// Represents an exception with keyevent.
+    /// Represents an exception with key event.
     /// </summary>
     public class InvalidKeyEventException : Exception
     {

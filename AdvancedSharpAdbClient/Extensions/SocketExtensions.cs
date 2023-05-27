@@ -36,11 +36,11 @@ namespace AdvancedSharpAdbClient
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
-            CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(() =>
+            CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(socket.
 #if !NET35
-            socket.Dispose()
+            Dispose
 #else
-            socket.Close()
+            Close
 #endif
             );
 

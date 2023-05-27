@@ -142,10 +142,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void SendSyncRequest(SyncCommand command, string path)
         {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
+            ExceptionExtensions.ThrowIfNull(path);
 
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             SendSyncRequest(command, pathBytes.Length);
@@ -417,6 +414,10 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        public virtual void Dispose() => socket.Dispose();
+        public virtual void Dispose()
+        {
+            socket.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 }
