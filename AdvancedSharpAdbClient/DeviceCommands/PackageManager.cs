@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -183,7 +184,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 95);
 
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (receiver.ErrorMessage.IsNotNullOrEmpty())
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -294,7 +295,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 95);
 
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (receiver.ErrorMessage.IsNotNullOrEmpty())
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -334,7 +335,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 95);
 
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (receiver.ErrorMessage.IsNotNullOrEmpty())
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -350,7 +351,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (receiver.ErrorMessage.IsNotNullOrEmpty())
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
@@ -467,7 +468,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallReceiver receiver = new();
             string reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
+            string addon = packageName.IsNotNullOrEmpty() ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
             client.ExecuteShellCommand(Device, cmd, receiver);
@@ -497,7 +498,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-write {session} {apkname}.apk \"{path}\"", receiver);
 
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            if (receiver.ErrorMessage.IsNotNullOrEmpty())
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
