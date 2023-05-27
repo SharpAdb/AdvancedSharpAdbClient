@@ -16,7 +16,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>https://github.com/wherewhere/DotnetEx/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/yungd1plomat/AdvancedSharpAdbClient/releases</PackageReleaseNotes>
     <PackageTags>Android;ADB;Communicate;UWP;Xamarin;MAUI;WinUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>

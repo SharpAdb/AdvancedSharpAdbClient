@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>An <see cref="Task"/> which return the list of devices that are connected.</returns>
-        Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Asks the ADB server to forward local connections from <paramref name="local"/>
@@ -336,7 +336,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the base APK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments);
 
         /// <summary>
         /// Asynchronously push multiple APKs to the device and install them.
@@ -347,7 +347,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Asynchronously push multiple APKs to the device and install them.
@@ -357,7 +357,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments);
 
         /// <summary>
         /// Asynchronously push multiple APKs to the device and install them.
@@ -368,7 +368,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, CancellationToken cancellationToken, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
@@ -415,7 +415,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the list of features supported.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>An <see cref="Task"/> which return the list of all features supported by the current device.</returns>
-        Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken);
+        Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the current device screen snapshot asynchronously.

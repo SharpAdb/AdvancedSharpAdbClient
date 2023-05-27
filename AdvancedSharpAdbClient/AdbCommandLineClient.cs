@@ -167,7 +167,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
-        internal static Version GetVersionFromOutput(List<string> output)
+        internal static Version GetVersionFromOutput(IEnumerable<string> output)
         {
             foreach (string line in output)
             {

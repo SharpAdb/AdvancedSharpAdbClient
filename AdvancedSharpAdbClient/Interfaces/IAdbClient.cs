@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
         /// }
         /// </code>
         /// </example>
-        List<DeviceData> GetDevices();
+        IEnumerable<DeviceData> GetDevices();
 
         // host:track-devices is implemented by the DeviceMonitor.
         // host:emulator is not implemented
@@ -324,7 +324,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="packageName">The package name of the base APK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments);
+        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -333,7 +333,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments);
+        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
@@ -365,7 +365,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>
         /// <returns>A list of all features supported by the current device.</returns>
-        List<string> GetFeatureSet(DeviceData device);
+        IEnumerable<string> GetFeatureSet(DeviceData device);
 
         /// <summary>
         /// Gets the current device screen snapshot.

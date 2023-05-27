@@ -303,15 +303,13 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private void ProcessIncomingDeviceData(string result)
         {
-            List<DeviceData> list = new();
-
             string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            List<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData).ToList();
+            IEnumerable<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData);
             UpdateDevices(currentDevices);
         }
 
-        private void UpdateDevices(List<DeviceData> devices)
+        private void UpdateDevices(IEnumerable<DeviceData> devices)
         {
             lock (this.devices)
             {

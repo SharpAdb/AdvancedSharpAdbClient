@@ -146,7 +146,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public List<DeviceData> GetDevices()
+        public IEnumerable<DeviceData> GetDevices()
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest("host:devices-l");
@@ -155,7 +155,7 @@ namespace AdvancedSharpAdbClient
 
             string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            return data.Select(DeviceData.CreateFromAdbData).ToList();
+            return data.Select(DeviceData.CreateFromAdbData);
         }
 
         /// <inheritdoc/>
@@ -464,7 +464,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments)
+        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -495,7 +495,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments)
+        public void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -635,7 +635,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public List<string> GetFeatureSet(DeviceData device)
+        public IEnumerable<string> GetFeatureSet(DeviceData device)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host-serial:{device.Serial}:features");
@@ -643,7 +643,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
             string features = socket.ReadString();
 
-            List<string> featureList = features.Split(new char[] { '\n', ',' }).ToList();
+            IEnumerable<string> featureList = features.Split(new char[] { '\n', ',' });
             return featureList;
         }
 

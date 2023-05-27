@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SendAdbRequestAsync("host:devices-l", cancellationToken);
@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
 
             string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            return data.Select(DeviceData.CreateFromAdbData).ToList();
+            return data.Select(DeviceData.CreateFromAdbData);
         }
 
         /// <inheritdoc/>
@@ -449,11 +449,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments) =>
+        public Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) =>
             InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
 
         /// <inheritdoc/>
-        public async Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -484,11 +484,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments) =>
+        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) =>
             InstallMultipleAsync(device, baseAPK, splitAPKs, default, arguments);
 
         /// <inheritdoc/>
-        public async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, CancellationToken cancellationToken, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -665,7 +665,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:features", cancellationToken);
@@ -673,7 +673,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             string features = await socket.ReadStringAsync(cancellationToken);
 
-            List<string> featureList = features.Split(new char[] { '\n', ',' }).ToList();
+            IEnumerable<string> featureList = features.Split(new char[] { '\n', ',' });
             return featureList;
         }
 

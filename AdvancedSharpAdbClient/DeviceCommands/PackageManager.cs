@@ -195,7 +195,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultiplePackage(string basePackageFilePath, string[] splitPackageFilePaths, bool reinstall)
+        public void InstallMultiplePackage(string basePackageFilePath, IList<string> splitPackageFilePaths, bool reinstall)
         {
             ValidateDevice();
 
@@ -203,14 +203,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             void OnMainSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, args.ProgressPercentage * 0.45);
 
-            string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
-            for (int i = 0; i < splitPackageFilePaths.Length; i++)
+            string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Count];
+            for (int i = 0; i < splitPackageFilePaths.Count; i++)
             {
-                int percent = 45 + (45 * i / splitPackageFilePaths.Length);
+                int percent = 45 + (45 * i / splitPackageFilePaths.Count);
 
                 splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i], OnSplitSyncProgressChanged);
 
-                void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.45 / splitPackageFilePaths.Length));
+                void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.45 / splitPackageFilePaths.Count));
             }
 
             InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, reinstall);
@@ -232,18 +232,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultiplePackage(string[] splitPackageFilePaths, string packageName, bool reinstall)
+        public void InstallMultiplePackage(IList<string> splitPackageFilePaths, string packageName, bool reinstall)
         {
             ValidateDevice();
 
-            string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Length];
-            for (int i = 0; i < splitPackageFilePaths.Length; i++)
+            string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Count];
+            for (int i = 0; i < splitPackageFilePaths.Count; i++)
             {
-                int percent = 90 * i / splitPackageFilePaths.Length;
+                int percent = 90 * i / splitPackageFilePaths.Count;
 
                 splitRemoteFilePaths[i] = SyncPackageToDevice(splitPackageFilePaths[i], OnSyncProgressChanged);
 
-                void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.9 / splitPackageFilePaths.Length));
+                void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args) => InstallProgressChanged?.Invoke(this, percent + (args.ProgressPercentage * 0.9 / splitPackageFilePaths.Count));
             }
 
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, reinstall);
@@ -262,7 +262,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultipleRemotePackage(string baseRemoteFilePath, string[] splitRemoteFilePaths, bool reinstall)
+        public void InstallMultipleRemotePackage(string baseRemoteFilePath, IList<string> splitRemoteFilePaths, bool reinstall)
         {
             ValidateDevice();
 
@@ -306,7 +306,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultipleRemotePackage(string[] splitRemoteFilePaths, string packageName, bool reinstall)
+        public void InstallMultipleRemotePackage(IList<string> splitRemoteFilePaths, string packageName, bool reinstall)
         {
             ValidateDevice();
 

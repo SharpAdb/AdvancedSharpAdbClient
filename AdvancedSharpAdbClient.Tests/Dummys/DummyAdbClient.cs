@@ -135,13 +135,13 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public List<DeviceData> GetDevices() => throw new NotImplementedException();
+        public IEnumerable<DeviceData> GetDevices() => throw new NotImplementedException();
 
-        public Task<List<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public List<string> GetFeatureSet(DeviceData device) => throw new NotImplementedException();
+        public IEnumerable<string> GetFeatureSet(DeviceData device) => throw new NotImplementedException();
 
-        public Task<List<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
@@ -165,17 +165,17 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
-        public void InstallMultiple(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments) => throw new NotImplementedException();
+        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) => throw new NotImplementedException();
 
-        public void InstallMultiple(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments) => throw new NotImplementedException();
+        public void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) => throw new NotImplementedException();
 
-        public Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, params string[] arguments) => throw new NotImplementedException();
+        public Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) => throw new NotImplementedException();
 
-        public Task InstallMultipleAsync(DeviceData device, Stream[] splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+        public Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
-        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, params string[] arguments) => throw new NotImplementedException();
+        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) => throw new NotImplementedException();
 
-        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, Stream[] splitAPKs, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
         public void InstallWrite(DeviceData device, Stream apk, string apkName, string session) => throw new NotImplementedException();
 
