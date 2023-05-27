@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         [StackTraceHidden]
 #endif
         public static void ThrowIf(
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
             [DoesNotReturnIf(true)]
 #endif
             bool condition, object instance)

@@ -97,14 +97,14 @@
                          or '$(TargetFramework)' == 'net8.0'
                          or '$(TargetFramework)' == 'netcoreapp3.1'
                          or '$(TargetFramework)' == 'netstandard2.1'">
-    <DefineConstants>$(DefineConstants);HAS_IndexRange</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_INDEXRANGE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcore50'
                         and '$(TargetFramework)' != 'netcoreapp1.0'
                         and '$(TargetFramework)' != 'netcoreapp1.1'
                         and '$(TargetFramework)' != 'netstandard1.3'">
-    <DefineConstants>$(DefineConstants);HAS_Process;HAS_Drawing;HAS_Serialization</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_PROCESS;HAS_DRAWING;HAS_SERIALIZATION</DefineConstants>
   </PropertyGroup>
 
 </Project>

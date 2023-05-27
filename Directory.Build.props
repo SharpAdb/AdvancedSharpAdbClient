@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
-    <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat, wherewhere</Authors>
+    <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat and wherewhere</Authors>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
     <Copyright>https://github.com/quamotion/madb</Copyright>
-    <Description>AdvancedSharpAdbClient is a .NET library that allows .NET and .NET Core applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
+    <Description>AdvancedSharpAdbClient is a .NET library that allows .NET, Mono, Unity applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
     <Deterministic>True</Deterministic>
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -17,14 +17,14 @@
     <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>https://github.com/wherewhere/DotnetEx/releases</PackageReleaseNotes>
-    <PackageTags>android;adb;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
+    <PackageTags>Android;ADB;Communicate;UWP;Xamarin;MAUI;WinUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>2.5.5</VersionPrefix>
+    <VersionPrefix>2.5.6</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -4,7 +4,7 @@
 
 using System;
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>

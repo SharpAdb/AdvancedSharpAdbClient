@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The return code of the process.</returns>
         public static Func<string, string, List<string>, List<string>, int> RunProcess { get; set; } = (string filename, string command, List<string> errorOutput, List<string> standardOutput) =>
         {
-#if HAS_Process
+#if HAS_PROCESS
             ProcessStartInfo psi = new(filename, command)
             {
                 CreateNoWindow = true,

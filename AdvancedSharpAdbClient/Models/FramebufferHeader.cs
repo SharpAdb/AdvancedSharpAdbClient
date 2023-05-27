@@ -10,7 +10,7 @@ using System.Text;
 using System.Runtime.Versioning;
 #endif
 
-#if HAS_Drawing
+#if HAS_DRAWING
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -140,7 +140,7 @@ namespace AdvancedSharpAdbClient
             return header;
         }
 
-#if HAS_Drawing
+#if HAS_DRAWING
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Image"/>.
         /// </summary>

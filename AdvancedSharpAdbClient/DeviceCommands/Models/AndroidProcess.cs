@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (cmdLinePrefix)
             {
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
                 string[] cmdLineParts = line[..processNameStart]
 #else
 
@@ -357,7 +357,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
                 else
                 {
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
                     pid = int.Parse(cmdLineParts[^1]);
 #else
                     pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
@@ -374,7 +374,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (!parsedCmdLinePrefix)
             {
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
                 pid = int.Parse(line[..processNameStart]);
 #else
                 pid = int.Parse(line.Substring(0, processNameStart));
@@ -385,7 +385,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 process.Name = comm;
             }
 
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
             string[] parts = line[(processNameEnd + 1)..]
 #else
             string[] parts = line.Substring(processNameEnd + 1)

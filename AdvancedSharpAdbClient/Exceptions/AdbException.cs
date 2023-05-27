@@ -5,7 +5,7 @@
 using System;
 using System.Net.Sockets;
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Exceptions
             Response = response;
         }
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class.
         /// </summary>

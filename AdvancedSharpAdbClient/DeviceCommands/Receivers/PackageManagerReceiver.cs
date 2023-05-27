@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     // package:mwc2015.be
 
                     // Remove the "package:" prefix
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
                     string package = line[8..];
 #else
                     string package = line.Substring(8);
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-#if HAS_IndexRange
+#if HAS_INDEXRANGE
                         string path = package[..separator];
                         string name = package[(separator + 1)..];
 #else

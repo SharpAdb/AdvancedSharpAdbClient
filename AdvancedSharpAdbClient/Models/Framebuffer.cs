@@ -13,7 +13,7 @@ using AdvancedSharpAdbClient.Exceptions;
 using System.Runtime.Versioning;
 #endif
 
-#if HAS_Drawing
+#if HAS_DRAWING
 using System.Drawing;
 #endif
 
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
         }
 
-#if HAS_Drawing
+#if HAS_DRAWING
         /// <summary>
         /// Converts the framebuffer data to a <see cref="Image"/>.
         /// </summary>

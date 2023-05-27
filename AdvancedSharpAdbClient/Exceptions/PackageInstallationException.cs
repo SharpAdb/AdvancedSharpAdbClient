@@ -4,7 +4,7 @@
 
 using System;
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
 using System.Runtime.Serialization;
 #endif
 
@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// An exception while installing a package on the device.
     /// </summary>
-#if HAS_Serialization
+#if HAS_SERIALIZATION
     [Serializable]
 #endif
     public class PackageInstallationException : Exception
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
         }
 
-#if HAS_Serialization
+#if HAS_SERIALIZATION
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallationException"/> class.
         /// </summary>
