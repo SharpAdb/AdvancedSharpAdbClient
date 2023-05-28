@@ -180,7 +180,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="p">The <see cref='Windows.Foundation.Point'/> to convert.</param>
         /// <returns>The <see cref='Cords'/> that results from the conversion.</returns>
-        public static implicit operator Cords(Windows.Foundation.Point p) => new(p);
+        public static explicit operator Cords(Windows.Foundation.Point p) => new(p);
 
         /// <summary>
         /// Creates a <see cref='Cords'/> with the coordinates of the specified <see cref='Windows.Foundation.Size'/>.
@@ -328,8 +328,9 @@ namespace AdvancedSharpAdbClient
         public readonly bool Equals(Cords other) => this == other;
 
         /// <summary>
-        /// Returns a hash code.
+        /// Returns a hash code for this <see cref="Cords"/>.
         /// </summary>
+        /// <returns>An integer value that specifies a hash value for this <see cref="Cords"/>.</returns>
         public override readonly int GetHashCode() =>
 #if NETCOREAPP2_1_OR_GREATER
             HashCode.Combine(x, y);

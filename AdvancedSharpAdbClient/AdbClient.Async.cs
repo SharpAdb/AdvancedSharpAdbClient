@@ -892,8 +892,8 @@ namespace AdvancedSharpAdbClient
                                 {
                                     attributes.Add(at.Name, at.Value);
                                 }
-                                Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                                return new Element(this, device, cord, attributes);
+                                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
+                                return new Element(this, device, area, attributes);
                             }
                         }
                     }
@@ -941,8 +941,8 @@ namespace AdvancedSharpAdbClient
                                     {
                                         attributes.Add(at.Name, at.Value);
                                     }
-                                    Cords cord = new((cords[0] + cords[2]) / 2, (cords[1] + cords[3]) / 2); // Average x1, y1, x2, y2
-                                    elements[i] = new Element(this, device, cord, attributes);
+                                    Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
+                                    elements[i] = new Element(this, device, area, attributes);
                                 }
                             }
                             return elements.Length == 0 ? null : elements;
@@ -974,7 +974,7 @@ namespace AdvancedSharpAdbClient
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync(string.Format("shell:input keyevent {0}", key), cancellationToken);
+            await socket.SendAdbRequestAsync($"shell:input keyevent {key}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
@@ -999,7 +999,7 @@ namespace AdvancedSharpAdbClient
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync(string.Format("shell:input text {0}", text), cancellationToken);
+            await socket.SendAdbRequestAsync($"shell:input text {text}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
