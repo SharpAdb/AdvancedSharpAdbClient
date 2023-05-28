@@ -371,8 +371,25 @@ namespace AdvancedSharpAdbClient
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
-        /// <returns>Xml containing current hierarchy.</returns>
+        /// <returns>A <see cref="string"/> containing current hierarchy.
+        /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
+        string DumpScreenString(DeviceData device);
+
+        /// <summary>
+        /// Gets the current device screen snapshot.
+        /// </summary>
+        /// <param name="device">The device for which to get the screen snapshot.</param>
+        /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
         XmlDocument DumpScreen(DeviceData device);
+
+#if WINDOWS_UWP
+        /// <summary>
+        /// Gets the current device screen snapshot.
+        /// </summary>
+        /// <param name="device">The device for which to get the screen snapshot.</param>
+        /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
+        Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device);
+#endif
 
         /// <summary>
         /// Clicks on the specified coordinates.

@@ -24,7 +24,12 @@ namespace AdvancedSharpAdbClient
         private DeviceData Device { get; set; }
 
         /// <summary>
-        /// Contains element coordinates.
+        /// The coordinates and size of the element.
+        /// </summary>
+        public Area Area { get; set; }
+
+        /// <summary>
+        /// The coordinates of the element to click. Default is the center of area.
         /// </summary>
         public Cords Cords { get; set; }
 
@@ -38,7 +43,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
-        /// <param name="cords">Contains element coordinates .</param>
+        /// <param name="cords">The coordinates of the element to click.</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
         public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
         {
@@ -46,6 +51,22 @@ namespace AdvancedSharpAdbClient
             Device = device;
             Cords = cords;
             Attributes = attributes;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, Area area, Dictionary<string, string> attributes)
+        {
+            Client = client;
+            Device = device;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
         }
 
         /// <summary>

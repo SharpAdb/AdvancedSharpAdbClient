@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (SocketException sex)
                 {
-                    throw new AdbException(string.Format("No Data to read: {0}", sex.Message));
+                    throw new AdbException($"No Data to read: {sex.Message}");
                 }
             }
 

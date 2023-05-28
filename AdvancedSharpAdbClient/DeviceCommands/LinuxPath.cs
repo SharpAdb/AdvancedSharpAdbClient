@@ -211,7 +211,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The quoted path.</returns>
-        public static string Quote(string path) => path.Contains(' ') ? string.Format("\"{0}\"", path) : path;
+        public static string Quote(string path) => path.Contains(' ') ? $"\"{path}\"" : path;
 
         /// <summary>
         /// Checks the invalid path chars.
@@ -243,7 +243,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
 #endif
             {
-                sb = string.Format(".{0}{1}", DirectorySeparatorChar, sb);
+                sb = $".{DirectorySeparatorChar}{sb}";
             }
 
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -252,7 +252,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
 #endif
             {
-                sb = string.Format("{0}{1}", sb, DirectorySeparatorChar);
+                sb = $"{sb}{DirectorySeparatorChar}";
             }
 
             sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));

@@ -2,12 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using AdvancedSharpAdbClient.Exceptions;
 
 #if NET
 using System.Runtime.Versioning;
@@ -15,6 +15,12 @@ using System.Runtime.Versioning;
 
 #if HAS_DRAWING
 using System.Drawing;
+#endif
+
+#if WINDOWS_UWP
+using Windows.System;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 namespace AdvancedSharpAdbClient
@@ -115,7 +121,6 @@ namespace AdvancedSharpAdbClient
         public Image ToImage()
         {
             EnsureNotDisposed();
-
             return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToImage(Data);
         }
 
@@ -124,6 +129,40 @@ namespace AdvancedSharpAdbClient
         [SupportedOSPlatform("windows")]
 #endif
         public static explicit operator Image(Framebuffer value) => value.ToImage();
+#endif
+
+#if WINDOWS_UWP
+        /// <summary>
+        /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
+        public Task<WriteableBitmap> ToBitmap()
+        {
+            EnsureNotDisposed();
+            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data);
+        }
+
+        /// <summary>
+        /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
+        /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
+        public Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher)
+        {
+            EnsureNotDisposed();
+            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data, dispatcher);
+        }
+
+        /// <summary>
+        /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
+        /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
+        public Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher)
+        {
+            EnsureNotDisposed();
+            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data, dispatcher);
+        }
 #endif
 
         /// <inheritdoc/>
