@@ -265,6 +265,13 @@ namespace AdvancedSharpAdbClient
         public static implicit operator System.Drawing.Rectangle(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
+        /// Creates a <see cref='System.Drawing.RectangleF'/> with the specified <see cref='Area'/>.
+        /// </summary>
+        /// <param name="rect">The <see cref='Area'/> to convert.</param>
+        /// <returns>The <see cref='System.Drawing.RectangleF'/> that results from the conversion.</returns>
+        public static implicit operator System.Drawing.RectangleF(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+
+        /// <summary>
         /// Creates a <see cref='Area'/> with the specified <see cref='System.Drawing.Rectangle'/>.
         /// </summary>
         /// <param name="rect">The <see cref='System.Drawing.Rectangle'/> to convert.</param>
