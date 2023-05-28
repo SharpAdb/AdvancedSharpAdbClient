@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 #if NET
 using System.Runtime.Versioning;
@@ -14,6 +15,16 @@ using System.Runtime.Versioning;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+#endif
+
+#if WINDOWS_UWP
+using Windows.Foundation;
+using Windows.Foundation.Metadata;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.System;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 namespace AdvancedSharpAdbClient
@@ -289,6 +300,130 @@ namespace AdvancedSharpAdbClient
 
             // If not caught by any of the statements before, the format is not supported.
             throw new NotSupportedException($"Pixel depths of {Bpp} are not supported");
+        }
+#endif
+
+#if WINDOWS_UWP
+        /// <summary>
+        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer containing the image data.</param>
+        /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
+        /// <returns>
+        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
+        /// </returns>
+        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher)
+        {
+            FramebufferHeader self = this;
+
+            if (dispatcher.HasThreadAccess)
+            {
+                return ToBitmap(buffer);
+            }
+            else
+            {
+                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+
+                _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    try
+                    {
+                        taskCompletionSource.SetResult(await self.ToBitmap(buffer));
+                    }
+                    catch (Exception e)
+                    {
+                        taskCompletionSource.SetException(e);
+                    }
+                });
+
+                return taskCompletionSource.Task;
+            }
+        }
+
+        /// <summary>
+        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer containing the image data.</param>
+        /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
+        /// <returns>
+        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
+        /// </returns>
+        [ContractVersion(typeof(UniversalApiContract), 327680u)]
+        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher)
+        {
+            FramebufferHeader self = this;
+
+            if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
+            {
+                return ToBitmap(buffer);
+            }
+            else
+            {
+                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+
+                if (!dispatcher.TryEnqueue(async () =>
+                {
+                    try
+                    {
+                        taskCompletionSource.SetResult(await self.ToBitmap(buffer));
+                    }
+                    catch (Exception e)
+                    {
+                        taskCompletionSource.SetException(e);
+                    }
+                }))
+                {
+                    taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
+                }
+
+                return taskCompletionSource.Task;
+            }
+        }
+
+        /// <summary>
+        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
+        /// </summary>
+        /// <param name="buffer">The buffer containing the image data.</param>
+        /// <returns>
+        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
+        /// </returns>
+        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException(nameof(buffer));
+            }
+
+            // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
+            // framebuffer is returned; we'll just return null.
+            if (Width == 0 || Height == 0 || Bpp == 0)
+            {
+                return null;
+            }
+
+            using MemoryStream stream = new(buffer);
+            using IRandomAccessStream randomAccessStream = stream.AsRandomAccessStream();
+            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
+            SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+            try
+            {
+                WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                await WriteableImage.SetSourceAsync(randomAccessStream);
+                return WriteableImage;
+            }
+            catch (Exception)
+            {
+                using InMemoryRandomAccessStream random = new();
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random);
+                encoder.SetSoftwareBitmap(softwareBitmap);
+                await encoder.FlushAsync();
+                WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+                await WriteableImage.SetSourceAsync(random);
+                return WriteableImage;
+            }
         }
 #endif
     }
