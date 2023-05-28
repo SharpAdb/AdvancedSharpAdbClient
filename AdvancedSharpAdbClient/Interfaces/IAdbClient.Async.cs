@@ -422,8 +422,27 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the Xml containing current hierarchy.</returns>
+        /// <returns>An <see cref="Task"/> which return a <see cref="string"/> containing current hierarchy.
+        /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
+        Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets the current device screen snapshot asynchronously.
+        /// </summary>
+        /// <param name="device">The device for which to get the screen snapshot.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
         Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
+
+#if WINDOWS_UWP
+        /// <summary>
+        /// Gets the current device screen snapshot asynchronously.
+        /// </summary>
+        /// <param name="device">The device for which to get the screen snapshot.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>An <see cref="Task"/> which return a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
+        Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken);
+#endif
 
         /// <summary>
         /// Clicks on the specified coordinates.

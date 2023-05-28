@@ -678,9 +678,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
-            XmlDocument doc = new();
+            EnsureDevice(device);
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken);
             await socket.SendAdbRequestAsync("shell:uiautomator dump /dev/tty", cancellationToken);
@@ -696,6 +696,14 @@ namespace AdvancedSharpAdbClient
             string xmlString = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
 #endif
             xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
+            return xmlString;
+        }
+
+        /// <inheritdoc/>
+        public async Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
+        {
+            XmlDocument doc = new();
+            string xmlString = await DumpScreenStringAsync(device, cancellationToken);
             if (!string.IsNullOrEmpty(xmlString)
                 && !xmlString.StartsWith("ERROR")
                 && !xmlString.StartsWith("java.lang.Exception"))
@@ -705,6 +713,23 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
+
+#if WINDOWS_UWP
+        /// <inheritdoc/>
+        public async Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken = default)
+        {
+            Windows.Data.Xml.Dom.XmlDocument doc = new();
+            string xmlString = await DumpScreenStringAsync(device, cancellationToken);
+            if (!string.IsNullOrEmpty(xmlString)
+                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("java.lang.Exception"))
+            {
+                doc.LoadXml(xmlString);
+                return doc;
+            }
+            return null;
+        }
+#endif
 
         /// <inheritdoc/>
         public async Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken = default)

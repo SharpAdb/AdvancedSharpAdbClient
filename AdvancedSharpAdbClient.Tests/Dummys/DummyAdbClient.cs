@@ -119,6 +119,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public string DumpScreenString(DeviceData device) => throw new NotImplementedException();
+
+        public Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
         public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();

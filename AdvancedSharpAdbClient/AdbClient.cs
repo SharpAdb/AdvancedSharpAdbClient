@@ -620,6 +620,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallCommit(DeviceData device, string session)
         {
+            EnsureDevice(device);
+
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
 
@@ -637,6 +639,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<string> GetFeatureSet(DeviceData device)
         {
+            EnsureDevice(device);
+
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest($"host-serial:{device.Serial}:features");
 
@@ -648,15 +652,23 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public XmlDocument DumpScreen(DeviceData device)
+        public string DumpScreenString(DeviceData device)
         {
-            XmlDocument doc = new();
+            EnsureDevice(device);
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
             socket.SendAdbRequest("shell:uiautomator dump /dev/tty");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
             string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
+            return xmlString;
+        }
+
+        /// <inheritdoc/>
+        public XmlDocument DumpScreen(DeviceData device)
+        {
+            XmlDocument doc = new();
+            string xmlString = DumpScreenString(device);
             if (!string.IsNullOrEmpty(xmlString)
                 && !xmlString.StartsWith("ERROR")
                 && !xmlString.StartsWith("java.lang.Exception"))
@@ -666,6 +678,23 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
+
+#if WINDOWS_UWP
+        /// <inheritdoc/>
+        public Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device)
+        {
+            Windows.Data.Xml.Dom.XmlDocument doc = new();
+            string xmlString = DumpScreenString(device);
+            if (!string.IsNullOrEmpty(xmlString)
+                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("java.lang.Exception"))
+            {
+                doc.LoadXml(xmlString);
+                return doc;
+            }
+            return null;
+        }
+#endif
 
         /// <inheritdoc/>
         public void Click(DeviceData device, Cords cords)
@@ -753,6 +782,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public AppStatus GetAppStatus(DeviceData device, string packageName)
         {
+            EnsureDevice(device);
+
             // Check if the app is in foreground
             bool currentApp = IsCurrentApp(device, packageName);
             if (currentApp)
@@ -773,6 +804,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default)
         {
+            EnsureDevice(device);
             Stopwatch stopwatch = new();
             stopwatch.Start();
             while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
@@ -808,6 +840,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default)
         {
+            EnsureDevice(device);
             Stopwatch stopwatch = new();
             stopwatch.Start();
             while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
