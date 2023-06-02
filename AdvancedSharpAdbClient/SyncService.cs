@@ -125,7 +125,11 @@ namespace AdvancedSharpAdbClient
         public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
+#if HAS_TASK
+            , CancellationToken cancellationToken = default
+#endif
+            )
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -160,8 +164,10 @@ namespace AdvancedSharpAdbClient
             // look while there is something to read
             while (true)
             {
+#if HAS_TASK
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();
+#endif
 
                 // read up to SYNC_DATA_MAX
                 int read = stream.Read(buffer, headerSize, maxDataSize);
@@ -217,7 +223,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public void Pull(string remoteFilePath, Stream stream, IProgress<int> progress
+#if HAS_TASK
+            , CancellationToken cancellationToken = default
+#endif
+            )
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
@@ -235,8 +245,9 @@ namespace AdvancedSharpAdbClient
             while (true)
             {
                 SyncCommand response = Socket.ReadSyncResponse();
+#if HAS_TASK
                 cancellationToken.ThrowIfCancellationRequested();
-
+#endif
                 if (response == SyncCommand.DONE)
                 {
                     break;

@@ -12,6 +12,7 @@ It's upgraded verion of [SharpAdbClient](https://github.com/quamotion/madb).
 Added important features.
 
 ## Support Platform
+- .NET Framework 2.0 (Without Task)
 - .NET Framework 3.5 (Maybe unstable)
 - .NET Framework 4.0 (Need [Microsoft.Bcl.Async](https://www.nuget.org/packages/Microsoft.Bcl.Async))
 - .NET Framework 4.5.2

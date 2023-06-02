@@ -1,10 +1,14 @@
+#if HAS_TASK
+// <copyright file="AdbServer.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -217,3 +221,4 @@ namespace AdvancedSharpAdbClient
         }
     }
 }
+#endif

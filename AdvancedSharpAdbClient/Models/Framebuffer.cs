@@ -7,7 +7,6 @@ using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -54,6 +53,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public byte[] Data { get; private set; }
 
+#if HAS_TASK
         /// <summary>
         /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
@@ -95,6 +95,7 @@ namespace AdvancedSharpAdbClient
             // followed by the actual framebuffer content
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
         }
+#endif
 
 #if HAS_DRAWING
         /// <summary>

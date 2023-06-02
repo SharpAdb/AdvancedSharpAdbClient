@@ -5,27 +5,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-
-#if NET
-using System.Runtime.Versioning;
-#endif
-
-#if HAS_DRAWING
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-#endif
-
-#if WINDOWS_UWP
-using Windows.Foundation;
-using Windows.Foundation.Metadata;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using Windows.System;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Media.Imaging;
-#endif
 
 namespace AdvancedSharpAdbClient
 {

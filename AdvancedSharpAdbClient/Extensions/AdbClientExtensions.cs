@@ -6,7 +6,6 @@ using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -112,6 +111,7 @@ namespace AdvancedSharpAdbClient
                 : client.Pair(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code);
         }
 
+#if HAS_TASK
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.
         /// </summary>
@@ -182,6 +182,7 @@ namespace AdvancedSharpAdbClient
                 ? throw new ArgumentNullException(nameof(host))
                 : client.PairAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code, cancellationToken);
         }
+#endif
 
         /// <summary>
         /// Connect to a device via TCP/IP.
@@ -226,6 +227,7 @@ namespace AdvancedSharpAdbClient
                 : client.Connect(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port));
         }
 
+#if HAS_TASK
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
@@ -271,5 +273,6 @@ namespace AdvancedSharpAdbClient
                 ? throw new ArgumentNullException(nameof(host))
                 : client.ConnectAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), cancellationToken);
         }
+#endif
     }
 }

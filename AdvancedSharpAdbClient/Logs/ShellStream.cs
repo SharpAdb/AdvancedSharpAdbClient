@@ -8,7 +8,6 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Logs
 {
@@ -190,6 +189,7 @@ namespace AdvancedSharpAdbClient.Logs
         }
 #endif
 
+#if HAS_TASK
         /// <inheritdoc/>
         public
 #if !NETFRAMEWORK || NET45_OR_GREATER
@@ -317,6 +317,7 @@ namespace AdvancedSharpAdbClient.Logs
 
             return read;
         }
+#endif
 
         /// <inheritdoc/>
         public override void Flush() => throw new NotImplementedException();

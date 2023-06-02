@@ -4,7 +4,6 @@
 
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -74,12 +73,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public void Click() => Client.Click(Device, Cords);
 
+#if HAS_TASK
         /// <summary>
         /// Clicks on this coordinates.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         public async Task ClickAsync(CancellationToken cancellationToken = default) =>
             await Client.ClickAsync(Device, Cords, cancellationToken);
+#endif
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
@@ -91,6 +92,7 @@ namespace AdvancedSharpAdbClient
             Client.SendText(Device, text);
         }
 
+#if HAS_TASK
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
@@ -102,6 +104,7 @@ namespace AdvancedSharpAdbClient
             await ClickAsync(cancellationToken);
             await Client.SendTextAsync(Device, text, cancellationToken);
         }
+#endif
 
         /// <summary>
         /// Clear the input text. Use <see cref="IAdbClient.ClearInput(DeviceData, int)"/> if the element is focused.
@@ -120,6 +123,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+#if HAS_TASK
         /// <summary>
         /// Clear the input text. Use <see cref="IAdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
@@ -138,5 +142,6 @@ namespace AdvancedSharpAdbClient
                 await Client.ClearInputAsync(Device, charCount, cancellationToken);
             }
         }
+#endif
     }
 }

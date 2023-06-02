@@ -1,5 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿#if HAS_TASK
+// <copyright file="IAdbSocket.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -79,3 +83,4 @@ namespace AdvancedSharpAdbClient
         Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken);
     }
 }
+#endif

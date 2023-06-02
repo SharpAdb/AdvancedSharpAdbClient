@@ -1,4 +1,5 @@
-﻿// <copyright file="IAdbClient.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="IAdbClient.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -10,7 +11,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace AdvancedSharpAdbClient
@@ -594,3 +594,4 @@ namespace AdvancedSharpAdbClient
         Task HomeBtnAsync(DeviceData device);
     }
 }
+#endif

@@ -7,7 +7,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -63,10 +62,10 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
-#if !NET35
-            socket.Dispose();
-#else
+#if NETFRAMEWORK && !NET40_OR_GREATER
             socket.Close();
+#else
+            socket.Dispose();
 #endif
             GC.SuppressFinalize(this);
         }
@@ -79,6 +78,7 @@ namespace AdvancedSharpAdbClient
         public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
             socket.Receive(buffer, offset, socketFlags);
 
+#if HAS_TASK
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
         public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
@@ -97,6 +97,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+#endif
 #endif
 
         /// <inheritdoc/>

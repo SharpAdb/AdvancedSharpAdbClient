@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -56,6 +55,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly ManualResetEvent firstDeviceListParsed = new(false);
 
+#if HAS_TASK
         /// <summary>
         /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
         /// </summary>
@@ -65,6 +65,17 @@ namespace AdvancedSharpAdbClient
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
         private Task monitorTask;
+#else
+        /// <summary>
+        /// A <see cref="bool"/> that can be used to cancel the <see cref="monitorThread"/>.
+        /// </summary>
+        private bool isMonitorThreadCancel = false;
+
+        /// <summary>
+        /// The <see cref="Thread"/> that monitors the <see cref="Socket"/> and waits for device notifications.
+        /// </summary>
+        private Thread monitorThread;
+#endif
 
 #if !HAS_LOGGER
 #pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
@@ -125,6 +136,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Start()
         {
+#if HAS_TASK
             if (monitorTask == null)
             {
                 _ = firstDeviceListParsed.Reset();
@@ -135,6 +147,18 @@ namespace AdvancedSharpAdbClient
                 // of devices.
                 _ = firstDeviceListParsed.WaitOne();
             }
+#else
+            if (monitorThread == null)
+            {
+                _ = firstDeviceListParsed.Reset();
+
+                monitorThread = new Thread(DeviceMonitorLoop);
+
+                // Wait for the worker thread to have read the first list
+                // of devices.
+                _ = firstDeviceListParsed.WaitOne();
+            }
+#endif
         }
 
         /// <summary>
@@ -142,6 +166,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public void Dispose()
         {
+#if HAS_TASK
             // First kill the monitor task, which has a dependency on the socket,
             // then close the socket.
             if (monitorTask != null)
@@ -172,6 +197,29 @@ namespace AdvancedSharpAdbClient
             firstDeviceListParsed.Close();
 #endif
             monitorTaskCancellationTokenSource.Dispose();
+#else
+            // First kill the monitor task, which has a dependency on the socket,
+            // then close the socket.
+            if (monitorThread != null)
+            {
+                IsRunning = false;
+
+                // Stop the thread. The tread will keep waiting for updated information from adb
+                // eternally, so we need to forcefully abort it here.
+                isMonitorThreadCancel = true;
+
+                monitorThread = null;
+            }
+
+            // Close the connection to adb. To be done after the monitor task exited.
+            if (Socket != null)
+            {
+                Socket.Dispose();
+                Socket = null;
+            }
+
+            firstDeviceListParsed.Close();
+#endif
 
             GC.SuppressFinalize(this);
         }
@@ -194,9 +242,12 @@ namespace AdvancedSharpAdbClient
         /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
         protected void OnDeviceDisconnected(DeviceDataEventArgs e) => DeviceDisconnected?.Invoke(this, e);
 
+#if HAS_TASK
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
@@ -285,6 +336,45 @@ namespace AdvancedSharpAdbClient
             }
             while (!cancellationToken.IsCancellationRequested);
         }
+#else
+        /// <summary>
+        /// Monitors the devices. This connects to the Debug Bridge
+        /// </summary>
+        private void DeviceMonitorLoop()
+        {
+            IsRunning = true;
+
+            // Set up the connection to track the list of devices.
+            InitializeSocket();
+
+            do
+            {
+                try
+                {
+                    string value = Socket.ReadString();
+                    ProcessIncomingDeviceData(value);
+
+                    firstDeviceListParsed.Set();
+                }
+                catch (AdbException adbException)
+                {
+                    if (adbException.ConnectionReset)
+                    {
+                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
+                        AdbServer.Instance.RestartServer();
+                        Socket.Reconnect();
+                        InitializeSocket();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            while (!isMonitorThreadCancel);
+            isMonitorThreadCancel = false;
+        }
+#endif
 
         private void InitializeSocket()
         {

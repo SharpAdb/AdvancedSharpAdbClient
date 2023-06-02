@@ -7,7 +7,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -53,6 +52,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The number of bytes sent to the Socket.</returns>
         int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags);
 
+#if HAS_TASK
         /// <summary>
         /// Asynchronously sends the specified number of bytes of data to a connected
         /// <see cref="ITcpSocket"/>, starting at the specified <paramref name="offset"/>,
@@ -65,6 +65,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
         public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
+#endif
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/> into the specified offset position of the
@@ -76,6 +77,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The number of bytes received.</returns>
         int Receive(byte[] buffer, int size, SocketFlags socketFlags);
 
+#if HAS_TASK
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/> into the specified offset position of the
         /// receive buffer, using the specified SocketFlags.
@@ -88,6 +90,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
+#endif
 
         /// <summary>
         /// Gets the underlying <see cref="Stream"/>.

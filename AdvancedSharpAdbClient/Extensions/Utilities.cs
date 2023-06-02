@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -26,7 +25,7 @@ namespace AdvancedSharpAdbClient
         /// <returns><see langword="true"/> if the value parameter was converted successfully; otherwise, <see langword="false"/>.</returns>
         /// <exception cref="ArgumentException"><typeparamref name="TEnum"/> is not an enumeration type.</exception>
         public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct =>
-#if NET35
+#if NETFRAMEWORK && !NET40_OR_GREATER
             EnumEx
 #else
             Enum
@@ -40,7 +39,7 @@ namespace AdvancedSharpAdbClient
         /// <returns><see langword="true"/> if the <paramref name="value"/> parameter is <see langword="null"/> or
         /// <see cref="string.Empty"/>, or if <paramref name="value"/> consists exclusively of white-space characters.</returns>
         public static bool IsNullOrWhiteSpace(this string value) =>
-#if NET35
+#if NETFRAMEWORK && !NET40_OR_GREATER
             StringEx
 #else
             string
@@ -57,13 +56,14 @@ namespace AdvancedSharpAdbClient
         /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
         /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
         public static string Join(string separator, IEnumerable<string> values) =>
-#if NET35
+#if NETFRAMEWORK && !NET40_OR_GREATER
             StringEx
 #else
             string
 #endif
             .Join(separator, values);
 
+#if HAS_TASK
         /// <summary>
         /// Creates a task that completes after a specified number of milliseconds.
         /// </summary>
@@ -112,6 +112,7 @@ namespace AdvancedSharpAdbClient
             Task
 #endif
             .Run(function, cancellationToken);
+#endif
 
         /// <summary>
         /// Converts a Unix time expressed as the number of seconds that have elapsed

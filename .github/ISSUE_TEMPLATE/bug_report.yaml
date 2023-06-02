@@ -47,6 +47,7 @@ body:
       description: Please specify the .NET Platform you're using when you encountered the issue.
       multiple: true
       options:
+        - ".NET Framework 2.0"
         - ".NET Framework 3.5"
         - ".NET Framework 4.0"
         - ".NET Framework 4.5.x"

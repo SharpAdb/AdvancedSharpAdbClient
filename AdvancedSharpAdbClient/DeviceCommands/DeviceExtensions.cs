@@ -67,7 +67,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+            IProgress<int> progress = null
+#if HAS_TASK
+            , CancellationToken cancellationToken = default
+#endif
+            )
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -75,7 +79,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
 
-            service.Pull(remotePath, stream, progress, cancellationToken);
+            service.Pull(remotePath, stream, progress
+#if HAS_TASK
+                , cancellationToken
+#endif
+                );
         }
 
         /// <summary>
@@ -93,7 +101,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+            IProgress<int> progress = null
+#if HAS_TASK
+            , CancellationToken cancellationToken = default
+#endif
+            )
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -101,7 +113,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
 
-            service.Push(stream, remotePath, permissions, timestamp, progress, cancellationToken);
+            service.Push(stream, remotePath, permissions, timestamp, progress
+#if HAS_TASK
+                , cancellationToken
+#endif
+                );
         }
 
         /// <summary>

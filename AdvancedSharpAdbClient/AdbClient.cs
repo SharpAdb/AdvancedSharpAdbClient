@@ -442,7 +442,11 @@ namespace AdvancedSharpAdbClient
             {
                 // Give adbd some time to kill itself and come back up.
                 // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
+#if HAS_PROCESS && !WINDOWS_UWP
+                Thread.Sleep(3000);
+#else
                 Utilities.Delay(3000).GetAwaiter().GetResult();
+#endif
             }
         }
 
@@ -948,7 +952,7 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, CancellationToken.None).Wait();
+            ExecuteRemoteCommand("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
         }
 
         /// <inheritdoc/>

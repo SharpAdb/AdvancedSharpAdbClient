@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Logs
 {
@@ -25,6 +24,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
         public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
+#if HAS_TASK
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
@@ -186,6 +186,7 @@ namespace AdvancedSharpAdbClient.Logs
                     };
             }
         }
+#endif
 
         private void ReadLogEntry(BinaryReader reader, Collection<object> parent)
         {
@@ -227,6 +228,7 @@ namespace AdvancedSharpAdbClient.Logs
             }
         }
 
+#if HAS_TASK
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
             byte[] data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
@@ -270,5 +272,6 @@ namespace AdvancedSharpAdbClient.Logs
 
             return totalRead < count ? null : data;
         }
+#endif
     }
 }

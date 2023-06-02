@@ -7,9 +7,20 @@ global using System.Numerics;
 #endif
 
 #if WINDOWS_UWP
+global using Windows.Foundation;
+global using Windows.Foundation.Metadata;
+global using Windows.Graphics.Imaging;
+global using Windows.Storage.Streams;
 global using Windows.System;
 global using Windows.UI.Core;
 global using Windows.UI.Xaml.Media.Imaging;
+global using Buffer = System.Buffer;
+global using DateTime = System.DateTime;
+global using TimeSpan = System.TimeSpan;
+#endif
+
+#if HAS_TASK
+global using System.Threading.Tasks;
 #endif
 
 #if HAS_LOGGER
@@ -23,4 +34,6 @@ global using System.Runtime.Serialization;
 
 #if HAS_DRAWING
 global using System.Drawing;
+global using System.Drawing.Imaging;
+global using System.Runtime.InteropServices;
 #endif

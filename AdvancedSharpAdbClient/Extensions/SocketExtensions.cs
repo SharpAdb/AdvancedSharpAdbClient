@@ -1,11 +1,11 @@
-﻿// <copyright file="SocketExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="SocketExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using System;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient
 {
@@ -78,3 +78,4 @@ namespace AdvancedSharpAdbClient
         }
     }
 }
+#endif
