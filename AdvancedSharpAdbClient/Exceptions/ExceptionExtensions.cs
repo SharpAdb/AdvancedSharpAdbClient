@@ -3,10 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 
-#if NET8_0_OR_GREATER
-using System.Numerics;
-#endif
-
 namespace AdvancedSharpAdbClient.Exceptions
 {
     internal static class ExceptionExtensions

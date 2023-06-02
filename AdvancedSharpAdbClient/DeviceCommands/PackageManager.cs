@@ -9,11 +9,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
-#if HAS_LOGGER
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-#endif
-
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     /// <summary>

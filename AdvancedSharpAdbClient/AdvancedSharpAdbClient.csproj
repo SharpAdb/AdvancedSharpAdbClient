@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <FullTargets>False</FullTargets>
+    <FullTargets>True</FullTargets>
     <NoWarn>CA2254</NoWarn>
   </PropertyGroup>
 
@@ -18,6 +18,12 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'">
+    <PackageReference Include="LinqBridge" Version="1.3.0" />
+    <PackageReference Include="Polyfill.System.Buffers.NET35" Version="0.0.5" />
+    <PackageReference Include="Polyfill.System.Runtime.InteropServices.RuntimeInformation.NET35" Version="0.0.5" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net3.5-client'">
@@ -89,6 +95,10 @@
                      or '$(TargetFramework)' == 'uap10.0.15138.0'">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'">
+    <DefineConstants>$(DefineConstants);HAS_TASK</DefineConstants>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'">

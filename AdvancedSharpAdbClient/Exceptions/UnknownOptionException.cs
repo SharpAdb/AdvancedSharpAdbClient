@@ -4,10 +4,6 @@
 
 using System;
 
-#if HAS_SERIALIZATION
-using System.Runtime.Serialization;
-#endif
-
 namespace AdvancedSharpAdbClient.Exceptions
 {
     /// <summary>

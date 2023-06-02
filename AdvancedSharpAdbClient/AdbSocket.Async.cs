@@ -6,10 +6,6 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if HAS_LOGGER
-using Microsoft.Extensions.Logging;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     public partial class AdbSocket

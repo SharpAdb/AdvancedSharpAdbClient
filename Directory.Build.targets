@@ -17,6 +17,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'
                      or '$(TargetFramework)' == 'uap10.0.15138.0'">
+    <EmbeddedResource Remove="Properties\AdvancedSharpAdbClient.rd.xml" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>
 

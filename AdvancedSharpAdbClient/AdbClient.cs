@@ -14,10 +14,6 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 
-#if NET
-using System.Runtime.Versioning;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -68,6 +64,44 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
+        public AdbClient(EndPoint endPoint) : this(endPoint, Factories.AdbSocketFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the adb server is listening.</param>
+        /// <param name="port">The port at which the adb server is listening.</param>
+        public AdbClient(string host, int port) : this(host, port, Factories.AdbSocketFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the adb server is listening.</param>
+        /// <param name="port">The port at which the adb server is listening.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public AdbClient(string host, int port, Func<EndPoint, IAdbSocket> adbSocketFactory)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            EndPoint = values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
+            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdbClient(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory)
         {
@@ -107,7 +141,7 @@ namespace AdvancedSharpAdbClient
         public static byte[] FormAdbRequest(string req)
         {
             int payloadLength = Encoding.GetByteCount(req);
-            string resultStr = $"{payloadLength.ToString("X4")}{req}";
+            string resultStr = $"{payloadLength:X4}{req}";
             byte[] result = Encoding.GetBytes(resultStr);
             return result;
         }

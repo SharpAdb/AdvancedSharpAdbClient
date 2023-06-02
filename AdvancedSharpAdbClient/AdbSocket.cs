@@ -11,11 +11,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-#if HAS_LOGGER
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
 

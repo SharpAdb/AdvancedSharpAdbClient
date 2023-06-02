@@ -9,20 +9,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-#if NET
-using System.Runtime.Versioning;
-#endif
-
-#if HAS_DRAWING
-using System.Drawing;
-#endif
-
-#if WINDOWS_UWP
-using Windows.System;
-using Windows.UI.Core;
-using Windows.UI.Xaml.Media.Imaging;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>

@@ -16,10 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
-#if NET
-using System.Runtime.Versioning;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     public partial class AdbClient

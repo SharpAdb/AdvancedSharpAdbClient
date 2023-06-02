@@ -5,10 +5,6 @@
 using System;
 using System.Net.Sockets;
 
-#if HAS_SERIALIZATION
-using System.Runtime.Serialization;
-#endif
-
 namespace AdvancedSharpAdbClient.Exceptions
 {
     /// <summary>

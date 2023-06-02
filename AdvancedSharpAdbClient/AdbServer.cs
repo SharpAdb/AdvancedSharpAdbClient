@@ -56,6 +56,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private static string cachedAdbPath;
 
+        /// <summary>
+        /// The current ADB client that manages the connection.
+        /// </summary>
         private readonly IAdbClient adbClient;
 
         /// <summary>
@@ -75,6 +78,16 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
+        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+        public AdbServer(Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(new AdbClient(), adbCommandLineClientFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="adbClient">The current ADB client that manages the connection.</param>
+        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
         public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
             this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
