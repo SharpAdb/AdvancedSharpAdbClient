@@ -1,112 +1,36 @@
-﻿// <copyright file="SyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="SyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    /// <summary>
-    /// Provides access to the sync service running on the Android device. Allows you to
-    /// list, download and upload files on the device.
-    /// </summary>
-    /// <example>
-    /// <para>
-    /// To send files to or receive files from your Android device, you can use the following code:
-    /// </para>
-    /// <code>
-    /// void DownloadFile()
-    /// {
-    ///     var device = AdbClient.Instance.GetDevices().First();
-    ///
-    ///     using (SyncService service = new SyncService(new AdbSocket(), device))
-    ///     using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
-    ///     {
-    ///         service.Pull("/data/MyFile.txt", stream, null, CancellationToken.None);
-    ///     }
-    /// }
-    ///
-    /// void UploadFile()
-    /// {
-    ///     var device = AdbClient.Instance.GetDevices().First();
-    ///
-    ///     using (SyncService service = new SyncService(new AdbSocket(), device))
-    ///     using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
-    ///     {
-    ///         service.Push(stream, "/data/MyFile.txt", null, CancellationToken.None);
-    ///     }
-    /// }
-    /// </code>
-    /// </example>
-    public partial class SyncService : ISyncService, IDisposable
+    public partial class SyncService
     {
-        /// <summary>
-        /// The maximum length of a path on the remote device.
-        /// </summary>
-        private const int MaxPathLength = 1024;
-
         /// <inheritdoc/>
-        public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SyncService"/> class.
-        /// </summary>
-        /// <param name="client">A connection to an adb server.</param>
-        /// <param name="device">The device on which to interact with the files.</param>
-        public SyncService(IAdbClient client, DeviceData device) : this(Factories.AdbSocketFactory(client.EndPoint), device)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SyncService"/> class.
-        /// </summary>
-        /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
-        /// <param name="device">The device on which to interact with the files.</param>
-        public SyncService(IAdbSocket socket, DeviceData device)
-        {
-            Socket = socket;
-            Device = device;
-
-            Open();
-        }
-
-        /// <summary>
-        /// Gets or sets the maximum size of data to transfer between the device and the PC in one block.
-        /// </summary>
-        public int MaxBufferSize { get; set; } = 64 * 1024;
-
-        /// <summary>
-        /// Gets the device on which the file operations are being executed.
-        /// </summary>
-        public DeviceData Device { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="IAdbSocket"/> that enables the connection with the adb server.
-        /// </summary>
-        public IAdbSocket Socket { get; private set; }
-
-        /// <inheritdoc/>
-        public bool IsOpen => Socket != null && Socket.Connected;
-
-        /// <inheritdoc/>
-        public void Open()
+        public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
-            Socket.SetDevice(Device);
+            await Socket.SetDeviceAsync(Device, default);
 
-            Socket.SendAdbRequest("sync:");
-            _ = Socket.ReadAdbResponse();
+            await Socket.SendAdbRequestAsync("sync:", default);
+            _ = await Socket.ReadAdbResponseAsync(default);
         }
 
         /// <summary>
         /// Reopen this connection.
         /// </summary>
         /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
-        public void Reopen(IAdbSocket socket)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public Task ReopenAsync(IAdbSocket socket, CancellationToken cancellationToken = default)
         {
             if (Socket != null)
             {
@@ -114,21 +38,19 @@ namespace AdvancedSharpAdbClient
                 Socket = null;
             }
             Socket = socket;
-            Open();
+            return OpenAsync(cancellationToken);
         }
 
         /// <summary>
         /// Reopen this connection.
         /// </summary>
         /// <param name="client">A connection to an adb server.</param>
-        public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public Task ReopenAsync(IAdbClient client, CancellationToken cancellationToken = default) => ReopenAsync(Factories.AdbSocketFactory(client.EndPoint), cancellationToken);
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress            , CancellationToken cancellationToken = default            )
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -139,7 +61,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
             }
 
-            Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
+            await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permissions, cancellationToken);
 
             // create the buffer used to read.
             // we read max SYNC_DATA_MAX.
@@ -163,10 +85,8 @@ namespace AdvancedSharpAdbClient
             // look while there is something to read
             while (true)
             {
-#if HAS_TASK
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();
-#endif
 
                 // read up to SYNC_DATA_MAX
                 int read = stream.Read(buffer, headerSize, maxDataSize);
@@ -190,7 +110,7 @@ namespace AdvancedSharpAdbClient
                 Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                 // now send the data to the device
-                Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
+                await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken);
 
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
@@ -203,57 +123,52 @@ namespace AdvancedSharpAdbClient
 
             // create the DONE message
             int time = (int)timestamp.ToUnixTimeSeconds();
-            Socket.SendSyncRequest(SyncCommand.DONE, time);
+            await Socket.SendSyncRequestAsync(SyncCommand.DONE, time, cancellationToken);
 
-            // read the result, in a byte array containing 2 ints
+            // read the result, in a byte array containing 2 int
             // (id, size)
-            SyncCommand result = Socket.ReadSyncResponse();
+            SyncCommand result = await Socket.ReadSyncResponseAsync(cancellationToken);
 
             if (result == SyncCommand.FAIL)
             {
-                string message = Socket.ReadSyncString();
+                string message = await Socket.ReadSyncStringAsync(cancellationToken);
 
                 throw new AdbException(message);
             }
             else if (result != SyncCommand.OKAY)
             {
-                throw new AdbException($"The server sent an invali repsonse {result}");
+                throw new AdbException($"The server sent an invalid response {result}");
             }
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilePath, Stream stream, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+        public async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress            , CancellationToken cancellationToken = default            )
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
             ExceptionExtensions.ThrowIfNull(stream);
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = Stat(remoteFilePath);
+            FileStatistics stat = await StatAsync(remoteFilePath, cancellationToken);
             long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
-            Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
+            await Socket.SendSyncRequestAsync(SyncCommand.RECV, remoteFilePath, cancellationToken);
 
             while (true)
             {
-                SyncCommand response = Socket.ReadSyncResponse();
-#if HAS_TASK
+                SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
-#endif
+
                 if (response == SyncCommand.DONE)
                 {
                     break;
                 }
                 else if (response == SyncCommand.FAIL)
                 {
-                    string message = Socket.ReadSyncString();
+                    string message = await Socket.ReadSyncStringAsync(cancellationToken);
                     throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
                 }
                 else if (response != SyncCommand.DATA)
@@ -263,7 +178,7 @@ namespace AdvancedSharpAdbClient
 
                 // The first 4 bytes contain the length of the data packet
                 byte[] reply = new byte[4];
-                _ = Socket.Read(reply);
+                await Socket.ReadAsync(reply, cancellationToken);
 
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -278,8 +193,14 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // now read the length we received
-                _ = Socket.Read(buffer, size);
-                stream.Write(buffer, 0, size);
+                await Socket.ReadAsync(buffer, size, cancellationToken);
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken);
+#elif !NET35
+                await stream.WriteAsync(buffer, 0, size, cancellationToken);
+#else
+                await Utilities.Run(() => stream.Write(buffer, 0, size));
+#endif
                 totalBytesRead += size;
 
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
@@ -293,12 +214,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public FileStatistics Stat(string remotePath)
+        public async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             // create the stat request message.
-            Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
+            await Socket.SendSyncRequestAsync(SyncCommand.STAT, remotePath, cancellationToken);
 
-            if (Socket.ReadSyncResponse() != SyncCommand.STAT)
+            if (await Socket.ReadSyncResponseAsync(cancellationToken) != SyncCommand.STAT)
             {
                 throw new AdbException($"The server returned an invalid sync response.");
             }
@@ -310,20 +231,22 @@ namespace AdvancedSharpAdbClient
                 Path = remotePath
             };
 
-            ReadStatistics(value);
+            await ReadStatisticsAsync(value, cancellationToken);
 
             return value;
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
+        public async Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
+            Collection<FileStatistics> value = new();
+
             // create the stat request message.
-            Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
+            await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken);
 
             while (true)
             {
-                SyncCommand response = Socket.ReadSyncResponse();
+                SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken);
 
                 if (response == SyncCommand.DONE)
                 {
@@ -335,30 +258,19 @@ namespace AdvancedSharpAdbClient
                 }
 
                 FileStatistics entry = new();
-                ReadStatistics(entry);
-                entry.Path = Socket.ReadSyncString();
+                await ReadStatisticsAsync(entry, cancellationToken);
+                entry.Path = await Socket.ReadSyncStringAsync(cancellationToken);
 
-                yield return entry;
+                value.Add(entry);
             }
+
+            return value;
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            if (Socket != null)
-            {
-                Socket.Dispose();
-                Socket = null;
-            }
-            GC.SuppressFinalize(this);
-        }
-
-        private void ReadStatistics(FileStatistics value)
+        private async Task ReadStatisticsAsync(FileStatistics value, CancellationToken cancellationToken = default)
         {
             byte[] statResult = new byte[12];
-            _ = Socket.Read(statResult);
+            await Socket.ReadAsync(statResult, cancellationToken);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -373,3 +285,4 @@ namespace AdvancedSharpAdbClient
         }
     }
 }
+#endif

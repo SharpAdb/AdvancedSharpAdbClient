@@ -41,6 +41,41 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public virtual Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default) =>
+            SendSyncRequestAsync(command, $"{path},{permissions}", cancellationToken);
+
+        /// <inheritdoc/>
+        public virtual async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(path);
+
+            byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
+            await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken);
+            _ = await WriteAsync(pathBytes, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
+        {
+            // The message structure is:
+            // First four bytes: command
+            // Next four bytes: length of the path
+            // Final bytes: path
+            byte[] commandBytes = SyncCommandConverter.GetBytes(command);
+
+            byte[] lengthBytes = BitConverter.GetBytes(length);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert from big endian to little endian
+                Array.Reverse(lengthBytes);
+            }
+
+            _ = await WriteAsync(commandBytes, cancellationToken);
+            _ = await WriteAsync(lengthBytes, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public virtual async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
@@ -122,6 +157,37 @@ namespace AdvancedSharpAdbClient
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<string> ReadSyncStringAsync(CancellationToken cancellationToken = default)
+        {
+            // The first 4 bytes contain the length of the string
+            byte[] reply = new byte[4];
+            await ReadAsync(reply, cancellationToken);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(reply);
+            }
+
+            int len = BitConverter.ToInt32(reply, 0);
+
+            // And get the string
+            reply = new byte[len];
+            await ReadAsync(reply, cancellationToken);
+
+            string value = AdbClient.Encoding.GetString(reply);
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
+        {
+            byte[] data = new byte[4];
+            await ReadAsync(data, cancellationToken);
+
+            return SyncCommandConverter.GetCommand(data);
         }
 
         /// <inheritdoc/>

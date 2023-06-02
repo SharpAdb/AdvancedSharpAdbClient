@@ -198,10 +198,44 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
+        public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken)
+        {
+            SendSyncRequest(command, path, permissions);
+            return Task.CompletedTask;
+        }
+
+        public Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken)
+        {
+            SendSyncRequest(command, path);
+            return Task.CompletedTask;
+        }
+
+        public Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken)
+        {
+            SendSyncRequest(command, length);
+            return Task.CompletedTask;
+        }
+
         public Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
             SendAdbRequest(request);
             return Task.CompletedTask;
+        }
+
+        public Task<string> ReadSyncStringAsync(CancellationToken cancellationToken)
+        {
+            var response = ReadSyncString();
+            var tcs = new TaskCompletionSource<string>();
+            tcs.SetResult(response);
+            return tcs.Task;
+        }
+
+        public Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken)
+        {
+            var response = ReadSyncResponse();
+            var tcs = new TaskCompletionSource<SyncCommand>();
+            tcs.SetResult(response);
+            return tcs.Task;
         }
 
         public Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)

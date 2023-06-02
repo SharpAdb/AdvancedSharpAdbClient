@@ -43,15 +43,55 @@ namespace AdvancedSharpAdbClient
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
-        /// This property is set after you call <see cref="RefreshAsync(CancellationToken)"/>.
+        /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
         public FramebufferHeader Header { get; private set; }
 
         /// <summary>
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
-        /// This property is set after you call <see cref="RefreshAsync(CancellationToken)"/>.
+        /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
         public byte[] Data { get; private set; }
+
+        /// <summary>
+        /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
+        /// and <see cref="Data"/> properties to get the updated framebuffer data.
+        /// </summary>
+        public void Refresh()
+        {
+            EnsureNotDisposed();
+
+            using IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint);
+            // Select the target device
+            socket.SetDevice(Device);
+
+            // Send the framebuffer command
+            socket.SendAdbRequest("framebuffer:");
+            socket.ReadAdbResponse();
+
+            // The result first is a FramebufferHeader object,
+            socket.Read(headerData);
+
+            if (!headerInitialized)
+            {
+                Header = FramebufferHeader.Read(headerData);
+                headerInitialized = true;
+            }
+
+            if (Data == null || Data.Length < Header.Size)
+            {
+                // Optimization on .NET Core: Use the BufferPool to rent buffers
+                if (Data != null)
+                {
+                    ArrayPool<byte>.Shared.Return(Data, clearArray: false);
+                }
+
+                Data = ArrayPool<byte>.Shared.Rent((int)Header.Size);
+            }
+
+            // followed by the actual framebuffer content
+            _ = socket.Read(Data, (int)Header.Size);
+        }
 
 #if HAS_TASK
         /// <summary>

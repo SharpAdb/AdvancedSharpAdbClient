@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A task that represents a proxy for the task returned by <paramref name="function"/>.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
         /// <remarks>For information on handling exceptions thrown by task operations, see <see href="https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library">Exception Handling</see>.</remarks>
-        public static Task Run(Func<Task> function, CancellationToken cancellationToken = default) =>
+        public static Task Run(Action function, CancellationToken cancellationToken = default) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
@@ -114,6 +114,9 @@ namespace AdvancedSharpAdbClient
             .Run(function, cancellationToken);
 #endif
 
+#if NET20
+#pragma warning disable CS1574 // XML 注释中有无法解析的 cref 特性
+#endif
         /// <summary>
         /// Converts a Unix time expressed as the number of seconds that have elapsed
         /// since 1970-01-01T00:00:00Z to a <see cref="DateTimeOffset"/> value.
@@ -132,6 +135,9 @@ namespace AdvancedSharpAdbClient
             new(seconds.ToDateTime());
 #else
             DateTimeOffset.FromUnixTimeSeconds(seconds);
+#endif
+#if NET20
+#pragma warning restore CS1574 // XML 注释中有无法解析的 cref 特性
 #endif
 
         /// <summary>

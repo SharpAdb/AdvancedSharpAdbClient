@@ -147,6 +147,8 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public Framebuffer GetFrameBuffer(DeviceData device) => throw new NotImplementedException();
+
         public Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void HomeBtn(DeviceData device) => throw new NotImplementedException();

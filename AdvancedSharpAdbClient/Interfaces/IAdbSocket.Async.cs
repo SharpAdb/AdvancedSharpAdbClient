@@ -29,6 +29,34 @@ namespace AdvancedSharpAdbClient
         Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command" >The command to send.</param>
+        /// <param name="path">The path of the file on which the command should operate.</param>
+        /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command">The command to send.</param>
+        /// <param name="path">The path of the file on which the command should operate.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command">The command to send.</param>
+        /// <param name="length">The length of the data packet that follows.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Asynchronously sends a request to the Android Debug Bridge.To read the response, call
         /// <see cref="ReadAdbResponseAsync(CancellationToken)"/>.
         /// </summary>
@@ -62,6 +90,21 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the<see cref="string"/> received from the <see cref = "IAdbSocket"/>.</returns>
         Task<string> ReadStringAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// the connection is in sync mode.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the <see cref="string"/> received from the <see cref = "IAdbSocket"/>.</returns>
+        Task<string> ReadSyncStringAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reads the response to a sync command.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the response that was sent by the device.</returns>
+        Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously receives an <see cref="AdbResponse"/> message, and throws an error

@@ -54,6 +54,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return service.GetDirectoryListing(remotePath);
         }
 
+#if !HAS_TASK
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#pragma warning disable CS1574 // XML 注释中有未能解析的 cref 特性
+#endif
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
@@ -119,6 +123,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
                 );
         }
+#if !HAS_TASK
+#pragma warning restore CS1574 // XML 注释中有未能解析的 cref 特性
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
 
         /// <summary>
         /// Gets the property of a device.

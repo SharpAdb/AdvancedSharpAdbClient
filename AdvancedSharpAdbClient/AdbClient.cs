@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
     /// call the <see cref="GetDevices"/> method.
     /// </para>
     /// <para>
-    /// To run a command on a device, you can use the <see cref="ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/>
+    /// To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/>
     /// method.
     /// </para>
     /// </summary>
@@ -351,6 +351,18 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             return new Framebuffer(device, this);
+        }
+
+        /// <inheritdoc/>
+        public Framebuffer GetFrameBuffer(DeviceData device)
+        {
+            EnsureDevice(device);
+
+            using Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
+            framebuffer.Refresh();
+
+            // Convert the framebuffer to an image, and return that.
+            return framebuffer;
         }
 
         /// <inheritdoc/>

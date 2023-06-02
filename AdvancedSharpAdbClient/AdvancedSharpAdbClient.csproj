@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <FullTargets>True</FullTargets>
-    <NoWarn>CA2254</NoWarn>
+    <FullTargets>False</FullTargets>
+    <NoWarn>CS1685;CA2254</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' == 'True'">
@@ -12,7 +12,7 @@
 
   <PropertyGroup Condition="'$(FullTargets)' != 'True'">
     <TargetFramework Condition="'$(GITHUB_ACTIONS)' == 'True'">netstandard2.0</TargetFramework>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' And '$(IsWindows)'">net3.5-client;net4.5.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' And '$(IsWindows)'">net2.0-client;net3.5-client;net4.5.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' And !'$(IsWindows)'">net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
 

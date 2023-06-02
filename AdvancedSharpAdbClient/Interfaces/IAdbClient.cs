@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -262,6 +263,15 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the framebuffer.</param>
         /// <returns>A <see cref="Framebuffer"/> object which can be used to get the framebuffer of the device.</returns>
         Framebuffer CreateRefreshableFramebuffer(DeviceData device);
+
+        /// <summary>
+        /// Gets the frame buffer from the specified end point.
+        /// </summary>
+        /// <param name="device">The device for which to get the framebuffer.</param>
+        /// <returns>The raw frame buffer.</returns>
+        /// <exception cref="AdbException">failed asking for frame buffer</exception>
+        /// <exception cref="AdbException">failed nudging</exception>
+        Framebuffer GetFrameBuffer(DeviceData device);
 
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented

@@ -1,4 +1,5 @@
-﻿// <copyright file="ISyncService.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="ISyncService.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -9,23 +10,8 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    /// <summary>
-    /// Interface containing methods for file synchronization.
-    /// </summary>
-    public partial interface ISyncService : IDisposable
+    public partial interface ISyncService
     {
-        /// <summary>
-        /// Gets a value indicating whether this instance is open.
-        /// </summary>
-        /// <value>
-        /// <see langword="true"/> if this instance is open; otherwise, <see langword="false"/>.
-        /// </value>
-        bool IsOpen { get; }
-
-#if !HAS_TASK
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#pragma warning disable CS1574 // XML 注释中有未能解析的 cref 特性
-#endif
         /// <summary>
         /// Pushes (uploads) a file to the remote device.
         /// </summary>
@@ -35,11 +21,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken
-#endif
-            );
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -48,38 +31,31 @@ namespace AdvancedSharpAdbClient
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        void Pull(string remotePath, Stream stream, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken
-#endif
-            );
-#if !HAS_TASK
-#pragma warning restore CS1574 // XML 注释中有未能解析的 cref 特性
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns information about a file on the device.
         /// </summary>
         /// <param name="remotePath">The path of the file on the device.</param>
-        /// <returns>A <see cref="FileStatistics"/> object that contains information about the file.</returns>
-        FileStatistics Stat(string remotePath);
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken);
 
         /// <summary>
         /// Lists the contents of a directory on the device.
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        IEnumerable<FileStatistics> GetDirectoryListing(string remotePath);
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken);
 
         /// <summary>
         /// Opens this connection.
         /// </summary>
-        void Open();
-
-        /// <summary>
-        /// Occurs when there is a change in the status of the sync.
-        /// </summary>
-        event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task OpenAsync(CancellationToken cancellationToken);
     }
 }
+#endif

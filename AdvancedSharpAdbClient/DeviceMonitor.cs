@@ -48,6 +48,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly List<DeviceData> devices;
 
+#if HAS_TASK
         /// <summary>
         /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
@@ -55,7 +56,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly ManualResetEvent firstDeviceListParsed = new(false);
 
-#if HAS_TASK
         /// <summary>
         /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
         /// </summary>
@@ -66,6 +66,13 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private Task monitorTask;
 #else
+        /// <summary>
+        /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
+        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
+        /// has processed the first list of devices.
+        /// </summary>
+        private readonly ManualResetEvent firstDeviceListParsed = new(false);
+
         /// <summary>
         /// A <see cref="bool"/> that can be used to cancel the <see cref="monitorThread"/>.
         /// </summary>
