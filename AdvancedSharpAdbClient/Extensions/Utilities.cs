@@ -242,7 +242,7 @@ namespace AdvancedSharpAdbClient
 #if HAS_RUNTIMEINFORMATION
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
             || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-#if NETCOREAPP
+#if NETCOREAPP3_0_OR_GREATER
             || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
 #endif
             ;

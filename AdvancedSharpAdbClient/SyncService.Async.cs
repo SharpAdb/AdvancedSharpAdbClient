@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -50,7 +51,7 @@ namespace AdvancedSharpAdbClient
         public Task ReopenAsync(IAdbClient client, CancellationToken cancellationToken = default) => ReopenAsync(Factories.AdbSocketFactory(client.EndPoint), cancellationToken);
 
         /// <inheritdoc/>
-        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress            , CancellationToken cancellationToken = default            )
+        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -142,7 +143,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress            , CancellationToken cancellationToken = default            )
+        public async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
@@ -266,6 +267,35 @@ namespace AdvancedSharpAdbClient
 
             return value;
         }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <inheritdoc/>
+        public async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            // create the stat request message.
+            await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken);
+
+            while (true)
+            {
+                SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken);
+
+                if (response == SyncCommand.DONE)
+                {
+                    break;
+                }
+                else if (response != SyncCommand.DENT)
+                {
+                    throw new AdbException($"The server returned an invalid sync response.");
+                }
+
+                FileStatistics entry = new();
+                await ReadStatisticsAsync(entry, cancellationToken);
+                entry.Path = await Socket.ReadSyncStringAsync(cancellationToken);
+
+                yield return entry;
+            }
+        }
+#endif
 
         private async Task ReadStatisticsAsync(FileStatistics value, CancellationToken cancellationToken = default)
         {

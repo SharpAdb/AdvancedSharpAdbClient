@@ -453,7 +453,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <returns>An integer that represents the hash code for this rectangle.</returns>
         public override readonly int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             HashCode.Combine(X, Y, Width, Height);
 #else
             X ^ Y ^ Width ^ Height;

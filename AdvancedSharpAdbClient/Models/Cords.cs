@@ -332,7 +332,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <returns>An integer value that specifies a hash value for this <see cref="Cords"/>.</returns>
         public override readonly int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             HashCode.Combine(x, y);
 #else
             x ^ y;

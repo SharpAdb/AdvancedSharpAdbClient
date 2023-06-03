@@ -18,6 +18,8 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
+        public IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath) => throw new NotImplementedException();
 
         public Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();

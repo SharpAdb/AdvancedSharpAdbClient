@@ -50,6 +50,16 @@ namespace AdvancedSharpAdbClient
         /// <returns>An <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken);
 
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken);
+#endif
+
         /// <summary>
         /// Opens this connection.
         /// </summary>

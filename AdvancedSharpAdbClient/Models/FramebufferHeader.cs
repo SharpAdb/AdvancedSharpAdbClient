@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
 using System.Text;
@@ -144,10 +145,7 @@ namespace AdvancedSharpAdbClient
 #endif
         public readonly Image ToImage(byte[] buffer)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
+            ExceptionExtensions.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -181,10 +179,7 @@ namespace AdvancedSharpAdbClient
         private readonly PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
+            ExceptionExtensions.ThrowIfNull(buffer);
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
