@@ -28,6 +28,10 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
+#if HAS_BUFFERS
+global using System.Buffers;
+#endif
+
 #if HAS_SERIALIZATION
 global using System.Runtime.Serialization;
 #endif

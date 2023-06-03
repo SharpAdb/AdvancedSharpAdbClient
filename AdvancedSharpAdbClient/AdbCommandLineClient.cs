@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient
@@ -49,8 +48,8 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            bool isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            bool isWindows = Utilities.IsWindowsPlatform();
+            bool isUnix = Utilities.IsUnixPlatform();
 
             if (isWindows)
             {

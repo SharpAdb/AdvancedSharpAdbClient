@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient
             }
             else if (result != SyncCommand.OKAY)
             {
-                throw new AdbException($"The server sent an invali repsonse {result}");
+                throw new AdbException($"The server sent an invalid response {result}");
             }
         }
 

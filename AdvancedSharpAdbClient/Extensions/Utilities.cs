@@ -2,8 +2,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -24,13 +27,32 @@ namespace AdvancedSharpAdbClient
         /// contains the default value of the underlying type of <typeparamref name="TEnum"/>. This parameter is passed uninitialized.</param>
         /// <returns><see langword="true"/> if the value parameter was converted successfully; otherwise, <see langword="false"/>.</returns>
         /// <exception cref="ArgumentException"><typeparamref name="TEnum"/> is not an enumeration type.</exception>
-        public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct =>
+        public static bool TryParse<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct
+        {
 #if NETFRAMEWORK && !NET40_OR_GREATER
-            EnumEx
+            string strTypeFixed = value.Replace(' ', '_');
+            if (Enum.IsDefined(typeof(TEnum), strTypeFixed))
+            {
+                result = (TEnum)Enum.Parse(typeof(TEnum), strTypeFixed, ignoreCase);
+                return true;
+            }
+            else
+            {
+                foreach (string str in Enum.GetNames(typeof(TEnum)))
+                {
+                    if (str.Equals(strTypeFixed, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result = (TEnum)Enum.Parse(typeof(TEnum), str, ignoreCase);
+                        return true;
+                    }
+                }
+                result = default;
+                return false;
+            }
 #else
-            Enum
+            return Enum.TryParse(value, ignoreCase, out result);
 #endif
-            .TryParse(value, ignoreCase, out result);
+        }
 
         /// <summary>
         /// Indicates whether a specified string is <see langword="null"/>, empty, or consists only of white-space characters.
@@ -38,13 +60,27 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The string to test.</param>
         /// <returns><see langword="true"/> if the <paramref name="value"/> parameter is <see langword="null"/> or
         /// <see cref="string.Empty"/>, or if <paramref name="value"/> consists exclusively of white-space characters.</returns>
-        public static bool IsNullOrWhiteSpace(this string value) =>
+        public static bool IsNullOrWhiteSpace(this string value)
+        {
 #if NETFRAMEWORK && !NET40_OR_GREATER
-            StringEx
+            if (value == null)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!char.IsWhiteSpace(value[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
 #else
-            string
+            return string.IsNullOrWhiteSpace(value);
 #endif
-            .IsNullOrWhiteSpace(value);
+        }
 
         /// <summary>
         /// Concatenates the members of a constructed <see cref="IEnumerable{T}"/> collection of type <see cref="string"/>,
@@ -55,13 +91,51 @@ namespace AdvancedSharpAdbClient
         /// <param name="values">A collection that contains the strings to concatenate.</param>
         /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
         /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
-        public static string Join(string separator, IEnumerable<string> values) =>
+        public static string Join(string separator, IEnumerable<string> values)
+        {
 #if NETFRAMEWORK && !NET40_OR_GREATER
-            StringEx
+            ExceptionExtensions.ThrowIfNull(values);
+
+            separator ??= string.Empty;
+
+            using IEnumerator<string> en = values.GetEnumerator();
+            if (!en.MoveNext())
+            {
+                return string.Empty;
+            }
+
+            StringBuilder result = new();
+            if (en.Current != null)
+            {
+                _ = result.Append(en.Current);
+            }
+
+            while (en.MoveNext())
+            {
+                _ = result.Append(separator);
+                if (en.Current != null)
+                {
+                    _ = result.Append(en.Current);
+                }
+            }
+            return result.ToString();
 #else
-            string
+            return string.Join(separator, values);
 #endif
-            .Join(separator, values);
+        }
+
+#if NETFRAMEWORK && !NET40_OR_GREATER
+        /// <summary>
+        /// Removes all characters from the current <see cref="StringBuilder"/> instance.
+        /// </summary>
+        /// <param name="builder">The <see cref="StringBuilder"/> to removes all characters.</param>
+        /// <returns>An object whose <see cref="StringBuilder.Length"/> is 0 (zero).</returns>
+        public static StringBuilder Clear(this StringBuilder builder)
+        {
+            builder.Length = 0;
+            return builder;
+        }
+#endif
 
 #if HAS_TASK
         /// <summary>
@@ -150,6 +224,32 @@ namespace AdvancedSharpAdbClient
             (int)dateTimeOffset.DateTime.ToUnixEpoch();
 #else
             (int)dateTimeOffset.ToUnixTimeSeconds();
+#endif
+
+        public static bool IsWindowsPlatform() =>
+#if HAS_RUNTIMEINFORMATION
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#else
+            Environment.OSVersion.Platform
+                is PlatformID.Win32S
+                or PlatformID.Win32Windows
+                or PlatformID.Win32NT
+                or PlatformID.WinCE
+                or PlatformID.Xbox;
+#endif
+
+        public static bool IsUnixPlatform() =>
+#if HAS_RUNTIMEINFORMATION
+            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+            || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+#if NETCOREAPP
+            || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
+#endif
+            ;
+#else
+            Environment.OSVersion.Platform
+                is PlatformID.Unix
+                or PlatformID.MacOSX;
 #endif
 
 #if !HAS_PROCESS
