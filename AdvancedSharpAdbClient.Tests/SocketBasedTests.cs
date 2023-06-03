@@ -44,10 +44,10 @@ namespace AdvancedSharpAdbClient
             TestClient = new AdbClient();
         }
 
-        protected static readonly AdbResponse[] NoResponses = Array.Empty<AdbResponse>();
-        protected static readonly AdbResponse[] OkResponse = new AdbResponse[] { AdbResponse.OK };
-        protected static readonly string[] NoResponseMessages = Array.Empty<string>();
-        protected static readonly DeviceData Device = new()
+        protected static AdbResponse[] NoResponses { get; } = Array.Empty<AdbResponse>();
+        protected static AdbResponse[] OkResponse { get; } = new AdbResponse[] { AdbResponse.OK };
+        protected static string[] NoResponseMessages { get; } = Array.Empty<string>();
+        protected static DeviceData Device { get; } = new()
         {
             Serial = "169.254.109.177:5555",
             State = DeviceState.Online

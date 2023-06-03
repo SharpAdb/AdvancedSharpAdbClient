@@ -10,17 +10,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
-    internal class VersionInfoReceiver : InfoReceiver
+    internal partial class VersionInfoReceiver : InfoReceiver
     {
         /// <summary>
         /// The name of the version code property.
         /// </summary>
-        private static readonly string versionCode = "VersionCode";
+        private const string versionCode = "VersionCode";
 
         /// <summary>
         /// The name of the version name property.
         /// </summary>
-        private static readonly string versionName = "VersionName";
+        private const string versionName = "VersionName";
+
+        /// <summary>
+        /// A regular expression that can be used to parse the version code.
+        /// </summary>
+        private const string VersionCodePattern = @"versionCode=(\d*)( minSdk=(\d*))?( targetSdk=(\d*))?$";
 
         /// <summary>
         /// Tracks whether we're currently in the packages section or not.
@@ -107,9 +112,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             // versionCode=4 minSdk=9 targetSdk=22
-            string versionCodeRegex = @"versionCode=(\d*)( minSdk=(\d*))?( targetSdk=(\d*))?$";
-            Match match = Regex.Match(line, versionCodeRegex);
+            Match match = VersionCodeRegex().Match(line);
             return match.Success ? int.Parse(match.Groups[1].Value.Trim()) : null;
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(VersionCodePattern)]
+        private static partial Regex VersionCodeRegex();
+#else
+        private static Regex VersionCodeRegex() => new(VersionCodePattern);
+#endif
     }
 }

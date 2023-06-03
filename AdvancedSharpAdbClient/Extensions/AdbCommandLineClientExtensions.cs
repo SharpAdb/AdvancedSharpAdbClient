@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
 
@@ -19,10 +20,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to validate.</param>
         public static void EnsureIsValidAdbFile(this IAdbCommandLineClient client, string adbPath)
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
+            ExceptionExtensions.ThrowIfNull(client);
 
             if (!client.IsValidAdbFile(adbPath))
             {

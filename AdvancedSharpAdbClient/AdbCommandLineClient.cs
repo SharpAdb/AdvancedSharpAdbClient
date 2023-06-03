@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
-    public class AdbCommandLineClient : IAdbCommandLineClient
+    public partial class AdbCommandLineClient : IAdbCommandLineClient
     {
         /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
@@ -36,8 +36,9 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
+        /// <param name="isForce">Don't check adb file name when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbCommandLineClient(string adbPath
+        public AdbCommandLineClient(string adbPath, bool isForce = false
 #if HAS_LOGGER
             , ILogger<AdbCommandLineClient> logger = null
 #endif
@@ -48,26 +49,29 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentNullException(nameof(adbPath));
             }
 
-            bool isWindows = Utilities.IsWindowsPlatform();
-            bool isUnix = Utilities.IsUnixPlatform();
+            if (!isForce)
+            {
+                bool isWindows = Utilities.IsWindowsPlatform();
+                bool isUnix = Utilities.IsUnixPlatform();
 
-            if (isWindows)
-            {
-                if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                if (isWindows)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
+                    if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
+                    }
                 }
-            }
-            else if (isUnix)
-            {
-                if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
+                else if (isUnix)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
+                    if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
+                    }
                 }
-            }
-            else
-            {
-                throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+                else
+                {
+                    throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+                }
             }
 
             this.EnsureIsValidAdbFile(adbPath);
@@ -163,6 +167,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
         internal static Version GetVersionFromOutput(IEnumerable<string> output)
         {
+            Regex regex = AdbVersionRegex();
             foreach (string line in output)
             {
                 // Skip empty lines
@@ -171,7 +176,7 @@ namespace AdvancedSharpAdbClient
                     continue;
                 }
 
-                Match matcher = Regex.Match(line, AdbVersionPattern);
+                Match matcher = regex.Match(line);
                 if (matcher.Success)
                 {
                     int majorVersion = int.Parse(matcher.Groups[1].Value);
@@ -227,5 +232,12 @@ namespace AdvancedSharpAdbClient
 
             return status;
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(AdbVersionPattern)]
+        private static partial Regex AdbVersionRegex();
+#else
+        private static Regex AdbVersionRegex() => new(AdbVersionPattern);
+#endif
     }
 }

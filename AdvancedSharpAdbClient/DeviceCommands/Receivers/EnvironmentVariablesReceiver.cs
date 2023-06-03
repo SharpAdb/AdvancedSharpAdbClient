@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.
     /// </summary>
-    public sealed class EnvironmentVariablesReceiver : MultiLineReceiver
+    public sealed partial class EnvironmentVariablesReceiver : MultiLineReceiver
     {
         /// <summary>
         /// The path to the <c>printenv</c> command.
@@ -38,6 +38,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="lines">The lines.</param>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
+            Regex regex = EnvRegex();
             foreach (string line in lines)
             {
                 if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
@@ -45,7 +46,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     continue;
                 }
 
-                Match m = Regex.Match(line, EnvPattern);
+                Match m = regex.Match(line);
                 if (m.Success)
                 {
                     string label = m.Groups[1].Value.Trim();
@@ -65,5 +66,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(EnvPattern)]
+        private static partial Regex EnvRegex();
+#else
+        private static Regex EnvRegex() => new(EnvPattern);
+#endif
     }
 }
