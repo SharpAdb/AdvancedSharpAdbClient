@@ -1,7 +1,7 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
+﻿using AdvancedSharpAdbClient.Tests;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     public class PackageManagerReceiverTests
     {

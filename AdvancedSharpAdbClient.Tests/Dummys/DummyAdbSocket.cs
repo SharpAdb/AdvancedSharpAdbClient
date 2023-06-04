@@ -48,7 +48,29 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Socket Socket => throw new NotImplementedException();
 
-        public void Dispose() => IsConnected = false;
+        public void Send(byte[] data, int length) => SyncDataSent.Enqueue(data.Take(length).ToArray());
+
+        public void Send(byte[] data, int offset, int length)
+        {
+            if (offset == 0)
+            {
+                Send(data, length);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public void SendSyncRequest(string command, int value) => SyncRequests.Add((Enum.Parse<SyncCommand>(command), value.ToString()));
+
+        public void SendSyncRequest(SyncCommand command, string path) => SyncRequests.Add((command, path));
+
+        public void SendSyncRequest(SyncCommand command, int length) => SyncRequests.Add((command, length.ToString()));
+
+        public void SendSyncRequest(SyncCommand command, string path, int permissions) => SyncRequests.Add((command, $"{path},{permissions}"));
+
+        public void SendAdbRequest(string request) => Requests.Add(request);
 
         public int Read(byte[] data)
         {
@@ -62,56 +84,6 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public Task ReadAsync(byte[] data, CancellationToken cancellationToken = default)
-        {
-            Read(data);
-
-            return Task.FromResult(true);
-        }
-
-        public AdbResponse ReadAdbResponse()
-        {
-            AdbResponse response = Responses.Dequeue();
-
-            return !response.Okay ? throw new AdbException(response.Message, response) : response;
-        }
-
-        public string ReadString() => ReadStringAsync(CancellationToken.None).Result;
-
-        public string ReadSyncString() => ResponseMessages.Dequeue();
-
-        public async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
-        {
-            if (WaitForNewData)
-            {
-                while (ResponseMessages.Count == 0)
-                {
-                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
-            }
-
-            string message = ResponseMessages.Dequeue();
-
-            if (message == ServerDisconnected)
-            {
-                SocketException socketException = new(AdbServer.ConnectionReset);
-                throw new AdbException(socketException.Message, socketException);
-            }
-            else
-            {
-                return message;
-            }
-        }
-
-        public void SendAdbRequest(string request) => Requests.Add(request);
-
-        public void Close() => IsConnected = false;
-
-        public void SendSyncRequest(string command, int value) => throw new NotImplementedException();
-
-        public void Send(byte[] data, int length) => SyncDataSent.Enqueue(data.Take(length).ToArray());
-
         public int Read(byte[] data, int length)
         {
             byte[] actual = SyncDataReceived.Dequeue();
@@ -123,13 +95,16 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public void SendSyncRequest(SyncCommand command, string path) => SyncRequests.Add((command, path));
+        public string ReadString() => ReadStringAsync(CancellationToken.None).Result;
 
-        public SyncCommand ReadSyncResponse() => SyncResponses.Dequeue();
+        public string ReadSyncString() => ResponseMessages.Dequeue();
 
-        public void SendSyncRequest(SyncCommand command, int length) => SyncRequests.Add((command, length.ToString()));
+        public AdbResponse ReadAdbResponse()
+        {
+            AdbResponse response = Responses.Dequeue();
 
-        public void SendSyncRequest(SyncCommand command, string path, int permissions) => SyncRequests.Add((command, $"{path},{permissions}"));
+            return !response.Okay ? throw new AdbException(response.Message, response) : response;
+        }
 
         public Stream GetShellStream()
         {
@@ -141,22 +116,6 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 // Simulate the device failing to respond properly.
                 throw new SocketException();
-            }
-        }
-
-        public void Reconnect() => DidReconnect = true;
-
-        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        public void Send(byte[] data, int offset, int length)
-        {
-            if (offset == 0)
-            {
-                Send(data, length);
-            }
-            else
-            {
-                throw new NotImplementedException();
             }
         }
 
@@ -185,6 +144,8 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
         }
+
+        public SyncCommand ReadSyncResponse() => SyncResponses.Dequeue();
 
         public Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
@@ -222,26 +183,66 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
+        public Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default)
+        {
+            int result = Read(data);
+            TaskCompletionSource<int> tcs = new();
+            tcs.SetResult(result);
+            return tcs.Task;
+        }
+
+        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
+        {
+            int result = Read(data, length);
+            TaskCompletionSource<int> tcs = new();
+            tcs.SetResult(result);
+            return tcs.Task;
+        }
+
+        public async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
+        {
+            if (WaitForNewData)
+            {
+                while (ResponseMessages.Count == 0)
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+            }
+
+            string message = ResponseMessages.Dequeue();
+
+            if (message == ServerDisconnected)
+            {
+                SocketException socketException = new(AdbServer.ConnectionReset);
+                throw new AdbException(socketException.Message, socketException);
+            }
+            else
+            {
+                return message;
+            }
+        }
+
         public Task<string> ReadSyncStringAsync(CancellationToken cancellationToken)
         {
-            var response = ReadSyncString();
-            var tcs = new TaskCompletionSource<string>();
+            string response = ReadSyncString();
+            TaskCompletionSource<string> tcs = new();
             tcs.SetResult(response);
             return tcs.Task;
         }
 
         public Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken)
         {
-            var response = ReadSyncResponse();
-            var tcs = new TaskCompletionSource<SyncCommand>();
+            SyncCommand response = ReadSyncResponse();
+            TaskCompletionSource<SyncCommand> tcs = new();
             tcs.SetResult(response);
             return tcs.Task;
         }
 
         public Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
         {
-            var response = ReadAdbResponse();
-            var tcs = new TaskCompletionSource<AdbResponse>();
+            AdbResponse response = ReadAdbResponse();
+            TaskCompletionSource<AdbResponse> tcs = new();
             tcs.SetResult(response);
             return tcs.Task;
         }
@@ -251,5 +252,11 @@ namespace AdvancedSharpAdbClient.Tests
             SetDevice(device);
             return Task.CompletedTask;
         }
+
+        public void Dispose() => IsConnected = false;
+
+        public void Close() => IsConnected = false;
+
+        public void Reconnect() => DidReconnect = true;
     }
 }

@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+        public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
             ReadAsync(data, data.Length, cancellationToken);
 
         /// <inheritdoc/>

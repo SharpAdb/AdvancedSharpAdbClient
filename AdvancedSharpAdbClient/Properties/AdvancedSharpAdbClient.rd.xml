@@ -1,5 +1,5 @@
 <!--
-    This file enables reflection for 'UnicodeStyle' and all of its public/private members.
+    This file enables reflection for 'AdvancedSharpAdbClient' and all of its public/private members.
     Thus, making the library to work in .NET Native, even if developers modified their default rd.xml.
     See issue https://github.com/CommunityToolkit/WindowsCommunityToolkit/issues/3093 for more details.
 -->

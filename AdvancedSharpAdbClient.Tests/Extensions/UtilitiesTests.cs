@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Extensions
+namespace AdvancedSharpAdbClient.Tests
 {
     /// <summary>
     /// Tests the <see cref="Utilities"/> class.

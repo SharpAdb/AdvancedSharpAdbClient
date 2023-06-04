@@ -1,7 +1,6 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class UnknownOptionExceptionTests
     {
@@ -17,10 +16,8 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
         public void TestMessageAndInnerConstructor() =>
             ExceptionTester<UnknownOptionException>.TestMessageAndInnerConstructor((message, inner) => new UnknownOptionException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
         public void TestSerializationConstructor() =>
             ExceptionTester<UnknownOptionException>.TestSerializationConstructor((info, context) => new UnknownOptionException(info, context));
-#endif
     }
 }

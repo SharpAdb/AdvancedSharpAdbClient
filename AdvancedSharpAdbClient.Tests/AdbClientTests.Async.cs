@@ -1,4 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,65 +7,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    /// <summary>
-    /// Tests the <see cref="AdbClient"/> class.
-    /// </summary>
-    public partial class AdbClientTests : SocketBasedTests
+    public partial class AdbClientTests
     {
-        // Toggle the integration test flag to true to run on an actual adb server
-        // (and to build/validate the test cases), set to false to use the mocked
-        // adb sockets.
-        // In release mode, this flag is ignored and the mocked adb sockets are always used.
-        public AdbClientTests() : base(integrationTest: false, doDispose: false)
-        {
-            lock (FactoriesTests.locker)
-            {
-                Factories.Reset();
-            }
-        }
-
         [Fact]
-        public void ConstructorNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => new AdbClient(null, Factories.AdbSocketFactory));
-
-        [Fact]
-        public void ConstructorInvalidEndPointTest() =>
-            _ = Assert.Throws<NotSupportedException>(() => new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory));
-
-        [Fact]
-        public void ConstructorTest()
-        {
-            AdbClient adbClient = new();
-            Assert.NotNull(adbClient);
-            Assert.NotNull(adbClient.EndPoint);
-            Assert.IsType<IPEndPoint>(adbClient.EndPoint);
-
-            IPEndPoint endPoint = (IPEndPoint)adbClient.EndPoint;
-
-            Assert.Equal(IPAddress.Loopback, endPoint.Address);
-            Assert.Equal(AdbClient.AdbServerPort, endPoint.Port);
-        }
-
-        [Fact]
-        public void FormAdbRequestTest()
-        {
-            Assert.Equal(Encoding.ASCII.GetBytes("0009host:kill"), AdbClient.FormAdbRequest("host:kill"));
-            Assert.Equal(Encoding.ASCII.GetBytes("000Chost:version"), AdbClient.FormAdbRequest("host:version"));
-        }
-
-        [Fact]
-        public void CreateAdbForwardRequestTest()
-        {
-            Assert.Equal(Encoding.ASCII.GetBytes("0008tcp:1984"), AdbClient.CreateAdbForwardRequest(null, 1984));
-            Assert.Equal(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
-        }
-
-        [Fact]
-        public void GetAdbVersionTest()
+        public async void GetAdbVersionAsyncTest()
         {
             string[] responseMessages = new string[]
             {
@@ -78,33 +30,33 @@ namespace AdvancedSharpAdbClient.Tests
 
             int version = 0;
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => version = TestClient.GetAdbVersion());
+                async () => version = await TestClient.GetAdbVersionAsync());
 
             // Make sure and the correct value is returned.
             Assert.Equal(32, version);
         }
 
         [Fact]
-        public void KillAdbTest()
+        public async void KillAdbAsyncTest()
         {
             string[] requests = new string[]
             {
                 "host:kill"
             };
 
-            RunTest(
+            await RunTestAsync(
                 NoResponses,
                 NoResponseMessages,
                 requests,
-                TestClient.KillAdb);
+                () => TestClient.KillAdbAsync());
         }
 
         [Fact]
-        public void GetDevicesTest()
+        public async void GetDevicesAsyncTest()
         {
             string[] responseMessages = new string[]
             {
@@ -118,11 +70,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             IEnumerable<DeviceData> devices = null;
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => devices = TestClient.GetDevices());
+                async () => devices = await TestClient.GetDevicesAsync());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
@@ -137,79 +89,32 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void SetDeviceTest()
-        {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
-
-            RunTest(
-                OkResponse,
-                NoResponseMessages,
-                requests,
-                () => Socket.SetDevice(Device));
-        }
-
-        [Fact]
-        public void SetInvalidDeviceTest()
-        {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
-
-            _ = Assert.Throws<DeviceNotFoundException>(() =>
-            RunTest(
-                new AdbResponse[] { AdbResponse.FromError("device not found") },
-                NoResponseMessages,
-                requests,
-                () => Socket.SetDevice(Device)));
-        }
-
-        [Fact]
-        public void SetDeviceOtherException()
-        {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
-
-            _ = Assert.Throws<AdbException>(() =>
-            RunTest(
-                new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
-                NoResponseMessages,
-                requests,
-                () => Socket.SetDevice(Device)));
-        }
-
-        [Fact]
-        public void CreateForwardTest() =>
-            RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
+        public async void CreateForwardAsyncTest() =>
+            await RunCreateForwardAsyncTest(
+                (device) => TestClient.CreateForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
 
         [Fact]
-        public void CreateReverseTest() =>
-            RunCreateReverseTest(
-                (device) => TestClient.CreateReverseForward(device, "tcp:1", "tcp:2", true),
+        public async void CreateReverseAsyncTest() =>
+            await RunCreateReverseAsyncTest(
+                (device) => TestClient.CreateReverseForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
         [Fact]
-        public void CreateTcpForwardTest() =>
-            RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, 3, 4),
+        public async void CreateTcpForwardAsyncTest() =>
+            await RunCreateForwardAsyncTest(
+                (device) => TestClient.CreateForwardAsync(device, 3, 4),
                 "tcp:3;tcp:4");
 
         [Fact]
-        public void CreateSocketForwardTest() =>
-            RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, 5, "/socket/1"),
+        public async void CreateSocketForwardAsyncTest() =>
+            await RunCreateForwardAsyncTest(
+                (device) => TestClient.CreateForwardAsync(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
         [Fact]
-        public void CreateDuplicateForwardTest()
+        public async void CreateDuplicateForwardAsyncTest()
         {
             AdbResponse[] responses = new AdbResponse[]
             {
@@ -221,31 +126,31 @@ namespace AdvancedSharpAdbClient.Tests
                 "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
             };
 
-            _ = Assert.Throws<AdbException>(() =>
-            RunTest(
+            _ = await Assert.ThrowsAsync<AdbException>(() =>
+            RunTestAsync(
                 responses,
                 NoResponseMessages,
                 requests,
-                () => TestClient.CreateForward(Device, "tcp:1", "tcp:2", false)));
+                () => TestClient.CreateForwardAsync(Device, "tcp:1", "tcp:2", false)));
         }
 
         [Fact]
-        public void RemoveForwardTest()
+        public async void RemoveForwardAsyncTest()
         {
             string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:killforward:tcp:1"
             };
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 NoResponseMessages,
                 requests,
-                () => TestClient.RemoveForward(Device, 1));
+                () => TestClient.RemoveForwardAsync(Device, 1));
         }
 
         [Fact]
-        public void RemoveReverseForwardTest()
+        public async void RemoveReverseForwardAsyncTest()
         {
             string[] requests = new string[]
             {
@@ -259,30 +164,30 @@ namespace AdvancedSharpAdbClient.Tests
                 AdbResponse.OK,
             };
 
-            RunTest(
+            await RunTestAsync(
                 responses,
                 NoResponseMessages,
                 requests,
-                () => TestClient.RemoveReverseForward(Device, "localabstract:test"));
+                () => TestClient.RemoveReverseForwardAsync(Device, "localabstract:test"));
         }
 
         [Fact]
-        public void RemoveAllForwardsTest()
+        public async void RemoveAllForwardsAsyncTest()
         {
             string[] requests = new string[]
             {
                 "host-serial:169.254.109.177:5555:killforward-all"
             };
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 NoResponseMessages,
                 requests,
-                () => TestClient.RemoveAllForwards(Device));
+                () => TestClient.RemoveAllForwardsAsync(Device));
         }
 
         [Fact]
-        public void RemoveAllReversesTest()
+        public async void RemoveAllReversesAsyncTest()
         {
             string[] requests = new string[]
             {
@@ -296,15 +201,15 @@ namespace AdvancedSharpAdbClient.Tests
                 AdbResponse.OK,
             };
 
-            RunTest(
+            await RunTestAsync(
                 responses,
                 NoResponseMessages,
                 requests,
-                () => TestClient.RemoveAllReverseForwards(Device));
+                () => TestClient.RemoveAllReverseForwardsAsync(Device));
         }
 
         [Fact]
-        public void ListForwardTest()
+        public async void ListForwardAsyncTest()
         {
             string[] responseMessages = new string[]
             {
@@ -318,11 +223,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             ForwardData[] forwards = null;
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => forwards = TestClient.ListForward(Device).ToArray());
+                async () => forwards = (await TestClient.ListForwardAsync(Device)).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -332,7 +237,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ListReverseForwardTest()
+        public async void ListReverseForwardAsyncTest()
         {
             string[] responseMessages = new string[]
             {
@@ -352,11 +257,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             ForwardData[] forwards = null;
 
-            RunTest(
+            await RunTestAsync(
                 responses,
                 responseMessages,
                 requests,
-                () => forwards = TestClient.ListReverseForward(Device).ToArray());
+                async () => forwards = (await TestClient.ListReverseForwardAsync(Device)).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -366,7 +271,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ExecuteRemoteCommandTest()
+        public async void ExecuteRemoteCommandAsyncTest()
         {
             DeviceData device = new()
             {
@@ -393,18 +298,18 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            RunTest(
+            await RunTestAsync(
                 responses,
                 responseMessages,
                 requests,
                 shellStream,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver));
+                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver));
 
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
         [Fact]
-        public void ExecuteRemoteCommandUnresponsiveTest()
+        public void ExecuteRemoteCommandAsyncUnresponsiveTest()
         {
             DeviceData device = new()
             {
@@ -428,17 +333,57 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            _ = Assert.Throws<ShellCommandUnresponsiveException>(() =>
-            RunTest(
+            _ = Assert.ThrowsAsync<ShellCommandUnresponsiveException>(() =>
+            RunTestAsync(
                 responses,
                 responseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
+                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None)));
         }
 
         [Fact]
-        public void RebootTest()
+        public async void RunLogServiceAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            AdbResponse[] responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            string[] responseMessages = Array.Empty<string>();
+
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:logcat -B -b system"
+            };
+
+            ConsoleOutputReceiver receiver = new();
+
+            using Stream stream = File.OpenRead("Assets/logcat.bin");
+            using ShellStream shellStream = new(stream, false);
+            Collection<LogEntry> logs = new();
+            Action<LogEntry> sink = logs.Add;
+
+            await RunTestAsync(
+                responses,
+                responseMessages,
+                requests,
+                shellStream,
+                () => TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, LogId.System));
+
+            Assert.Equal(3, logs.Count);
+        }
+
+        [Fact]
+        public async void RebootAsyncTest()
         {
             string[] requests = new string[]
             {
@@ -446,112 +391,112 @@ namespace AdvancedSharpAdbClient.Tests
                 "reboot:"
             };
 
-            RunTest(
+            await RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 NoResponseMessages,
                 requests,
-                () => TestClient.Reboot(Device));
+                () => TestClient.RebootAsync(Device));
         }
 
         [Fact]
-        public void PairIPAddressTest() =>
-            RunPairTest(
-                () => TestClient.Pair(IPAddress.Loopback, "114514"),
+        public async void PairAsyncIPAddressTest() =>
+            await RunPairAsyncTest(
+                () => TestClient.PairAsync(IPAddress.Loopback, "114514"),
                 "127.0.0.1:5555",
                 "114514");
 
         [Fact]
-        public void PairDnsEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair(new DnsEndPoint("localhost", 1234), "114514"),
+        public async void PairAsyncDnsEndpointTest() =>
+            await RunPairAsyncTest(
+                () => TestClient.PairAsync(new DnsEndPoint("localhost", 1234), "114514"),
                 "localhost:1234",
                 "114514");
 
         [Fact]
-        public void PairIPEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
+        public async void PairAsyncIPEndpointTest() =>
+            await RunPairAsyncTest(
+                () => TestClient.PairAsync(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
                 "127.0.0.1:4321",
                 "114514");
 
         [Fact]
-        public void PairHostEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair("localhost:9926", "114514"),
+        public async void PairAsyncHostEndpointTest() =>
+            await RunPairAsyncTest(
+                () => TestClient.PairAsync("localhost:9926", "114514"),
                 "localhost:9926",
                 "114514");
 
         [Fact]
-        public void PairIPAddressNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPAddress)null, "114514"));
+        public async void PairAsyncIPAddressNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
 
         [Fact]
-        public void PairDnsEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair(null, "114514"));
+        public async void PairAsyncDnsEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync(null, "114514"));
 
         [Fact]
-        public void PairIPEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPEndPoint)null, "114514"));
+        public async void PairAsyncIPEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPEndPoint)null, "114514"));
 
         [Fact]
-        public void PairHostEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((string)null, "114514"));
+        public async void PairAsyncHostEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((string)null, "114514"));
 
         [Fact]
-        public void ConnectIPAddressTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(IPAddress.Loopback),
+        public async void ConnectAsyncIPAddressTest() =>
+            await RunConnectAsyncTest(
+                () => TestClient.ConnectAsync(IPAddress.Loopback),
                 "127.0.0.1:5555");
 
         [Fact]
-        public void ConnectDnsEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(new DnsEndPoint("localhost", 1234)),
+        public async void ConnectAsyncDnsEndpointTest() =>
+            await RunConnectAsyncTest(
+                () => TestClient.ConnectAsync(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
 
         [Fact]
-        public void ConnectIPEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
+        public async void ConnectAsyncIPEndpointTest() =>
+            await RunConnectAsyncTest(
+                () => TestClient.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
 
         [Fact]
-        public void ConnectHostEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect("localhost:9926"),
+        public async void ConnectAsyncHostEndpointTest() =>
+            await RunConnectAsyncTest(
+                () => TestClient.ConnectAsync("localhost:9926"),
                 "localhost:9926");
 
         [Fact]
-        public void ConnectIPAddressNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
+        public async void ConnectAsyncIPAddressNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPAddress)null));
 
         [Fact]
-        public void ConnectDnsEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
+        public async void ConnectAsyncDnsEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
 
         [Fact]
-        public void ConnectIPEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
+        public async void ConnectAsyncIPEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPEndPoint)null));
 
         [Fact]
-        public void ConnectHostEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((string)null));
+        public async void ConnectAsyncHostEndpointNullTest() =>
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((string)null));
 
         [Fact]
-        public void DisconnectTest()
+        public async void DisconnectAsyncTest()
         {
             string[] requests = new string[] { "host:disconnect:localhost:5555" };
             string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
+                () => TestClient.DisconnectAsync(new DnsEndPoint("localhost", 5555)));
         }
 
         [Fact]
-        public void RootTest()
+        public void RootAsyncTest()
         {
             DeviceData device = new()
             {
@@ -569,8 +514,8 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            _ = Assert.Throws<AdbException>(() =>
-            RunTest(
+            _ = Assert.ThrowsAsync<AdbException>(() =>
+            RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 NoResponseMessages,
                 requests,
@@ -578,11 +523,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Array.Empty<SyncCommand>(),
                 new byte[][] { expectedData },
                 Array.Empty<byte[]>(),
-                () => TestClient.Root(device)));
+                () => TestClient.RootAsync(device)));
         }
 
         [Fact]
-        public void UnrootTest()
+        public void UnrootAsyncTest()
         {
             DeviceData device = new()
             {
@@ -600,8 +545,8 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            _ = Assert.Throws<AdbException>(() =>
-            RunTest(
+            _ = Assert.ThrowsAsync<AdbException>(() =>
+            RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 NoResponseMessages,
                 requests,
@@ -609,11 +554,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Array.Empty<SyncCommand>(),
                 new byte[][] { expectedData },
                 Array.Empty<byte[]>(),
-                () => TestClient.Unroot(device)));
+                () => TestClient.UnrootAsync(device)));
         }
 
         [Fact]
-        public void InstallTest()
+        public async void InstallAsyncTest()
         {
             DeviceData device = new()
             {
@@ -635,7 +580,7 @@ namespace AdvancedSharpAdbClient.Tests
                 while (true)
                 {
                     byte[] buffer = new byte[32 * 1024];
-                    int read = stream.Read(buffer, 0, buffer.Length);
+                    int read = await stream.ReadAsync(buffer);
 
                     if (read == 0)
                     {
@@ -653,7 +598,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
-                RunTest(
+                await RunTestAsync(
                     new AdbResponse[]
                     {
                         AdbResponse.OK,
@@ -665,11 +610,11 @@ namespace AdvancedSharpAdbClient.Tests
                     Array.Empty<SyncCommand>(),
                     new byte[][] { response },
                     applicationDataChuncks.ToArray(),
-                    () => TestClient.Install(device, stream));
+                    () => TestClient.InstallAsync(device, stream));
             }
         }
 
-        private void RunConnectTest(Action test, string connectString)
+        private Task RunConnectAsyncTest(Func<Task> test, string connectString)
         {
             string[] requests = new string[]
             {
@@ -681,14 +626,14 @@ namespace AdvancedSharpAdbClient.Tests
                 $"connected to {connectString}"
             };
 
-            RunTest(
+            return RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
                 test);
         }
 
-        private void RunPairTest(Action test, string connectString, string code)
+        private Task RunPairAsyncTest(Func<Task> test, string connectString, string code)
         {
             string[] requests = new string[]
             {
@@ -700,14 +645,14 @@ namespace AdvancedSharpAdbClient.Tests
                 $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
             };
 
-            RunTest(
+            return RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
                 test);
         }
 
-        private void RunCreateReverseTest(Action<DeviceData> test, string reverseString)
+        private Task RunCreateReverseAsyncTest(Func<DeviceData, Task> test, string reverseString)
         {
             string[] requests = new string[]
             {
@@ -715,7 +660,7 @@ namespace AdvancedSharpAdbClient.Tests
                 $"reverse:forward:{reverseString}",
             };
 
-            RunTest(
+            return RunTestAsync(
                 new AdbResponse[]
                 {
                     AdbResponse.OK,
@@ -730,14 +675,14 @@ namespace AdvancedSharpAdbClient.Tests
                 () => test(Device));
         }
 
-        private void RunCreateForwardTest(Action<DeviceData> test, string forwardString)
+        private Task RunCreateForwardAsyncTest(Func<DeviceData, Task> test, string forwardString)
         {
             string[] requests = new string[]
             {
                 $"host-serial:169.254.109.177:5555:forward:{forwardString}"
             };
 
-            RunTest(
+            return RunTestAsync(
                 new AdbResponse[]
                 {
                     AdbResponse.OK,

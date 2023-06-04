@@ -48,11 +48,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override int Read(byte[] data)
         {
-#if NETCOREAPP1_1
-            StackTrace trace = null;
-#else
             StackTrace trace = new();
-#endif
 
             int read = base.Read(data);
 
@@ -66,11 +62,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override int Read(byte[] data, int length)
         {
-#if NETCOREAPP1_1
-            StackTrace trace = null;
-#else
             StackTrace trace = new();
-#endif
 
             int read = base.Read(data, length);
 
@@ -137,11 +129,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override void SendSyncRequest(SyncCommand command, int length)
         {
-#if NETCOREAPP1_1
-            StackTrace trace = null;
-#else
             StackTrace trace = new();
-#endif
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
@@ -160,11 +148,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override void Send(byte[] data, int length)
         {
-#if NETCOREAPP1_1
-            StackTrace trace = null;
-#else
             StackTrace trace = new();
-#endif
 
             base.Send(data, length);
 

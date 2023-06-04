@@ -1,4 +1,4 @@
-﻿// <copyright file="InfoReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="InfoOutputReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes command line output of a <c>adb</c> shell command.
     /// </summary>
-    public class InfoReceiver : MultiLineReceiver
+    public class InfoOutputReceiver : MultiLineReceiver
     {
         /// <summary>
         /// Gets or sets a dictionary with the extracted properties and their corresponding values.

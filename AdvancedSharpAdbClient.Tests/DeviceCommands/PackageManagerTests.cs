@@ -1,10 +1,10 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
+﻿using AdvancedSharpAdbClient.Tests;
 using Moq;
 using System;
 using System.IO;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
 
     public class PackageManagerTests

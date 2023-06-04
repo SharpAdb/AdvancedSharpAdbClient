@@ -1,7 +1,6 @@
 ﻿using Xunit;
-using AdvancedSharpAdbClient.DeviceCommands;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     /// <summary>
     /// Tests the <see cref="EnvironmentVariablesReceiver"/> class.

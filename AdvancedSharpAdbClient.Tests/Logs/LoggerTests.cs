@@ -1,12 +1,11 @@
-﻿using AdvancedSharpAdbClient.Logs;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Logs
+namespace AdvancedSharpAdbClient.Logs.Tests
 {
     public class LoggerTests
     {

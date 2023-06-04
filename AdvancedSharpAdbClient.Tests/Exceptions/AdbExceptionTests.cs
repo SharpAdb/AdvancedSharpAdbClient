@@ -1,7 +1,6 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class AdbExceptionTests
     {
@@ -17,10 +16,8 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
         public void TestMessageAndInnerConstructor() =>
             ExceptionTester<AdbException>.TestMessageAndInnerConstructor((message, inner) => new AdbException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
         public void TestSerializationConstructor() =>
             ExceptionTester<AdbException>.TestSerializationConstructor((info, context) => new AdbException(info, context));
-#endif
     }
 }

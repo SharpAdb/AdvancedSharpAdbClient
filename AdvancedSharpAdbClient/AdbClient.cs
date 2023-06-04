@@ -339,6 +339,10 @@ namespace AdvancedSharpAdbClient
                     receiver?.AddOutput(line);
                 }
             }
+            catch (Exception e)
+            {
+                throw new ShellCommandUnresponsiveException(e);
+            }
             finally
             {
                 receiver?.Flush();

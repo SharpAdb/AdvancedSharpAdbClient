@@ -339,10 +339,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task RootAsync(DeviceData device, CancellationToken cancellationToken) => RootAsync("root:", device, cancellationToken);
+        public Task RootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("root:", device, cancellationToken);
 
         /// <inheritdoc/>
-        public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken) => RootAsync("unroot:", device, cancellationToken);
+        public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("unroot:", device, cancellationToken);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with or without root privileges.
@@ -435,7 +435,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken);
             }
 
-            read = await socket.ReadAsync(buffer, buffer.Length, cancellationToken);
+            read = await socket.ReadAsync(buffer, cancellationToken);
             string value = Encoding.UTF8.GetString(buffer, 0, read);
 
             if (!value.Contains("Success"))
@@ -617,7 +617,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken);
             }
 
-            read = await socket.ReadAsync(buffer, buffer.Length, cancellationToken);
+            read = await socket.ReadAsync(buffer, cancellationToken);
             string value = Encoding.UTF8.GetString(buffer, 0, read);
 
             if (!value.Contains("Success"))

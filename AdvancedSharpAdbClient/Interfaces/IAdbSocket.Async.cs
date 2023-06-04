@@ -72,7 +72,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="data" >The buffer to store the read data into.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        Task ReadAsync(byte[] data, CancellationToken cancellationToken);
+        Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.

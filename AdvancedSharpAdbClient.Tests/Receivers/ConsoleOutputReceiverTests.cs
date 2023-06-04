@@ -53,22 +53,22 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void TrowOnErrorTest()
+        public void ThrowOnErrorTest()
         {
-            AssertTrowsException<FileNotFoundException>("/dev/test: not found");
-            AssertTrowsException<FileNotFoundException>("No such file or directory");
-            AssertTrowsException<UnknownOptionException>("Unknown option -h");
-            AssertTrowsException<CommandAbortingException>("/dev/test: Aborting.");
-            AssertTrowsException<FileNotFoundException>("/dev/test: applet not found");
-            AssertTrowsException<PermissionDeniedException>("/dev/test: permission denied");
-            AssertTrowsException<PermissionDeniedException>("/dev/test: access denied");
+            AssertThrowsException<FileNotFoundException>("/dev/test: not found");
+            AssertThrowsException<FileNotFoundException>("No such file or directory");
+            AssertThrowsException<UnknownOptionException>("Unknown option -h");
+            AssertThrowsException<CommandAbortingException>("/dev/test: Aborting.");
+            AssertThrowsException<FileNotFoundException>("/dev/test: applet not found");
+            AssertThrowsException<PermissionDeniedException>("/dev/test: permission denied");
+            AssertThrowsException<PermissionDeniedException>("/dev/test: access denied");
 
             // Should not thrown an exception
             ConsoleOutputReceiver receiver = new();
             receiver.ThrowOnError("Stay calm and watch cat movies.");
         }
 
-        private static void AssertTrowsException<T>(string line) where T : Exception
+        private static void AssertThrowsException<T>(string line) where T : Exception
         {
             ConsoleOutputReceiver receiver = new();
             _ = Assert.Throws<T>(() => receiver.ThrowOnError(line));

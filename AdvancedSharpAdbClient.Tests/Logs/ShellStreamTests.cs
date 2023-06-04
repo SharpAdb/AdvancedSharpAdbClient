@@ -1,11 +1,10 @@
-﻿using AdvancedSharpAdbClient.Logs;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Logs
+namespace AdvancedSharpAdbClient.Logs.Tests
 {
     public class ShellStreamTests
     {

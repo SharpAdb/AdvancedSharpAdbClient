@@ -373,7 +373,7 @@ namespace AdvancedSharpAdbClient
                 string message = ReadString();
                 resp.Message = message;
 #if HAS_LOGGER
-                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
+                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{resp.Message}'");
 #endif
             }
 

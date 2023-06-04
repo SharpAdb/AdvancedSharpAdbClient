@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     /// <summary>
     /// Tests the <see cref="Exception"/> class.
@@ -30,7 +30,6 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
             Assert.Equal(inner, ex.InnerException);
         }
 
-#if !NETCOREAPP1_1
         public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
         {
             SerializationInfo info = new(typeof(T), new FormatterConverter());
@@ -49,6 +48,5 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
 
             _ = constructor(info, context);
         }
-#endif
     }
 }

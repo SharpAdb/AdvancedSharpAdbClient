@@ -1,7 +1,6 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class CommandAbortingExceptionTests
     {
@@ -17,10 +16,8 @@ namespace AdvancedSharpAdbClient.Tests.Exceptions
         public void TestMessageAndInnerConstructor() =>
             ExceptionTester<CommandAbortingException>.TestMessageAndInnerConstructor((message, inner) => new CommandAbortingException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
         public void TestSerializationConstructor() =>
             ExceptionTester<CommandAbortingException>.TestSerializationConstructor((info, context) => new CommandAbortingException(info, context));
-#endif
     }
 }

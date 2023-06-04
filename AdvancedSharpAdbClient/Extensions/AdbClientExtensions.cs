@@ -21,6 +21,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device to which to forward the connections.</param>
         /// <param name="localPort">The local port to forward.</param>
         /// <param name="remotePort">The remote port to forward to</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
         public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort) =>
             client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
@@ -32,10 +34,45 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device to which to forward the connections.</param>
         /// <param name="localPort">The local port to forward.</param>
         /// <param name="remoteSocket">The remote Unix socket.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
         /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
         public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket) =>
             client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
+
+#if HAS_TASK
+        /// <summary>
+        /// Creates a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="localPort">The local port to forward.</param>
+        /// <param name="remotePort">The remote port to forward to</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
+        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
+        /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
+        public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, int localPort, int remotePort, CancellationToken cancellationToken = default) =>
+            client.CreateForwardAsync(device, $"tcp:{localPort}", $"tcp:{remotePort}", true, cancellationToken);
+
+        /// <summary>
+        /// Forwards a remote Unix socket to a local TCP socket.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="localPort">The local port to forward.</param>
+        /// <param name="remoteSocket">The remote Unix socket.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
+        /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
+        /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
+        /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
+        public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, int localPort, string remoteSocket, CancellationToken cancellationToken = default) =>
+            client.CreateForwardAsync(device, $"tcp:{localPort}", $"local:{remoteSocket}", true, cancellationToken);
+#endif
 
         /// <summary>
         /// Reboots the specified adb socket address.
@@ -43,6 +80,17 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device.</param>
         public static void Reboot(this IAdbClient client, DeviceData device) => client.Reboot(string.Empty, device);
+
+#if HAS_TASK
+        /// <summary>
+        /// Reboots the specified adb socket address.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task RebootAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.RebootAsync(string.Empty, device, cancellationToken);
+#endif
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.

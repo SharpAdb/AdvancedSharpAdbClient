@@ -1,8 +1,7 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
-using System;
+﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     /// <summary>
     /// Tests the <see cref="AndroidProcess"/> class.

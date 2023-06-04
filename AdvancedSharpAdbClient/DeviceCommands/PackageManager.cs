@@ -170,7 +170,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
@@ -284,7 +284,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 94);
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             InstallProgressChanged?.Invoke(this, 95);
@@ -324,7 +324,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, 93);
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             InstallProgressChanged?.Invoke(this, 95);
@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -464,7 +464,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             string reinstallSwitch = reinstall ? " -r" : string.Empty;
             string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
 
@@ -493,7 +493,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             client.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))

@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
     /// </summary>
-    internal class ProcessOutputReceiver : MultiLineReceiver
+    public class ProcessOutputReceiver : MultiLineReceiver
     {
         /// <summary>
         /// Gets a list of all processes that have been received.

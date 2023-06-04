@@ -1,11 +1,10 @@
 ﻿using System;
 using Xunit;
-using AdvancedSharpAdbClient.Exceptions;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     /// <summary>
-    /// Tests the <see cref="AdvancedSharpAdbClient.Exceptions.ExceptionExtensions"/> class.
+    /// Tests the <see cref="ExceptionExtensions"/> class.
     /// </summary>
     public class ExceptionExtensionsTests
     {
