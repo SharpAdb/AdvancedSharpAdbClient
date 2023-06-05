@@ -477,8 +477,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="timeout">The timeout for waiting the elements.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
-        /// <returns>The <see cref="Array"/> of <see cref="Element"/> has got.</returns>
-        Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
+        /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.

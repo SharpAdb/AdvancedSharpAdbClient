@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            MemoryStream stream = new();
+            using MemoryStream stream = new();
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 

@@ -122,6 +122,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="top">The y-coordinate of the upper-left corner of this <see cref='Area'/> structure.</param>
         /// <param name="right">The x-coordinate of the lower-right corner of this <see cref='Area'/> structure.</param>
         /// <param name="bottom">The y-coordinate of the lower-right corner of this <see cref='Area'/> structure.</param>
+        /// <returns>The new <see cref="Area"/> that this method creates.</returns>
         public static Area FromLTRB(int left, int top, int right, int bottom) =>
             new(left, top, unchecked(right - left), unchecked(bottom - top));
 

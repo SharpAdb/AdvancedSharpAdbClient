@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -389,7 +391,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
-            MemoryStream shellStream = new(streamData);
+            using MemoryStream shellStream = new(streamData);
 
             ConsoleOutputReceiver receiver = new();
 
@@ -624,7 +626,7 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
-                "exec:cmd package 'install'  -S 205774"
+                "exec:cmd package 'install' -S 205774"
             };
 
             // The app data is sent in chunks of 32 kb
@@ -667,6 +669,313 @@ namespace AdvancedSharpAdbClient.Tests
                     applicationDataChuncks.ToArray(),
                     () => TestClient.Install(device, stream));
             }
+        }
+
+        [Fact]
+        public void InstallCreateTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-create' -p com.google.android.gms"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            string session = string.Empty;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => session = TestClient.InstallCreate(device, "com.google.android.gms"));
+
+            Assert.Equal("936013062", session);
+        }
+
+        [Fact]
+        public void InstallWriteTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
+            };
+
+            // The app data is sent in chunks of 32 kb
+            Collection<byte[]> applicationDataChuncks = new();
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[32 * 1024];
+                    int read = stream.Read(buffer, 0, buffer.Length);
+
+                    if (read == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        buffer = buffer.Take(read).ToArray();
+                        applicationDataChuncks.Add(buffer);
+                    }
+                }
+            }
+
+            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                RunTest(
+                    new AdbResponse[]
+                    {
+                        AdbResponse.OK,
+                        AdbResponse.OK,
+                    },
+                    NoResponseMessages,
+                    requests,
+                    Array.Empty<(SyncCommand, string)>(),
+                    Array.Empty<SyncCommand>(),
+                    new byte[][] { response },
+                    applicationDataChuncks.ToArray(),
+                    () => TestClient.InstallWrite(device, stream, "base", "936013062"));
+            }
+        }
+
+        [Fact]
+        public void InstallCommitTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-commit' 936013062"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.InstallCommit(device, "936013062"));
+        }
+
+        [Fact]
+        public void GetFeatureSetTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host-serial:009d1cd696d5194a:features"
+            };
+
+            string[] responses = new string[]
+            {
+                "sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"
+            };
+
+            IEnumerable<string> features = null;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                },
+                responses,
+                requests,
+                () => features = TestClient.GetFeatureSet(device));
+
+            Assert.Equal(12, features.Count());
+            Assert.Equal("sendrecv_v2_brotli", features.First());
+            Assert.Equal("stat_v2", features.Last());
+        }
+
+        [Fact]
+        public void DumpScreenStringTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            string xml = string.Empty;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => xml = TestClient.DumpScreenString(device));
+
+            Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
+        }
+
+        [Fact]
+        public void DumpScreenTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            XmlDocument xml = null;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => xml = TestClient.DumpScreen(device));
+
+            XmlDocument doc = new();
+            doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
+
+            Assert.Equal(doc, xml);
+        }
+
+        [Fact]
+        public void FindElementTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () =>
+                {
+                    Element element = TestClient.FindElement(device);
+                    Assert.Equal(144, element.GetChildCount());
+                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
+        }
+
+        [Fact]
+        public void FindElementsTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () =>
+                {
+                    List<Element> elements = TestClient.FindElements(device).ToList();
+                    int childCount = elements.Count;
+                    elements.ForEach(x => childCount += x.GetChildCount());
+                    Assert.Equal(145, childCount);
+                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
         }
 
         private void RunConnectTest(Action test, string connectString)

@@ -116,7 +116,7 @@ namespace AdvancedSharpAdbClient
             socket.ReadAdbResponse();
 
             // The result first is a FramebufferHeader object,
-            await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
             if (!headerInitialized)
             {

@@ -179,7 +179,7 @@ namespace AdvancedSharpAdbClient
 
                 // The first 4 bytes contain the length of the data packet
                 byte[] reply = new byte[4];
-                await Socket.ReadAsync(reply, cancellationToken);
+                _ = await Socket.ReadAsync(reply, cancellationToken);
 
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -300,7 +300,7 @@ namespace AdvancedSharpAdbClient
         private async Task ReadStatisticsAsync(FileStatistics value, CancellationToken cancellationToken = default)
         {
             byte[] statResult = new byte[12];
-            await Socket.ReadAsync(statResult, cancellationToken);
+            _ = await Socket.ReadAsync(statResult, cancellationToken);
 
             if (!BitConverter.IsLittleEndian)
             {

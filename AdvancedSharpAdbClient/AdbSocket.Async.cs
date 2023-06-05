@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
@@ -153,7 +153,7 @@ namespace AdvancedSharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -164,7 +164,7 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -175,7 +175,7 @@ namespace AdvancedSharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -185,7 +185,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
         {
             byte[] data = new byte[4];
-            await ReadAsync(data, cancellationToken);
+            _ = await ReadAsync(data, cancellationToken);
 
             return SyncCommandConverter.GetCommand(data);
         }
@@ -268,7 +268,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse resp = new();
 
             byte[] reply = new byte[4];
-            await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken);
 
             resp.IOSuccess = true;
 

@@ -123,13 +123,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
         public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
+        public IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
-        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<List<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public int GetAdbVersion() => throw new NotImplementedException();
 

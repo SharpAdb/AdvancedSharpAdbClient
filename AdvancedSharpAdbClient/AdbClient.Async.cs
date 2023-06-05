@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Xml;
@@ -400,14 +401,13 @@ namespace AdvancedSharpAdbClient
             }
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install' ");
+            _ = requestBuilder.Append("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -532,15 +532,14 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install-create' ");
-            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}");
+            _ = requestBuilder.Append("exec:cmd package 'install-create'");
+            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -589,7 +588,7 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(apkName);
 
             StringBuilder requestBuilder = new();
-            requestBuilder.Append($"exec:cmd package 'install-write' ");
+            requestBuilder.Append($"exec:cmd package 'install-write'");
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
@@ -669,7 +668,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             string features = await socket.ReadStringAsync(cancellationToken);
 
-            IEnumerable<string> featureList = features.Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
             return featureList;
         }
 
@@ -867,7 +866,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
+        public async Task<Element> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -879,17 +878,10 @@ namespace AdvancedSharpAdbClient
                         XmlNode xmlNode = doc.SelectSingleNode(xpath);
                         if (xmlNode != null)
                         {
-                            string bounds = xmlNode.Attributes["bounds"].Value;
-                            if (bounds != null)
+                            Element element = Element.FromXmlNode(this, device, xmlNode);
+                            if (element != null)
                             {
-                                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                Dictionary<string, string> attributes = new();
-                                foreach (XmlAttribute at in xmlNode.Attributes)
-                                {
-                                    attributes.Add(at.Name, at.Value);
-                                }
-                                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                                return new Element(this, device, area, attributes);
+                                return element;
                             }
                         }
                     }
@@ -913,7 +905,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
+        public async Task<List<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -925,23 +917,16 @@ namespace AdvancedSharpAdbClient
                         XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                         if (xmlNodes != null)
                         {
-                            Element[] elements = new Element[xmlNodes.Count];
-                            for (int i = 0; i < elements.Length; i++)
+                            List<Element> elements = new();
+                            for (int i = 0; i < xmlNodes.Count; i++)
                             {
-                                string bounds = xmlNodes[i].Attributes["bounds"].Value;
-                                if (bounds != null)
+                                Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                if (element != null)
                                 {
-                                    int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                    Dictionary<string, string> attributes = new();
-                                    foreach (XmlAttribute at in xmlNodes[i].Attributes)
-                                    {
-                                        attributes.Add(at.Name, at.Value);
-                                    }
-                                    Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                                    elements[i] = new Element(this, device, area, attributes);
+                                    elements.Add(element);
                                 }
                             }
-                            return elements.Length == 0 ? null : elements;
+                            return elements.Count == 0 ? null : elements;
                         }
                     }
                     if (cancellationToken == default)
@@ -962,6 +947,42 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <inheritdoc/>
+        public async IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath = "hierarchy/node", [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                XmlDocument doc = await DumpScreenAsync(device, cancellationToken);
+                if (doc != null)
+                {
+                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    if (xmlNodes != null)
+                    {
+                        bool isBreak = false;
+                        for (int i = 0; i < xmlNodes.Count; i++)
+                        {
+                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            if (element != null)
+                            {
+                                isBreak = true;
+                                yield return element;
+                            }
+                        }
+                        if (isBreak)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (cancellationToken == default)
+                {
+                    break;
+                }
+            }
+        }
+#endif
 
         /// <inheritdoc/>
         public async Task SendKeyEventAsync(DeviceData device, string key, CancellationToken cancellationToken = default)

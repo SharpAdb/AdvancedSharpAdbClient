@@ -521,7 +521,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="xpath"></param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> which return the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
         Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
 
         /// <summary>
@@ -531,8 +531,20 @@ namespace AdvancedSharpAdbClient
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
+        /// <returns>A <see cref="Task"/> which return the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
+        Task<List<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="device">The device on which to get elements.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="IAsyncEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath, CancellationToken cancellationToken);
+#endif
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.

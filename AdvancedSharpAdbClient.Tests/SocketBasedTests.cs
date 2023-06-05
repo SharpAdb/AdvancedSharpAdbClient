@@ -77,18 +77,10 @@ namespace AdvancedSharpAdbClient
         /// over the wire.
         /// </para>
         /// </summary>
-        /// <param name="responses">
-        /// The <see cref="AdbResponse"/> messages that the ADB sever should send.
-        /// </param>
-        /// <param name="responseMessages">
-        /// The messages that should follow the <paramref name="responses"/>.
-        /// </param>
-        /// <param name="requests">
-        /// The requests the client should send.
-        /// </param>
-        /// <param name="test">
-        /// The test to run.
-        /// </param>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -96,6 +88,28 @@ namespace AdvancedSharpAdbClient
             Action test) =>
             RunTest(responses, responseMessages, requests, null, null, null, null, null, test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -104,6 +118,31 @@ namespace AdvancedSharpAdbClient
             Action test) =>
             RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -124,6 +163,32 @@ namespace AdvancedSharpAdbClient
                 null,
                 test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -265,7 +330,7 @@ namespace AdvancedSharpAdbClient
 
         /// <summary>
         /// <para>
-        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
         /// </para>
         /// <para>
         /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
@@ -280,18 +345,11 @@ namespace AdvancedSharpAdbClient
         /// over the wire.
         /// </para>
         /// </summary>
-        /// <param name="responses">
-        /// The <see cref="AdbResponse"/> messages that the ADB sever should send.
-        /// </param>
-        /// <param name="responseMessages">
-        /// The messages that should follow the <paramref name="responses"/>.
-        /// </param>
-        /// <param name="requests">
-        /// The requests the client should send.
-        /// </param>
-        /// <param name="test">
-        /// The test to run.
-        /// </param>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -299,6 +357,29 @@ namespace AdvancedSharpAdbClient
             Func<Task> test) =>
             RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -307,6 +388,32 @@ namespace AdvancedSharpAdbClient
             Func<Task> test) =>
             RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStream, test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
@@ -327,6 +434,33 @@ namespace AdvancedSharpAdbClient
                 null,
                 test);
 
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected async Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,

@@ -9,6 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -294,7 +295,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
-            MemoryStream shellStream = new(streamData);
+            using MemoryStream shellStream = new(streamData);
 
             ConsoleOutputReceiver receiver = new();
 
@@ -569,7 +570,7 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
-                "exec:cmd package 'install'  -S 205774"
+                "exec:cmd package 'install' -S 205774"
             };
 
             // The app data is sent in chunks of 32 kb
@@ -612,6 +613,313 @@ namespace AdvancedSharpAdbClient.Tests
                     applicationDataChuncks.ToArray(),
                     () => TestClient.InstallAsync(device, stream));
             }
+        }
+
+        [Fact]
+        public async void InstallCreateAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-create' -p com.google.android.gms"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            string session = string.Empty;
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => session = await TestClient.InstallCreateAsync(device, "com.google.android.gms"));
+
+            Assert.Equal("936013062", session);
+        }
+
+        [Fact]
+        public async void InstallWriteAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
+            };
+
+            // The app data is sent in chunks of 32 kb
+            Collection<byte[]> applicationDataChuncks = new();
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[32 * 1024];
+                    int read = await stream.ReadAsync(buffer);
+
+                    if (read == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        buffer = buffer.Take(read).ToArray();
+                        applicationDataChuncks.Add(buffer);
+                    }
+                }
+            }
+
+            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                await RunTestAsync(
+                    new AdbResponse[]
+                    {
+                        AdbResponse.OK,
+                        AdbResponse.OK,
+                    },
+                    NoResponseMessages,
+                    requests,
+                    Array.Empty<(SyncCommand, string)>(),
+                    Array.Empty<SyncCommand>(),
+                    new byte[][] { response },
+                    applicationDataChuncks.ToArray(),
+                    () => TestClient.InstallWriteAsync(device, stream, "base", "936013062"));
+            }
+        }
+
+        [Fact]
+        public async void InstallCommitAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-commit' 936013062"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.InstallCommitAsync(device, "936013062"));
+        }
+
+        [Fact]
+        public async void GetFeatureSetAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host-serial:009d1cd696d5194a:features"
+            };
+
+            string[] responses = new string[]
+            {
+                "sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"
+            };
+
+            IEnumerable<string> features = null;
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                },
+                responses,
+                requests,
+                async () => features = await TestClient.GetFeatureSetAsync(device));
+
+            Assert.Equal(12, features.Count());
+            Assert.Equal("sendrecv_v2_brotli", features.First());
+            Assert.Equal("stat_v2", features.Last());
+        }
+
+        [Fact]
+        public async void DumpScreenStringAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            string xml = string.Empty;
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => xml = await TestClient.DumpScreenStringAsync(device));
+
+            Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
+        }
+
+        [Fact]
+        public async void DumpScreenAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            XmlDocument xml = null;
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => xml = await TestClient.DumpScreenAsync(device));
+
+            XmlDocument doc = new();
+            doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
+
+            Assert.Equal(doc, xml);
+        }
+
+        [Fact]
+        public async void FindElementAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () =>
+                {
+                    Element element = await TestClient.FindElementAsync(device);
+                    Assert.Equal(144, element.GetChildCount());
+                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
+        }
+
+        [Fact]
+        public async void FindElementsAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () =>
+                {
+                    List<Element> elements = await TestClient.FindElementsAsync(device);
+                    int childCount = elements.Count;
+                    elements.ForEach(x => childCount += x.GetChildCount());
+                    Assert.Equal(145, childCount);
+                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
         }
 
         private Task RunConnectAsyncTest(Func<Task> test, string connectString)
