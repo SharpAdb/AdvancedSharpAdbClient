@@ -845,12 +845,7 @@ namespace AdvancedSharpAdbClient
 
             // Check if the app is running in background
             bool isAppRunning = IsAppRunning(device, packageName);
-            if (isAppRunning)
-            {
-                return AppStatus.Background;
-            }
-
-            return AppStatus.Stopped;
+            return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
         /// <inheritdoc/>

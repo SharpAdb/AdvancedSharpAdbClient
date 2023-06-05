@@ -144,7 +144,7 @@ namespace AdvancedSharpAdbClient
         /// Gets or sets the coordinates of the center of the rectangular region represented by this
         /// <see cref='Area'/>.
         /// </summary>
-        public readonly Cords Center => unchecked(new(X + Width / 2, Y + Height / 2));
+        public readonly Cords Center => unchecked(new(X + (Width / 2), Y + (Height / 2)));
 
 #if HAS_DRAWING
         /// <summary>
@@ -534,12 +534,7 @@ namespace AdvancedSharpAdbClient
             int y1 = Math.Max(a.Y, b.Y);
             int y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
 
-            if (x2 >= x1 && y2 >= y1)
-            {
-                return new Area(x1, y1, x2 - x1, y2 - y1);
-            }
-
-            return Empty;
+            return x2 >= x1 && y2 >= y1 ? new Area(x1, y1, x2 - x1, y2 - y1) : Empty;
         }
 
         /// <summary>

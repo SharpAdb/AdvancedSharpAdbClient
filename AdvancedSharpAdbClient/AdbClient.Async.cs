@@ -857,12 +857,7 @@ namespace AdvancedSharpAdbClient
 
             // Check if the app is running in background
             bool isAppRunning = await IsAppRunningAsync(device, packageName, cancellationToken);
-            if (isAppRunning)
-            {
-                return AppStatus.Background;
-            }
-
-            return AppStatus.Stopped;
+            return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
         /// <inheritdoc/>

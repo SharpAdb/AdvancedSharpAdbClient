@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -29,10 +28,16 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => new AdbClient(null, Factories.AdbSocketFactory));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorInvalidEndPointTest() =>
             _ = Assert.Throws<NotSupportedException>(() => new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory));
@@ -51,6 +56,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(AdbClient.AdbServerPort, endPoint.Port);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FormAdbRequest(string)"/> method.
+        /// </summary>
         [Fact]
         public void FormAdbRequestTest()
         {
@@ -58,6 +66,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(Encoding.ASCII.GetBytes("000Chost:version"), AdbClient.FormAdbRequest("host:version"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(string, int)"/> method.
+        /// </summary>
         [Fact]
         public void CreateAdbForwardRequestTest()
         {
@@ -65,6 +76,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAdbVersion"/> method.
+        /// </summary>
         [Fact]
         public void GetAdbVersionTest()
         {
@@ -90,6 +104,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(32, version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.KillAdb"/> method.
+        /// </summary>
         [Fact]
         public void KillAdbTest()
         {
@@ -105,6 +122,9 @@ namespace AdvancedSharpAdbClient.Tests
                 TestClient.KillAdb);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetDevices"/> method.
+        /// </summary>
         [Fact]
         public void GetDevicesTest()
         {
@@ -138,6 +158,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("donatello", device.Name);
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetDeviceTest()
         {
@@ -153,6 +176,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetInvalidDeviceTest()
         {
@@ -169,6 +195,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetDeviceOtherException()
         {
@@ -185,31 +214,45 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
-
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateReverseForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateReverseTest() =>
             RunCreateReverseTest(
                 (device) => TestClient.CreateReverseForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForward(IAdbClient, DeviceData, int, int)"/> method.
+        /// </summary>
         [Fact]
         public void CreateTcpForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, 3, 4),
                 "tcp:3;tcp:4");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForward(IAdbClient, DeviceData, int, string)"/> method.
+        /// </summary>
         [Fact]
         public void CreateSocketForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateDuplicateForwardTest()
         {
@@ -231,6 +274,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.CreateForward(Device, "tcp:1", "tcp:2", false)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveForward(DeviceData, int)"/> method.
+        /// </summary>
         [Fact]
         public void RemoveForwardTest()
         {
@@ -246,6 +292,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveForward(Device, 1));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveReverseForward(DeviceData, string)"/> method.
+        /// </summary>
         [Fact]
         public void RemoveReverseForwardTest()
         {
@@ -268,6 +317,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveReverseForward(Device, "localabstract:test"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllForwards(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void RemoveAllForwardsTest()
         {
@@ -283,6 +335,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveAllForwards(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllReverseForwards(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void RemoveAllReversesTest()
         {
@@ -305,6 +360,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveAllReverseForwards(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListForward(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ListForwardTest()
         {
@@ -333,6 +391,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:2", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListReverseForward(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ListReverseForwardTest()
         {
@@ -367,6 +428,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:100", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/> method.
+        /// </summary>
         [Fact]
         public void ExecuteRemoteCommandTest()
         {
@@ -405,6 +469,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/> method.
+        /// </summary>
         [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()
         {
@@ -439,6 +506,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Reboot(IAdbClient, DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void RebootTest()
         {
@@ -455,6 +525,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Reboot(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPAddress, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairIPAddressTest() =>
             RunPairTest(
@@ -462,6 +535,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:5555",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairDnsEndpointTest() =>
             RunPairTest(
@@ -469,6 +545,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "localhost:1234",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPEndPoint, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairIPEndpointTest() =>
             RunPairTest(
@@ -476,6 +555,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:4321",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, string, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairHostEndpointTest() =>
             RunPairTest(
@@ -483,62 +565,101 @@ namespace AdvancedSharpAdbClient.Tests
                 "localhost:9926",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPAddress, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairIPAddressNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPAddress)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairDnsEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair(null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPEndPoint, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairIPEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPEndPoint)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, string, string)"/> method.
+        /// </summary>
         [Fact]
         public void PairHostEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((string)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPAddress)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectIPAddressTest() =>
             RunConnectTest(
                 () => TestClient.Connect(IPAddress.Loopback),
                 "127.0.0.1:5555");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectDnsEndpointTest() =>
             RunConnectTest(
                 () => TestClient.Connect(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPEndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectIPEndpointTest() =>
             RunConnectTest(
                 () => TestClient.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectHostEndpointTest() =>
             RunConnectTest(
                 () => TestClient.Connect("localhost:9926"),
                 "localhost:9926");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPAddress)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectIPAddressNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectDnsEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPEndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectIPEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// </summary>
         [Fact]
         public void ConnectHostEndpointNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((string)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Disconnect(DnsEndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void DisconnectTest()
         {
@@ -552,6 +673,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Root(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void RootTest()
         {
@@ -583,6 +707,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Root(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Unroot(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void UnrootTest()
         {
@@ -614,6 +741,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Unroot(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, string[])"/> method.
+        /// </summary>
         [Fact]
         public void InstallTest()
         {
@@ -671,6 +801,9 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCreate(DeviceData, string, string[])"/> method.
+        /// </summary>
         [Fact]
         public void InstallCreateTest()
         {
@@ -705,6 +838,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("936013062", session);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string)"/> method.
+        /// </summary>
         [Fact]
         public void InstallWriteTest()
         {
@@ -762,6 +898,9 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCommit(DeviceData, string)"/> method.
+        /// </summary>
         [Fact]
         public void InstallCommitTest()
         {
@@ -792,6 +931,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.InstallCommit(device, "936013062"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetFeatureSet(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void GetFeatureSetTest()
         {
@@ -827,6 +969,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("stat_v2", features.Last());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenString(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void DumpScreenStringTest()
         {
@@ -862,6 +1007,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreen(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void DumpScreenTest()
         {
@@ -900,6 +1048,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(doc, xml);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElement(DeviceData, string, TimeSpan)"/> method.
+        /// </summary>
         [Fact]
         public void FindElementTest()
         {
@@ -938,6 +1089,9 @@ namespace AdvancedSharpAdbClient.Tests
                 });
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElements(DeviceData, string, TimeSpan)"/> method.
+        /// </summary>
         [Fact]
         public void FindElementsTest()
         {

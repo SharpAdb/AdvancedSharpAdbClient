@@ -42,6 +42,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"{VersionName} - {VersionCode}";
+        public override string ToString() => $"{VersionName} ({VersionCode})";
     }
 }

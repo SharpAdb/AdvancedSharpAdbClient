@@ -142,26 +142,18 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (obj is not ForwardSpec other)
-            {
-                return false;
-            }
-
-            if (other.Protocol != Protocol)
-            {
-                return false;
-            }
-
-            return Protocol switch
-            {
-                ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
-                ForwardProtocol.Tcp => Port == other.Port,
-                ForwardProtocol.LocalAbstract
-                or ForwardProtocol.LocalFilesystem
-                or ForwardProtocol.LocalReserved
-                or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
-                _ => false,
-            };
+            return obj is ForwardSpec other
+&& other.Protocol == Protocol
+&& Protocol switch
+{
+    ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
+    ForwardProtocol.Tcp => Port == other.Port,
+    ForwardProtocol.LocalAbstract
+    or ForwardProtocol.LocalFilesystem
+    or ForwardProtocol.LocalReserved
+    or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
+    _ => false,
+};
         }
     }
 }
