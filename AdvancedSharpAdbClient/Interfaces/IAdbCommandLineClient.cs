@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides a common interface for any class that provides access to the <c>adb.exe</c> executable.
     /// </summary>
-    public interface IAdbCommandLineClient
+    public partial interface IAdbCommandLineClient
     {
         /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.

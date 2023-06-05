@@ -1,14 +1,13 @@
-﻿// <copyright file="IAdbServer.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="IAdbServer.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    /// <summary>
-    /// Represents a common interface for any class that allows starting or stopping the Android Debug Bridge (adb) server/deamon.
-    /// </summary>
     public partial interface IAdbServer
     {
         /// <summary>
@@ -24,7 +23,9 @@ namespace AdvancedSharpAdbClient
         /// executable at <paramref name="adbPath"/> is newer than the version that is currently
         /// running; <see langword="false"/> to keep a previous version of the server running.
         /// </param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>
+        /// A <see cref="Task"/> which return
         /// <list type="ordered">
         /// <item>
         ///   <see cref="StartServerResult.AlreadyRunning"/> if the adb server was already
@@ -46,23 +47,27 @@ namespace AdvancedSharpAdbClient
         /// The server was not running, or an outdated version of the server was running,
         /// and the <paramref name="adbPath"/> parameter was not specified.
         /// </exception>
-        StartServerResult StartServer(string adbPath, bool restartServerIfNewer);
+        Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken);
 
         /// <summary>
         /// Restarts the adb server if it suddenly became unavailable. Call this class if, for example,
         /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
         /// set to <see langword="true"/> - a clear indicating the ADB server died.
         /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <remarks>
         /// You can only call this method if you have previously started the adb server via
         /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.
         /// </remarks>
-        void RestartServer();
+        Task RestartServerAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the status of the adb server.
         /// </summary>
-        /// <returns>A <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
-        AdbServerStatus GetStatus();
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return a <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
+        Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken);
     }
 }
+#endif

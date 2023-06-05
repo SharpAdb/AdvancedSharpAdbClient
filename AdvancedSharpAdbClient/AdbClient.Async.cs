@@ -351,7 +351,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="request">The command of root or unroot.</param>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         protected async Task RootAsync(string request, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);

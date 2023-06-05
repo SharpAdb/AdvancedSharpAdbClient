@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -28,8 +30,21 @@ namespace AdvancedSharpAdbClient.Tests
         /// <inheritdoc/>
         public AdbServerStatus GetStatus() => Status;
 
+        public Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
+        {
+            TaskCompletionSource<AdbServerStatus> tcs = new();
+            tcs.SetResult(Status);
+            return tcs.Task;
+        }
+
         /// <inheritdoc/>
         public void RestartServer() => WasRestarted = true;
+
+        public Task RestartServerAsync(CancellationToken cancellationToken = default)
+        {
+            WasRestarted = true;
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
@@ -46,6 +61,14 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             return StartServerResult.Started;
+        }
+
+        public Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
+        {
+            StartServerResult result = StartServer(adbPath, restartServerIfNewer);
+            TaskCompletionSource<StartServerResult> tcs = new();
+            tcs.SetResult(result);
+            return tcs.Task;
         }
     }
 }

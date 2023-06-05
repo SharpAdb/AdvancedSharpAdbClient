@@ -282,7 +282,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         public static Task<string> ConnectAsync(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -294,7 +294,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         public static Task<string> ConnectAsync(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -307,7 +307,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="port">The port of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(host))

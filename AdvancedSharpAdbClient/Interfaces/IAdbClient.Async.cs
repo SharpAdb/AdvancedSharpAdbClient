@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         /// Ask the ADB server for its internal version number.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the ADB version number.</returns>
+        /// <returns>A <see cref="Task"/> which return the ADB version number.</returns>
         Task<int> GetAdbVersionAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient
         /// Gets the devices that are available for communication.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the list of devices that are connected.</returns>
+        /// <returns>A <see cref="Task"/> which return the list of devices that are connected.</returns>
         Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to list the existing forward connections.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the <see cref="ForwardData"/> entry for each existing forward connection.</returns>
+        /// <returns>A <see cref="Task"/> which return the <see cref="ForwardData"/> entry for each existing forward connection.</returns>
         Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to list the existing reverse foward connections.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the <see cref="ForwardData"/> entry for each existing reverse forward connection.</returns>
+        /// <returns>A <see cref="Task"/> which return the <see cref="ForwardData"/> entry for each existing reverse forward connection.</returns>
         Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this to stop reading from the event log.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        /// <returns>An <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken);
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="endpoint">The endpoint of the remote device to disconnect.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
@@ -376,7 +376,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>An <see cref="Task"/> which return the session ID</returns>
+        /// <returns>A <see cref="Task"/> which return the session ID</returns>
         Task<string> InstallCreateAsync(DeviceData device, string packageName, params string[] arguments);
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>An <see cref="Task"/> which return the session ID</returns>
+        /// <returns>A <see cref="Task"/> which return the session ID</returns>
         Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the list of all features supported by the current device.</returns>
+        /// <returns>A <see cref="Task"/> which return the list of all features supported by the current device.</returns>
         Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
@@ -422,7 +422,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return a <see cref="string"/> containing current hierarchy.
+        /// <returns>A <see cref="Task"/> which return a <see cref="string"/> containing current hierarchy.
         /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
         Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken);
 
@@ -431,7 +431,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
+        /// <returns>A <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
         Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
 
 #if WINDOWS_UWP
@@ -440,7 +440,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
+        /// <returns>A <see cref="Task"/> which return a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
         Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken);
 #endif
 
@@ -493,7 +493,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to check.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
         Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>
@@ -502,7 +502,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to check.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
         Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>
@@ -511,7 +511,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to get status.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        /// <returns>A <see cref="Task"/> which return the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
         Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>

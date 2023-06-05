@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
     /// between clients and devices.
     /// </para>
     /// </summary>
-    public class AdbServer : IAdbServer
+    public partial class AdbServer : IAdbServer
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.

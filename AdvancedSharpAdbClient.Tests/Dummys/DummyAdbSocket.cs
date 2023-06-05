@@ -159,19 +159,19 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken)
+        public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default)
         {
             SendSyncRequest(command, path, permissions);
             return Task.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken)
+        public Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
             SendSyncRequest(command, path);
             return Task.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken)
+        public Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
         {
             SendSyncRequest(command, length);
             return Task.CompletedTask;
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public Task<string> ReadSyncStringAsync(CancellationToken cancellationToken)
+        public Task<string> ReadSyncStringAsync(CancellationToken cancellationToken = default)
         {
             string response = ReadSyncString();
             TaskCompletionSource<string> tcs = new();
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient.Tests
             return tcs.Task;
         }
 
-        public Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken)
+        public Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
         {
             SyncCommand response = ReadSyncResponse();
             TaskCompletionSource<SyncCommand> tcs = new();
@@ -247,7 +247,7 @@ namespace AdvancedSharpAdbClient.Tests
             return tcs.Task;
         }
 
-        public Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken)
+        public Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             SetDevice(device);
             return Task.CompletedTask;
