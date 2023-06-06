@@ -310,7 +310,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ExecuteRemoteCommandAsyncUnresponsiveTest()
+        public async void ExecuteRemoteCommandAsyncUnresponsiveTest()
         {
             DeviceData device = new()
             {
@@ -334,7 +334,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            _ = Assert.ThrowsAsync<ShellCommandUnresponsiveException>(() =>
+            _ = await Assert.ThrowsAsync<ShellCommandUnresponsiveException>(() =>
             RunTestAsync(
                 responses,
                 responseMessages,
@@ -497,7 +497,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void RootAsyncTest()
+        public async void RootAsyncTest()
         {
             DeviceData device = new()
             {
@@ -515,7 +515,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            _ = Assert.ThrowsAsync<AdbException>(() =>
+            _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 NoResponseMessages,
@@ -528,7 +528,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void UnrootAsyncTest()
+        public async void UnrootAsyncTest()
         {
             DeviceData device = new()
             {
@@ -546,7 +546,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
             Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
 
-            _ = Assert.ThrowsAsync<AdbException>(() =>
+            _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 NoResponseMessages,

@@ -191,10 +191,10 @@ namespace AdvancedSharpAdbClient
                 try
                 {
                     int left = expLen - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
+                    int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    byte[] buffer = new byte[buflen];
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
+                    byte[] buffer = new byte[bufferLength];
+                    count = socket.Receive(buffer, bufferLength, SocketFlags.None);
                     if (count < 0)
                     {
 #if HAS_LOGGER

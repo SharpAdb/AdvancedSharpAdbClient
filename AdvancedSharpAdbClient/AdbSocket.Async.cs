@@ -109,9 +109,9 @@ namespace AdvancedSharpAdbClient
                 try
                 {
                     int left = length - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
+                    int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = await socket.ReceiveAsync(data, totalRead, buflen, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count = await socket.ReceiveAsync(data, totalRead, bufferLength, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {

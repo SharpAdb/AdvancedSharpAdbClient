@@ -7,21 +7,10 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    /// <summary>
-    /// Tests the <see cref="SyncService"/> class.
-    /// </summary>
-    public partial class SyncServiceTests : SocketBasedTests
+    public partial class SyncServiceTests
     {
-        // Toggle the integration test flag to true to run on an actual adb server
-        // (and to build/validate the test cases), set to false to use the mocked
-        // adb sockets.
-        // In release mode, this flag is ignored and the mocked adb sockets are always used.
-        public SyncServiceTests() : base(integrationTest: false, doDispose: false)
-        {
-        }
-
         [Fact]
-        public void StatTest()
+        public async void StatAsyncTest()
         {
             DeviceData device = new()
             {
@@ -31,7 +20,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             FileStatistics value = null;
 
-            RunTest(
+            await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
@@ -39,10 +28,10 @@ namespace AdvancedSharpAdbClient.Tests
                 new SyncCommand[] { SyncCommand.STAT },
                 new byte[][] { new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 } },
                 null,
-                () =>
+                async () =>
                 {
                     using SyncService service = new(Socket, device);
-                    value = service.Stat("/fstab.donatello");
+                    value = await service.StatAsync("/fstab.donatello");
                 });
 
             Assert.NotNull(value);
@@ -52,7 +41,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void GetListingTest()
+        public async void GetListingAsyncTest()
         {
             DeviceData device = new()
             {
@@ -62,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             List<FileStatistics> value = null;
 
-            RunTest(
+            await RunTestAsync(
                 OkResponses(2),
                 ResponseMessages(".", "..", "sdcard0", "emulated"),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
@@ -76,10 +65,10 @@ namespace AdvancedSharpAdbClient.Tests
                     new byte[] { 109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 }
                 },
                 null,
-                () =>
+                async () =>
                 {
                     using SyncService service = new(Socket, device);
-                    value = service.GetDirectoryListing("/storage").ToList();
+                    value = (await service.GetDirectoryListingAsync("/storage")).ToList();
                 });
 
             Assert.Equal(4, value.Count);
@@ -112,7 +101,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void PullTest()
+        public async void PullAsyncTest()
         {
             DeviceData device = new()
             {
@@ -124,7 +113,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
-            RunTest(
+            await RunTestAsync(
                 OkResponses(2),
                 ResponseMessages(),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
@@ -137,10 +126,10 @@ namespace AdvancedSharpAdbClient.Tests
                     content
                 },
                 null,
-                () =>
+                async () =>
                 {
                     using SyncService service = new(Socket, device);
-                    service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
+                    await service.PullAsync("/fstab.donatello", stream, null, CancellationToken.None);
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
@@ -148,7 +137,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void PushTest()
+        public async void PushAsyncTest()
         {
             DeviceData device = new()
             {
@@ -163,7 +152,7 @@ namespace AdvancedSharpAdbClient.Tests
             contentMessage.AddRange(BitConverter.GetBytes(content.Length));
             contentMessage.AddRange(content);
 
-            RunTest(
+            await RunTestAsync(
                 OkResponses(2),
                 ResponseMessages(),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
@@ -176,10 +165,10 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     contentMessage.ToArray()
                 },
-                () =>
+                async () =>
                 {
                     using SyncService service = new(Socket, device);
-                    service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
+                    await service.PushAsync(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
                 });
         }
     }

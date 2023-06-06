@@ -53,11 +53,16 @@ namespace AdvancedSharpAdbClient
         /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
         /// set to <see langword="true"/> - a clear indicating the ADB server died.
         /// </summary>
+        /// <param name="adbPath">
+        /// The path to the <c>adb.exe</c> executable that can be used to start the adb server.
+        /// If this path is not provided, this method will use the path that was cached by
+        /// <see cref="StartServer(string, bool)"/>
+        /// </param>
         /// <remarks>
         /// You can only call this method if you have previously started the adb server via
         /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.
         /// </remarks>
-        void RestartServer();
+        StartServerResult RestartServer(string adbPath = null);
 
         /// <summary>
         /// Gets the status of the adb server.

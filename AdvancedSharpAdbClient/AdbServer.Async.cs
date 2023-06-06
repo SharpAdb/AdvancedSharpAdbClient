@@ -63,9 +63,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task RestartServerAsync(CancellationToken cancellationToken = default)
+        public Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken = default) => RestartServerAsync(null, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default)
         {
-            if (!CrossPlatformFunc.CheckFileExists(cachedAdbPath))
+            adbPath ??= cachedAdbPath;
+
+            if (!IsValidAdbFile(adbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
@@ -87,13 +92,14 @@ namespace AdvancedSharpAdbClient
                 }
             }, cancellationToken);
 
-            await StartServerAsync(cachedAdbPath, false, cancellationToken);
+            StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken);
             manualResetEvent.Set();
 #if !NET35
             manualResetEvent.Dispose();
 #else
             manualResetEvent.Close();
 #endif
+            return result;
         }
 
         /// <inheritdoc/>

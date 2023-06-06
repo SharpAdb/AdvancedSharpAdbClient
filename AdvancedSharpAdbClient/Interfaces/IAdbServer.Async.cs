@@ -60,7 +60,25 @@ namespace AdvancedSharpAdbClient
         /// You can only call this method if you have previously started the adb server via
         /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.
         /// </remarks>
-        Task RestartServerAsync(CancellationToken cancellationToken);
+        Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Restarts the adb server if it suddenly became unavailable. Call this class if, for example,
+        /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
+        /// set to <see langword="true"/> - a clear indicating the ADB server died.
+        /// </summary>
+        /// <param name="adbPath">
+        /// The path to the <c>adb.exe</c> executable that can be used to start the adb server.
+        /// If this path is not provided, this method will use the path that was cached by
+        /// <see cref="StartServerAsync(string, bool, CancellationToken)"/>
+        /// </param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// You can only call this method if you have previously started the adb server via
+        /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.
+        /// </remarks>
+        Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the status of the adb server.

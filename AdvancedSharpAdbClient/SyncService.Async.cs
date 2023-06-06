@@ -19,10 +19,10 @@ namespace AdvancedSharpAdbClient
         public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
-            await Socket.SetDeviceAsync(Device, default);
+            await Socket.SetDeviceAsync(Device, cancellationToken);
 
-            await Socket.SendAdbRequestAsync("sync:", default);
-            _ = await Socket.ReadAdbResponseAsync(default);
+            await Socket.SendAdbRequestAsync("sync:", cancellationToken);
+            _ = await Socket.ReadAdbResponseAsync(cancellationToken);
         }
 
         /// <summary>

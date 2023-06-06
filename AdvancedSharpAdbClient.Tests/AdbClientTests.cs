@@ -16,10 +16,12 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public partial class AdbClientTests : SocketBasedTests
     {
-        // Toggle the integration test flag to true to run on an actual adb server
-        // (and to build/validate the test cases), set to false to use the mocked
-        // adb sockets.
-        // In release mode, this flag is ignored and the mocked adb sockets are always used.
+        /// <summary>
+        /// Toggle the integration test flag to true to run on an actual adb server
+        /// (and to build/validate the test cases), set to false to use the mocked
+        /// adb sockets.
+        /// In release mode, this flag is ignored and the mocked adb sockets are always used.
+        /// </summary>
         public AdbClientTests() : base(integrationTest: false, doDispose: false)
         {
             lock (FactoriesTests.locker)
