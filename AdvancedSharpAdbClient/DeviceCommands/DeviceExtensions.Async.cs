@@ -1,4 +1,5 @@
-﻿// <copyright file="DeviceExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="DeviceExtensions.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -12,10 +13,6 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    /// <summary>
-    /// Provides extension methods for the <see cref="DeviceData"/> class,
-    /// allowing you to run commands directory against a <see cref="DeviceData"/> object.
-    /// </summary>
     public static partial class DeviceExtensions
     {
         /// <summary>
@@ -25,8 +22,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
-            client.ExecuteRemoteCommand(command, device, receiver);
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken);
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -34,11 +33,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to look for the file.</param>
         /// <param name="path">The path to the file.</param>
-        /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
-        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        public static async Task<FileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return service.Stat(path);
+            return await service.StatAsync(path, cancellationToken);
         }
 
         /// <summary>
@@ -47,17 +47,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to list the directory.</param>
         /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device, string remotePath)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        public static async Task<IEnumerable<FileStatistics>> List(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return service.GetDirectoryListing(remotePath);
+            return await service.GetDirectoryListingAsync(remotePath, cancellationToken);
         }
 
-#if !HAS_TASK
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#pragma warning disable CS1574 // XML 注释中有未能解析的 cref 特性
-#endif
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
@@ -68,14 +65,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        public static void Pull(this IAdbClient client, DeviceData device,
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -83,11 +77,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
 
-            service.Pull(remotePath, stream, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            await service.PullAsync(remotePath, stream, progress, cancellationToken);
         }
 
         /// <summary>
@@ -102,14 +92,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        public static void Push(this IAdbClient client, DeviceData device,
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -117,16 +104,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
 
-            service.Push(stream, remotePath, permissions, timestamp, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken);
         }
-#if !HAS_TASK
-#pragma warning restore CS1574 // XML 注释中有未能解析的 cref 特性
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets the property of a device.
@@ -134,11 +113,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to get the property.</param>
         /// <param name="property">The name of property which to get.</param>
-        /// <returns>The value of the property on the device.</returns>
-        public static string GetProperty(this IAdbClient client, DeviceData device, string property)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return the value of the property on the device.</returns>
+        public static async Task<string> GetPropertyAsync(this IAdbClient client, DeviceData device, string property, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            client.ExecuteRemoteCommand($"{GetPropReceiver.GetPropCommand} {property}", device, receiver);
+            await client.ExecuteRemoteCommandAsync($"{GetPropReceiver.GetPropCommand} {property}", device, receiver, cancellationToken);
             return receiver.ToString();
         }
 
@@ -147,11 +127,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the properties.</param>
-        /// <returns>A dictionary containing the properties of the device, and their values.</returns>
-        public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return a dictionary containing the properties of the device, and their values.</returns>
+        public static async Task<Dictionary<string, string>> GetPropertiesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             GetPropReceiver receiver = new();
-            client.ExecuteRemoteCommand(GetPropReceiver.GetPropCommand, device, receiver);
+            await client.ExecuteRemoteCommandAsync(GetPropReceiver.GetPropCommand, device, receiver, cancellationToken);
             return receiver.Properties;
         }
 
@@ -160,36 +141,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the environment variables.</param>
-        /// <returns>A dictionary containing the environment variables of the device, and their values.</returns>
-        public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return the a dictionary containing the environment variables of the device, and their values.</returns>
+        public static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnvironmentVariablesReceiver receiver = new();
-            client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            await client.ExecuteRemoteCommandAsync(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver, cancellationToken);
             return receiver.EnvironmentVariables;
-        }
-
-        /// <summary>
-        /// Uninstalls a package from the device.
-        /// </summary>
-        /// <param name="client">The connection to the adb server.</param>
-        /// <param name="device">The device on which to uninstall the package.</param>
-        /// <param name="packageName">The name of the package to uninstall.</param>
-        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
-        {
-            PackageManager manager = new(client, device);
-            manager.UninstallPackage(packageName);
-        }
-
-        /// <summary>
-        /// Requests the version information from the device.
-        /// </summary>
-        /// <param name="client">The connection to the adb server.</param>
-        /// <param name="device">The device on which to uninstall the package.</param>
-        /// <param name="packageName">The name of the package from which to get the application version.</param>
-        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
-        {
-            PackageManager manager = new(client, device);
-            return manager.GetVersionInfo(packageName);
         }
 
         /// <summary>
@@ -197,9 +155,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>
-        /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return the an <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
         /// that are currently running on the device.</returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
+        public static async Task<IEnumerable<AndroidProcess>> ListProcessesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
@@ -229,13 +188,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
             // This if/then/else syntax was tested on Android 2.x, 4.x and 7
             ConsoleOutputReceiver receiver = new();
-            client.ExecuteShellCommand(device, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+            await client.ExecuteShellCommandAsync(device, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
     /system/bin/ls /proc/
 else
     /system/bin/ls -1 /proc/
-fi".Replace("\r\n", "\n"), receiver);
+fi".Replace("\r\n", "\n"), receiver, cancellationToken);
 
             Collection<int> pids = new();
 
@@ -244,7 +203,16 @@ fi".Replace("\r\n", "\n"), receiver);
             {
                 while (reader.Peek() > 0)
                 {
-                    string line = reader.ReadLine();
+                    string line =
+#if !NET35
+                        await reader.ReadLineAsync(
+#if NET7_0_OR_GREATER
+                            cancellationToken
+#endif
+                            ).ConfigureAwait(false);
+#else
+                        await Utilities.Run(reader.ReadLine, cancellationToken).ConfigureAwait(false);
+#endif
 
                     if (!line.All(char.IsDigit))
                     {
@@ -273,8 +241,8 @@ fi".Replace("\r\n", "\n"), receiver);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-                    catBuilder.Clear();
+                    await client.ExecuteShellCommandAsync(device, catBuilder.ToString(), processOutputReceiver, cancellationToken);
+                    _ = catBuilder.Clear();
                     _ = catBuilder.Append("cat ");
                 }
             }
@@ -285,3 +253,4 @@ fi".Replace("\r\n", "\n"), receiver);
         }
     }
 }
+#endif
