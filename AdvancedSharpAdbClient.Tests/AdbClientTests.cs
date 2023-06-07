@@ -24,21 +24,17 @@ namespace AdvancedSharpAdbClient.Tests
         /// </summary>
         public AdbClientTests() : base(integrationTest: false, doDispose: false)
         {
-            lock (FactoriesTests.locker)
-            {
-                Factories.Reset();
-            }
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// Tests the <see cref="AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
         /// </summary>
         [Fact]
         public void ConstructorNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => new AdbClient(null, Factories.AdbSocketFactory));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// Tests the <see cref="AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
         /// </summary>
         [Fact]
         public void ConstructorInvalidEndPointTest() =>

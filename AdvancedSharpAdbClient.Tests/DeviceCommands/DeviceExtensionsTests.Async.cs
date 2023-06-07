@@ -2,37 +2,38 @@
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
-    /// <summary>
-    /// Tests the <see cref="DeviceExtensions"/> class.
-    /// </summary>
     public partial class DeviceExtensionsTests
     {
         [Fact]
-        public void StatTest()
+        public void StatAsyncTest()
         {
             FileStatistics stats = new();
+            TaskCompletionSource<FileStatistics> tcs = new();
+            tcs.SetResult(stats);
 
             Mock<IAdbClient> client = new();
             Mock<ISyncService> mock = new();
-            mock.Setup(m => m.Stat("/test")).Returns(stats);
+            mock.Setup(m => m.StatAsync("/test", It.IsAny<CancellationToken>())).Returns(tcs.Task);
 
             lock (FactoriesTests.locker)
             {
                 Factories.SyncServiceFactory = (c, d) => mock.Object;
 
                 DeviceData device = new();
-                Assert.Equal(stats, client.Object.Stat(device, "/test"));
+                Assert.Equal(tcs.Task.Result, client.Object.StatAsync(device, "/test").Result);
 
                 Factories.Reset();
             }
         }
 
         [Fact]
-        public void GetEnvironmentVariablesTest()
+        public async void GetEnvironmentVariablesAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -40,7 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             DeviceData device = new();
 
-            Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(device);
+            Dictionary<string, string> variables = await adbClient.GetEnvironmentVariablesAsync(device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
@@ -48,7 +49,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public void UninstallPackageTests()
+        public async void UninstallPackageAsyncTests()
         {
             DummyAdbClient adbClient = new();
 
@@ -59,7 +60,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             {
                 State = DeviceState.Online
             };
-            adbClient.UninstallPackage(device, "com.example");
+            await adbClient.UninstallPackageAsync(device, "com.example");
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
@@ -67,7 +68,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public void GetPackageVersionTest()
+        public async void GetPackageVersionAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -112,7 +113,7 @@ Shared users:
             {
                 State = DeviceState.Online
             };
-            VersionInfo version = adbClient.GetPackageVersion(device, "com.example");
+            VersionInfo version = await adbClient.GetPackageVersionAsync(device, "com.example");
 
             Assert.Equal(22, version.VersionCode);
             Assert.Equal("5.1-eng.buildbot.20151117.204057", version.VersionName);
@@ -123,7 +124,7 @@ Shared users:
         }
 
         [Fact]
-        public void GetPackageVersionTest2()
+        public async void GetPackageVersionAsyncTest2()
         {
             DummyAdbClient adbClient = new();
 
@@ -203,7 +204,7 @@ End!!!!");
             {
                 State = DeviceState.Online
             };
-            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
+            VersionInfo version = await adbClient.GetPackageVersionAsync(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -214,7 +215,7 @@ End!!!!");
         }
 
         [Fact]
-        public void GetPackageVersionTest3()
+        public async void GetPackageVersionAsyncTest3()
         {
             DummyAdbClient adbClient = new();
 
@@ -348,7 +349,7 @@ Compiler stats:
             {
                 State = DeviceState.Online
             };
-            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
+            VersionInfo version = await adbClient.GetPackageVersionAsync(device, "jp.co.cyberagent.stf");
 
             Assert.Equal(4, version.VersionCode);
             Assert.Equal("2.1.0", version.VersionName);
@@ -359,7 +360,7 @@ Compiler stats:
         }
 
         [Fact]
-        public void ListProcessesTest()
+        public async void ListProcessesAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -388,7 +389,7 @@ asound");
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
 
             DeviceData device = new();
-            AndroidProcess[] processes = adbClient.ListProcesses(device).ToArray();
+            AndroidProcess[] processes = (await adbClient.ListProcessesAsync(device)).ToArray();
 
             Assert.Equal(3, processes.Length);
             Assert.Equal("init", processes[0].Name);
