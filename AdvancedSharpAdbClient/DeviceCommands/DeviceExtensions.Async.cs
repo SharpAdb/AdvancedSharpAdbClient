@@ -151,6 +151,34 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Uninstalls a package from the device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        {
+            PackageManager manager = new(client, device);
+            return manager.UninstallPackageAsync(packageName, cancellationToken);
+        }
+
+        /// <summary>
+        /// Requests the version information from the device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package from which to get the application version.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="VersionInfo"/> of target application.</returns>
+        public static Task<VersionInfo> GetPackageVersionAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        {
+            PackageManager manager = new(client, device);
+            return manager.GetVersionInfoAsync(packageName, cancellationToken);
+        }
+
+        /// <summary>
         /// Lists all processes running on the device.
         /// </summary>
         /// <param name="client">A connection to ADB.</param>
