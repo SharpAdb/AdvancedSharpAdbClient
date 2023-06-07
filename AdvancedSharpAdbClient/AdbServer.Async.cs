@@ -109,12 +109,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int versionCode = await adbClient.GetAdbVersionAsync(cancellationToken);
-
-                return new AdbServerStatus
-                {
-                    IsRunning = true,
-                    Version = new Version(1, 0, versionCode)
-                };
+                return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (AggregateException ex)
             {
@@ -122,11 +117,7 @@ namespace AdvancedSharpAdbClient
                 {
                     if (exception.SocketErrorCode == SocketError.ConnectionRefused)
                     {
-                        return new AdbServerStatus
-                        {
-                            IsRunning = false,
-                            Version = null
-                        };
+                        return new AdbServerStatus(false, null);
                     }
                     else
                     {
@@ -143,11 +134,7 @@ namespace AdvancedSharpAdbClient
             {
                 if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
-                    return new AdbServerStatus
-                    {
-                        IsRunning = false,
-                        Version = null
-                    };
+                    return new AdbServerStatus(false, null);
                 }
                 else
                 {

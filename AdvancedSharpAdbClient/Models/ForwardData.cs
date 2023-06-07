@@ -35,6 +35,26 @@ namespace AdvancedSharpAdbClient
         public ForwardSpec RemoteSpec => ForwardSpec.Parse(Remote);
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
+        /// </summary>
+        public ForwardData()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
+        /// </summary>
+        /// <param name="serialNumber">The serial number of the device for which the port forwarding is configured.</param>
+        /// <param name="local">The <see cref="string"/> that represents the local (PC) endpoint.</param>
+        /// <param name="remote">The <see cref="string"/> that represents the remote (device) endpoint.</param>
+        public ForwardData(string serialNumber, string local, string remote)
+        { 
+            SerialNumber = serialNumber;
+            Local = local;
+            Remote = remote;
+        }
+
+        /// <summary>
         /// Creates a new instance of the <seealso cref="ForwardData"/> class by parsing a <see cref="string"/>.
         /// </summary>
         /// <param name="value">The <see cref="string"/> value to parse.</param>
@@ -45,14 +65,8 @@ namespace AdvancedSharpAdbClient
             {
                 return null;
             }
-
             string[] parts = value.Split(' ');
-            return new ForwardData()
-            {
-                SerialNumber = parts[0],
-                Local = parts[1],
-                Remote = parts[2]
-            };
+            return new ForwardData(parts[0], parts[1], parts[2]);
         }
 
         /// <inheritdoc/>

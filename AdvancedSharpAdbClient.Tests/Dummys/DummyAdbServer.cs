@@ -62,13 +62,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 return StartServerResult.AlreadyRunning;
             }
-
-            Status = new AdbServerStatus()
-            {
-                IsRunning = true,
-                Version = new Version(1, 0, 20)
-            };
-
+            Status = new AdbServerStatus(true, new Version(1, 0, 20));
             return StartServerResult.Started;
         }
 

@@ -20,13 +20,13 @@ namespace AdvancedSharpAdbClient
         /// Gets the number of bytes sync to the local computer.
         /// </summary>
         /// <value>An <see cref="long"/> representing the number of sync bytes.</value>
-        public long ReceivedBytesSize { get; internal set; }
+        public long ReceivedBytesSize { get; }
 
         /// <summary>
         /// Gets the total number of bytes for the sync operation.
         /// </summary>
         /// <value>An <see cref="long"/> representing the total size of the download, in bytes.</value>
-        public long TotalBytesToReceive { get; internal set; }
+        public long TotalBytesToReceive { get; }
 
         internal SyncProgressChangedEventArgs(long received, long total)
         {

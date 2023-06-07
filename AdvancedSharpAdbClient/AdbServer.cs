@@ -177,22 +177,13 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int versionCode = adbClient.GetAdbVersion();
-
-                return new AdbServerStatus
-                {
-                    IsRunning = true,
-                    Version = new Version(1, 0, versionCode)
-                };
+                return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (SocketException ex)
             {
                 if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
-                    return new AdbServerStatus
-                    {
-                        IsRunning = false,
-                        Version = null
-                    };
+                    return new AdbServerStatus(false, null);
                 }
                 else
                 {

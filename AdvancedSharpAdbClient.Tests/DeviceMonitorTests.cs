@@ -273,20 +273,20 @@ namespace AdvancedSharpAdbClient.Tests
 
             using DeviceMonitor monitor = new(Socket);
             RunTest(
-            new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
-            ResponseMessages(
-                DummyAdbSocket.ServerDisconnected,
-                string.Empty),
-            Requests(
-                "host:track-devices",
-                "host:track-devices"),
-            () =>
-            {
-                monitor.Start();
+                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                ResponseMessages(
+                    DummyAdbSocket.ServerDisconnected,
+                    string.Empty),
+                Requests(
+                    "host:track-devices",
+                    "host:track-devices"),
+                () =>
+                {
+                    monitor.Start();
 
-                Assert.True(Socket.DidReconnect);
-                Assert.True(dummyAdbServer.WasRestarted);
-            });
+                    Assert.True(Socket.DidReconnect);
+                    Assert.True(dummyAdbServer.WasRestarted);
+                });
         }
     }
 }

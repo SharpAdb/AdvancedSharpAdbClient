@@ -15,27 +15,27 @@ namespace AdvancedSharpAdbClient
     public class Element
     {
         /// <summary>
-        /// The current ADB client that manages the connection.
+        /// Gets or sets the current ADB client that manages the connection.
         /// </summary>
-        private IAdbClient Client { get; }
+        private IAdbClient Client { get; set; }
 
         /// <summary>
-        /// The current device containing the element.
+        /// Gets the current device containing the element.
         /// </summary>
         private DeviceData Device { get; }
 
         /// <summary>
-        /// The coordinates and size of the element.
+        /// Gets the coordinates and size of the element.
         /// </summary>
         public Area Area { get; }
 
         /// <summary>
-        /// The coordinates of the element to click. Default is the center of area.
+        /// Gets or sets the coordinates of the element to click. Default is the center of area.
         /// </summary>
         public Cords Cords { get; set; }
 
         /// <summary>
-        /// The children of this element.
+        /// Gets the children of this element.
         /// </summary>
         public List<Element> Children { get; }
 
