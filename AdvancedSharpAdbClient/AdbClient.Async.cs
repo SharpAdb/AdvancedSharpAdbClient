@@ -241,7 +241,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
+            RunLogServiceAsync(device, messageSink, default, logNames);
+        
+        /// <inheritdoc/>
+        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
             ExceptionExtensions.ThrowIfNull(messageSink);
 
@@ -272,7 +276,7 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    entry = await reader.ReadEntry(cancellationToken).ConfigureAwait(false);
+                    entry = await reader.ReadEntryAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch (EndOfStreamException)
                 {

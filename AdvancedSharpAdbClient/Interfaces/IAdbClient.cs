@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -272,6 +273,14 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">failed asking for frame buffer</exception>
         /// <exception cref="AdbException">failed nudging</exception>
         Framebuffer GetFrameBuffer(DeviceData device);
+
+        /// <summary>
+        /// Runs the event log service on a device.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
 
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented

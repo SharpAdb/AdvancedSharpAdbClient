@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using AdvancedSharpAdbClient.Logs;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -367,6 +368,56 @@ namespace AdvancedSharpAdbClient
 
             // Convert the framebuffer to an image, and return that.
             return framebuffer;
+        }
+
+        /// <inheritdoc/>
+        public void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames)
+        {
+            ExceptionExtensions.ThrowIfNull(messageSink);
+
+            EnsureDevice(device);
+
+            // The 'log' service has been deprecated, see
+            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            StringBuilder request = new();
+            request.Append("shell:logcat -B");
+
+            foreach (LogId logName in logNames)
+            {
+                request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+            }
+
+            socket.SendAdbRequest(request.ToString());
+            AdbResponse response = socket.ReadAdbResponse();
+
+            using Stream stream = socket.GetShellStream();
+            LogReader reader = new(stream);
+
+            while (true)
+            {
+                LogEntry entry = null;
+
+                try
+                {
+                    entry = reader.ReadEntry();
+                }
+                catch (EndOfStreamException)
+                {
+                    // This indicates the end of the stream; the entry will remain null.
+                }
+
+                if (entry != null)
+                {
+                    messageSink(entry);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         /// <inheritdoc/>

@@ -1,43 +1,34 @@
-﻿// <copyright file="LogReader.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿#if HAS_TASK
+// <copyright file="LogReader.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient.Logs
 {
-    /// <summary>
-    /// Processes Android log files in binary format. You usually get the binary format by running <c>logcat -B</c>.
-    /// </summary>
     public partial class LogReader
     {
-        private readonly Stream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogReader"/> class.
-        /// </summary>
-        /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
-        public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
-
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
-        /// <returns>A new <see cref="LogEntry"/> object.</returns>
-        public LogEntry ReadEntry()
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return a new <see cref="LogEntry"/> object.</returns>
+        public async Task<LogEntry> ReadEntryAsync(CancellationToken cancellationToken = default)
         {
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
             // https://android.googlesource.com/platform/system/core/+/67d7eaf/include/log/logger.h
-            ushort? payloadLengthValue = ReadUInt16();
-            ushort? headerSizeValue = payloadLengthValue == null ? null : ReadUInt16();
-            int? pidValue = headerSizeValue == null ? null : ReadInt32();
-            int? tidValue = pidValue == null ? null : ReadInt32();
-            int? secValue = tidValue == null ? null : ReadInt32();
-            int? nsecValue = secValue == null ? null : ReadInt32();
+            ushort? payloadLengthValue = await ReadUInt16Async(cancellationToken).ConfigureAwait(false);
+            ushort? headerSizeValue = payloadLengthValue == null ? null : await ReadUInt16Async(cancellationToken).ConfigureAwait(false);
+            int? pidValue = headerSizeValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? tidValue = pidValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? secValue = tidValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
+            int? nsecValue = secValue == null ? null : await ReadInt32Async(cancellationToken).ConfigureAwait(false);
 
             if (nsecValue == null)
             {
@@ -62,7 +53,7 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 if (headerSize >= 0x18)
                 {
-                    uint? idValue = ReadUInt32();
+                    uint? idValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
                     if (idValue == null)
                     {
@@ -74,7 +65,7 @@ namespace AdvancedSharpAdbClient.Logs
 
                 if (headerSize >= 0x1c)
                 {
-                    uint? uidValue = ReadUInt32();
+                    uint? uidValue = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
 
                     if (uidValue == null)
                     {
@@ -87,7 +78,7 @@ namespace AdvancedSharpAdbClient.Logs
                 if (headerSize >= 0x20)
                 {
                     // Not sure what this is.
-                    _ = ReadUInt32();
+                    _ = await ReadUInt32Async(cancellationToken).ConfigureAwait(false);
                 }
 
                 if (headerSize > 0x20)
@@ -96,7 +87,7 @@ namespace AdvancedSharpAdbClient.Logs
                 }
             }
 
-            byte[] data = ReadBytesSafe(payloadLength);
+            byte[] data = await ReadBytesSafeAsync(payloadLength, cancellationToken).ConfigureAwait(false);
 
             if (data == null)
             {
@@ -182,74 +173,43 @@ namespace AdvancedSharpAdbClient.Logs
                     };
             }
         }
-
-        private void ReadLogEntry(BinaryReader reader, Collection<object> parent)
+        private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
-            EventLogType type = (EventLogType)reader.ReadByte();
-
-            switch (type)
-            {
-                case EventLogType.Float:
-                    parent.Add(reader.ReadSingle());
-                    break;
-
-                case EventLogType.Integer:
-                    parent.Add(reader.ReadInt32());
-                    break;
-
-                case EventLogType.Long:
-                    parent.Add(reader.ReadInt64());
-                    break;
-
-                case EventLogType.List:
-                    byte listLength = reader.ReadByte();
-
-                    Collection<object> list = new();
-
-                    for (int i = 0; i < listLength; i++)
-                    {
-                        ReadLogEntry(reader, list);
-                    }
-
-                    parent.Add(list);
-                    break;
-
-                case EventLogType.String:
-                    int stringLength = reader.ReadInt32();
-                    byte[] messageData = reader.ReadBytes(stringLength);
-                    string message = Encoding.ASCII.GetString(messageData);
-                    parent.Add(message);
-                    break;
-            }
-        }
-        private ushort? ReadUInt16()
-        {
-            byte[] data = ReadBytesSafe(2);
+            byte[] data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
-        private uint? ReadUInt32()
+        private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
-        private int? ReadInt32()
+        private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
-        private byte[] ReadBytesSafe(int count)
+        private async Task<byte[]> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;
+            int read = 0;
+
             byte[] data = new byte[count];
 
-            int read;
-            while ((read = stream.Read(data, totalRead, count - totalRead)) > 0)
+            while ((read =
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+                await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
+#elif !NET35
+                await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
+#else
+                await Utilities.Run(() => stream.Read(data, totalRead, count - totalRead)).ConfigureAwait(false)
+#endif
+                ) > 0)
             {
                 totalRead += read;
             }
@@ -258,3 +218,4 @@ namespace AdvancedSharpAdbClient.Logs
         }
     }
 }
+#endif

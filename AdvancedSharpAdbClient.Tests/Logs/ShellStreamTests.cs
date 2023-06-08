@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public void TestCRLFAtStart()
+        public void CRLFAtStartTest()
         {
             using MemoryStream stream = GetStream("\r\nHello, World!");
             using ShellStream shellStream = new(stream, false);
@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public void MultipleCRLFInString()
+        public void MultipleCRLFInStringTest()
         {
             using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
             using ShellStream shellStream = new(stream, false);
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async Task TestCRLFAtStartAsync()
+        public async void CRLFAtStartAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\nHello, World!");
             using ShellStream shellStream = new(stream, false);
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async Task MultipleCRLFInStringAsync()
+        public async void MultipleCRLFInStringAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
             using ShellStream shellStream = new(stream, false);
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async Task PendingByteTest1Async()
+        public async void PendingByteTest1AsyncTest()
         {
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);

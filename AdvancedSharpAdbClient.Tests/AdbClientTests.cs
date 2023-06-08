@@ -1,4 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -502,6 +503,46 @@ namespace AdvancedSharpAdbClient.Tests
                 requests,
                 null,
                 () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
+        }
+
+        [Fact]
+        public void RunLogServiceTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            AdbResponse[] responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            string[] responseMessages = Array.Empty<string>();
+
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:logcat -B -b system"
+            };
+
+            ConsoleOutputReceiver receiver = new();
+
+            using Stream stream = File.OpenRead("Assets/logcat.bin");
+            using ShellStream shellStream = new(stream, false);
+            Collection<LogEntry> logs = new();
+            Action<LogEntry> sink = logs.Add;
+
+            RunTest(
+                responses,
+                responseMessages,
+                requests,
+                shellStream,
+                () => TestClient.RunLogService(device, sink, LogId.System));
+
+            Assert.Equal(3, logs.Count);
         }
 
         /// <summary>

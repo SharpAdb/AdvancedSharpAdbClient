@@ -254,6 +254,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to run the event log service.</param>
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
+
+        /// <summary>
+        /// Asynchronously runs the event log service on a device.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this to stop reading from the event log.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
