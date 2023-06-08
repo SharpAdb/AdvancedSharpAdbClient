@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
+            client.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             PackageManager manager = new(client, device);
 
             Assert.True(manager.Packages.ContainsKey("com.android.gallery3d"));
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands.Add("pm list packages -f", "package:mwc2015.be");
+            client.Commands["pm list packages -f"] = "package:mwc2015.be";
             PackageManager manager = new(client, device);
 
             Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
@@ -54,9 +54,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            adbClient.Commands.Add("pm install \"/data/test.apk\"", string.Empty);
-            adbClient.Commands.Add("pm install -r \"/data/test.apk\"", string.Empty);
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["pm install \"/data/test.apk\""] = string.Empty;
+            adbClient.Commands["pm install -r \"/data/test.apk\""] = string.Empty;
 
             DeviceData device = new()
             {
@@ -85,9 +85,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
                 DummyAdbClient adbClient = new();
 
-                adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-                adbClient.Commands.Add("pm install \"/data/local/tmp/test.txt\"", string.Empty);
-                adbClient.Commands.Add("rm \"/data/local/tmp/test.txt\"", string.Empty);
+                adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+                adbClient.Commands["pm install \"/data/local/tmp/test.txt\""] = string.Empty;
+                adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
 
                 DeviceData device = new()
                 {
@@ -112,15 +112,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            adbClient.Commands.Add("pm install-create", "Success: created install session [936013062]");
-            adbClient.Commands.Add("pm install-create -r", "Success: created install session [936013062]");
-            adbClient.Commands.Add("pm install-create -p com.google.android.gms", "Success: created install session [936013062]");
-            adbClient.Commands.Add("pm install-create -r -p com.google.android.gms", "Success: created install session [936013062]");
-            adbClient.Commands.Add("pm install-write 936013062 base.apk \"/data/base.apk\"", string.Empty);
-            adbClient.Commands.Add("pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\"", string.Empty);
-            adbClient.Commands.Add("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", string.Empty);
-            adbClient.Commands.Add("pm install-commit 936013062", string.Empty);
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["pm install-create"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-create -r"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-create -r -p com.google.android.gms"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-write 936013062 base.apk \"/data/base.apk\""] = string.Empty;
+            adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\""] = string.Empty;
+            adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\""] = string.Empty;
+            adbClient.Commands["pm install-commit 936013062"] = string.Empty    ;
 
             DeviceData device = new()
             {
@@ -173,16 +173,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
                 DummyAdbClient adbClient = new();
 
-                adbClient.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-                adbClient.Commands.Add("pm install-create", "Success: created install session [936013062]");
-                adbClient.Commands.Add("pm install-create -p com.google.android.gms", "Success: created install session [936013062]");
-                adbClient.Commands.Add("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", string.Empty);
-                adbClient.Commands.Add("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", string.Empty);
-                adbClient.Commands.Add("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", string.Empty);
-                adbClient.Commands.Add("pm install-commit 936013062", string.Empty);
-                adbClient.Commands.Add("rm \"/data/local/tmp/test.txt\"", string.Empty);
-                adbClient.Commands.Add("rm \"/data/local/tmp/gapps.txt\"", string.Empty);
-                adbClient.Commands.Add("rm \"/data/local/tmp/logcat.bin\"", string.Empty);
+                adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+                adbClient.Commands["pm install-create"] = "Success: created install session [936013062]";
+                adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
+                adbClient.Commands["pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\""] = string.Empty;
+                adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\""] = string.Empty;
+                adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\""] = string.Empty;
+                adbClient.Commands["pm install-commit 936013062"] = string.Empty;
+                adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
+                adbClient.Commands["rm \"/data/local/tmp/gapps.txt\""] = string.Empty;
+                adbClient.Commands["rm \"/data/local/tmp/logcat.bin\""] = string.Empty;
 
                 DeviceData device = new()
                 {
@@ -233,8 +233,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands.Add("pm list packages -f", "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d");
-            client.Commands.Add("pm uninstall com.android.gallery3d", "Success");
+            client.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            client.Commands["pm uninstall com.android.gallery3d"] = "Success";
             PackageManager manager = new(client, device);
 
             // Command should execute correctly; if the wrong command is passed an exception
@@ -251,7 +251,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands.Add("dumpsys package com.google.android.gms", File.ReadAllText("Assets/gapps.txt"));
+            client.Commands["dumpsys package com.google.android.gms"] = File.ReadAllText("Assets/gapps.txt");
             PackageManager manager = new(client, device, skipInit: true);
 
             VersionInfo versionInfo = manager.GetVersionInfo("com.google.android.gms");

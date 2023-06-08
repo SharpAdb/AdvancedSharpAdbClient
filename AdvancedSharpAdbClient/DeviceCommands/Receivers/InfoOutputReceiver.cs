@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="propertyName">The name of the property</param>
         /// <returns>The received value</returns>
-        public object GetPropertyValue(string propertyName) => Properties.ContainsKey(propertyName) ? Properties[propertyName] : null;
+        public object GetPropertyValue(string propertyName) => Properties.TryGetValue(propertyName, out object property) ? property : null;
 
         /// <summary>
         /// Adds a new parser to this receiver.
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="property">The property corresponding with the parser.</param>
         /// <param name="parser">Function parsing one string and returning the property value if possible. </param>
-        public void AddPropertyParser(string property, Func<string, object> parser) => PropertyParsers.Add(property, parser);
+        public void AddPropertyParser(string property, Func<string, object> parser) => PropertyParsers[property] = parser;
 
         /// <summary>
         /// Processes the new lines, and sets version information if the line represents package information data.
@@ -58,7 +58,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     object propertyValue = parser.Value(line);
                     if (propertyValue != null)
                     {
-                        Properties.Add(parser.Key, propertyValue);
+                        Properties[parser.Key] = propertyValue;
                     }
                 }
             }

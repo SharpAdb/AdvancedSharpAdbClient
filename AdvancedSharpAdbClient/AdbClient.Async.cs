@@ -916,7 +916,7 @@ namespace AdvancedSharpAdbClient
                         XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                         if (xmlNodes != null)
                         {
-                            List<Element> elements = new();
+                            List<Element> elements = new(xmlNodes.Count);
                             for (int i = 0; i < xmlNodes.Count; i++)
                             {
                                 Element element = Element.FromXmlNode(this, device, xmlNodes[i]);

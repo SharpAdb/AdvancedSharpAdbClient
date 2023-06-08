@@ -42,14 +42,14 @@ namespace AdvancedSharpAdbClient.Tests
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles.Add(remotePath, stream);
+            UploadedFiles[remotePath] = stream;
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
         }
 
         public Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles.Add(remotePath, stream);
+            UploadedFiles[remotePath] = stream;
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
             return Task.CompletedTask;
         }

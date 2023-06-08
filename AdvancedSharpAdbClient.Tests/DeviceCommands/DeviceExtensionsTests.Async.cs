@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add(EnvironmentVariablesReceiver.PrintEnvCommand, "a=b");
+            adbClient.Commands[EnvironmentVariablesReceiver.PrintEnvCommand] = "a=b";
 
             DeviceData device = new();
 
@@ -53,8 +53,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "");
-            adbClient.Commands.Add("pm uninstall com.example", "");
+            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands["pm uninstall com.example"] = "";
 
             DeviceData device = new()
             {
@@ -72,8 +72,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "");
-            adbClient.Commands.Add("dumpsys package com.example",
+            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands["dumpsys package com.example"] =
 @"Activity Resolver Table:
   Non-Data Actions:
       com.android.providers.contacts.DUMP_DATABASE:
@@ -107,7 +107,7 @@ Shared users:
   SharedUser [android.uid.shared] (3341dee):
     userId=10002 gids=[3003, 1028, 1015]
     grantedPermissions:
-      android.permission.WRITE_SETTINGS");
+      android.permission.WRITE_SETTINGS";
 
             DeviceData device = new()
             {
@@ -128,8 +128,8 @@ Shared users:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "");
-            adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
+            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands["dumpsys package jp.co.cyberagent.stf"] =
 @"Activity Resolver Table:
   Schemes:
       package:
@@ -198,7 +198,7 @@ mSettings.mPackages:
 the number of packages is 223
 mPackages:
 the number of packages is 223
-End!!!!");
+End!!!!";
 
             DeviceData device = new()
             {
@@ -219,8 +219,8 @@ End!!!!");
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add("pm list packages -f", "");
-            adbClient.Commands.Add("dumpsys package jp.co.cyberagent.stf",
+            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands["dumpsys package jp.co.cyberagent.stf"] =
 @"Activity Resolver Table:
   Schemes:
       package:
@@ -343,7 +343,7 @@ Dexopt state:
 
 Compiler stats:
   [jp.co.cyberagent.stf]
-     base.apk - 1084");
+     base.apk - 1084";
 
             DeviceData device = new()
             {
@@ -364,29 +364,29 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands.Add(@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+            adbClient.Commands[@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
     /system/bin/ls /proc/
 else
     /system/bin/ls -1 /proc/
-fi".Replace("\r\n", "\n"),
+fi".Replace("\r\n", "\n")] =
 @"1
 2
 3
 acpi
-asound");
-            adbClient.Commands.Add("cat /proc/1/stat /proc/2/stat /proc/3/stat ",
+asound";
+            adbClient.Commands["cat /proc/1/stat /proc/2/stat /proc/3/stat "] =
 @"1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 4288071392 4288070744 134658736 0 0 0 65536 18446744071580117077 0 0 17 1 0 0 0 0 0 135152736 135165080 142131200 4288073690 4288073696 4288073696 4288073714 0
 2 (kthreadd) S 0 0 0 0 -1 2129984 0 0 0 0 0 0 0 0 20 0 1 0 2 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579254310 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
-            adbClient.Commands.Add("cat /proc/1/cmdline /proc/1/stat /proc/2/cmdline /proc/2/stat /proc/3/cmdline /proc/3/stat ",
+3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+            adbClient.Commands["cat /proc/1/cmdline /proc/1/stat /proc/2/cmdline /proc/2/stat /proc/3/cmdline /proc/3/stat "] =
 @"
 1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 4288071392 4288070744 134658736 0 0 0 65536 18446744071580117077 0 0 17 1 0 0 0 0 0 135152736 135165080 142131200 4288073690 4288073696 4288073696 4288073714 0
 
 2 (kthreadd) S 0 0 0 0 -1 2129984 0 0 0 0 0 0 0 0 20 0 1 0 2 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579254310 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 
-3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
+3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
 
             DeviceData device = new();
             AndroidProcess[] processes = (await adbClient.ListProcessesAsync(device)).ToArray();

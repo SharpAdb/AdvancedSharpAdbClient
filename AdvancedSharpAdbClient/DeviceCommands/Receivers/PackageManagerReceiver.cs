@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     if (separator == -1)
                     {
-                        PackageManager.Packages.Add(package, null);
+                        PackageManager.Packages[package] = null;
                     }
                     else
                     {
@@ -74,7 +74,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         string path = package.Substring(0, separator);
                         string name = package.Substring(separator + 1);
 #endif
-                        PackageManager.Packages.Add(name, path);
+                        PackageManager.Packages[name] = path;
                     }
                 }
             }

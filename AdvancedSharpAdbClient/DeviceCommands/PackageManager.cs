@@ -201,20 +201,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath, OnMainSyncProgressChanged);
 
-            Dictionary<string, double> progress = new();
+            Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
                 int count = 1;
                 if (sender is string path)
                 {
-                    if (!progress.ContainsKey(path))
-                    {
-                        progress.Add(path, args.ProgressPercentage);
-                    }
-                    else
-                    {
-                        progress[path] = args.ProgressPercentage;
-                    }
+                    progress[path] = args.ProgressPercentage;
                 }
                 else if (sender is true)
                 {
@@ -262,20 +255,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            Dictionary<string, double> progress = new();
+            Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
                 int count = 1;
                 if (sender is string path)
                 {
-                    if (!progress.ContainsKey(path))
-                    {
-                        progress.Add(path, args.ProgressPercentage);
-                    }
-                    else
-                    {
-                        progress[path] = args.ProgressPercentage;
-                    }
+                    progress[path] = args.ProgressPercentage;
                 }
                 else if (sender is true)
                 {

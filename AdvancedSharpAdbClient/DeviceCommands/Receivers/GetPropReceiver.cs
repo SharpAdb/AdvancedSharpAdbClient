@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     if (label.Length > 0)
                     {
-                        Properties.Add(label, value);
+                        Properties[label] = value;
                     }
                 }
             }

@@ -97,20 +97,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             string baseRemoteFilePath = await SyncPackageToDeviceAsync(basePackageFilePath, OnMainSyncProgressChanged, cancellationToken);
 
-            Dictionary<string, double> progress = new();
+            Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
                 int count = 1;
                 if (sender is string path)
                 {
-                    if (!progress.ContainsKey(path))
-                    {
-                        progress.Add(path, args.ProgressPercentage);
-                    }
-                    else
-                    {
-                        progress[path] = args.ProgressPercentage;
-                    }
+                    progress[path] = args.ProgressPercentage;
                 }
                 else if (sender is true)
                 {
@@ -126,7 +119,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 InstallProgressChanged?.Invoke(this, new InstallProgress(count, splitPackageFilePaths.Count + 1, present));
             }
 
-            List<string> splitRemoteFilePaths = new();
+            List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
             IEnumerable<Task> tasks = splitPackageFilePaths.Select(async (x) => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSplitSyncProgressChanged, cancellationToken)));
             foreach (Task task in tasks)
             {
@@ -165,20 +158,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            Dictionary<string, double> progress = new();
+            Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
                 int count = 1;
                 if (sender is string path)
                 {
-                    if (!progress.ContainsKey(path))
-                    {
-                        progress.Add(path, args.ProgressPercentage);
-                    }
-                    else
-                    {
-                        progress[path] = args.ProgressPercentage;
-                    }
+                    progress[path] = args.ProgressPercentage;
                 }
                 else if (sender is true)
                 {
@@ -194,7 +180,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 InstallProgressChanged?.Invoke(this, new InstallProgress(count, splitPackageFilePaths.Count, present));
             }
 
-            List<string> splitRemoteFilePaths = new();
+            List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
             IEnumerable<Task> tasks = splitPackageFilePaths.Select(async (x) => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSyncProgressChanged, cancellationToken)));
             foreach (Task task in tasks)
             {

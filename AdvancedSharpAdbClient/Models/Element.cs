@@ -123,17 +123,17 @@ namespace AdvancedSharpAdbClient
             if (bounds != null)
             {
                 int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                Dictionary<string, string> attributes = new();
+                Dictionary<string, string> attributes = new(xmlNode.Attributes.Count);
                 foreach (XmlAttribute at in xmlNode.Attributes)
                 {
-                    attributes.Add(at.Name, at.Value);
+                    attributes[at.Name] = at.Value;
                 }
                 Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
                 XmlNodeList childNodes = xmlNode.ChildNodes;
-                List<Element> elements = new();
+                List<Element> elements = new(childNodes?.Count ?? 0);
                 if (childNodes != null)
                 {
-                    for (int i = 0; i < xmlNode.ChildNodes.Count; i++)
+                    for (int i = 0; i < childNodes.Count; i++)
                     {
                         Element element = FromXmlNode(client, device, childNodes[i]);
                         if (element != null)
