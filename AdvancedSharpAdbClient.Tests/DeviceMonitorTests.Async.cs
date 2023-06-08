@@ -1,38 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    /// <summary>
-    /// Tests the <see cref="DeviceMonitor"/> class.
-    /// </summary>
-    public partial class DeviceMonitorTests : SocketBasedTests
+    public partial class DeviceMonitorTests
     {
-        // Toggle the integration test flag to true to run on an actual adb server
-        // (and to build/validate the test cases), set to false to use the mocked
-        // adb sockets.
-        // In release mode, this flag is ignored and the mocked adb sockets are always used.
-        public DeviceMonitorTests() : base(integrationTest: false, doDispose: true)
-        {
-        }
-
         [Fact]
-        public void ConstructorTest()
-        {
-            using DeviceMonitor monitor = new(Socket);
-            Assert.NotNull(monitor.Devices);
-            Assert.Equal(0, monitor.Devices.Count);
-            Assert.Equal(Socket, monitor.Socket);
-            Assert.False(monitor.IsRunning);
-        }
-
-        [Fact]
-        public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
-
-        [Fact]
-        public void DeviceDisconnectedTest()
+        public async void DeviceDisconnectedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -42,13 +17,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, monitor.Devices.Count);
 
             // Start the monitor, detect the initial device.
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 ResponseMessages("169.254.109.177:5555\tdevice\n"),
                 Requests("host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Single(sink.ConnectedEvents);
@@ -82,7 +57,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void DeviceConnectedTest()
+        public async void DeviceConnectedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -92,13 +67,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, monitor.Devices.Count);
 
             // Start the monitor, detect the initial device.
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 ResponseMessages(""),
                 Requests("host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.Equal(0, monitor.Devices.Count);
                     Assert.Empty(sink.ConnectedEvents);
@@ -132,7 +107,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void StartInitialDeviceListTest()
+        public async void StartInitialDeviceListAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -141,13 +116,13 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.Equal(0, monitor.Devices.Count);
 
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 ResponseMessages("169.254.109.177:5555\tdevice\n"),
                 Requests("host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
@@ -160,7 +135,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void DeviceChanged_TriggeredWhenStatusChangedTest()
+        public async void DeviceChanged_TriggeredWhenStatusChangedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -170,13 +145,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, monitor.Devices.Count);
 
             // Start the monitor, detect the initial device.
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 ResponseMessages("169.254.109.177:5555\toffline\n"),
                 Requests("host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
@@ -214,7 +189,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void DeviceChanged_NoTriggerIfStatusIsSameTest()
+        public async void DeviceChanged_NoTriggerIfStatusIsSameAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -224,13 +199,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, monitor.Devices.Count);
 
             // Start the monitor, detect the initial device.
-            RunTest(
+            await RunTestAsync(
                 OkResponse,
                 ResponseMessages("169.254.109.177:5555\toffline\n"),
                 Requests("host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.Equal(1, monitor.Devices.Count);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
@@ -271,7 +246,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
         /// </summary>
         [Fact]
-        public void AdbKilledTest()
+        public async void AdbKilledAsyncTest()
         {
             DummyAdbServer dummyAdbServer = new();
             AdbServer.Instance = dummyAdbServer;
@@ -279,7 +254,7 @@ namespace AdvancedSharpAdbClient.Tests
             Socket.WaitForNewData = true;
 
             using DeviceMonitor monitor = new(Socket);
-            RunTest(
+            await RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 ResponseMessages(
                     DummyAdbSocket.ServerDisconnected,
@@ -287,9 +262,9 @@ namespace AdvancedSharpAdbClient.Tests
                 Requests(
                     "host:track-devices",
                     "host:track-devices"),
-                () =>
+                async () =>
                 {
-                    monitor.Start();
+                    await monitor.StartAsync();
 
                     Assert.True(Socket.DidReconnect);
                     Assert.True(dummyAdbServer.WasRestarted);

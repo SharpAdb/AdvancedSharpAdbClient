@@ -5,6 +5,7 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 
@@ -34,7 +35,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    public class DeviceMonitor : IDeviceMonitor, IDisposable
+    public partial class DeviceMonitor : IDeviceMonitor, IDisposable
     {
 #if HAS_LOGGER
         /// <summary>
@@ -48,24 +49,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private readonly List<DeviceData> devices;
 
-#if HAS_TASK
-        /// <summary>
-        /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
-        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
-        /// has processed the first list of devices.
-        /// </summary>
-        private readonly ManualResetEvent firstDeviceListParsed = new(false);
-
-        /// <summary>
-        /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
-        /// </summary>
-        private readonly CancellationTokenSource monitorTaskCancellationTokenSource = new();
-
-        /// <summary>
-        /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
-        /// </summary>
-        private Task monitorTask;
-#else
+#if !HAS_TASK
         /// <summary>
         /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
@@ -110,23 +94,19 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataEventArgs> DeviceChanged;
+        public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataEventArgs> DeviceConnected;
+        public event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
+        public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
 
         /// <inheritdoc/>
-        public
-#if !NETFRAMEWORK || NET45_OR_GREATER
-            IReadOnlyCollection
-#else
-            IEnumerable
-#endif
-            <DeviceData> Devices
-        { get; private set; }
+        public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
+
+        /// <inheritdoc/>
+        public ReadOnlyCollection<DeviceData> Devices { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
@@ -150,8 +130,7 @@ namespace AdvancedSharpAdbClient
 
                 monitorTask = Utilities.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token));
 
-                // Wait for the worker thread to have read the first list
-                // of devices.
+                // Wait for the worker thread to have read the first list of devices.
                 _ = firstDeviceListParsed.WaitOne();
             }
 #else
@@ -161,8 +140,7 @@ namespace AdvancedSharpAdbClient
 
                 monitorThread = new Thread(DeviceMonitorLoop);
 
-                // Wait for the worker thread to have read the first list
-                // of devices.
+                // Wait for the worker thread to have read the first list of devices.
                 _ = firstDeviceListParsed.WaitOne();
             }
 #endif
@@ -234,116 +212,28 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Raises the <see cref="DeviceChanged"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceChanged(DeviceDataEventArgs e) => DeviceChanged?.Invoke(this, e);
+        /// <param name="e">The <see cref="DeviceDataChangeEventArgs"/> instance containing the event data.</param>
+        protected void OnDeviceChanged(DeviceDataChangeEventArgs e) => DeviceChanged?.Invoke(this, e);
+
+        /// <summary>
+        /// Raises the <see cref="DeviceNotified"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="IEnumerable{DeviceData}"/> instance containing the event data.</param>
+        protected void OnDeviceNotified(DeviceDataNotifyEventArgs e) => DeviceNotified?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="DeviceConnected"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceConnected(DeviceDataEventArgs e) => DeviceConnected?.Invoke(this, e);
+        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
+        protected void OnDeviceConnected(DeviceDataConnectEventArgs e) => DeviceConnected?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="DeviceDisconnected"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="DeviceDataEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceDisconnected(DeviceDataEventArgs e) => DeviceDisconnected?.Invoke(this, e);
+        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
+        protected void OnDeviceDisconnected(DeviceDataConnectEventArgs e) => DeviceDisconnected?.Invoke(this, e);
 
-#if HAS_TASK
-        /// <summary>
-        /// Monitors the devices. This connects to the Debug Bridge
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
-        {
-            IsRunning = true;
-
-            // Set up the connection to track the list of devices.
-            InitializeSocket();
-
-            do
-            {
-                try
-                {
-                    string value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
-                    ProcessIncomingDeviceData(value);
-
-                    firstDeviceListParsed.Set();
-                }
-#if HAS_LOGGER
-                catch (TaskCanceledException ex)
-#else
-                catch (TaskCanceledException)
-#endif
-                {
-                    // We get a TaskCanceledException on Windows
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        // The DeviceMonitor is shutting down (disposing) and Dispose()
-                        // has called cancellationToken.Cancel(). This exception is expected,
-                        // so we can safely swallow it.
-                    }
-                    else
-                    {
-                        // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
-                        logger.LogError(ex, ex.Message);
-#endif
-                        throw;
-                    }
-                }
-#if HAS_LOGGER
-                catch (ObjectDisposedException ex)
-#else
-                catch (ObjectDisposedException)
-#endif
-                {
-                    // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        // The DeviceMonitor is shutting down (disposing) and Dispose()
-                        // has called cancellationToken.Cancel(). This exception is expected,
-                        // so we can safely swallow it.
-                    }
-                    else
-                    {
-                        // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
-                        logger.LogError(ex, ex.Message);
-#endif
-                        throw;
-                    }
-                }
-                catch (AdbException adbException)
-                {
-                    if (adbException.ConnectionReset)
-                    {
-                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
-                        AdbServer.Instance.RestartServer();
-                        Socket.Reconnect();
-                        InitializeSocket();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-#if HAS_LOGGER
-                catch (Exception ex)
-                {
-                    // The exception was unexpected, so log it & rethrow.
-                    logger.LogError(ex, ex.Message);
-#else
-                catch (Exception)
-                {
-#endif
-                    throw;
-                }
-            }
-            while (!cancellationToken.IsCancellationRequested);
-        }
-#else
+#if !HAS_TASK
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
@@ -381,7 +271,6 @@ namespace AdvancedSharpAdbClient
             while (!isMonitorThreadCancel);
             isMonitorThreadCancel = false;
         }
-#endif
 
         private void InitializeSocket()
         {
@@ -389,6 +278,7 @@ namespace AdvancedSharpAdbClient
             Socket.SendAdbRequest("host:track-devices");
             _ = Socket.ReadAdbResponse();
         }
+#endif
 
         /// <summary>
         /// Processes the incoming device data.
@@ -422,12 +312,13 @@ namespace AdvancedSharpAdbClient
                     if (existingDevice == null)
                     {
                         this.devices.Add(device);
-                        OnDeviceConnected(new DeviceDataEventArgs(device));
+                        OnDeviceConnected(new DeviceDataConnectEventArgs(device, true));
                     }
                     else if (existingDevice.State != device.State)
                     {
+                        DeviceState oldState = existingDevice.State;
                         existingDevice.State = device.State;
-                        OnDeviceChanged(new DeviceDataEventArgs(existingDevice));
+                        OnDeviceChanged(new DeviceDataChangeEventArgs(existingDevice, device.State, oldState));
                     }
                 }
 
@@ -435,7 +326,12 @@ namespace AdvancedSharpAdbClient
                 foreach (DeviceData device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.devices.Remove(device);
-                    OnDeviceDisconnected(new DeviceDataEventArgs(device));
+                    OnDeviceDisconnected(new DeviceDataConnectEventArgs(device, false));
+                }
+
+                if (devices.Any())
+                {
+                    OnDeviceNotified(new DeviceDataNotifyEventArgs(devices));
                 }
             }
         }
