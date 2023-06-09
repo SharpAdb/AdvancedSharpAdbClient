@@ -5,19 +5,19 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
     public class CommandAbortingExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor() =>
-            ExceptionTester<CommandAbortingException>.TestEmptyConstructor(() => new CommandAbortingException());
+        public void EmptyConstructorTest() =>
+            ExceptionTester<CommandAbortingException>.EmptyConstructorTest(() => new CommandAbortingException());
 
         [Fact]
-        public void TestMessageConstructor() =>
-            ExceptionTester<CommandAbortingException>.TestMessageConstructor((message) => new CommandAbortingException(message));
+        public void MessageConstructorTest() =>
+            ExceptionTester<CommandAbortingException>.MessageConstructorTest((message) => new CommandAbortingException(message));
 
         [Fact]
-        public void TestMessageAndInnerConstructor() =>
-            ExceptionTester<CommandAbortingException>.TestMessageAndInnerConstructor((message, inner) => new CommandAbortingException(message, inner));
+        public void MessageAndInnerConstructorTest() =>
+            ExceptionTester<CommandAbortingException>.MessageAndInnerConstructorTest((message, inner) => new CommandAbortingException(message, inner));
 
         [Fact]
-        public void TestSerializationConstructor() =>
-            ExceptionTester<CommandAbortingException>.TestSerializationConstructor((info, context) => new CommandAbortingException(info, context));
+        public void SerializationConstructorTest() =>
+            ExceptionTester<CommandAbortingException>.SerializationConstructorTest((info, context) => new CommandAbortingException(info, context));
     }
 }

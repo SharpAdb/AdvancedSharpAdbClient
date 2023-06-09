@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ToDateTime()
+        public void ToDateTimeTest()
         {
             DateTime time = new(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc);
             Assert.Equal(time, ((long)1654085434).ToDateTime());

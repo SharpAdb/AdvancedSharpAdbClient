@@ -9,9 +9,9 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
     /// </summary>
     internal static class ExceptionTester<T> where T : Exception
     {
-        public static void TestEmptyConstructor(Func<T> constructor) => _ = constructor();
+        public static void EmptyConstructorTest(Func<T> constructor) => _ = constructor();
 
-        public static void TestMessageConstructor(Func<string, T> constructor)
+        public static void MessageConstructorTest(Func<string, T> constructor)
         {
             string message = "Hello, World";
             T ex = constructor(message);
@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             Assert.Null(ex.InnerException);
         }
 
-        public static void TestMessageAndInnerConstructor(Func<string, Exception, T> constructor)
+        public static void MessageAndInnerConstructorTest(Func<string, Exception, T> constructor)
         {
             string message = "Hello, World";
             Exception inner = new();
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             Assert.Equal(inner, ex.InnerException);
         }
 
-        public static void TestSerializationConstructor(Func<SerializationInfo, StreamingContext, T> constructor)
+        public static void SerializationConstructorTest(Func<SerializationInfo, StreamingContext, T> constructor)
         {
             SerializationInfo info = new(typeof(T), new FormatterConverter());
             StreamingContext context = new();

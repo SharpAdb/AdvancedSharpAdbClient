@@ -5,15 +5,15 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
     public class DeviceNotFoundExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor() =>
-            ExceptionTester<DeviceNotFoundException>.TestEmptyConstructor(() => new DeviceNotFoundException());
+        public void EmptyConstructorTest() =>
+            ExceptionTester<DeviceNotFoundException>.EmptyConstructorTest(() => new DeviceNotFoundException());
 
         [Fact]
-        public void TestMessageAndInnerConstructor() =>
-            ExceptionTester<DeviceNotFoundException>.TestMessageAndInnerConstructor((message, inner) => new DeviceNotFoundException(message, inner));
+        public void MessageAndInnerConstructorTest() =>
+            ExceptionTester<DeviceNotFoundException>.MessageAndInnerConstructorTest((message, inner) => new DeviceNotFoundException(message, inner));
 
         [Fact]
-        public void TestSerializationConstructor() =>
-            ExceptionTester<DeviceNotFoundException>.TestSerializationConstructor((info, context) => new DeviceNotFoundException(info, context));
+        public void SerializationConstructorTest() =>
+            ExceptionTester<DeviceNotFoundException>.SerializationConstructorTest((info, context) => new DeviceNotFoundException(info, context));
     }
 }

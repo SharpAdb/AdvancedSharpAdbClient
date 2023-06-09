@@ -81,7 +81,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public void PendingByteTest1()
+        public void PendingByteTest()
         {
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async void PendingByteTest1AsyncTest()
+        public async void PendingByteAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);

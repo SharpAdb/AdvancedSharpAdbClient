@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
     public class LoggerTests
     {
         [Fact]
-        public void ReadLogTests()
+        public void ReadLogTest()
         {
             using Stream stream = File.OpenRead(@"Assets/logcat.bin");
             using ShellStream shellStream = new(stream, false);
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async void ReadLogAsyncTests()
+        public async void ReadLogAsyncTest()
         {
             using Stream stream = File.OpenRead(@"Assets/logcat.bin");
             using ShellStream shellStream = new(stream, false);
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public void ReadEventLogAsync()
+        public void ReadEventLogTest()
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.

@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void ReadFramebufferv2Test()
+        public void ReadFramebufferV2Test()
         {
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
 

@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => ForwardSpec.Parse("xyz:1234"));
 
         [Fact]
-        public void ToStringInvalidProtocol()
+        public void ToStringInvalidProtocolTest()
         {
             ForwardSpec spec = new()
             {
