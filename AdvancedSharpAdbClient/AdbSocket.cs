@@ -5,8 +5,11 @@
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -191,10 +194,10 @@ namespace AdvancedSharpAdbClient
                 try
                 {
                     int left = expLen - totalRead;
-                    int buflen = left < ReceiveBufferSize ? left : ReceiveBufferSize;
+                    int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    byte[] buffer = new byte[buflen];
-                    count = socket.Receive(buffer, buflen, SocketFlags.None);
+                    byte[] buffer = new byte[bufferLength];
+                    count = socket.Receive(buffer, bufferLength, SocketFlags.None);
                     if (count < 0)
                     {
 #if HAS_LOGGER
@@ -373,7 +376,7 @@ namespace AdvancedSharpAdbClient
                 string message = ReadString();
                 resp.Message = message;
 #if HAS_LOGGER
-                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), resp.Message);
+                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{resp.Message}'");
 #endif
             }
 

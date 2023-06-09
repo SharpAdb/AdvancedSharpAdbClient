@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// Provides extension methods for the <see cref="DeviceData"/> class,
     /// allowing you to run commands directory against a <see cref="DeviceData"/> object.
     /// </summary>
-    public static class DeviceExtensions
+    public static partial class DeviceExtensions
     {
         /// <summary>
         /// Executes a shell command on the device.

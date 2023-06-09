@@ -1,26 +1,23 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class UnknownOptionExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor() =>
-            ExceptionTester<UnknownOptionException>.TestEmptyConstructor(() => new UnknownOptionException());
+        public void EmptyConstructorTest() =>
+            ExceptionTester<UnknownOptionException>.EmptyConstructorTest(() => new UnknownOptionException());
 
         [Fact]
-        public void TestMessageConstructor() =>
-            ExceptionTester<UnknownOptionException>.TestMessageConstructor((message) => new UnknownOptionException(message));
+        public void MessageConstructorTest() =>
+            ExceptionTester<UnknownOptionException>.MessageConstructorTest((message) => new UnknownOptionException(message));
 
         [Fact]
-        public void TestMessageAndInnerConstructor() =>
-            ExceptionTester<UnknownOptionException>.TestMessageAndInnerConstructor((message, inner) => new UnknownOptionException(message, inner));
+        public void MessageAndInnerConstructorTest() =>
+            ExceptionTester<UnknownOptionException>.MessageAndInnerConstructorTest((message, inner) => new UnknownOptionException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor() =>
-            ExceptionTester<UnknownOptionException>.TestSerializationConstructor((info, context) => new UnknownOptionException(info, context));
-#endif
+        public void SerializationConstructorTest() =>
+            ExceptionTester<UnknownOptionException>.SerializationConstructorTest((info, context) => new UnknownOptionException(info, context));
     }
 }

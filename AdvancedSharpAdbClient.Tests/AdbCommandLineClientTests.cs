@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="AdbCommandLineClient"/> class.
     /// </summary>
-    public class AdbCommandLineClientTests
+    public partial class AdbCommandLineClientTests
     {
         [Fact]
         public void GetVersionTest()

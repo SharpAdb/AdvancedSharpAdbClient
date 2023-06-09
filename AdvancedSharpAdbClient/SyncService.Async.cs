@@ -19,10 +19,10 @@ namespace AdvancedSharpAdbClient
         public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
-            await Socket.SetDeviceAsync(Device, default);
+            await Socket.SetDeviceAsync(Device, cancellationToken);
 
-            await Socket.SendAdbRequestAsync("sync:", default);
-            _ = await Socket.ReadAdbResponseAsync(default);
+            await Socket.SendAdbRequestAsync("sync:", cancellationToken);
+            _ = await Socket.ReadAdbResponseAsync(cancellationToken);
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace AdvancedSharpAdbClient
 
                 // The first 4 bytes contain the length of the data packet
                 byte[] reply = new byte[4];
-                await Socket.ReadAsync(reply, cancellationToken);
+                _ = await Socket.ReadAsync(reply, cancellationToken);
 
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -300,7 +300,7 @@ namespace AdvancedSharpAdbClient
         private async Task ReadStatisticsAsync(FileStatistics value, CancellationToken cancellationToken = default)
         {
             byte[] statResult = new byte[12];
-            await Socket.ReadAsync(statResult, cancellationToken);
+            _ = await Socket.ReadAsync(statResult, cancellationToken);
 
             if (!BitConverter.IsLittleEndian)
             {

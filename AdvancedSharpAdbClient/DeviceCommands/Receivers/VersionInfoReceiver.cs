@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
-    internal partial class VersionInfoReceiver : InfoReceiver
+    public partial class VersionInfoReceiver : InfoOutputReceiver
     {
         /// <summary>
         /// The name of the version code property.

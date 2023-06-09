@@ -194,7 +194,7 @@ namespace AdvancedSharpAdbClient.Tests
         [InlineData(0, int.MinValue, int.MaxValue, 0)]
         public void ContainsTest(int x, int y, int width, int height)
         {
-            Area rect = new(unchecked(2 * x - width), unchecked(2 * y - height), width, height);
+            Area rect = new(unchecked((2 * x) - width), unchecked((2 * y) - height), width, height);
             Cords p = new(x, y);
             Area r = new(x, y, width / 2, height / 2);
 
@@ -212,7 +212,7 @@ namespace AdvancedSharpAdbClient.Tests
             Area inflatedRect, rect = new(x, y, width, height);
             unchecked
             {
-                inflatedRect = new Area(x - width, y - height, width + 2 * width, height + 2 * height);
+                inflatedRect = new Area(x - width, y - height, width + (2 * width), height + (2 * height));
             }
 
             Assert.Equal(inflatedRect, Area.Inflate(rect, width, height));
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient.Tests
             Size s = new(x, y);
             unchecked
             {
-                inflatedRect = new Area(rect.X - x, rect.Y - y, rect.Width + 2 * x, rect.Height + 2 * y);
+                inflatedRect = new Area(rect.X - x, rect.Y - y, rect.Width + (2 * x), rect.Height + (2 * y));
             }
 
             rect.Inflate(s);

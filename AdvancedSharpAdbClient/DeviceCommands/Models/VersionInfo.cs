@@ -12,12 +12,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the version code of an Android application.
         /// </summary>
-        public int VersionCode { get; set; }
+        public int VersionCode { get; }
 
         /// <summary>
         /// Gets or sets the version name of an Android application.
         /// </summary>
-        public string VersionName { get; set; }
+        public string VersionName { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionInfo"/> class.
@@ -42,6 +42,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <inheritdoc/>
-        public override string ToString() => $"{VersionName} - {VersionCode}";
+        public override string ToString() => $"{VersionName} ({VersionCode})";
     }
 }

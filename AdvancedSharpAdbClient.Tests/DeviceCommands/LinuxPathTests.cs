@@ -1,8 +1,7 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
-using System;
+﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     /// <summary>
     /// Tests the <see cref="LinuxPath"/> class.
@@ -18,23 +17,18 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
             // Should not throw an exception.
             LinuxPath.CheckInvalidPathChars("/var/test");
 
-        [Fact]
-        public void CheckInvalidPathCharsTest2() =>
+        [Theory]
+        [InlineData("/var/test > out")]
+        [InlineData("\t/var/test")]
+        public void CheckInvalidPathCharsThrowTest(string path) =>
             // Should throw an exception.
-            _ = Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("/var/test > out"));
+            _ = Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars(path));
 
-        [Fact]
-        public void CheckInvalidPathCharsTest3() =>
-            // Should throw an exception.
-            _ = Assert.Throws<ArgumentException>(() => LinuxPath.CheckInvalidPathChars("\t/var/test"));
-
-        [Fact]
-        public void CombineNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(null));
-
-        [Fact]
-        public void CombineNullTest2() =>
-            _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(new string[] { "/test", "hi", null }));
+        [Theory]
+        [InlineData(null)]
+        [InlineData("/test", "hi", null)]
+        public void CombineNullTest(params string[] paths) =>
+            _ = Assert.Throws<ArgumentNullException>(() => LinuxPath.Combine(paths));
 
         [Fact]
         public void CombineTest()

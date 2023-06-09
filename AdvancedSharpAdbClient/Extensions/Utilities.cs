@@ -257,7 +257,7 @@ namespace AdvancedSharpAdbClient
         /// Begins to asynchronously receive data from a connected <see cref="System.Net.Sockets.Socket"/>.
         /// </summary>
         /// <param name="socket">The Socket.</param>
-        /// <param name="buffer">An array of type <see cref="Byte"/> that is the storage location for the received data.</param>
+        /// <param name="buffer">An array of type <see cref="byte"/> that is the storage location for the received data.</param>
         /// <param name="offset">The zero-based position in the <paramref name="buffer"/> parameter at which to store the received data.</param>
         /// <param name="size">The number of bytes to receive.</param>
         /// <param name="socketFlags">A bitwise combination of the <see cref="System.Net.Sockets.SocketFlags"/> values.</param>

@@ -38,8 +38,8 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
-            var result = Send(buffer, offset, size, socketFlags);
-            var tcs = new TaskCompletionSource<int>();
+            int result = Send(buffer, offset, size, socketFlags);
+            TaskCompletionSource<int> tcs = new();
             tcs.SetResult(result);
             return tcs.Task;
         }

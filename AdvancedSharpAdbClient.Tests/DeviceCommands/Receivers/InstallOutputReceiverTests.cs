@@ -1,14 +1,13 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
-    public class InstallReceiverTests
+    public class InstallOutputReceiverTests
     {
         [Fact]
         public void ProcessFailureTest()
         {
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             receiver.AddOutput("Failure [message]");
             receiver.Flush();
 
@@ -19,29 +18,29 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
         [Fact]
         public void ProcessFailureEmptyMessageTest()
         {
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             receiver.AddOutput("Failure [  ]");
             receiver.Flush();
 
             Assert.False(receiver.Success);
-            Assert.Equal(InstallReceiver.UnknownError, receiver.ErrorMessage);
+            Assert.Equal(InstallOutputReceiver.UnknownError, receiver.ErrorMessage);
         }
 
         [Fact]
         public void ProcessFailureNoMessageTest()
         {
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             receiver.AddOutput("Failure");
             receiver.Flush();
 
             Assert.False(receiver.Success);
-            Assert.Equal(InstallReceiver.UnknownError, receiver.ErrorMessage);
+            Assert.Equal(InstallOutputReceiver.UnknownError, receiver.ErrorMessage);
         }
 
         [Fact]
         public void ProcessSuccessTest()
         {
-            InstallReceiver receiver = new();
+            InstallOutputReceiver receiver = new();
             receiver.AddOutput("Success");
             receiver.Flush();
 

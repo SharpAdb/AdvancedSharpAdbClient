@@ -31,26 +31,26 @@ namespace AdvancedSharpAdbClient
             this.client = client ?? throw new ArgumentNullException(nameof(client));
 
             // Initialize the headerData buffer
-            var size = Marshal.SizeOf(default(FramebufferHeader));
+            int size = Marshal.SizeOf(default(FramebufferHeader));
             this.headerData = new byte[size];
         }
 
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; private set; }
+        public DeviceData Device { get; set; }
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public FramebufferHeader Header { get; private set; }
+        public FramebufferHeader Header { get; set; }
 
         /// <summary>
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public byte[] Data { get; private set; }
+        public byte[] Data { get; set; }
 
         /// <summary>
         /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
@@ -116,7 +116,7 @@ namespace AdvancedSharpAdbClient
             socket.ReadAdbResponse();
 
             // The result first is a FramebufferHeader object,
-            await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
             if (!headerInitialized)
             {

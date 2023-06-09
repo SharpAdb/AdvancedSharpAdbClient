@@ -7,8 +7,8 @@ using System;
 namespace AdvancedSharpAdbClient.Logs
 {
     /// <summary>
-    /// The userspace structure for version 1 of the logger_entry ABI.
-    /// This structure is returned to userspace by the kernel logger
+    /// The user space structure for version 1 of the logger_entry ABI.
+    /// This structure is returned to user space by the kernel logger
     /// driver unless an upgrade to a newer ABI version is requested.
     /// </summary>
     /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h"/></remarks>

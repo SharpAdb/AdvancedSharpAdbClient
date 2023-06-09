@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="SyncService"/> class.
     /// </summary>
-    public class SyncServiceTests : SocketBasedTests
+    public partial class SyncServiceTests : SocketBasedTests
     {
         // Toggle the integration test flag to true to run on an actual adb server
         // (and to build/validate the test cases), set to false to use the mocked
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            MemoryStream stream = new();
+            using MemoryStream stream = new();
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 

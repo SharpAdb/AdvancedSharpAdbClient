@@ -3,7 +3,6 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
-using System;
 using System.IO;
 
 namespace AdvancedSharpAdbClient

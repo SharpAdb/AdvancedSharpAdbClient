@@ -14,10 +14,10 @@ namespace AdvancedSharpAdbClient
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
     /// information about the framebuffer.
     /// </summary>
-    public struct FramebufferHeader
+    public class FramebufferHeader
     {
         /// <summary>
-        /// Gets or sets the version of the framebuffer structure.
+        /// Gets or sets the version of the framebuffer class.
         /// </summary>
         public uint Version { get; set; }
 
@@ -69,12 +69,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
         /// </summary>
-        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> structure.</param>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> class.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
         public static FramebufferHeader Read(byte[] data)
         {
             // as defined in https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp
-            FramebufferHeader header = default;
+            FramebufferHeader header = new();
 
             // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
             using (MemoryStream stream = new(data))
@@ -103,6 +103,7 @@ namespace AdvancedSharpAdbClient
                 header.Size = reader.ReadUInt32();
                 header.Width = reader.ReadUInt32();
                 header.Height = reader.ReadUInt32();
+
                 header.Red = new ColorData
                 {
                     Offset = reader.ReadUInt32(),
@@ -126,9 +127,9 @@ namespace AdvancedSharpAdbClient
                     Offset = reader.ReadUInt32(),
                     Length = reader.ReadUInt32()
                 };
-            }
 
-            return header;
+                return header;
+            }
         }
 
 #if HAS_DRAWING
@@ -143,7 +144,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public readonly Image ToImage(byte[] buffer)
+        public Image ToImage(byte[] buffer)
         {
             ExceptionExtensions.ThrowIfNull(buffer);
 
@@ -176,7 +177,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        private readonly PixelFormat StandardizePixelFormat(byte[] buffer)
+        private PixelFormat StandardizePixelFormat(byte[] buffer)
         {
             // Initial parameter validation.
             ExceptionExtensions.ThrowIfNull(buffer);
@@ -287,7 +288,7 @@ namespace AdvancedSharpAdbClient
         /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher)
+        public Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher)
         {
             FramebufferHeader self = this;
 
@@ -325,7 +326,7 @@ namespace AdvancedSharpAdbClient
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher)
+        public Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher)
         {
             FramebufferHeader self = this;
 
@@ -364,7 +365,7 @@ namespace AdvancedSharpAdbClient
         /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
-        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer)
+        public async Task<WriteableBitmap> ToBitmap(byte[] buffer)
         {
             if (buffer == null)
             {

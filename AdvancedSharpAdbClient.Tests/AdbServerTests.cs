@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="AdbServer"/> class.
     /// </summary>
-    public class AdbServerTests
+    public partial class AdbServerTests
     {
         private readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
         private readonly DummyAdbSocket socket;
@@ -26,6 +26,7 @@ namespace AdvancedSharpAdbClient.Tests
             adbSocketFactory = (endPoint) => socket;
 
             commandLineClient = new DummyAdbCommandLineClient();
+            AdbServer.IsValidAdbFile = commandLineClient.IsValidAdbFile;
             adbCommandLineClientFactory = (version) => commandLineClient;
 
             adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
@@ -183,6 +184,23 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(commandLineClient.ServerStarted);
             _ = adbServer.StartServer(ServerName, false);
+
+            Assert.False(commandLineClient.ServerStarted);
+
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:version", socket.Requests[0]);
+        }
+
+        [Fact]
+        public void RestartServerTest()
+        {
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.ResponseMessages.Enqueue("001f");
+
+            commandLineClient.Version = new Version(1, 0, 32);
+
+            Assert.False(commandLineClient.ServerStarted);
+            _ = adbServer.RestartServer(ServerName);
 
             Assert.False(commandLineClient.ServerStarted);
 

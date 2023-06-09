@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -273,6 +274,14 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">failed nudging</exception>
         Framebuffer GetFrameBuffer(DeviceData device);
 
+        /// <summary>
+        /// Runs the event log service on a device.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
+
         // jdwp:<pid>: not implemented
         // track-jdwp: not implemented
         // sync: not implemented
@@ -477,8 +486,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="timeout">The timeout for waiting the elements.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
-        /// <returns>The <see cref="Array"/> of <see cref="Element"/> has got.</returns>
-        Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
+        /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.

@@ -1,26 +1,23 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class ShellCommandUnresponsiveExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor() =>
-            ExceptionTester<ShellCommandUnresponsiveException>.TestEmptyConstructor(() => new ShellCommandUnresponsiveException());
+        public void EmptyConstructorTest() =>
+            ExceptionTester<ShellCommandUnresponsiveException>.EmptyConstructorTest(() => new ShellCommandUnresponsiveException());
 
         [Fact]
-        public void TestMessageConstructor() =>
-            ExceptionTester<ShellCommandUnresponsiveException>.TestMessageConstructor((message) => new ShellCommandUnresponsiveException(message));
+        public void MessageConstructorTest() =>
+            ExceptionTester<ShellCommandUnresponsiveException>.MessageConstructorTest((message) => new ShellCommandUnresponsiveException(message));
 
         [Fact]
-        public void TestMessageAndInnerConstructor() =>
-            ExceptionTester<ShellCommandUnresponsiveException>.TestMessageAndInnerConstructor((message, inner) => new ShellCommandUnresponsiveException(message, inner));
+        public void MessageAndInnerConstructorTest() =>
+            ExceptionTester<ShellCommandUnresponsiveException>.MessageAndInnerConstructorTest((message, inner) => new ShellCommandUnresponsiveException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor() =>
-            ExceptionTester<ShellCommandUnresponsiveException>.TestSerializationConstructor((info, context) => new ShellCommandUnresponsiveException(info, context));
-#endif
+        public void SerializationConstructorTest() =>
+            ExceptionTester<ShellCommandUnresponsiveException>.SerializationConstructorTest((info, context) => new ShellCommandUnresponsiveException(info, context));
     }
 }

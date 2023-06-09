@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -54,5 +55,80 @@ namespace AdvancedSharpAdbClient
             throw new PlatformNotSupportedException();
 #endif
         };
+
+#if HAS_TASK
+#if NETFRAMEWORK && !NET40_OR_GREATER
+        /// <summary>
+        /// Encapsulates a method that has five parameters and returns a value of the type specified by the <typeparamref name="TResult"/> parameter.
+        /// </summary>
+        /// <returns>The return value of the method that this delegate encapsulates.</returns>
+        public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+#endif
+
+        /// <summary>
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// </summary>
+        /// <returns>The return code of the process.</returns>
+        public static Func<string, string, List<string>, List<string>, CancellationToken, Task<int>> RunProcessAsync { get; set; } =
+#if HAS_PROCESS
+            async
+#endif
+            (string filename, string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken) =>
+        {
+#if HAS_PROCESS
+            ProcessStartInfo psi = new(filename, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            using Process process = Process.Start(psi);
+#if !NET35
+            string standardErrorString = await process.StandardError.ReadToEndAsync(
+#if NET7_0_OR_GREATER
+                cancellationToken
+#endif
+                );
+            string standardOutputString = await process.StandardOutput.ReadToEndAsync(
+#if NET7_0_OR_GREATER
+                cancellationToken
+#endif
+                );
+#else
+            string standardErrorString = await Utilities.Run(process.StandardError.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string standardOutputString = await Utilities.Run(process.StandardOutput.ReadToEnd, cancellationToken).ConfigureAwait(false);
+#endif
+
+            errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+
+#if NET5_0_OR_GREATER
+            using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
+            {
+                await process.WaitForExitAsync(completionSource.Token);
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                }
+            }
+#else
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
+            {
+                process.Kill();
+            }
+#endif
+            return process.ExitCode;
+#else
+            TaskCompletionSource<int> source = new();
+            source.SetException(new PlatformNotSupportedException());
+            return source.Task;
+#endif
+        };
+#endif
     }
 }

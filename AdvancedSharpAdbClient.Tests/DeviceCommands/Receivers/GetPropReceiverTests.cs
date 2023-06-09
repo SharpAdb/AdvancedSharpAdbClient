@@ -1,8 +1,8 @@
-﻿using AdvancedSharpAdbClient.DeviceCommands;
+﻿using AdvancedSharpAdbClient.Tests;
 using System.Collections.Generic;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     public class GetPropReceiverTests
     {
@@ -15,9 +15,9 @@ namespace AdvancedSharpAdbClient.Tests.DeviceCommands
             };
 
             DummyAdbClient client = new();
-            client.Commands.Add("/system/bin/getprop", @"[init.svc.BGW]: [running]
+            client.Commands["/system/bin/getprop"] = @"[init.svc.BGW]: [running]
 [init.svc.MtkCodecService]: [running]
-[init.svc.bootanim]: [stopped]");
+[init.svc.bootanim]: [stopped]";
 
             Dictionary<string, string> properties = client.GetProperties(device);
             Assert.NotNull(properties);

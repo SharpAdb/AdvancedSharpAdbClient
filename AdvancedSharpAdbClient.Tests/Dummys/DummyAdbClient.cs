@@ -123,13 +123,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
         public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
         public Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
+        public IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
-        public Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<List<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public int GetAdbVersion() => throw new NotImplementedException();
 
@@ -235,6 +237,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task RootAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        public void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) => throw new NotImplementedException();
+
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) => throw new NotImplementedException();
+
         public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames) => throw new NotImplementedException();
 
         public void SendKeyEvent(DeviceData device, string key) => throw new NotImplementedException();
@@ -247,11 +253,11 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void StartApp(DeviceData device, string packageName) => throw new NotImplementedException();
 
-        public Task StartAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void StopApp(DeviceData device, string packageName) => throw new NotImplementedException();
 
-        public Task StopAppAsync(DeviceData device, string packagename, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task StopAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void Swipe(DeviceData device, Element first, Element second, long speed) => throw new NotImplementedException();
 

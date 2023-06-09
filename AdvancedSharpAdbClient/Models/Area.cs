@@ -122,6 +122,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="top">The y-coordinate of the upper-left corner of this <see cref='Area'/> structure.</param>
         /// <param name="right">The x-coordinate of the lower-right corner of this <see cref='Area'/> structure.</param>
         /// <param name="bottom">The y-coordinate of the lower-right corner of this <see cref='Area'/> structure.</param>
+        /// <returns>The new <see cref="Area"/> that this method creates.</returns>
         public static Area FromLTRB(int left, int top, int right, int bottom) =>
             new(left, top, unchecked(right - left), unchecked(bottom - top));
 
@@ -143,7 +144,7 @@ namespace AdvancedSharpAdbClient
         /// Gets or sets the coordinates of the center of the rectangular region represented by this
         /// <see cref='Area'/>.
         /// </summary>
-        public readonly Cords Center => unchecked(new(X + Width / 2, Y + Height / 2));
+        public readonly Cords Center => unchecked(new(X + (Width / 2), Y + (Height / 2)));
 
 #if HAS_DRAWING
         /// <summary>
@@ -533,12 +534,7 @@ namespace AdvancedSharpAdbClient
             int y1 = Math.Max(a.Y, b.Y);
             int y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
 
-            if (x2 >= x1 && y2 >= y1)
-            {
-                return new Area(x1, y1, x2 - x1, y2 - y1);
-            }
-
-            return Empty;
+            return x2 >= x1 && y2 >= y1 ? new Area(x1, y1, x2 - x1, y2 - y1) : Empty;
         }
 
         /// <summary>

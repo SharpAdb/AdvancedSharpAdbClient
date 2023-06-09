@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -44,6 +46,14 @@ namespace AdvancedSharpAdbClient.Tests
             }
 
             return 0;
+        }
+
+        protected override Task<int> RunAdbProcessInnerAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        {
+            int result = RunAdbProcessInner(command, errorOutput, standardOutput);
+            TaskCompletionSource<int> tcs = new();
+            tcs.SetResult(result);
+            return tcs.Task;
         }
 
         private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";

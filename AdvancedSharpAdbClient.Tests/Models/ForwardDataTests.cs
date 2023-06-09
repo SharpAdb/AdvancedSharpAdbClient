@@ -8,7 +8,7 @@ namespace AdvancedSharpAdbClient.Tests
     public class ForwardDataTests
     {
         [Fact]
-        public void SpecTests()
+        public void SpecTest()
         {
             ForwardData data = new()
             {

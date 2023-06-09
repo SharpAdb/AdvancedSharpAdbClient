@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -29,7 +31,29 @@ namespace AdvancedSharpAdbClient.Tests
         public AdbServerStatus GetStatus() => Status;
 
         /// <inheritdoc/>
-        public void RestartServer() => WasRestarted = true;
+        public Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
+        {
+            TaskCompletionSource<AdbServerStatus> tcs = new();
+            tcs.SetResult(Status);
+            return tcs.Task;
+        }
+
+        /// <inheritdoc/>
+        public StartServerResult RestartServer(string adbPath = null)
+        {
+            WasRestarted = true;
+            return StartServer(adbPath, false);
+        }
+
+        /// <inheritdoc/>
+        public Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken = default) => RestartServerAsync(null, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default)
+        {
+            WasRestarted = true;
+            return StartServerAsync(adbPath, false, cancellationToken);
+        }
 
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
@@ -38,14 +62,17 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 return StartServerResult.AlreadyRunning;
             }
-
-            Status = new AdbServerStatus()
-            {
-                IsRunning = true,
-                Version = new Version(1, 0, 20)
-            };
-
+            Status = new AdbServerStatus(true, new Version(1, 0, 20));
             return StartServerResult.Started;
+        }
+
+        /// <inheritdoc/>
+        public Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
+        {
+            StartServerResult result = StartServer(adbPath, restartServerIfNewer);
+            TaskCompletionSource<StartServerResult> tcs = new();
+            tcs.SetResult(result);
+            return tcs.Task;
         }
     }
 }

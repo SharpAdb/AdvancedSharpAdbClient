@@ -1,26 +1,23 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Exceptions
+namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
     public class PermissionDeniedExceptionTests
     {
         [Fact]
-        public void TestEmptyConstructor() =>
-            ExceptionTester<PermissionDeniedException>.TestEmptyConstructor(() => new PermissionDeniedException());
+        public void EmptyConstructorTest() =>
+            ExceptionTester<PermissionDeniedException>.EmptyConstructorTest(() => new PermissionDeniedException());
 
         [Fact]
-        public void TestMessageConstructor() =>
-            ExceptionTester<PermissionDeniedException>.TestMessageConstructor((message) => new PermissionDeniedException(message));
+        public void MessageConstructorTest() =>
+            ExceptionTester<PermissionDeniedException>.MessageConstructorTest((message) => new PermissionDeniedException(message));
 
         [Fact]
-        public void TestMessageAndInnerConstructor() =>
-            ExceptionTester<PermissionDeniedException>.TestMessageAndInnerConstructor((message, inner) => new PermissionDeniedException(message, inner));
+        public void MessageAndInnerConstructorTest() =>
+            ExceptionTester<PermissionDeniedException>.MessageAndInnerConstructorTest((message, inner) => new PermissionDeniedException(message, inner));
 
-#if !NETCOREAPP1_1
         [Fact]
-        public void TestSerializationConstructor() =>
-            ExceptionTester<PermissionDeniedException>.TestSerializationConstructor((info, context) => new PermissionDeniedException(info, context));
-#endif
+        public void SerializationConstructorTest() =>
+            ExceptionTester<PermissionDeniedException>.SerializationConstructorTest((info, context) => new PermissionDeniedException(info, context));
     }
 }

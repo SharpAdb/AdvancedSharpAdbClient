@@ -3,40 +3,39 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// Provides a common interface for any class that allows you to monitor the list of devices that are currently connected to the adb server.
     /// </summary>
-    public interface IDeviceMonitor : IDisposable
+    public partial interface IDeviceMonitor : IDisposable
     {
         /// <summary>
         /// Occurs when the status of one of the connected devices has changed.
         /// </summary>
-        event EventHandler<DeviceDataEventArgs> DeviceChanged;
+        event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
+
+        /// <summary>
+        /// Occurs when received a list of device from the Android Debug Bridge.
+        /// </summary>
+        event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
 
         /// <summary>
         /// Occurs when a device has connected to the Android Debug Bridge.
         /// </summary>
-        event EventHandler<DeviceDataEventArgs> DeviceConnected;
+        event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
 
         /// <summary>
         /// Occurs when a device has disconnected from the Android Debug Bridge.
         /// </summary>
-        event EventHandler<DeviceDataEventArgs> DeviceDisconnected;
+        event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
 
         /// <summary>
         /// Gets the devices that are currently connected to the Android Debug Bridge.
         /// </summary>
-#if !NETFRAMEWORK || NET45_OR_GREATER
-        IReadOnlyCollection
-#else
-        IEnumerable
-#endif
-            <DeviceData> Devices
-        { get; }
+        ReadOnlyCollection<DeviceData> Devices { get; }
 
         /// <summary>
         /// Starts the monitoring.

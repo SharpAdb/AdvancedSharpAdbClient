@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="TcpSocket"/> class.
     /// </summary>
-    public class TcpSocketTests
+    public partial class TcpSocketTests
     {
         [Fact]
         public void LifecycleTest()

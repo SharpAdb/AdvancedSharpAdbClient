@@ -17,23 +17,18 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Maps the <see cref="SyncCommand"/> values to their string representations.
         /// </summary>
-        private static readonly Dictionary<SyncCommand, string> Values = new();
-
-        /// <summary>
-        /// Initializes static members of the <see cref="SyncCommandConverter"/> class.
-        /// </summary>
-        static SyncCommandConverter()
+        private static readonly Dictionary<SyncCommand, string> Values = new()
         {
-            Values.Add(SyncCommand.DATA, "DATA");
-            Values.Add(SyncCommand.DENT, "DENT");
-            Values.Add(SyncCommand.DONE, "DONE");
-            Values.Add(SyncCommand.FAIL, "FAIL");
-            Values.Add(SyncCommand.LIST, "LIST");
-            Values.Add(SyncCommand.OKAY, "OKAY");
-            Values.Add(SyncCommand.RECV, "RECV");
-            Values.Add(SyncCommand.SEND, "SEND");
-            Values.Add(SyncCommand.STAT, "STAT");
-        }
+            { SyncCommand.DATA, "DATA" },
+            { SyncCommand.DENT, "DENT" },
+            { SyncCommand.DONE, "DONE" },
+            { SyncCommand.FAIL, "FAIL" },
+            { SyncCommand.LIST, "LIST" },
+            { SyncCommand.OKAY, "OKAY" },
+            { SyncCommand.RECV, "RECV" },
+            { SyncCommand.SEND, "SEND" },
+            { SyncCommand.STAT, "STAT" }
+        };
 
         /// <summary>
         /// Gets the byte array that represents the <see cref="SyncCommand"/>.

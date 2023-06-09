@@ -16,9 +16,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static readonly Cords Empty;
 
-        private int x; // Do not rename (binary serialization)
-        private int y; // Do not rename (binary serialization)
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Cords"/> class.
         /// </summary>
@@ -26,8 +23,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="cy">The vertical "Y" coordinate.</param>
         public Cords(int cx, int cy)
         {
-            x = cx;
-            y = cy;
+            X = cx;
+            Y = cy;
         }
 
         /// <summary>
@@ -35,8 +32,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public Cords(int dw)
         {
-            x = LowInt16(dw);
-            y = HighInt16(dw);
+            X = LowInt16(dw);
+            Y = HighInt16(dw);
         }
 
 #if HAS_DRAWING
@@ -45,8 +42,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public Cords(System.Drawing.Point sz)
         {
-            x = sz.X;
-            y = sz.Y;
+            X = sz.X;
+            Y = sz.Y;
         }
 
         /// <summary>
@@ -54,8 +51,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public Cords(System.Drawing.Size sz)
         {
-            x = sz.Width;
-            y = sz.Height;
+            X = sz.Width;
+            Y = sz.Height;
         }
 #endif
 
@@ -66,8 +63,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public Cords(Windows.Foundation.Point sz)
         {
-            x = unchecked((int)sz.X);
-            y = unchecked((int)sz.Y);
+            X = unchecked((int)sz.X);
+            Y = unchecked((int)sz.Y);
         }
 
         /// <summary>
@@ -75,8 +72,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public Cords(Windows.Foundation.Size sz)
         {
-            x = unchecked((int)sz.Width);
-            y = unchecked((int)sz.Height);
+            X = unchecked((int)sz.Width);
+            Y = unchecked((int)sz.Height);
         }
 #pragma warning restore CS0419 // cref 特性中有不明确的引用
 #endif
@@ -84,25 +81,17 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a value indicating whether this <see cref='Cords'/> is empty.
         /// </summary>
-        public readonly bool IsEmpty => x == 0 && y == 0;
+        public readonly bool IsEmpty => X == 0 && Y == 0;
 
         /// <summary>
         /// Gets or sets the horizontal "X" coordinate.
         /// </summary>
-        public int X
-        {
-            readonly get => x;
-            set => x = value;
-        }
+        public int X { readonly get; set; }
 
         /// <summary>
         /// Gets or sets the vertical "Y" coordinate.
         /// </summary>
-        public int Y
-        {
-            readonly get => y;
-            set => y = value;
-        }
+        public int Y { readonly get; set; }
 
 #if HAS_DRAWING
         /// <summary>
@@ -333,9 +322,9 @@ namespace AdvancedSharpAdbClient
         /// <returns>An integer value that specifies a hash value for this <see cref="Cords"/>.</returns>
         public override readonly int GetHashCode() =>
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            HashCode.Combine(x, y);
+            HashCode.Combine(X, Y);
 #else
-            x ^ y;
+            X ^ Y;
 #endif
 
         /// <summary>
@@ -371,8 +360,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="cy">The vertical "Y" coordinate.</param>
         public readonly void Deconstruct(out int cx, out int cy)
         {
-            cx = x;
-            cy = y;
+            cx = X;
+            cy = Y;
         }
 
         private static short HighInt16(int n) => unchecked((short)((n >> 16) & 0xffff));

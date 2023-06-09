@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using AdvancedSharpAdbClient.Logs;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -339,6 +340,10 @@ namespace AdvancedSharpAdbClient
                     receiver?.AddOutput(line);
                 }
             }
+            catch (Exception e)
+            {
+                throw new ShellCommandUnresponsiveException(e);
+            }
             finally
             {
                 receiver?.Flush();
@@ -363,6 +368,56 @@ namespace AdvancedSharpAdbClient
 
             // Convert the framebuffer to an image, and return that.
             return framebuffer;
+        }
+
+        /// <inheritdoc/>
+        public void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames)
+        {
+            ExceptionExtensions.ThrowIfNull(messageSink);
+
+            EnsureDevice(device);
+
+            // The 'log' service has been deprecated, see
+            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            StringBuilder request = new();
+            request.Append("shell:logcat -B");
+
+            foreach (LogId logName in logNames)
+            {
+                request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+            }
+
+            socket.SendAdbRequest(request.ToString());
+            AdbResponse response = socket.ReadAdbResponse();
+
+            using Stream stream = socket.GetShellStream();
+            LogReader reader = new(stream);
+
+            while (true)
+            {
+                LogEntry entry = null;
+
+                try
+                {
+                    entry = reader.ReadEntry();
+                }
+                catch (EndOfStreamException)
+                {
+                    // This indicates the end of the stream; the entry will remain null.
+                }
+
+                if (entry != null)
+                {
+                    messageSink(entry);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -475,14 +530,13 @@ namespace AdvancedSharpAdbClient
             }
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install' ");
+            _ = requestBuilder.Append("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -588,15 +642,14 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install-create' ");
-            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}");
+            _ = requestBuilder.Append("exec:cmd package 'install-create'");
+            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -636,7 +689,7 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(apkName);
 
             StringBuilder requestBuilder = new();
-            requestBuilder.Append($"exec:cmd package 'install-write' ");
+            requestBuilder.Append($"exec:cmd package 'install-write'");
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
@@ -697,7 +750,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
             string features = socket.ReadString();
 
-            IEnumerable<string> featureList = features.Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
             return featureList;
         }
 
@@ -843,16 +896,11 @@ namespace AdvancedSharpAdbClient
 
             // Check if the app is running in background
             bool isAppRunning = IsAppRunning(device, packageName);
-            if (isAppRunning)
-            {
-                return AppStatus.Background;
-            }
-
-            return AppStatus.Stopped;
+            return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
         /// <inheritdoc/>
-        public Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default)
+        public Element FindElement(DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default)
         {
             EnsureDevice(device);
             Stopwatch stopwatch = new();
@@ -865,17 +913,10 @@ namespace AdvancedSharpAdbClient
                     XmlNode xmlNode = doc.SelectSingleNode(xpath);
                     if (xmlNode != null)
                     {
-                        string bounds = xmlNode.Attributes["bounds"].Value;
-                        if (bounds != null)
+                        Element element = Element.FromXmlNode(this, device, xmlNode);
+                        if (element != null)
                         {
-                            int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                            Dictionary<string, string> attributes = new();
-                            foreach (XmlAttribute at in xmlNode.Attributes)
-                            {
-                                attributes.Add(at.Name, at.Value);
-                            }
-                            Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                            return new Element(this, device, area, attributes);
+                            return element;
                         }
                     }
                 }
@@ -888,7 +929,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Element[] FindElements(DeviceData device, string xpath, TimeSpan timeout = default)
+        public IEnumerable<Element> FindElements(DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default)
         {
             EnsureDevice(device);
             Stopwatch stopwatch = new();
@@ -901,23 +942,20 @@ namespace AdvancedSharpAdbClient
                     XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
-                        Element[] elements = new Element[xmlNodes.Count];
-                        for (int i = 0; i < elements.Length; i++)
+                        bool isBreak = false;
+                        for (int i = 0; i < xmlNodes.Count; i++)
                         {
-                            string bounds = xmlNodes[i].Attributes["bounds"].Value;
-                            if (bounds != null)
+                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            if (element != null)
                             {
-                                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                Dictionary<string, string> attributes = new();
-                                foreach (XmlAttribute at in xmlNodes[i].Attributes)
-                                {
-                                    attributes.Add(at.Name, at.Value);
-                                }
-                                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                                elements[i] = new Element(this, device, area, attributes);
+                                isBreak = true;
+                                yield return element;
                             }
                         }
-                        return elements.Length == 0 ? null : elements;
+                        if (isBreak)
+                        {
+                            break;
+                        }
                     }
                 }
                 if (timeout == TimeSpan.Zero)
@@ -925,7 +963,6 @@ namespace AdvancedSharpAdbClient
                     break;
                 }
             }
-            return null;
         }
 
         /// <inheritdoc/>

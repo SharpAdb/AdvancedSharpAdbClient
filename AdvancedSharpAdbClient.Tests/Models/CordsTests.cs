@@ -163,7 +163,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void EqualityTest(int x, int y)
         {
             Cords p1 = new(x, y);
-            Cords p2 = new((x / 2) - 1, y / 2 - 1);
+            Cords p2 = new((x / 2) - 1, (y / 2) - 1);
             Cords p3 = new(x, y);
 
             Assert.True(p1 == p3);

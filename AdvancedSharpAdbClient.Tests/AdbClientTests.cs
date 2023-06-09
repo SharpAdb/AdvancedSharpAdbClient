@@ -7,8 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Xml;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -16,24 +15,28 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Tests the <see cref="AdbClient"/> class.
     /// </summary>
-    public class AdbClientTests : SocketBasedTests
+    public partial class AdbClientTests : SocketBasedTests
     {
-        // Toggle the integration test flag to true to run on an actual adb server
-        // (and to build/validate the test cases), set to false to use the mocked
-        // adb sockets.
-        // In release mode, this flag is ignored and the mocked adb sockets are always used.
+        /// <summary>
+        /// Toggle the integration test flag to true to run on an actual adb server
+        /// (and to build/validate the test cases), set to false to use the mocked
+        /// adb sockets.
+        /// In release mode, this flag is ignored and the mocked adb sockets are always used.
+        /// </summary>
         public AdbClientTests() : base(integrationTest: false, doDispose: false)
         {
-            lock (FactoriesTests.locker)
-            {
-                Factories.Reset();
-            }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => new AdbClient(null, Factories.AdbSocketFactory));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient(EndPoint, Func{EndPoint, IAdbSocket})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorInvalidEndPointTest() =>
             _ = Assert.Throws<NotSupportedException>(() => new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory));
@@ -52,6 +55,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(AdbClient.AdbServerPort, endPoint.Port);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FormAdbRequest(string)"/> method.
+        /// </summary>
         [Fact]
         public void FormAdbRequestTest()
         {
@@ -59,6 +65,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(Encoding.ASCII.GetBytes("000Chost:version"), AdbClient.FormAdbRequest("host:version"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(string, int)"/> method.
+        /// </summary>
         [Fact]
         public void CreateAdbForwardRequestTest()
         {
@@ -66,21 +75,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
-        [Fact]
-        public void KillAdbTest()
-        {
-            string[] requests = new string[]
-            {
-                "host:kill"
-            };
-
-            RunTest(
-                NoResponses,
-                NoResponseMessages,
-                requests,
-                TestClient.KillAdb);
-        }
-
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAdbVersion"/> method.
+        /// </summary>
         [Fact]
         public void GetAdbVersionTest()
         {
@@ -106,6 +103,27 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(32, version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.KillAdb"/> method.
+        /// </summary>
+        [Fact]
+        public void KillAdbTest()
+        {
+            string[] requests = new string[]
+            {
+                "host:kill"
+            };
+
+            RunTest(
+                NoResponses,
+                NoResponseMessages,
+                requests,
+                TestClient.KillAdb);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetDevices"/> method.
+        /// </summary>
         [Fact]
         public void GetDevicesTest()
         {
@@ -139,6 +157,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("donatello", device.Name);
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetDeviceTest()
         {
@@ -154,6 +175,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetInvalidDeviceTest()
         {
@@ -170,6 +194,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="IAdbSocket.SetDevice(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void SetDeviceOtherException()
         {
@@ -186,137 +213,45 @@ namespace AdvancedSharpAdbClient.Tests
                 () => Socket.SetDevice(Device)));
         }
 
-        [Fact]
-        public void RebootTest()
-        {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555",
-                "reboot:"
-            };
-
-            RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
-                NoResponseMessages,
-                requests,
-                () =>
-                TestClient.Reboot(Device));
-        }
-
-        [Fact]
-        public void ExecuteRemoteCommandTest()
-        {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK
-            };
-
-            string[] responseMessages = Array.Empty<string>();
-
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555",
-                "shell:echo Hello, World"
-            };
-
-            byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
-            MemoryStream shellStream = new(streamData);
-
-            ConsoleOutputReceiver receiver = new();
-
-            RunTest(
-                responses,
-                responseMessages,
-                requests,
-                shellStream,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver));
-
-            Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
-        }
-
-        [Fact]
-        public void ExecuteRemoteCommandUnresponsiveTest()
-        {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK
-            };
-
-            string[] responseMessages = Array.Empty<string>();
-
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555",
-                "shell:echo Hello, World"
-            };
-
-            ConsoleOutputReceiver receiver = new();
-
-            _ = Assert.Throws<ShellCommandUnresponsiveException>(() =>
-            RunTest(
-                responses,
-                responseMessages,
-                requests,
-                null,
-                () =>
-                {
-                    try
-                    {
-                        TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None).Wait();
-                    }
-                    catch (AggregateException ex)
-                    {
-                        if (ex.InnerExceptions.Count == 1)
-                        {
-                            throw ex.InnerException;
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }));
-        }
-
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
-
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateReverseForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateReverseTest() =>
             RunCreateReverseTest(
                 (device) => TestClient.CreateReverseForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForward(IAdbClient, DeviceData, int, int)"/> method.
+        /// </summary>
         [Fact]
         public void CreateTcpForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, 3, 4),
                 "tcp:3;tcp:4");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForward(IAdbClient, DeviceData, int, string)"/> method.
+        /// </summary>
         [Fact]
         public void CreateSocketForwardTest() =>
             RunCreateForwardTest(
                 (device) => TestClient.CreateForward(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForward(DeviceData, string, string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void CreateDuplicateForwardTest()
         {
@@ -338,6 +273,95 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.CreateForward(Device, "tcp:1", "tcp:2", false)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveForward(DeviceData, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void RemoveForwardTest()
+        {
+            string[] requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:killforward:tcp:1"
+            };
+
+            RunTest(
+                OkResponse,
+                NoResponseMessages,
+                requests,
+                () => TestClient.RemoveForward(Device, 1));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveReverseForward(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void RemoveReverseForwardTest()
+        {
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "reverse:killforward:localabstract:test"
+            };
+
+            AdbResponse[] responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK,
+            };
+
+            RunTest(
+                responses,
+                NoResponseMessages,
+                requests,
+                () => TestClient.RemoveReverseForward(Device, "localabstract:test"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllForwards(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void RemoveAllForwardsTest()
+        {
+            string[] requests = new string[]
+            {
+                "host-serial:169.254.109.177:5555:killforward-all"
+            };
+
+            RunTest(
+                OkResponse,
+                NoResponseMessages,
+                requests,
+                () => TestClient.RemoveAllForwards(Device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllReverseForwards(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void RemoveAllReversesTest()
+        {
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "reverse:killforward-all"
+            };
+
+            AdbResponse[] responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK,
+            };
+
+            RunTest(
+                responses,
+                NoResponseMessages,
+                requests,
+                () => TestClient.RemoveAllReverseForwards(Device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListForward(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ListForwardTest()
         {
@@ -366,6 +390,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:2", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListReverseForward(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ListReverseForwardTest()
         {
@@ -400,179 +427,86 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:100", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/> method.
+        /// </summary>
         [Fact]
-        public void RemoveForwardTest()
+        public void ExecuteRemoteCommandTest()
         {
-            string[] requests = new string[]
+            DeviceData device = new()
             {
-                "host-serial:169.254.109.177:5555:killforward:tcp:1"
-            };
-
-            RunTest(
-                OkResponse,
-                NoResponseMessages,
-                requests,
-                () => TestClient.RemoveForward(Device, 1));
-        }
-
-        [Fact]
-        public void RemoveReverseForwardTest()
-        {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555",
-                "reverse:killforward:localabstract:test"
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
             };
 
             AdbResponse[] responses = new AdbResponse[]
             {
                 AdbResponse.OK,
-                AdbResponse.OK,
+                AdbResponse.OK
             };
 
-            RunTest(
-                responses,
-                NoResponseMessages,
-                requests,
-                () => TestClient.RemoveReverseForward(Device, "localabstract:test"));
-        }
+            string[] responseMessages = Array.Empty<string>();
 
-        [Fact]
-        public void RemoveAllForwardsTest()
-        {
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:killforward-all"
-            };
-
-            RunTest(
-                OkResponse,
-                NoResponseMessages,
-                requests,
-                () => TestClient.RemoveAllForwards(Device));
-        }
-
-        [Fact]
-        public void RemoveAllReversesTest()
-        {
             string[] requests = new string[]
             {
                 "host:transport:169.254.109.177:5555",
-                "reverse:killforward-all"
+                "shell:echo Hello, World"
             };
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK,
-            };
+            byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            ConsoleOutputReceiver receiver = new();
 
             RunTest(
                 responses,
-                NoResponseMessages,
-                requests,
-                () => TestClient.RemoveAllReverseForwards(Device));
-        }
-
-        [Fact]
-        public void PairIPAddressTest() =>
-            RunPairTest(
-                () => TestClient.Pair(IPAddress.Loopback, "114514"),
-                "127.0.0.1:5555",
-                "114514");
-
-        [Fact]
-        public void PairDnsEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair(new DnsEndPoint("localhost", 1234), "114514"),
-                "localhost:1234",
-                "114514");
-
-        [Fact]
-        public void PairIPEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
-                "127.0.0.1:4321",
-                "114514");
-
-        [Fact]
-        public void PairHostEndpointTest() =>
-            RunPairTest(
-                () => TestClient.Pair("localhost:9926", "114514"),
-                "localhost:9926",
-                "114514");
-
-        [Fact]
-        public async Task PairIPAddressNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
-
-        [Fact]
-        public async Task PairDnsEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync(null, "114514"));
-
-        [Fact]
-        public async Task PairIPEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPEndPoint)null, "114514"));
-
-        [Fact]
-        public async Task PairHostEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((string)null, "114514"));
-
-        [Fact]
-        public void ConnectIPAddressTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(IPAddress.Loopback),
-                "127.0.0.1:5555");
-
-        [Fact]
-        public void ConnectDnsEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(new DnsEndPoint("localhost", 1234)),
-                "localhost:1234");
-
-        [Fact]
-        public void ConnectIPEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
-                "127.0.0.1:4321");
-
-        [Fact]
-        public void ConnectHostEndpointTest() =>
-            RunConnectTest(
-                () => TestClient.Connect("localhost:9926"),
-                "localhost:9926");
-
-        [Fact]
-        public async Task ConnectIPAddressNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPAddress)null));
-
-        [Fact]
-        public async Task ConnectDnsEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
-
-        [Fact]
-        public async Task ConnectIPEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPEndPoint)null));
-
-        [Fact]
-        public async Task ConnectHostEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((string)null));
-
-        [Fact]
-        public void DisconnectTest()
-        {
-            string[] requests = new string[] { "host:disconnect:localhost:5555" };
-            string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
-
-            RunTest(
-                OkResponse,
                 responseMessages,
                 requests,
-                () => TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
+                shellStream,
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver));
+
+            Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/> method.
+        /// </summary>
+        [Fact]
+        public void ExecuteRemoteCommandUnresponsiveTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            AdbResponse[] responses = new AdbResponse[]
+            {
+                AdbResponse.OK,
+                AdbResponse.OK
+            };
+
+            string[] responseMessages = Array.Empty<string>();
+
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "shell:echo Hello, World"
+            };
+
+            ConsoleOutputReceiver receiver = new();
+
+            _ = Assert.Throws<ShellCommandUnresponsiveException>(() =>
+            RunTest(
+                responses,
+                responseMessages,
+                requests,
+                null,
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
         }
 
         [Fact]
-        public void ReadLogTest()
+        public void RunLogServiceTest()
         {
             DeviceData device = new()
             {
@@ -606,11 +540,181 @@ namespace AdvancedSharpAdbClient.Tests
                 responseMessages,
                 requests,
                 shellStream,
-                () => TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, LogId.System).Wait());
+                () => TestClient.RunLogService(device, sink, LogId.System));
 
             Assert.Equal(3, logs.Count);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Reboot(IAdbClient, DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void RebootTest()
+        {
+            string[] requests = new string[]
+            {
+                "host:transport:169.254.109.177:5555",
+                "reboot:"
+            };
+
+            RunTest(
+                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                NoResponseMessages,
+                requests,
+                () => TestClient.Reboot(Device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPAddress, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairIPAddressTest() =>
+            RunPairTest(
+                () => TestClient.Pair(IPAddress.Loopback, "114514"),
+                "127.0.0.1:5555",
+                "114514");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairDnsEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair(new DnsEndPoint("localhost", 1234), "114514"),
+                "localhost:1234",
+                "114514");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPEndPoint, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairIPEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
+                "127.0.0.1:4321",
+                "114514");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, string, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairHostEndpointTest() =>
+            RunPairTest(
+                () => TestClient.Pair("localhost:9926", "114514"),
+                "localhost:9926",
+                "114514");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPAddress, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairIPAddressNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPAddress)null, "114514"));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairDnsEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair(null, "114514"));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPEndPoint, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairIPEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPEndPoint)null, "114514"));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, string, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void PairHostEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((string)null, "114514"));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPAddress)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectIPAddressTest() =>
+            RunConnectTest(
+                () => TestClient.Connect(IPAddress.Loopback),
+                "127.0.0.1:5555");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectDnsEndpointTest() =>
+            RunConnectTest(
+                () => TestClient.Connect(new DnsEndPoint("localhost", 1234)),
+                "localhost:1234");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPEndPoint)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectIPEndpointTest() =>
+            RunConnectTest(
+                () => TestClient.Connect(new IPEndPoint(IPAddress.Loopback, 4321)),
+                "127.0.0.1:4321");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectHostEndpointTest() =>
+            RunConnectTest(
+                () => TestClient.Connect("localhost:9926"),
+                "localhost:9926");
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPAddress)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectIPAddressNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectDnsEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPEndPoint)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectIPEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void ConnectHostEndpointNullTest() =>
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((string)null));
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Disconnect(DnsEndPoint)"/> method.
+        /// </summary>
+        [Fact]
+        public void DisconnectTest()
+        {
+            string[] requests = new string[] { "host:disconnect:localhost:5555" };
+            string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
+
+            RunTest(
+                OkResponse,
+                responseMessages,
+                requests,
+                () => TestClient.Disconnect(new DnsEndPoint("localhost", 5555)));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Root(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void RootTest()
         {
@@ -642,6 +746,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Root(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Unroot(DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void UnrootTest()
         {
@@ -673,6 +780,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.Unroot(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, string[])"/> method.
+        /// </summary>
         [Fact]
         public void InstallTest()
         {
@@ -685,7 +795,7 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
-                "exec:cmd package 'install'  -S 205774"
+                "exec:cmd package 'install' -S 205774"
             };
 
             // The app data is sent in chunks of 32 kb
@@ -730,23 +840,335 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        private void RunPairTest(Action test, string connectString, string code)
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCreate(DeviceData, string, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public void InstallCreateTest()
         {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
             string[] requests = new string[]
             {
-                $"host:pair:{code}:{connectString}"
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-create' -p com.google.android.gms"
             };
 
-            string[] responseMessages = new string[]
-            {
-                $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
-            };
+            byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            string session = string.Empty;
 
             RunTest(
-                OkResponse,
-                responseMessages,
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
                 requests,
-                test);
+                shellStream,
+                () => session = TestClient.InstallCreate(device, "com.google.android.gms"));
+
+            Assert.Equal("936013062", session);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void InstallWriteTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
+            };
+
+            // The app data is sent in chunks of 32 kb
+            Collection<byte[]> applicationDataChuncks = new();
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                while (true)
+                {
+                    byte[] buffer = new byte[32 * 1024];
+                    int read = stream.Read(buffer, 0, buffer.Length);
+
+                    if (read == 0)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        buffer = buffer.Take(read).ToArray();
+                        applicationDataChuncks.Add(buffer);
+                    }
+                }
+            }
+
+            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+
+            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            {
+                RunTest(
+                    new AdbResponse[]
+                    {
+                        AdbResponse.OK,
+                        AdbResponse.OK,
+                    },
+                    NoResponseMessages,
+                    requests,
+                    Array.Empty<(SyncCommand, string)>(),
+                    Array.Empty<SyncCommand>(),
+                    new byte[][] { response },
+                    applicationDataChuncks.ToArray(),
+                    () => TestClient.InstallWrite(device, stream, "base", "936013062"));
+            }
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCommit(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void InstallCommitTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "exec:cmd package 'install-commit' 936013062"
+            };
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.InstallCommit(device, "936013062"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetFeatureSet(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void GetFeatureSetTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host-serial:009d1cd696d5194a:features"
+            };
+
+            string[] responses = new string[]
+            {
+                "sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"
+            };
+
+            IEnumerable<string> features = null;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                },
+                responses,
+                requests,
+                () => features = TestClient.GetFeatureSet(device));
+
+            Assert.Equal(12, features.Count());
+            Assert.Equal("sendrecv_v2_brotli", features.First());
+            Assert.Equal("stat_v2", features.Last());
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenString(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenStringTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            string xml = string.Empty;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => xml = TestClient.DumpScreenString(device));
+
+            Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreen(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            XmlDocument xml = null;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => xml = TestClient.DumpScreen(device));
+
+            XmlDocument doc = new();
+            doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
+
+            Assert.Equal(doc, xml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElement(DeviceData, string, TimeSpan)"/> method.
+        /// </summary>
+        [Fact]
+        public void FindElementTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () =>
+                {
+                    Element element = TestClient.FindElement(device);
+                    Assert.Equal(144, element.GetChildCount());
+                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElements(DeviceData, string, TimeSpan)"/> method.
+        /// </summary>
+        [Fact]
+        public void FindElementsTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () =>
+                {
+                    List<Element> elements = TestClient.FindElements(device).ToList();
+                    int childCount = elements.Count;
+                    elements.ForEach(x => childCount += x.GetChildCount());
+                    Assert.Equal(145, childCount);
+                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+                    Assert.Equal("where-where", element.Attributes["text"]);
+                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                });
         }
 
         private void RunConnectTest(Action test, string connectString)
@@ -759,6 +1181,25 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = new string[]
             {
                 $"connected to {connectString}"
+            };
+
+            RunTest(
+                OkResponse,
+                responseMessages,
+                requests,
+                test);
+        }
+
+        private void RunPairTest(Action test, string connectString, string code)
+        {
+            string[] requests = new string[]
+            {
+                $"host:pair:{code}:{connectString}"
+            };
+
+            string[] responseMessages = new string[]
+            {
+                $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
             };
 
             RunTest(

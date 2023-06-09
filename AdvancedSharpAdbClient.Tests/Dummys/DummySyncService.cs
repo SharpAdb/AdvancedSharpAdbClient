@@ -30,26 +30,26 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task OpenAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken) =>
+        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default) =>
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
 
-        public Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken)
+        public Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
             return Task.CompletedTask;
         }
 
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles.Add(remotePath, stream);
+            UploadedFiles[remotePath] = stream;
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
         }
 
-        public Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken)
+        public Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles.Add(remotePath, stream);
+            UploadedFiles[remotePath] = stream;
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
             return Task.CompletedTask;
         }

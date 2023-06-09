@@ -1,4 +1,4 @@
-﻿// <copyright file="InstallReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="InstallOutputReceiver.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
-    public partial class InstallReceiver : MultiLineReceiver
+    public partial class InstallOutputReceiver : MultiLineReceiver
     {
         /// <summary>
         /// The error message that indicates an unknown error occurred.

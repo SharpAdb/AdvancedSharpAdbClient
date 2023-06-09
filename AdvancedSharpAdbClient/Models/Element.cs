@@ -3,7 +3,9 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Xml;
 
 namespace AdvancedSharpAdbClient
 {
@@ -13,29 +15,49 @@ namespace AdvancedSharpAdbClient
     public class Element
     {
         /// <summary>
-        /// The current ADB client that manages the connection.
+        /// Gets or sets the current ADB client that manages the connection.
         /// </summary>
         private IAdbClient Client { get; set; }
 
         /// <summary>
-        /// The current device containing the element.
+        /// Gets the current device containing the element.
         /// </summary>
-        private DeviceData Device { get; set; }
+        private DeviceData Device { get; }
 
         /// <summary>
-        /// The coordinates and size of the element.
+        /// Gets the coordinates and size of the element.
         /// </summary>
-        public Area Area { get; set; }
+        public Area Area { get; }
 
         /// <summary>
-        /// The coordinates of the element to click. Default is the center of area.
+        /// Gets or sets the coordinates of the element to click. Default is the center of area.
         /// </summary>
         public Cords Cords { get; set; }
 
         /// <summary>
-        /// Gets or sets element attributes.
+        /// Gets the children of this element.
         /// </summary>
-        public Dictionary<string, string> Attributes { get; set; }
+        public List<Element> Children { get; }
+
+        /// <summary>
+        /// Gets the element attributes.
+        /// </summary>
+        public Dictionary<string, string> Attributes { get; }
+
+        /// <summary>
+        /// Gets the <see cref="XmlNode"/> of this element.
+        /// </summary>
+        public XmlNode Node { get; }
+
+        /// <summary>
+        /// Gets or sets the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to get or set.</param>
+        /// <returns>The element at the specified index.</returns>
+        public Element this[int index]
+        {
+            get => Children[index];
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Element"/> class.
@@ -66,6 +88,73 @@ namespace AdvancedSharpAdbClient
             Area = area;
             Attributes = attributes;
             Cords = area.Center; // Average x1, y1, x2, y2
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="node">The <see cref="XmlNode"/> of the element.</param>
+        /// <param name="children">The children of the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, XmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
+        {
+            Client = client;
+            Device = device;
+            Node = node;
+            Children = children;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
+        }
+
+        /// <summary>
+        /// Creates a new <see cref='Element'/> with the specified <see cref="XmlNode"/>.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="xmlNode">The <see cref="XmlNode"/> of the element.</param>
+        /// <returns>The new <see cref="Element"/> that this method creates.</returns>
+        public static Element FromXmlNode(IAdbClient client, DeviceData device, XmlNode xmlNode)
+        {
+            string bounds = xmlNode.Attributes["bounds"].Value;
+            if (bounds != null)
+            {
+                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
+                Dictionary<string, string> attributes = new(xmlNode.Attributes.Count);
+                foreach (XmlAttribute at in xmlNode.Attributes)
+                {
+                    attributes[at.Name] = at.Value;
+                }
+                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
+                XmlNodeList childNodes = xmlNode.ChildNodes;
+                List<Element> elements = new(childNodes?.Count ?? 0);
+                if (childNodes != null)
+                {
+                    for (int i = 0; i < childNodes.Count; i++)
+                    {
+                        Element element = FromXmlNode(client, device, childNodes[i]);
+                        if (element != null)
+                        {
+                            elements.Add(element);
+                        }
+                    }
+                }
+                return new Element(client, device, xmlNode, elements, area, attributes);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the count of <see cref="Children"/> in this element.
+        /// </summary>
+        public int GetChildCount()
+        {
+            int count = Children.Count;
+            Children.ForEach(x => count += x.GetChildCount());
+            return count;
         }
 
         /// <summary>

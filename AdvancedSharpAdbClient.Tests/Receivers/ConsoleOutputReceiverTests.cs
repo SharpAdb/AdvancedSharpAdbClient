@@ -24,51 +24,39 @@ namespace AdvancedSharpAdbClient.Tests
                 ignoreLineEndingDifferences: true);
         }
 
-        [Fact]
-        public void ToStringIgnoredLineTest()
+        [Theory]
+        [InlineData("#Hello, World!", "See you!", "See you!\r\n")]
+        [InlineData("Hello, World!", "$See you!", "Hello, World!\r\n")]
+        public void ToStringIgnoredLineTest(string line1, string line2, string result)
         {
             ConsoleOutputReceiver receiver = new();
-            receiver.AddOutput("#Hello, World!");
-            receiver.AddOutput("See you!");
+            receiver.AddOutput(line1);
+            receiver.AddOutput(line2);
 
             receiver.Flush();
 
-            Assert.Equal("See you!\r\n",
+            Assert.Equal(result,
                 receiver.ToString(),
                 ignoreLineEndingDifferences: true);
         }
 
         [Fact]
-        public void ToStringIgnoredLineTest2()
+        public void ThrowOnErrorTest()
         {
-            ConsoleOutputReceiver receiver = new();
-            receiver.AddOutput("Hello, World!");
-            receiver.AddOutput("$See you!");
-
-            receiver.Flush();
-
-            Assert.Equal("Hello, World!\r\n",
-                receiver.ToString(),
-                ignoreLineEndingDifferences: true);
-        }
-
-        [Fact]
-        public void TrowOnErrorTest()
-        {
-            AssertTrowsException<FileNotFoundException>("/dev/test: not found");
-            AssertTrowsException<FileNotFoundException>("No such file or directory");
-            AssertTrowsException<UnknownOptionException>("Unknown option -h");
-            AssertTrowsException<CommandAbortingException>("/dev/test: Aborting.");
-            AssertTrowsException<FileNotFoundException>("/dev/test: applet not found");
-            AssertTrowsException<PermissionDeniedException>("/dev/test: permission denied");
-            AssertTrowsException<PermissionDeniedException>("/dev/test: access denied");
+            AssertThrowsException<FileNotFoundException>("/dev/test: not found");
+            AssertThrowsException<FileNotFoundException>("No such file or directory");
+            AssertThrowsException<UnknownOptionException>("Unknown option -h");
+            AssertThrowsException<CommandAbortingException>("/dev/test: Aborting.");
+            AssertThrowsException<FileNotFoundException>("/dev/test: applet not found");
+            AssertThrowsException<PermissionDeniedException>("/dev/test: permission denied");
+            AssertThrowsException<PermissionDeniedException>("/dev/test: access denied");
 
             // Should not thrown an exception
             ConsoleOutputReceiver receiver = new();
             receiver.ThrowOnError("Stay calm and watch cat movies.");
         }
 
-        private static void AssertTrowsException<T>(string line) where T : Exception
+        private static void AssertThrowsException<T>(string line) where T : Exception
         {
             ConsoleOutputReceiver receiver = new();
             _ = Assert.Throws<T>(() => receiver.ThrowOnError(line));

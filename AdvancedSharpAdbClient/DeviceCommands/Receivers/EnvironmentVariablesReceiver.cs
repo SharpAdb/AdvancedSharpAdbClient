@@ -54,14 +54,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     if (label.Length > 0)
                     {
-                        if (EnvironmentVariables.ContainsKey(label))
-                        {
-                            EnvironmentVariables[label] = value;
-                        }
-                        else
-                        {
-                            EnvironmentVariables.Add(label, value);
-                        }
+                        EnvironmentVariables[label] = value;
                     }
                 }
             }

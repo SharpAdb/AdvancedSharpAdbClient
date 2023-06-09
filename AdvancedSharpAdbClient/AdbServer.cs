@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
     /// between clients and devices.
     /// </para>
     /// </summary>
-    public class AdbServer : IAdbServer
+    public partial class AdbServer : IAdbServer
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -44,6 +44,11 @@ namespace AdvancedSharpAdbClient
         /// host uses a hard close. This error may also result if a connection was broken due to keep-alive activity detecting
         /// a failure while one or more operations are in progress. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
         internal const int ConnectionReset = 10054;
+
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        internal static Func<string, bool> IsValidAdbFile = CrossPlatformFunc.CheckFileExists;
 
         /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
@@ -150,16 +155,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void RestartServer()
+        public StartServerResult RestartServer(string adbPath = null)
         {
-            if (!CrossPlatformFunc.CheckFileExists(cachedAdbPath))
+            adbPath ??= cachedAdbPath;
+
+            if (!IsValidAdbFile(adbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
 
             lock (RestartLock)
             {
-                _ = StartServer(cachedAdbPath, false);
+                return StartServer(adbPath, false);
             }
         }
 
@@ -170,22 +177,13 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int versionCode = adbClient.GetAdbVersion();
-
-                return new AdbServerStatus
-                {
-                    IsRunning = true,
-                    Version = new Version(1, 0, versionCode)
-                };
+                return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (SocketException ex)
             {
                 if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
-                    return new AdbServerStatus
-                    {
-                        IsRunning = false,
-                        Version = null
-                    };
+                    return new AdbServerStatus(false, null);
                 }
                 else
                 {

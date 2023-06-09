@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Xml;
@@ -240,7 +241,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
+        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
+            RunLogServiceAsync(device, messageSink, default, logNames);
+        
+        /// <inheritdoc/>
+        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
             ExceptionExtensions.ThrowIfNull(messageSink);
 
@@ -271,7 +276,7 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    entry = await reader.ReadEntry(cancellationToken).ConfigureAwait(false);
+                    entry = await reader.ReadEntryAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch (EndOfStreamException)
                 {
@@ -339,10 +344,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task RootAsync(DeviceData device, CancellationToken cancellationToken) => RootAsync("root:", device, cancellationToken);
+        public Task RootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("root:", device, cancellationToken);
 
         /// <inheritdoc/>
-        public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken) => RootAsync("unroot:", device, cancellationToken);
+        public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("unroot:", device, cancellationToken);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with or without root privileges.
@@ -350,7 +355,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="request">The command of root or unroot.</param>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>An <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
         protected async Task RootAsync(string request, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -400,14 +405,13 @@ namespace AdvancedSharpAdbClient
             }
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install' ");
+            _ = requestBuilder.Append("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -435,7 +439,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken);
             }
 
-            read = await socket.ReadAsync(buffer, buffer.Length, cancellationToken);
+            read = await socket.ReadAsync(buffer, cancellationToken);
             string value = Encoding.UTF8.GetString(buffer, 0, read);
 
             if (!value.Contains("Success"))
@@ -458,12 +462,12 @@ namespace AdvancedSharpAdbClient
             string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments);
 
             int i = 0;
-            foreach (Stream splitAPK in splitAPKs)
+            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
                     Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
+                    return;
                 }
 
                 try
@@ -474,6 +478,10 @@ namespace AdvancedSharpAdbClient
                 {
                     Debug.WriteLine(ex.Message);
                 }
+            });
+            foreach (Task task in tasks)
+            {
+                await task;
             }
 
             await InstallCommitAsync(device, session, cancellationToken);
@@ -500,12 +508,12 @@ namespace AdvancedSharpAdbClient
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, cancellationToken);
 
             int i = 0;
-            foreach (Stream splitAPK in splitAPKs)
+            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
                     Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
+                    return;
                 }
 
                 try
@@ -516,6 +524,10 @@ namespace AdvancedSharpAdbClient
                 {
                     Debug.WriteLine(ex.Message);
                 }
+            });
+            foreach (Task task in tasks)
+            {
+                await task;
             }
 
             await InstallCommitAsync(device, session, cancellationToken);
@@ -532,15 +544,14 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install-create' ");
-            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $"-p {packageName}");
+            _ = requestBuilder.Append("exec:cmd package 'install-create'");
+            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ');
-                    _ = requestBuilder.Append(argument);
+                    _ = requestBuilder.Append($" {argument}");
                 }
             }
 
@@ -589,7 +600,7 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(apkName);
 
             StringBuilder requestBuilder = new();
-            requestBuilder.Append($"exec:cmd package 'install-write' ");
+            requestBuilder.Append($"exec:cmd package 'install-write'");
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
@@ -617,7 +628,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken);
             }
 
-            read = await socket.ReadAsync(buffer, buffer.Length, cancellationToken);
+            read = await socket.ReadAsync(buffer, cancellationToken);
             string value = Encoding.UTF8.GetString(buffer, 0, read);
 
             if (!value.Contains("Success"))
@@ -669,7 +680,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             string features = await socket.ReadStringAsync(cancellationToken);
 
-            IEnumerable<string> featureList = features.Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
             return featureList;
         }
 
@@ -858,16 +869,11 @@ namespace AdvancedSharpAdbClient
 
             // Check if the app is running in background
             bool isAppRunning = await IsAppRunningAsync(device, packageName, cancellationToken);
-            if (isAppRunning)
-            {
-                return AppStatus.Background;
-            }
-
-            return AppStatus.Stopped;
+            return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
         /// <inheritdoc/>
-        public async Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
+        public async Task<Element> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -879,17 +885,10 @@ namespace AdvancedSharpAdbClient
                         XmlNode xmlNode = doc.SelectSingleNode(xpath);
                         if (xmlNode != null)
                         {
-                            string bounds = xmlNode.Attributes["bounds"].Value;
-                            if (bounds != null)
+                            Element element = Element.FromXmlNode(this, device, xmlNode);
+                            if (element != null)
                             {
-                                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                Dictionary<string, string> attributes = new();
-                                foreach (XmlAttribute at in xmlNode.Attributes)
-                                {
-                                    attributes.Add(at.Name, at.Value);
-                                }
-                                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                                return new Element(this, device, area, attributes);
+                                return element;
                             }
                         }
                     }
@@ -913,7 +912,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<Element[]> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken = default)
+        public async Task<List<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -925,23 +924,16 @@ namespace AdvancedSharpAdbClient
                         XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                         if (xmlNodes != null)
                         {
-                            Element[] elements = new Element[xmlNodes.Count];
-                            for (int i = 0; i < elements.Length; i++)
+                            List<Element> elements = new(xmlNodes.Count);
+                            for (int i = 0; i < xmlNodes.Count; i++)
                             {
-                                string bounds = xmlNodes[i].Attributes["bounds"].Value;
-                                if (bounds != null)
+                                Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                if (element != null)
                                 {
-                                    int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                                    Dictionary<string, string> attributes = new();
-                                    foreach (XmlAttribute at in xmlNodes[i].Attributes)
-                                    {
-                                        attributes.Add(at.Name, at.Value);
-                                    }
-                                    Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                                    elements[i] = new Element(this, device, area, attributes);
+                                    elements.Add(element);
                                 }
                             }
-                            return elements.Length == 0 ? null : elements;
+                            return elements.Count == 0 ? null : elements;
                         }
                     }
                     if (cancellationToken == default)
@@ -962,6 +954,42 @@ namespace AdvancedSharpAdbClient
             }
             return null;
         }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <inheritdoc/>
+        public async IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath = "hierarchy/node", [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                XmlDocument doc = await DumpScreenAsync(device, cancellationToken);
+                if (doc != null)
+                {
+                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    if (xmlNodes != null)
+                    {
+                        bool isBreak = false;
+                        for (int i = 0; i < xmlNodes.Count; i++)
+                        {
+                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            if (element != null)
+                            {
+                                isBreak = true;
+                                yield return element;
+                            }
+                        }
+                        if (isBreak)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (cancellationToken == default)
+                {
+                    break;
+                }
+            }
+        }
+#endif
 
         /// <inheritdoc/>
         public async Task SendKeyEventAsync(DeviceData device, string key, CancellationToken cancellationToken = default)

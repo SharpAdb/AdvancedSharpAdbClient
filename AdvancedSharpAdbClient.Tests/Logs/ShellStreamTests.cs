@@ -1,11 +1,10 @@
-﻿using AdvancedSharpAdbClient.Logs;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Logs
+namespace AdvancedSharpAdbClient.Logs.Tests
 {
     public class ShellStreamTests
     {
@@ -41,7 +40,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public void TestCRLFAtStart()
+        public void CRLFAtStartTest()
         {
             using MemoryStream stream = GetStream("\r\nHello, World!");
             using ShellStream shellStream = new(stream, false);
@@ -60,7 +59,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public void MultipleCRLFInString()
+        public void MultipleCRLFInStringTest()
         {
             using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
             using ShellStream shellStream = new(stream, false);
@@ -82,7 +81,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public void PendingByteTest1()
+        public void PendingByteTest()
         {
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);
@@ -105,7 +104,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public async Task TestCRLFAtStartAsync()
+        public async void CRLFAtStartAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\nHello, World!");
             using ShellStream shellStream = new(stream, false);
@@ -124,7 +123,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public async Task MultipleCRLFInStringAsync()
+        public async void MultipleCRLFInStringAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
             using ShellStream shellStream = new(stream, false);
@@ -146,7 +145,7 @@ namespace AdvancedSharpAdbClient.Tests.Logs
         }
 
         [Fact]
-        public async Task PendingByteTest1Async()
+        public async void PendingByteAsyncTest()
         {
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);
