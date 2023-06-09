@@ -88,9 +88,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="condition">The condition to evaluate.</param>
         /// <param name="instance">The object whose type's full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
         /// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
-#if NET6_0_OR_GREATER
         [StackTraceHidden]
-#endif
         public static void ThrowIf(
 #if HAS_INDEXRANGE
             [DoesNotReturnIf(true)]

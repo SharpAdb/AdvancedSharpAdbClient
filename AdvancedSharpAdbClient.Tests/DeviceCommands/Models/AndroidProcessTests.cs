@@ -33,18 +33,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("init", process.Name);
         }
 
-        /// <summary>
-        /// Tests the parsing of a process where the /cmdline output is empty.
-        /// </summary>
         [Fact]
-        public void ParseTest2()
+        public void ParseLongTest()
         {
             AndroidProcess p = AndroidProcess.Parse("10 (rcu_sched) S 2 0 0 0 -1 2129984 0 0 0 0 0 0 0 0 20 0 1 0 9 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579565281 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0", true);
             Assert.Equal("rcu_sched", p.Name);
         }
 
+        /// <summary>
+        /// Tests the parsing of a process where the cmd line output is empty.
+        /// </summary>
         [Fact]
-        public void ParseTest3()
+        public void ParseWithEmptyTest()
         {
             AndroidProcess p = AndroidProcess.Parse("be.xx.yy.android.test\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\04212 (le.android.test) S 2088 2088 0 0 -1 1077944640 10251 1315 2 0 10 8 0 1 20 0 10 0 15838 1062567936 12163 18446744073709551615 4152340480 4152354824 4289177024 4289174228 4147921093 0 4612 0 38136 18446744073709551615 0 0 17 1 0 0 0 0 0 4152360256 4152360952 4157476864 4289182806 4289182882 4289182882 4289183712 0", true);
             Assert.Equal("be.xx.yy.android.test", p.Name);

@@ -11,19 +11,19 @@ namespace AdvancedSharpAdbClient.Tests
     public partial class AdbSocketTests
     {
         [Fact]
-        public async void SendSyncRequestAsyncTest() =>
+        public async void SendSyncDATARequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, 2, CancellationToken.None),
                 new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
 
         [Fact]
-        public async void SendSyncRequestAsyncTest2() =>
+        public async void SendSyncSENDRequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", CancellationToken.None),
                 new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
 
         [Fact]
-        public async void SendSyncRequestAsyncTest3() =>
+        public async void SendSyncDENTRequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", 633, CancellationToken.None),
                 new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });

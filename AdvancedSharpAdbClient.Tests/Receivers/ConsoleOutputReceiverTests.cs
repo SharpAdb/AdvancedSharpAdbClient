@@ -24,30 +24,18 @@ namespace AdvancedSharpAdbClient.Tests
                 ignoreLineEndingDifferences: true);
         }
 
-        [Fact]
-        public void ToStringIgnoredLineTest()
+        [Theory]
+        [InlineData("#Hello, World!", "See you!", "See you!\r\n")]
+        [InlineData("Hello, World!", "$See you!", "Hello, World!\r\n")]
+        public void ToStringIgnoredLineTest(string line1, string line2, string result)
         {
             ConsoleOutputReceiver receiver = new();
-            receiver.AddOutput("#Hello, World!");
-            receiver.AddOutput("See you!");
+            receiver.AddOutput(line1);
+            receiver.AddOutput(line2);
 
             receiver.Flush();
 
-            Assert.Equal("See you!\r\n",
-                receiver.ToString(),
-                ignoreLineEndingDifferences: true);
-        }
-
-        [Fact]
-        public void ToStringIgnoredLineTest2()
-        {
-            ConsoleOutputReceiver receiver = new();
-            receiver.AddOutput("Hello, World!");
-            receiver.AddOutput("$See you!");
-
-            receiver.Flush();
-
-            Assert.Equal("Hello, World!\r\n",
+            Assert.Equal(result,
                 receiver.ToString(),
                 ignoreLineEndingDifferences: true);
         }

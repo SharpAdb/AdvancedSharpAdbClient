@@ -66,14 +66,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("pm uninstall com.example", adbClient.ReceivedCommands[1]);
         }
 
-        [Fact]
-        public void GetPackageVersionTest()
-        {
-            DummyAdbClient adbClient = new();
-
-            adbClient.Commands["pm list packages -f"] = "";
-            adbClient.Commands["dumpsys package com.example"] =
-@"Activity Resolver Table:
+        [Theory]
+        [InlineData(@"Activity Resolver Table:
   Non-Data Actions:
       com.android.providers.contacts.DUMP_DATABASE:
         310a0bd8 com.android.providers.contacts/.debug.ContactsDumpActivity
@@ -106,30 +100,8 @@ Shared users:
   SharedUser [android.uid.shared] (3341dee):
     userId=10002 gids=[3003, 1028, 1015]
     grantedPermissions:
-      android.permission.WRITE_SETTINGS";
-
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            VersionInfo version = adbClient.GetPackageVersion(device, "com.example");
-
-            Assert.Equal(22, version.VersionCode);
-            Assert.Equal("5.1-eng.buildbot.20151117.204057", version.VersionName);
-
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("dumpsys package com.example", adbClient.ReceivedCommands[1]);
-        }
-
-        [Fact]
-        public void GetPackageVersionTest2()
-        {
-            DummyAdbClient adbClient = new();
-
-            adbClient.Commands["pm list packages -f"] = "";
-            adbClient.Commands["dumpsys package jp.co.cyberagent.stf"] =
-@"Activity Resolver Table:
+      android.permission.WRITE_SETTINGS", 22, "5.1-eng.buildbot.20151117.204057", "com.example")]
+        [InlineData(@"Activity Resolver Table:
   Schemes:
       package:
         423fa100 jp.co.cyberagent.stf/.IconActivity filter 427ae628
@@ -197,30 +169,8 @@ mSettings.mPackages:
 the number of packages is 223
 mPackages:
 the number of packages is 223
-End!!!!";
-
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
-
-            Assert.Equal(4, version.VersionCode);
-            Assert.Equal("2.1.0", version.VersionName);
-
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
-        }
-
-        [Fact]
-        public void GetPackageVersionTest3()
-        {
-            DummyAdbClient adbClient = new();
-
-            adbClient.Commands["pm list packages -f"] = "";
-            adbClient.Commands["dumpsys package jp.co.cyberagent.stf"] =
-@"Activity Resolver Table:
+End!!!!", 4, "2.1.0", "jp.co.cyberagent.stf")]
+        [InlineData(@"Activity Resolver Table:
   Schemes:
       package:
         de681a8 jp.co.cyberagent.stf/.IconActivity filter 2863eca
@@ -342,20 +292,26 @@ Dexopt state:
 
 Compiler stats:
   [jp.co.cyberagent.stf]
-     base.apk - 1084";
+     base.apk - 1084", 4, "2.1.0", "jp.co.cyberagent.stf")]
+        public void GetPackageVersionTest(string command, int versionCode, string versionName, string packageName)
+        {
+            DummyAdbClient adbClient = new();
+
+            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands[$"dumpsys package {packageName}"] = command;
 
             DeviceData device = new()
             {
                 State = DeviceState.Online
             };
-            VersionInfo version = adbClient.GetPackageVersion(device, "jp.co.cyberagent.stf");
+            VersionInfo version = adbClient.GetPackageVersion(device, packageName);
 
-            Assert.Equal(4, version.VersionCode);
-            Assert.Equal("2.1.0", version.VersionName);
+            Assert.Equal(versionCode, version.VersionCode);
+            Assert.Equal(versionName, version.VersionName);
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("dumpsys package jp.co.cyberagent.stf", adbClient.ReceivedCommands[1]);
+            Assert.Equal($"dumpsys package {packageName}", adbClient.ReceivedCommands[1]);
         }
 
         [Fact]

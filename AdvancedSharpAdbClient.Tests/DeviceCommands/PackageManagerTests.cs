@@ -17,8 +17,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Mock.Of<IAdbClient>(), null));
         }
 
-        [Fact]
-        public void PackagesPropertyTest()
+        [Theory]
+        [InlineData("package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d", "com.android.gallery3d", "/system/app/Gallery2/Gallery2.apk")]
+        [InlineData("package:mwc2015.be", "mwc2015.be", null)]
+        public void PackagesPropertyTest(string command, string packageName, string path)
         {
             DeviceData device = new()
             {
@@ -26,27 +28,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            client.Commands["pm list packages -f"] = command;
             PackageManager manager = new(client, device);
 
-            Assert.True(manager.Packages.ContainsKey("com.android.gallery3d"));
-            Assert.Equal("/system/app/Gallery2/Gallery2.apk", manager.Packages["com.android.gallery3d"]);
-        }
-
-        [Fact]
-        public void PackagesPropertyTest2()
-        {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            DummyAdbClient client = new();
-            client.Commands["pm list packages -f"] = "package:mwc2015.be";
-            PackageManager manager = new(client, device);
-
-            Assert.True(manager.Packages.ContainsKey("mwc2015.be"));
-            Assert.Null(manager.Packages["mwc2015.be"]);
+            Assert.True(manager.Packages.ContainsKey(packageName));
+            Assert.Equal(path, manager.Packages[packageName]);
         }
 
         [Fact]

@@ -18,12 +18,12 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("VS Emulator Android Device - 480 x 800", device.Product);
             Assert.Equal("Android_Device___480_x_800", device.Model);
             Assert.Equal("donatello", device.Name);
-            Assert.Equal<DeviceState>(DeviceState.Offline, device.State);
+            Assert.Equal(DeviceState.Offline, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
 
         [Fact]
-        public void CreateFromDeviceNoPermissionTest2()
+        public void CreateFromDeviceNoPermissionTest()
         {
             string data = "009d1cd696d5194a        no permissions (user in plugdev group; are your udev rules wrong?); see [http://developer.android.com/tools/device.html";
 
@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);
             Assert.Equal(string.Empty, device.Features);
-            Assert.Equal<DeviceState>(DeviceState.NoPermissions, device.State);
+            Assert.Equal(DeviceState.NoPermissions, device.State);
             Assert.Equal(" (user in plugdev group; are your udev rules wrong?); see [http://developer.android.com/tools/device.html", device.Message);
             Assert.Equal(string.Empty, device.Usb);
             Assert.Equal(string.Empty, device.TransportId);
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);
             Assert.Equal(string.Empty, device.Features);
-            Assert.Equal<DeviceState>(DeviceState.Authorizing, device.State);
+            Assert.Equal(DeviceState.Authorizing, device.State);
             Assert.Equal("9-1.4.1", device.Usb);
             Assert.Equal("8149", device.TransportId);
         }
@@ -65,7 +65,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("", device.Product);
             Assert.Equal("", device.Model);
             Assert.Equal("", device.Name);
-            Assert.Equal<DeviceState>(DeviceState.Unauthorized, device.State);
+            Assert.Equal(DeviceState.Unauthorized, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
 
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             DeviceData device = DeviceData.CreateFromAdbData(data);
             Assert.Equal("emulator-5586", device.Serial);
-            Assert.Equal<DeviceState>(DeviceState.Host, device.State);
+            Assert.Equal(DeviceState.Host, device.State);
             Assert.Equal("shell_2", device.Features);
             Assert.Equal(string.Empty, device.Usb);
         }
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             DeviceData device = DeviceData.CreateFromAdbData(data);
             Assert.Equal("0100a9ee51a18f2b", device.Serial);
-            Assert.Equal<DeviceState>(DeviceState.Online, device.State);
+            Assert.Equal(DeviceState.Online, device.State);
             Assert.Equal("Nexus_5X", device.Model);
             Assert.Equal("bullhead", device.Product);
             Assert.Equal("bullhead", device.Name);
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             DeviceData device = DeviceData.CreateFromAdbData(data);
             Assert.Equal("EAOKCY112414", device.Serial);
-            Assert.Equal<DeviceState>(DeviceState.Online, device.State);
+            Assert.Equal(DeviceState.Online, device.State);
             Assert.Equal("K013", device.Model);
             Assert.Equal("WW_K013", device.Product);
             Assert.Equal("K013_1", device.Name);
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             DeviceData device = DeviceData.CreateFromAdbData(data);
             Assert.Equal("ZY3222LBDC", device.Serial);
-            Assert.Equal<DeviceState>(DeviceState.Recovery, device.State);
+            Assert.Equal(DeviceState.Recovery, device.State);
             Assert.Equal("337641472X", device.Usb);
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal("omni_cedric", device.Product);
@@ -150,7 +150,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public void CreateFromInvalidDatatest()
+        public void CreateFromInvalidDataTest()
         {
             string data = "xyz";
 
@@ -175,52 +175,24 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(DeviceState.Unknown, DeviceData.GetStateFromString("hello"));
         }
 
-        [Fact]
-        public void CreateFromDeviceDataTransportIdTest()
+        [Theory]
+        [InlineData("R32D102SZAE            device transport_id:6", "R32D102SZAE", "", "", "", "6")]
+        [InlineData("emulator-5554          device product:sdk_google_phone_x86 model:Android_SDK_built_for_x86 device:generic_x86 transport_id:1", "emulator-5554", "sdk_google_phone_x86", "Android_SDK_built_for_x86", "generic_x86", "1")]
+        [InlineData("00bc13bcf4bacc62 device product:bullhead model:Nexus_5X device:bullhead transport_id:1", "00bc13bcf4bacc62", "bullhead", "Nexus_5X", "bullhead", "1")]
+        public void CreateFromDeviceDataTransportIdTest(string data, string serial, string product, string model, string name, string transportId)
         {
-            string data = "R32D102SZAE            device transport_id:6";
-
             DeviceData device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal("R32D102SZAE", device.Serial);
-            Assert.Equal("", device.Product);
-            Assert.Equal("", device.Model);
-            Assert.Equal("", device.Name);
-            Assert.Equal<DeviceState>(DeviceState.Online, device.State);
+            Assert.Equal(serial, device.Serial);
+            Assert.Equal(product, device.Product);
+            Assert.Equal(model, device.Model);
+            Assert.Equal(name, device.Name);
+            Assert.Equal(transportId, device.TransportId);
+            Assert.Equal(DeviceState.Online, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
 
         [Fact]
-        public void CreateFromDeviceDataTransportIdTest2()
-        {
-            string data = "emulator-5554          device product:sdk_google_phone_x86 model:Android_SDK_built_for_x86 device:generic_x86 transport_id:1";
-
-            DeviceData device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal("emulator-5554", device.Serial);
-            Assert.Equal("sdk_google_phone_x86", device.Product);
-            Assert.Equal("Android_SDK_built_for_x86", device.Model);
-            Assert.Equal("generic_x86", device.Name);
-            Assert.Equal("1", device.TransportId);
-            Assert.Equal<DeviceState>(DeviceState.Online, device.State);
-            Assert.Equal(string.Empty, device.Usb);
-        }
-
-        [Fact]
-        public void CreateFromDeviceDataTransportIdTest3()
-        {
-            string data = "00bc13bcf4bacc62 device product:bullhead model:Nexus_5X device:bullhead transport_id:1";
-
-            DeviceData device = DeviceData.CreateFromAdbData(data);
-            Assert.Equal("00bc13bcf4bacc62", device.Serial);
-            Assert.Equal("bullhead", device.Product);
-            Assert.Equal("Nexus_5X", device.Model);
-            Assert.Equal("bullhead", device.Name);
-            Assert.Equal("1", device.TransportId);
-            Assert.Equal<DeviceState>(DeviceState.Online, device.State);
-            Assert.Equal(string.Empty, device.Usb);
-        }
-
-        [Fact]
-        public void CreateFromDeviceDataConnecting()
+        public void CreateFromDeviceDataConnectingTest()
         {
             string data = "00bc13bcf4bacc62 connecting";
 
@@ -230,9 +202,8 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);
             Assert.Equal(string.Empty, device.TransportId);
-            Assert.Equal<DeviceState>(DeviceState.Unknown, device.State);
+            Assert.Equal(DeviceState.Unknown, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
-
     }
 }

@@ -462,12 +462,12 @@ namespace AdvancedSharpAdbClient
             string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments);
 
             int i = 0;
-            foreach (Stream splitAPK in splitAPKs)
+            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
                     Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
+                    return;
                 }
 
                 try
@@ -478,6 +478,10 @@ namespace AdvancedSharpAdbClient
                 {
                     Debug.WriteLine(ex.Message);
                 }
+            });
+            foreach (Task task in tasks)
+            {
+                await task;
             }
 
             await InstallCommitAsync(device, session, cancellationToken);
@@ -504,12 +508,12 @@ namespace AdvancedSharpAdbClient
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, cancellationToken);
 
             int i = 0;
-            foreach (Stream splitAPK in splitAPKs)
+            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
                     Debug.WriteLine("The apk stream must be a readable and seekable stream");
-                    continue;
+                    return;
                 }
 
                 try
@@ -520,6 +524,10 @@ namespace AdvancedSharpAdbClient
                 {
                     Debug.WriteLine(ex.Message);
                 }
+            });
+            foreach (Task task in tasks)
+            {
+                await task;
             }
 
             await InstallCommitAsync(device, session, cancellationToken);
