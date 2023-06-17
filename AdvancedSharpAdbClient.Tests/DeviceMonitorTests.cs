@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             using DeviceMonitor monitor = new(Socket);
             Assert.NotNull(monitor.Devices);
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
             Assert.Equal(Socket, monitor.Socket);
             Assert.False(monitor.IsRunning);
         }
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Tests
             using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
 
             // Start the monitor, detect the initial device.
             RunTest(
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
                     Assert.Single(sink.NotifiedEvents);
@@ -72,7 +72,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.Equal(0, monitor.Devices.Count);
+                    Assert.Empty(monitor.Devices);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
                     Assert.Single(sink.NotifiedEvents);
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient.Tests
             using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
 
             // Start the monitor, detect the initial device.
             RunTest(
@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.Equal(0, monitor.Devices.Count);
+                    Assert.Empty(monitor.Devices);
                     Assert.Empty(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
                     Assert.Empty(sink.NotifiedEvents);
@@ -122,7 +122,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
                     Assert.Single(sink.NotifiedEvents);
@@ -139,7 +139,7 @@ namespace AdvancedSharpAdbClient.Tests
             using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
 
             RunTest(
                 OkResponse,
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
@@ -167,7 +167,7 @@ namespace AdvancedSharpAdbClient.Tests
             using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
 
             // Start the monitor, detect the initial device.
             RunTest(
@@ -178,7 +178,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
@@ -203,7 +203,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
                     Assert.Empty(sink.ConnectedEvents);
                     Assert.Single(sink.ChangedEvents);
@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient.Tests
             using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
-            Assert.Equal(0, monitor.Devices.Count);
+            Assert.Empty(monitor.Devices);
 
             // Start the monitor, detect the initial device.
             RunTest(
@@ -232,7 +232,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     monitor.Start();
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
                     Assert.Single(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);
@@ -257,7 +257,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     eventWaiter.WaitOne(1000);
 
-                    Assert.Equal(1, monitor.Devices.Count);
+                    Assert.Single(monitor.Devices);
                     Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
                     Assert.Empty(sink.ConnectedEvents);
                     Assert.Empty(sink.ChangedEvents);

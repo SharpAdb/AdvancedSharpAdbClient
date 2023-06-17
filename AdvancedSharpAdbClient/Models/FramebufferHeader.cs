@@ -132,17 +132,17 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_DRAWING
         /// <summary>
-        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Image"/>.
+        /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Bitmap"/>.
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
         /// <returns>
-        /// A <see cref="Image"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// A <see cref="Bitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
         /// </returns>
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public readonly Image ToImage(byte[] buffer)
+        public readonly Bitmap ToImage(byte[] buffer)
         {
             ExceptionExtensions.ThrowIfNull(buffer);
 

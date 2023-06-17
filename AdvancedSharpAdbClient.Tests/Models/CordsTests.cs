@@ -6,7 +6,7 @@ using Xunit;
 namespace AdvancedSharpAdbClient.Tests
 {
     /// <summary>
-    /// Tests the <see cref="Cords"/> class.
+    /// Tests the <see cref="Cords"/> struct.
     /// </summary>
     public class CordsTests
     {

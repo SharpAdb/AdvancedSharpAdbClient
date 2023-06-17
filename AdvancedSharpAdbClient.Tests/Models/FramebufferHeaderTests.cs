@@ -9,7 +9,7 @@ using Xunit;
 namespace AdvancedSharpAdbClient.Tests
 {
     /// <summary>
-    /// Tests the <see cref="FramebufferHeader"/> class.
+    /// Tests the <see cref="FramebufferHeader"/> struct.
     /// </summary>
     public class FramebufferHeaderTests
     {
@@ -68,7 +68,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
             byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
-            using Bitmap image = (Bitmap)header.ToImage(framebuffer);
+            using Bitmap image = header.ToImage(framebuffer);
             Assert.NotNull(image);
             Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] framebuffer = Array.Empty<byte>();
 
-            Image image = header.ToImage(framebuffer);
+            Bitmap image = header.ToImage(framebuffer);
             Assert.Null(image);
         }
     }

@@ -146,13 +146,13 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_DRAWING
         /// <summary>
-        /// Converts the framebuffer data to a <see cref="Image"/>.
+        /// Converts the framebuffer data to a <see cref="Bitmap"/>.
         /// </summary>
-        /// <returns>An <see cref="Image"/> which represents the framebuffer data.</returns>
+        /// <returns>An <see cref="Bitmap"/> which represents the framebuffer data.</returns>
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public Image ToImage()
+        public Bitmap ToImage()
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToImage(Data);
@@ -163,6 +163,12 @@ namespace AdvancedSharpAdbClient
         [SupportedOSPlatform("windows")]
 #endif
         public static explicit operator Image(Framebuffer value) => value.ToImage();
+
+        /// <inheritdoc/>
+#if NET
+        [SupportedOSPlatform("windows")]
+#endif
+        public static explicit operator Bitmap(Framebuffer value) => value.ToImage();
 #endif
 
 #if WINDOWS_UWP

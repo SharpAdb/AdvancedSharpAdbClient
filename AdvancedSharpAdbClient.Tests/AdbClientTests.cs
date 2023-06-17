@@ -551,6 +551,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
+            Assert.Equal(16, framebuffer.Data.Length);
 
             FramebufferHeader header = framebuffer.Header;
 
@@ -571,7 +572,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                using Bitmap image = (Bitmap)framebuffer.ToImage();
+                using Bitmap image = framebuffer.ToImage();
                 Assert.NotNull(image);
                 Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
