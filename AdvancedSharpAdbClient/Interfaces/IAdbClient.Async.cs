@@ -443,7 +443,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
         Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
         /// Gets the current device screen snapshot asynchronously.
         /// </summary>

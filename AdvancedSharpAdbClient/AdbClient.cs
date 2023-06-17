@@ -782,7 +782,7 @@ namespace AdvancedSharpAdbClient
             return null;
         }
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
         public Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device)
         {

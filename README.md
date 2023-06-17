@@ -1,6 +1,6 @@
 | Issues | License | NuGet |
 |--------|---------|-------|
-[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![Github Issues](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
+[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![License](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
 
 # A .NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)
 
@@ -373,7 +373,7 @@ static void Main(string[] args)
 static async void Main(string[] args)
 {
     ...
-    System.Drawing.Image img = client.GetFrameBufferAsync(device, CancellationToken.None).GetAwaiter().GetResult(); // synchronously
+    System.Drawing.Image img = client.GetFrameBuffer(device, CancellationToken.None); // synchronously
     ...
     System.Drawing.Image img = await client.GetFrameBufferAsync(device, CancellationToken.None); // asynchronously
     ...
@@ -442,7 +442,7 @@ AdbClient.SetEncoding(Encoding.ASCII);
 [![Contributors](https://contrib.rocks/image?repo=yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/graphs/contributors)
 
 ## Consulting and Support
-Please open an **issue** on if you have suggestions or problems.
+Please open an [**issue**](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues) on if you have suggestions or problems.
 
 ## History
 AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).

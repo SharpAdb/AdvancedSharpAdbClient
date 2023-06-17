@@ -19,6 +19,13 @@ global using DateTime = System.DateTime;
 global using TimeSpan = System.TimeSpan;
 #endif
 
+#if WINDOWS10_0_17763_0_OR_GREATER
+global using Windows.Foundation;
+global using Buffer = System.Buffer;
+global using DateTime = System.DateTime;
+global using TimeSpan = System.TimeSpan;
+#endif
+
 #if HAS_TASK
 global using System.Threading.Tasks;
 #endif

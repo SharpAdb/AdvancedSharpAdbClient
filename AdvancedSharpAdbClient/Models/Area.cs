@@ -37,8 +37,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref='Area'/> class with the specified rectangle.
         /// </summary>
-        /// <param name="rectangle">A <see cref="System.Drawing.Rectangle"/> that represents the rectangular region.</param>
-        public Area(System.Drawing.Rectangle rectangle)
+        /// <param name="rectangle">A <see cref="Rectangle"/> that represents the rectangular region.</param>
+        public Area(Rectangle rectangle)
         {
             x = rectangle.X;
             y = rectangle.Y;
@@ -73,13 +73,13 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
         /// Initializes a new instance of the <see cref='Area'/> class with the specified rectangle.
         /// </summary>
-        /// <param name="rectangle">A <see cref="Windows.Foundation.Rect"/> that represents the rectangular region.</param>
-        public Area(Windows.Foundation.Rect rectangle)
+        /// <param name="rectangle">A <see cref="Rect"/> that represents the rectangular region.</param>
+        public Area(Rect rectangle)
         {
             x = unchecked((int)rectangle.X);
             y = unchecked((int)rectangle.Y);
@@ -165,7 +165,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the size of this <see cref='Area'/>.
         /// </summary>
-        public Windows.Foundation.Size Size
+        public Size Size
         {
             readonly get => new(Width, Height);
             set
@@ -259,42 +259,42 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_DRAWING
         /// <summary>
-        /// Creates a <see cref='System.Drawing.Rectangle'/> with the specified <see cref='Area'/>.
+        /// Creates a <see cref='Rectangle'/> with the specified <see cref='Area'/>.
         /// </summary>
         /// <param name="rect">The <see cref='Area'/> to convert.</param>
-        /// <returns>The <see cref='System.Drawing.Rectangle'/> that results from the conversion.</returns>
-        public static implicit operator System.Drawing.Rectangle(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+        /// <returns>The <see cref='Rectangle'/> that results from the conversion.</returns>
+        public static implicit operator Rectangle(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
-        /// Creates a <see cref='System.Drawing.RectangleF'/> with the specified <see cref='Area'/>.
+        /// Creates a <see cref='RectangleF'/> with the specified <see cref='Area'/>.
         /// </summary>
         /// <param name="rect">The <see cref='Area'/> to convert.</param>
-        /// <returns>The <see cref='System.Drawing.RectangleF'/> that results from the conversion.</returns>
-        public static implicit operator System.Drawing.RectangleF(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+        /// <returns>The <see cref='RectangleF'/> that results from the conversion.</returns>
+        public static implicit operator RectangleF(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
-        /// Creates a <see cref='Area'/> with the specified <see cref='System.Drawing.Rectangle'/>.
+        /// Creates a <see cref='Area'/> with the specified <see cref='Rectangle'/>.
         /// </summary>
-        /// <param name="rect">The <see cref='System.Drawing.Rectangle'/> to convert.</param>
+        /// <param name="rect">The <see cref='Rectangle'/> to convert.</param>
         /// <returns>The <see cref='Area'/> that results from the conversion.</returns>
-        public static implicit operator Area(System.Drawing.Rectangle rect) => new(rect);
+        public static implicit operator Area(Rectangle rect) => new(rect);
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
-        /// Creates a <see cref='Windows.Foundation.Rect'/> with the specified <see cref='Area'/>.
+        /// Creates a <see cref='Rect'/> with the specified <see cref='Area'/>.
         /// </summary>
         /// <param name="rect">The <see cref='Area'/> to convert.</param>
-        /// <returns>The <see cref='Windows.Foundation.Rect'/> that results from the conversion.</returns>
-        public static implicit operator Windows.Foundation.Rect(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+        /// <returns>The <see cref='Rect'/> that results from the conversion.</returns>
+        public static implicit operator Rect(Area rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         /// <summary>
-        /// Creates a <see cref='Area'/> with the specified <see cref='Windows.Foundation.Rect'/>.
+        /// Creates a <see cref='Area'/> with the specified <see cref='Rect'/>.
         /// </summary>
-        /// <param name="rect">The <see cref='Windows.Foundation.Rect'/> to convert.</param>
+        /// <param name="rect">The <see cref='Rect'/> to convert.</param>
         /// <returns>The <see cref='Area'/> that results from the conversion.</returns>
-        public static implicit operator Area(Windows.Foundation.Rect rect) => new(rect);
+        public static implicit operator Area(Rect rect) => new(rect);
 #pragma warning restore CS0419 // cref 特性中有不明确的引用
 #endif
 
@@ -319,10 +319,10 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_DRAWING
         /// <summary>
-        /// Converts a <see cref="System.Drawing.RectangleF"/> to a <see cref="Area"/> by performing a ceiling operation on all the coordinates.
+        /// Converts a <see cref="RectangleF"/> to a <see cref="Area"/> by performing a ceiling operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="System.Drawing.RectangleF"/> structure to be converted.</param>
-        public static Area Ceiling(System.Drawing.RectangleF value)
+        /// <param name="value">The <see cref="RectangleF"/> structure to be converted.</param>
+        public static Area Ceiling(RectangleF value)
         {
             unchecked
             {
@@ -335,10 +335,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Converts a <see cref="System.Drawing.RectangleF"/> to a <see cref="Area"/> by performing a truncate operation on all the coordinates.
+        /// Converts a <see cref="RectangleF"/> to a <see cref="Area"/> by performing a truncate operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="System.Drawing.RectangleF"/> structure to be converted.</param>
-        public static Area Truncate(System.Drawing.RectangleF value)
+        /// <param name="value">The <see cref="RectangleF"/> structure to be converted.</param>
+        public static Area Truncate(RectangleF value)
         {
             unchecked
             {
@@ -351,10 +351,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Converts a <see cref="System.Drawing.RectangleF"/> to a <see cref="Area"/> by performing a round operation on all the coordinates.
+        /// Converts a <see cref="RectangleF"/> to a <see cref="Area"/> by performing a round operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="System.Drawing.RectangleF"/> structure to be converted.</param>
-        public static Area Round(System.Drawing.RectangleF value)
+        /// <param name="value">The <see cref="RectangleF"/> structure to be converted.</param>
+        public static Area Round(RectangleF value)
         {
             unchecked
             {
@@ -367,13 +367,13 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
-        /// Converts a <see cref="Windows.Foundation.Rect"/> to a <see cref="Area"/> by performing a ceiling operation on all the coordinates.
+        /// Converts a <see cref="Rect"/> to a <see cref="Area"/> by performing a ceiling operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="Windows.Foundation.Rect"/> structure to be converted.</param>
-        public static Area Ceiling(Windows.Foundation.Rect value)
+        /// <param name="value">The <see cref="Rect"/> structure to be converted.</param>
+        public static Area Ceiling(Rect value)
         {
             unchecked
             {
@@ -386,10 +386,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Converts a <see cref="Windows.Foundation.Rect"/> to a <see cref="Area"/> by performing a truncate operation on all the coordinates.
+        /// Converts a <see cref="Rect"/> to a <see cref="Area"/> by performing a truncate operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="Windows.Foundation.Rect"/> structure to be converted.</param>
-        public static Area Truncate(Windows.Foundation.Rect value)
+        /// <param name="value">The <see cref="Rect"/> structure to be converted.</param>
+        public static Area Truncate(Rect value)
         {
             unchecked
             {
@@ -402,10 +402,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Converts a <see cref="Windows.Foundation.Rect"/> to a <see cref="Area"/> by performing a round operation on all the coordinates.
+        /// Converts a <see cref="Rect"/> to a <see cref="Area"/> by performing a round operation on all the coordinates.
         /// </summary>
-        /// <param name="value">The <see cref="Windows.Foundation.Rect"/> structure to be converted.</param>
-        public static Area Round(Windows.Foundation.Rect value)
+        /// <param name="value">The <see cref="Rect"/> structure to be converted.</param>
+        public static Area Round(Rect value)
         {
             unchecked
             {
@@ -485,7 +485,7 @@ namespace AdvancedSharpAdbClient
         public void Inflate(System.Drawing.Size size) => Inflate(size.Width, size.Height);
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
         /// Inflates this <see cref='Area'/> by the specified amount.
         /// </summary>

@@ -401,7 +401,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
         XmlDocument DumpScreen(DeviceData device);
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
         /// Gets the current device screen snapshot.
         /// </summary>

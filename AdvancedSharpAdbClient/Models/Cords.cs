@@ -56,7 +56,7 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
         /// Initializes a new instance of the <see cref='Cords'/> class from a <see cref='Windows.Foundation.Point'/> .
@@ -148,7 +148,7 @@ namespace AdvancedSharpAdbClient
         public static Cords operator -(Cords pt, System.Drawing.Size sz) => Subtract(pt, sz);
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
         /// Creates a <see cref='Windows.Foundation.Point'/> with the coordinates of the specified <see cref='Cords'/>.
@@ -259,7 +259,7 @@ namespace AdvancedSharpAdbClient
         public static Cords Round(System.Drawing.PointF value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
 #endif
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
 #pragma warning disable CS0419 // cref 特性中有不明确的引用
         /// <summary>
         /// Translates a <see cref='Cords'/> by a given <see cref='Windows.Foundation.Size'/>.
