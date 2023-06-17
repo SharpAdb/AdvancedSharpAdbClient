@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient
         private readonly AdbClient client;
         private byte[] headerData;
         private bool headerInitialized;
-        private bool disposed;
+        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
 
             // Initialize the headerData buffer
             int size = Marshal.SizeOf(default(FramebufferHeader));
-            this.headerData = new byte[size];
+            headerData = new byte[size];
         }
 
         /// <summary>
@@ -226,12 +226,6 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
         /// </summary>
-        protected void EnsureNotDisposed()
-        {
-            if (disposed)
-            {
-                ExceptionExtensions.ThrowIf(disposed, this);
-            }
-        }
+        protected void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
     }
 }

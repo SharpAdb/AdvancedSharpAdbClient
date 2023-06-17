@@ -15,34 +15,38 @@ namespace AdvancedSharpAdbClient
 
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
-            // this.EndPoint = AdbClient.Instance.EndPoint;
-
+            lock (FactoriesTests.locker)
+            {
+                // this.EndPoint = AdbClient.Instance.EndPoint;
 #if DEBUG
-            // Use the tracing adb socket factory to run the tests on an actual device.
-            // use the dummy socket factory to run unit tests.
-            if (integrationTest)
-            {
-                TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
+                // Use the tracing adb socket factory to run the tests on an actual device.
+                // use the dummy socket factory to run unit tests.
+                if (integrationTest)
+                {
+                    TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
 
-                Factories.AdbSocketFactory = (endPoint) => tracingSocket;
-            }
-            else
-            {
-                DummyAdbSocket socket = new();
-                Factories.AdbSocketFactory = (endPoint) => socket;
-            }
+                    Factories.AdbSocketFactory = (endPoint) => tracingSocket;
+                }
+                else
+                {
+                    DummyAdbSocket socket = new();
+                    Factories.AdbSocketFactory = (endPoint) => socket;
+                }
 
-            IntegrationTest = integrationTest;
+                IntegrationTest = integrationTest;
 #else
-            // In release mode (e.g. on the build server),
-            // never run integration tests.
-            DummyAdbSocket socket = new DummyAdbSocket();
-            Factories.AdbSocketFactory = (endPoint) => socket;
-            IntegrationTest = false;
+                // In release mode (e.g. on the build server),
+                // never run integration tests.
+                DummyAdbSocket socket = new DummyAdbSocket();
+                Factories.AdbSocketFactory = (endPoint) => socket;
+                IntegrationTest = false;
 #endif
-            Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(EndPoint);
+                Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(EndPoint);
 
-            TestClient = new AdbClient();
+                TestClient = new AdbClient();
+
+                Factories.Reset();
+            }
         }
 
         protected static AdbResponse[] NoResponses { get; } = Array.Empty<AdbResponse>();

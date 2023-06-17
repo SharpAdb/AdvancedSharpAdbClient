@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -15,7 +16,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadFramebufferTest()
         {
-            byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
+            byte[] data = File.ReadAllBytes("Assets/framebufferheader-v1.bin");
 
             FramebufferHeader header = FramebufferHeader.Read(data);
 
@@ -28,6 +29,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(8u, header.Blue.Length);
             Assert.Equal(16u, header.Blue.Offset);
             Assert.Equal(32u, header.Bpp);
+            Assert.Equal(14745600u, header.Size);
             Assert.Equal(2560u, header.Height);
             Assert.Equal(1440u, header.Width);
             Assert.Equal(1u, header.Version);
@@ -50,6 +52,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(8u, header.Blue.Length);
             Assert.Equal(16u, header.Blue.Offset);
             Assert.Equal(32u, header.Bpp);
+            Assert.Equal(8294400u, header.Size);
             Assert.Equal(1920u, header.Height);
             Assert.Equal(1080u, header.Width);
             Assert.Equal(2u, header.Version);
@@ -64,9 +67,6 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
-            header.Width = 1;
-            header.Height = 1;
-            header.Size = 4;
             byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
             using Bitmap image = (Bitmap)header.ToImage(framebuffer);
             Assert.NotNull(image);
@@ -91,7 +91,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
 
-            byte[] framebuffer = new byte[] { };
+            byte[] framebuffer = Array.Empty<byte>();
 
             Image image = header.ToImage(framebuffer);
             Assert.Null(image);
