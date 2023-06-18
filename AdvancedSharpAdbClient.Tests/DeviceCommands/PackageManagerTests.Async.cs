@@ -12,8 +12,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient adbClient = new();
 
             adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-            adbClient.Commands["pm install \"/data/test.apk\""] = string.Empty;
-            adbClient.Commands["pm install -r \"/data/test.apk\""] = string.Empty;
+            adbClient.Commands["pm install \"/data/test.apk\""] = "Success";
+            adbClient.Commands["pm install -r \"/data/test.apk\""] = "Success";
 
             DeviceData device = new()
             {
@@ -43,7 +43,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 DummyAdbClient adbClient = new();
 
                 adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-                adbClient.Commands["pm install \"/data/local/tmp/test.txt\""] = string.Empty;
+                adbClient.Commands["pm install \"/data/local/tmp/test.txt\""] = "Success";
                 adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
 
                 DeviceData device = new()
@@ -74,10 +74,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["pm install-create -r"] = "Success: created install session [936013062]";
             adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
             adbClient.Commands["pm install-create -r -p com.google.android.gms"] = "Success: created install session [936013062]";
-            adbClient.Commands["pm install-write 936013062 base.apk \"/data/base.apk\""] = string.Empty;
-            adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\""] = string.Empty;
-            adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\""] = string.Empty;
-            adbClient.Commands["pm install-commit 936013062"] = string.Empty;
+            adbClient.Commands["pm install-write 936013062 base.apk \"/data/base.apk\""] = "Success";
+            adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\""] = "Success";
+            adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\""] = "Success";
+            adbClient.Commands["pm install-commit 936013062"] = "Success";
 
             DeviceData device = new()
             {
@@ -133,10 +133,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
                 adbClient.Commands["pm install-create"] = "Success: created install session [936013062]";
                 adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
-                adbClient.Commands["pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\""] = string.Empty;
-                adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\""] = string.Empty;
-                adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\""] = string.Empty;
-                adbClient.Commands["pm install-commit 936013062"] = string.Empty;
+                adbClient.Commands["pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\""] = "Success";
+                adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\""] = "Success";
+                adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\""] = "Success";
+                adbClient.Commands["pm install-commit 936013062"] = "Success";
                 adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
                 adbClient.Commands["rm \"/data/local/tmp/gapps.txt\""] = string.Empty;
                 adbClient.Commands["rm \"/data/local/tmp/logcat.bin\""] = string.Empty;

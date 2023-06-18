@@ -54,17 +54,13 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </summary>
-        /// <returns>
-        /// A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
-        /// </returns>
+        /// <returns>A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.</returns>
         public override string ToString() => output.ToString();
 
         /// <summary>
         /// Throws an error message if the console output line contains an error message.
         /// </summary>
-        /// <param name="line">
-        /// The line to inspect.
-        /// </param>
+        /// <param name="line">The line to inspect.</param>
         public void ThrowOnError(string line)
         {
             if (!ParsesErrors)

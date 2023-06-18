@@ -23,6 +23,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string SuccessOutput = "Success";
 
         /// <summary>
+        /// The message that indicates the operation indicates a failure.
+        /// </summary>
+        private const string FailureOutput = "Failure";
+
+        /// <summary>
         /// A regular expression that matches output of the success.
         /// </summary>
         private const string SuccessPattern = @"Success:\s+(.*)?";
@@ -31,6 +36,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// A regular expression that matches output that indicates a failure.
         /// </summary>
         private const string FailurePattern = @"Failure(?:\s+\[(.*)\])?";
+
+        /// <summary>
+        /// A regular expression that matches output that indicates a error.
+        /// </summary>
+        private const string ErrorPattern = @"Error:\s+(.*)?";
 
         /// <summary>
         /// Gets the error message if the install was unsuccessful.
@@ -58,6 +68,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             Regex successRegex = SuccessRegex();
             Regex failureRegex = FailureRegex();
+            Regex errorRegex = ErrorRegex();
 
             foreach (string line in lines)
             {
@@ -66,21 +77,36 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     if (line.StartsWith(SuccessOutput))
                     {
                         Match m = successRegex.Match(line);
-                        SuccessMessage = SuccessOutput;
+                        SuccessMessage = string.Empty;
 
                         ErrorMessage = null;
 
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            SuccessMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                            SuccessMessage = msg ?? string.Empty;
                         }
 
                         Success = true;
                     }
-                    else
+                    else if (line.StartsWith(FailureOutput))
                     {
                         Match m = failureRegex.Match(line);
+                        ErrorMessage = UnknownError;
+
+                        SuccessMessage = null;
+
+                        if (m.Success)
+                        {
+                            string msg = m.Groups[1].Value;
+                            ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                        }
+
+                        Success = false;
+                    }
+                    else
+                    {
+                        Match m = errorRegex.Match(line);
                         ErrorMessage = UnknownError;
 
                         SuccessMessage = null;
@@ -103,10 +129,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
         [GeneratedRegex(FailurePattern, RegexOptions.IgnoreCase)]
         private static partial Regex FailureRegex();
+
+        [GeneratedRegex(ErrorPattern, RegexOptions.IgnoreCase)]
+        private static partial Regex ErrorRegex();
 #else
         private static Regex SuccessRegex() => new(SuccessPattern, RegexOptions.IgnoreCase);
 
         private static Regex FailureRegex() => new(FailurePattern, RegexOptions.IgnoreCase);
+
+        private static Regex ErrorRegex() => new(ErrorPattern, RegexOptions.IgnoreCase);
 #endif
     }
 }

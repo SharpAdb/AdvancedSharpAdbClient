@@ -53,8 +53,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["pm list packages -f"] = "";
-            adbClient.Commands["pm uninstall com.example"] = "";
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["pm uninstall com.example"] = "Success";
 
             DeviceData device = new()
             {
@@ -298,7 +298,7 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["pm list packages -f"] = "";
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands[$"dumpsys package {packageName}"] = command;
 
             DeviceData device = new()

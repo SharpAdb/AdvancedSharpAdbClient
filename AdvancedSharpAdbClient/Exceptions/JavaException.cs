@@ -1,0 +1,121 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace AdvancedSharpAdbClient.Exceptions
+{
+    /// <summary>
+    /// Represents an exception with the Java exception output.
+    /// </summary>
+    public partial class JavaException : Exception
+    {
+        private const string UnknownError = "An error occurred in Java";
+
+        private const string ExceptionOutput = "java.lang.";
+        private const string ExceptionPattern = @"java.lang.(\w+Exception):\s+(.*)?";
+
+        /// <summary>
+        /// Gets the name of Java exception.
+        /// </summary>
+        public string JavaName { get; }
+
+        /// <summary>
+        /// Gets a string representation of the immediate frames on the call stack of Java exception.
+        /// </summary>
+        public string JavaStackTrace { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="name">The name of Java exception.</param>
+        /// <param name="stackTrace">The stackTrace of Java exception.</param>
+        public JavaException(string name, string stackTrace) : base(UnknownError)
+        {
+            JavaName = name;
+            JavaStackTrace = stackTrace;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="name">The name of Java exception.</param>
+        /// <param name="message">The message of Java exception.</param>
+        /// <param name="stackTrace">The stackTrace of Java exception.</param>
+        public JavaException(string name, string message, string stackTrace) : base(message)
+        {
+            JavaName = name;
+            JavaStackTrace = stackTrace;
+        }
+
+#if HAS_SERIALIZATION
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="serializationInfo">The serialization info.</param>
+        /// <param name="context">The context.</param>
+#if NET8_0_OR_GREATER
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.", DiagnosticId = "SYSLIB0051", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
+#endif
+        public JavaException(SerializationInfo serializationInfo, StreamingContext context) : base(serializationInfo, context)
+        {
+        }
+#endif
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="name">The name of Java exception.</param>
+        /// <param name="message">The message of Java exception.</param>
+        /// <param name="stackTrace">The stackTrace of Java exception.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public JavaException(string name, string message, string stackTrace, Exception innerException) : base(message, innerException)
+        {
+            JavaName = name;
+            JavaStackTrace = stackTrace;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.
+        /// </summary>
+        /// <param name="lines">A <see cref="IEnumerable{String}"/> which represents a <see cref="JavaException"/>.</param>
+        /// <returns>The equivalent <see cref="JavaException"/>.</returns>
+        public static JavaException Parse(IEnumerable<string> lines)
+        {
+            string exception = string.Empty, message = string.Empty;
+            StringBuilder stackTrace = new();
+            Regex exceptionRegex = ExceptionRegex();
+
+            foreach (string line in lines)
+            {
+                if (line.Length > 0)
+                {
+                    if (line.StartsWith(ExceptionOutput))
+                    {
+                        Match m = exceptionRegex.Match(line);
+                        if (m.Success)
+                        {
+                            exception = m.Groups[1].Value;
+
+                            message = m.Groups[2].Value;
+                            message = message.IsNullOrWhiteSpace() ? UnknownError : message;
+                        }
+                    }
+                    else if (!line.IsNullOrWhiteSpace())
+                    {
+                        stackTrace.AppendLine(line.Trim());
+                    }
+                }
+            }
+
+            return new JavaException(exception, message, stackTrace.ToString().TrimEnd());
+        }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex(ExceptionPattern, RegexOptions.IgnoreCase)]
+        private static partial Regex ExceptionRegex();
+#else
+        private static Regex ExceptionRegex() => new(ExceptionPattern, RegexOptions.IgnoreCase);
+#endif
+    }
+}
