@@ -234,7 +234,7 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
-            await framebuffer.RefreshAsync(cancellationToken).ConfigureAwait(false);
+            await framebuffer.RefreshAsync(true, cancellationToken).ConfigureAwait(false);
 
             // Convert the framebuffer to an image, and return that.
             return framebuffer;

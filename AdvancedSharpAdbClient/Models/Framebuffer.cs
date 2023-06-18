@@ -4,6 +4,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -14,7 +15,6 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public class Framebuffer : IDisposable
     {
-        private readonly AdbClient client;
         private byte[] headerData;
         private bool headerInitialized;
         private bool disposed = false;
@@ -23,44 +23,67 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="client">A <see cref="AdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, AdbClient client)
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        public Framebuffer(DeviceData device, EndPoint endPoint)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
 
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
+            EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
             // Initialize the headerData buffer
+#if !NETFRAMEWORK || NET451_OR_GREATER
+            int size = Marshal.SizeOf<FramebufferHeader>();
+#else
             int size = Marshal.SizeOf(default(FramebufferHeader));
+#endif
             headerData = new byte[size];
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="client">A <see cref="AdbClient"/> which manages the connection with adb.</param>
+        public Framebuffer(DeviceData device, AdbClient client) : this(device, client?.EndPoint) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        public Framebuffer(DeviceData device) : this(device, AdbClient.DefaultEndPoint) { }
+
+        /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; set; }
+        public DeviceData Device { get; }
+
+        /// <summary>
+        /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
+        /// </summary>
+        public EndPoint EndPoint { get; }
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public FramebufferHeader Header { get; set; }
+        public FramebufferHeader Header { get; private set; }
 
         /// <summary>
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public byte[] Data { get; set; }
+        public byte[] Data { get; private set; }
 
         /// <summary>
-        /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
+        /// Refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
-        public void Refresh()
+        /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
+        public void Refresh(bool reset = false)
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint);
+            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
             // Select the target device
             socket.SetDevice(Device);
 
@@ -71,7 +94,7 @@ namespace AdvancedSharpAdbClient
             // The result first is a FramebufferHeader object,
             socket.Read(headerData);
 
-            if (!headerInitialized)
+            if (reset || !headerInitialized)
             {
                 Header = FramebufferHeader.Read(headerData);
                 headerInitialized = true;
@@ -101,13 +124,14 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
+        /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task RefreshAsync(CancellationToken cancellationToken = default)
+        public async Task RefreshAsync(bool reset = false, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(client.EndPoint);
+            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
             // Select the target device
             socket.SetDevice(Device);
 
@@ -118,7 +142,7 @@ namespace AdvancedSharpAdbClient
             // The result first is a FramebufferHeader object,
             _ = await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
-            if (!headerInitialized)
+            if (reset || !headerInitialized)
             {
                 Header = FramebufferHeader.Read(headerData);
                 headerInitialized = true;

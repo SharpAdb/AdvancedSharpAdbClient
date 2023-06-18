@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using Xunit;
 
@@ -15,9 +16,12 @@ namespace AdvancedSharpAdbClient.Tests.Models
         [Fact]
         public void ConstructorNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(null, null));
-            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(new DeviceData(), null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(null, (AdbClient)null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(null, (EndPoint)null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(new DeviceData(), (AdbClient)null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(new DeviceData(), (EndPoint)null));
             _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(null, new AdbClient()));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(null, AdbClient.DefaultEndPoint));
         }
 
         [Fact]
@@ -40,7 +44,7 @@ namespace AdvancedSharpAdbClient.Tests.Models
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device, new AdbClient());
+            using Framebuffer framebuffer = new(device);
 
             lock (FactoriesTests.locker)
             {
@@ -106,7 +110,7 @@ namespace AdvancedSharpAdbClient.Tests.Models
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device, new AdbClient());
+            using Framebuffer framebuffer = new(device);
 
             lock (FactoriesTests.locker)
             {
