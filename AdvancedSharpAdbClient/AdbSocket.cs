@@ -5,11 +5,8 @@
 using AdvancedSharpAdbClient.Exceptions;
 using AdvancedSharpAdbClient.Logs;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -18,20 +15,14 @@ namespace AdvancedSharpAdbClient
 {
 
     /// <summary>
-    /// <para>
-    /// Implements a client for the Android Debug Bridge client-server protocol. Using the client, you
-    /// can send messages to and receive messages from the Android Debug Bridge.
-    /// </para>
-    /// <para>
-    /// The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
+    /// <para>Implements a client for the Android Debug Bridge client-server protocol. Using the client, you
+    /// can send messages to and receive messages from the Android Debug Bridge.</para>
+    /// <para>The <see cref="AdbSocket"/> class implements the raw messaging protocol; that is,
     /// sending and receiving messages. For interacting with the services the Android Debug
-    /// Bridge exposes, use the <see cref="AdbClient"/>.
-    /// </para>
-    /// <para>
-    /// For more information about the protocol that is implemented here, see chapter
+    /// Bridge exposes, use the <see cref="AdbClient"/>.</para>
+    /// <para>For more information about the protocol that is implemented here, see chapter
     /// II Protocol Details, section 1. Client &lt;-&gt;Server protocol at
-    /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.
-    /// </para>
+    /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.</para>
     /// </summary>
     public partial class AdbSocket : IAdbSocket, IDisposable
     {

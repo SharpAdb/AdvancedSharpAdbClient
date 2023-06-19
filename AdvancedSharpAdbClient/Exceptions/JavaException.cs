@@ -78,6 +78,14 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.
         /// </summary>
+        /// <param name="line">A <see cref="string"/> which represents a <see cref="JavaException"/>.</param>
+        /// <returns>The equivalent <see cref="JavaException"/>.</returns>
+        public static JavaException Parse(string line) => Parse(line.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries));
+
+
+        /// <summary>
+        /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.
+        /// </summary>
         /// <param name="lines">A <see cref="IEnumerable{String}"/> which represents a <see cref="JavaException"/>.</param>
         /// <returns>The equivalent <see cref="JavaException"/>.</returns>
         public static JavaException Parse(IEnumerable<string> lines)
@@ -103,7 +111,7 @@ namespace AdvancedSharpAdbClient.Exceptions
                     }
                     else if (!line.IsNullOrWhiteSpace())
                     {
-                        stackTrace.AppendLine(line.Trim());
+                        stackTrace.AppendLine(line.TrimEnd());
                     }
                 }
             }

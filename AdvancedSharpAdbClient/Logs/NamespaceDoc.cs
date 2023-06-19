@@ -10,6 +10,6 @@ namespace AdvancedSharpAdbClient.Logs
     /// The classes in this namespace provide access to the Android system log.
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
-    [CompilerGeneratedAttribute]
+    [CompilerGenerated]
     internal class NamespaceDoc { }
 }

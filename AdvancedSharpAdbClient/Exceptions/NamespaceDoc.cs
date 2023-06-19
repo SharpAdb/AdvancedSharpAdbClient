@@ -11,6 +11,6 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// The classes in this namespace provide <see cref="Exception"/>s.
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
-    [CompilerGeneratedAttribute]
+    [CompilerGenerated]
     internal class NamespaceDoc { }
 }

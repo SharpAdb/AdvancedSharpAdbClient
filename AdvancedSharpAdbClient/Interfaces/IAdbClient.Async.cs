@@ -46,9 +46,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
-        /// <para>
-        /// The local address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
@@ -59,9 +57,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -74,10 +70,8 @@ namespace AdvancedSharpAdbClient
         ///   </item>
         /// </list>
         /// </param>
-        /// <param name="allowRebind">
-        /// If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.
-        /// </param>
+        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
+        /// connection from <paramref name="local"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
@@ -90,9 +84,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
-        /// <para>
-        /// The local address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
@@ -103,9 +95,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -132,9 +122,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to reverse forward the connections.</param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to reverse forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to reverse forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -148,9 +136,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="local">
-        /// <para>
-        /// The local address to reverse forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to reverse forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;

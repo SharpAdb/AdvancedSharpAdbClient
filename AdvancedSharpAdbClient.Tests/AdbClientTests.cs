@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
+using System.Data.Common;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -1169,6 +1170,164 @@ namespace AdvancedSharpAdbClient.Tests
             doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
 
             Assert.Equal(doc, xml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Click(DeviceData, int, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void ClickTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:input tap 100 100"
+            };
+
+            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+        at com.android.commands.input.Input.access$200(Input.java:41)
+        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+        at com.android.commands.input.Input.onRun(Input.java:107)
+        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+        at com.android.commands.input.Input.main(Input.java:71)
+        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+Caused by: android.os.RemoteException: Remote stack trace:
+        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+        at android.os.Binder.execTransactInternal(Binder.java:1165)
+        at android.os.Binder.execTransact(Binder.java:1134)");
+            using MemoryStream shellStream = new(streamData);
+
+            JavaException exception = Assert.Throws<JavaException>(() =>
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.Click(device, 100, 100)));
+
+            Assert.Equal("SecurityException", exception.JavaName);
+            Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
+            Assert.Equal(@"        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+        at com.android.commands.input.Input.access$200(Input.java:41)
+        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+        at com.android.commands.input.Input.onRun(Input.java:107)
+        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+        at com.android.commands.input.Input.main(Input.java:71)
+        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+Caused by: android.os.RemoteException: Remote stack trace:
+        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+        at android.os.Binder.execTransactInternal(Binder.java:1165)
+        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Click(DeviceData, Cords)"/> method.
+        /// </summary>
+        [Fact]
+        public void ClickCordsTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:input tap 100 100"
+            };
+
+            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+        at com.android.commands.input.Input.access$200(Input.java:41)
+        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+        at com.android.commands.input.Input.onRun(Input.java:107)
+        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+        at com.android.commands.input.Input.main(Input.java:71)
+        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+Caused by: android.os.RemoteException: Remote stack trace:
+        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+        at android.os.Binder.execTransactInternal(Binder.java:1165)
+        at android.os.Binder.execTransact(Binder.java:1134)");
+            using MemoryStream shellStream = new(streamData);
+
+            JavaException exception = Assert.Throws<JavaException>(() =>
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.Click(device, new Cords(100, 100))));
+
+            Assert.Equal("SecurityException", exception.JavaName);
+            Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
+            Assert.Equal(@"        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+        at android.os.Parcel.createException(Parcel.java:2357)
+        at android.os.Parcel.readException(Parcel.java:2340)
+        at android.os.Parcel.readException(Parcel.java:2282)
+        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+        at com.android.commands.input.Input.access$200(Input.java:41)
+        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+        at com.android.commands.input.Input.onRun(Input.java:107)
+        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+        at com.android.commands.input.Input.main(Input.java:71)
+        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+Caused by: android.os.RemoteException: Remote stack trace:
+        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+        at android.os.Binder.execTransactInternal(Binder.java:1165)
+        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace);
         }
 
         /// <summary>

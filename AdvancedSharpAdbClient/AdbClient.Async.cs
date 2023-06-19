@@ -712,8 +712,8 @@ namespace AdvancedSharpAdbClient
             XmlDocument doc = new();
             string xmlString = await DumpScreenStringAsync(device, cancellationToken);
             if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR")
-                && !xmlString.StartsWith("java.lang.Exception"))
+                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
+                && !xmlString.StartsWith("java.lang."))
             {
                 doc.LoadXml(xmlString);
                 return doc;
@@ -728,8 +728,8 @@ namespace AdvancedSharpAdbClient
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = await DumpScreenStringAsync(device, cancellationToken);
             if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR")
-                && !xmlString.StartsWith("java.lang.Exception"))
+                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
+                && !xmlString.StartsWith("java.lang."))
             {
                 doc.LoadXml(xmlString);
                 return doc;
@@ -749,15 +749,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR")) // error or ERROR
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -774,15 +778,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR"))
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -799,15 +807,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR"))
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -824,15 +836,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR"))
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -1002,15 +1018,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR"))
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new InvalidKeyEventException("KeyEvent is invalid");
             }
@@ -1027,15 +1047,19 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
 #if !NET35
-            string result = await reader.ReadToEndAsync(
+            string result = (await reader.ReadToEndAsync(
 #if NET7_0_OR_GREATER
                 cancellationToken
 #endif
-                );
+                )).TrimStart();
 #else
-            string result = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
+            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
 #endif
-            if (result.ToUpper().Contains("ERROR"))
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new InvalidTextException();
             }

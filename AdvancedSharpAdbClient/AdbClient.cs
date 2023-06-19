@@ -18,22 +18,18 @@ using System.Xml;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// <para>
-    /// Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
-    /// adb server and devices that are connected to that adb server.
-    /// </para>
-    /// <para>
-    /// For example, to fetch a list of all devices that are currently connected to this PC, you can
-    /// call the <see cref="GetDevices"/> method.
-    /// </para>
-    /// <para>
-    /// To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/>
-    /// method.
-    /// </para>
+    /// <para>Implements the <see cref="IAdbClient"/> interface, and allows you to interact with the
+    /// adb server and devices that are connected to that adb server.</para>
+    /// <para>For example, to fetch a list of all devices that are currently connected to this PC, you can
+    /// call the <see cref="GetDevices"/> method.</para>
+    /// <para>To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/>
+    /// method.</para>
     /// </summary>
-    /// <remarks><para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso></para>
+    /// <remarks>
+    /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/SERVICES.TXT">SERVICES.TXT</seealso></para>
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
-    /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para></remarks>
+    /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
+    /// </remarks>
     public partial class AdbClient : IAdbClient
     {
         /// <summary>
@@ -773,7 +769,7 @@ namespace AdvancedSharpAdbClient
             XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
             if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
                 && !xmlString.StartsWith("java.lang.Exception"))
             {
                 doc.LoadXml(xmlString);
@@ -789,7 +785,7 @@ namespace AdvancedSharpAdbClient
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
             if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR")
+                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
                 && !xmlString.StartsWith("java.lang.Exception"))
             {
                 doc.LoadXml(xmlString);
@@ -809,7 +805,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input tap {cords.X} {cords.Y}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR")) // error or ERROR
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -825,7 +826,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input tap {x} {y}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -841,7 +847,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input swipe {first.Cords.X} {first.Cords.Y} {second.Cords.X} {second.Cords.Y} {speed}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -857,7 +868,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input swipe {x1} {y1} {x2} {y2} {speed}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -975,7 +991,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input keyevent {key}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new InvalidKeyEventException("KeyEvent is invalid");
             }
@@ -991,7 +1012,12 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:input text {text}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            if (reader.ReadToEnd().ToUpper().Contains("ERROR"))
+            string result = reader.ReadToEnd().TrimStart();
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
             {
                 throw new InvalidTextException();
             }

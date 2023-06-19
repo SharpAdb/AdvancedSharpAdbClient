@@ -10,6 +10,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// The classes in this namespace provide Device Commands of adb.
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
-    [CompilerGeneratedAttribute]
+    [CompilerGenerated]
     internal class NamespaceDoc { }
 }

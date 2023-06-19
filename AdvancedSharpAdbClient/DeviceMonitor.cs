@@ -12,15 +12,11 @@ using System.Threading;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// <para>
     /// A Device monitor. This connects to the Android Debug Bridge and get device and
     /// debuggable process information from it.
-    /// </para>
     /// </summary>
     /// <example>
-    /// <para>
-    /// To receive notifications when devices connect to or disconnect from your PC, you can use the following code:
-    /// </para>
+    /// <para>To receive notifications when devices connect to or disconnect from your PC, you can use the following code:</para>
     /// <code>
     /// void Test()
     /// {

@@ -5,15 +5,11 @@
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// <para>
-    /// Contains information about a color element. Information about each pixel on the screen
+    /// <para>Contains information about a color element. Information about each pixel on the screen
     /// is contained in a byte array (for example, a 4-byte array for 32-bit color depths), and
-    /// a certain number of bits are reserved for each color.
-    /// </para>
-    /// <para>
-    /// For example, in a 24-bit RGB structure, the first byte contains the red color,
-    /// the next byte the green color and the last byte the blue color.
-    /// </para>
+    /// a certain number of bits are reserved for each color.</para>
+    /// <para>For example, in a 24-bit RGB structure, the first byte contains the red color,
+    /// the next byte the green color and the last byte the blue color.</para>
     /// </summary>
     public struct ColorData
     {

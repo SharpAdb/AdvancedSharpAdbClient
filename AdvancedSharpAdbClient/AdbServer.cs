@@ -9,17 +9,13 @@ using System.Net.Sockets;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// <para>
-    /// Provides methods for interacting with the adb server. The adb server must be running for
-    /// the rest of the <c>Managed.Adb</c> library to work.
-    /// </para>
-    /// <para>
-    /// The adb server is a background process that runs on the host machine.
+    /// <para>Provides methods for interacting with the adb server. The adb server must be running for
+    /// the rest of the <c>Managed.Adb</c> library to work.</para>
+    /// <para>The adb server is a background process that runs on the host machine.
     /// Its purpose if to sense the USB ports to know when devices are attached/removed,
     /// as well as when emulator instances start/stop. The ADB server is really one
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
-    /// between clients and devices.
-    /// </para>
+    /// between clients and devices.</para>
     /// </summary>
     public partial class AdbServer : IAdbServer
     {

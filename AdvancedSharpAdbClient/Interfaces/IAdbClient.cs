@@ -45,13 +45,11 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <returns>A list of devices that are connected.</returns>
         /// <example>
-        /// <para>
-        /// The following example list all Android devices that are currently connected to this PC:
-        /// </para>
+        /// <para>The following example list all Android devices that are currently connected to this PC:</para>
         /// <code>
-        /// var devices = AdbClient.Instance.GetDevices();
+        /// var devices = new AdbClient().GetDevices();
         /// 
-        /// foreach(var device in devices)
+        /// foreach (var device in devices)
         /// {
         ///     Console.WriteLine(device.Name);
         /// }
@@ -77,9 +75,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
-        /// <para>
-        /// The local address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
@@ -90,9 +86,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -117,9 +111,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to forward the connections.</param>
         /// <param name="local">
-        /// <para>
-        /// The local address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
@@ -130,9 +122,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -157,9 +147,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to reverse forward the connections.</param>
         /// <param name="remote">
-        /// <para>
-        /// The remote address to reverse forward. This value can be in one of:
-        /// </para>
+        /// <para>The remote address to reverse forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
@@ -173,9 +161,7 @@ namespace AdvancedSharpAdbClient
         /// </list>
         /// </param>
         /// <param name="local">
-        /// <para>
-        /// The local address to reverse forward. This value can be in one of:
-        /// </para>
+        /// <para>The local address to reverse forward. This value can be in one of:</para>
         /// <list type="ordered">
         ///   <item>
         ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;

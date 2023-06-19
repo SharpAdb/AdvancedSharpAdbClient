@@ -7,8 +7,9 @@ using System.Runtime.CompilerServices;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
+    /// 
     /// <para>
-    /// SharpAdbClient is a .NET library that allows.NET applications to communicate with Android devices.
+    /// AdvancedSharpAdbClient is a .NET library that allows.NET applications to communicate with Android devices.
     /// It provides a.NET implementation of the <c>adb</c> protocol, giving more flexibility to the developer than launching an
     /// <c>adb.exe</c> process and parsing the console output.
     /// </para>
@@ -27,23 +28,33 @@ namespace AdvancedSharpAdbClient
     /// To be notified when Android devices connect to or disconnect from your PC, you can use the <see cref="DeviceMonitor"/>
     /// class.
     /// </para>
+    /// 
     /// </summary>
     ///
     /// <example>
+    /// 
     /// <para>
     /// To list all Android devices that are connected to your PC, you can use the following code:
     /// </para>
     ///
     /// <code>
-    /// var devices = devices = AdbClient.Instance.GetDevices();
+    /// var devices = devices = new AdbClient().GetDevices();
     ///
     /// foreach(var device in devices)
     /// {
-    ///     Console.WriteLine(device.Name
+    ///     Console.WriteLine(device.Name);
     /// }
     /// </code>
+    /// 
     /// </example>
-    /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
-    [CompilerGeneratedAttribute]
+    /// 
+    /// <remarks>
+    /// 
+    /// <c>
+    /// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+    /// </c>
+    /// 
+    /// </remarks>
+    [CompilerGenerated]
     internal class NamespaceDoc { }
 }

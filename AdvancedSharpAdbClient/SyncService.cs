@@ -15,13 +15,11 @@ namespace AdvancedSharpAdbClient
     /// list, download and upload files on the device.
     /// </summary>
     /// <example>
-    /// <para>
-    /// To send files to or receive files from your Android device, you can use the following code:
-    /// </para>
+    /// <para>To send files to or receive files from your Android device, you can use the following code:</para>
     /// <code>
     /// void DownloadFile()
     /// {
-    ///     var device = AdbClient.Instance.GetDevices().First();
+    ///     var device = new AdbClient().GetDevices().First();
     ///
     ///     using (SyncService service = new SyncService(new AdbSocket(), device))
     ///     using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
@@ -32,7 +30,7 @@ namespace AdvancedSharpAdbClient
     ///
     /// void UploadFile()
     /// {
-    ///     var device = AdbClient.Instance.GetDevices().First();
+    ///     var device = new AdbClient().GetDevices().First();
     ///
     ///     using (SyncService service = new SyncService(new AdbSocket(), device))
     ///     using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
