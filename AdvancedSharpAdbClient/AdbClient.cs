@@ -33,14 +33,14 @@ namespace AdvancedSharpAdbClient
     public partial class AdbClient : IAdbClient
     {
         /// <summary>
-        /// The port at which the Android Debug Bridge server listens by default.
-        /// </summary>
-        public const int AdbServerPort = 5037;
-
-        /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
         public const int DefaultPort = 5555;
+
+        /// <summary>
+        /// The port at which the Android Debug Bridge server listens by default.
+        /// </summary>
+        public const int DefaultAdbServerPort = 5037;
 
         /// <summary>
         /// Gets a new instance of the <see cref="AdbClient"/> class.
@@ -117,6 +117,11 @@ namespace AdvancedSharpAdbClient
         /// Get or set default encoding
         /// </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
+
+        /// <summary>
+        /// Gets the current port at which the Android Debug Bridge server listens.
+        /// </summary>
+        public static int AdbServerPort => int.TryParse(Environment.GetEnvironmentVariable("ANDROID_ADB_SERVER_PORT"), out int result) ? result : DefaultAdbServerPort;
 
         /// <summary>
         /// The Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.

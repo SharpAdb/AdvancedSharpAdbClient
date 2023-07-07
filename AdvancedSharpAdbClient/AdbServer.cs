@@ -79,6 +79,14 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
+        /// <param name="adbClient">The current ADB client that manages the connection.</param>
+        public AdbServer(IAdbClient adbClient) : this(adbClient, Factories.AdbCommandLineClientFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
         /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
         public AdbServer(Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(new AdbClient(), adbCommandLineClientFactory)
         {
