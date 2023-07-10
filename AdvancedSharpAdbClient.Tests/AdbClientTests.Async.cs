@@ -20,6 +20,9 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public partial class AdbClientTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAdbVersionAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetAdbVersionAsyncTest()
         {
@@ -45,6 +48,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(32, version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.KillAdbAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void KillAdbAsyncTest()
         {
@@ -60,6 +66,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.KillAdbAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetDevicesAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetDevicesAsyncTest()
         {
@@ -93,31 +102,45 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("donatello", device.Name);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void CreateForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 (device) => TestClient.CreateForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
-
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateReverseForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void CreateReverseAsyncTest() =>
             await RunCreateReverseAsyncTest(
                 (device) => TestClient.CreateReverseForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForwardAsync(IAdbClient, DeviceData, int, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void CreateTcpForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 (device) => TestClient.CreateForwardAsync(device, 3, 4),
                 "tcp:3;tcp:4");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.CreateForwardAsync(IAdbClient, DeviceData, int, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void CreateSocketForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 (device) => TestClient.CreateForwardAsync(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void CreateDuplicateForwardAsyncTest()
         {
@@ -139,6 +162,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.CreateForwardAsync(Device, "tcp:1", "tcp:2", false)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveForwardAsync(DeviceData, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RemoveForwardAsyncTest()
         {
@@ -154,6 +180,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveForwardAsync(Device, 1));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveReverseForwardAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RemoveReverseForwardAsyncTest()
         {
@@ -176,6 +205,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveReverseForwardAsync(Device, "localabstract:test"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllForwardsAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RemoveAllForwardsAsyncTest()
         {
@@ -191,6 +223,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveAllForwardsAsync(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RemoveAllReverseForwardsAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RemoveAllReversesAsyncTest()
         {
@@ -213,6 +248,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RemoveAllReverseForwardsAsync(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListForwardAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ListForwardAsyncTest()
         {
@@ -241,6 +279,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:2", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ListReverseForwardAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ListReverseForwardAsyncTest()
         {
@@ -275,6 +316,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("tcp:100", forwards[0].Remote);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncTest()
         {
@@ -313,6 +357,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncUnresponsiveTest()
         {
@@ -347,6 +394,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetFrameBufferAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public void GetFrameBufferAsyncTest()
         {
@@ -415,6 +465,9 @@ namespace AdvancedSharpAdbClient.Tests
             framebuffer.Dispose();
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, CancellationToken, LogId[])"/> method.
+        /// </summary>
         [Fact]
         public async void RunLogServiceAsyncTest()
         {
@@ -455,6 +508,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(3, logs.Count);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RebootAsync(string, DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RebootAsyncTest()
         {
@@ -471,6 +527,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RebootAsync(Device));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPAddress, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncIPAddressTest() =>
             await RunPairAsyncTest(
@@ -478,6 +537,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:5555",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.PairAsync(DnsEndPoint, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncDnsEndpointTest() =>
             await RunPairAsyncTest(
@@ -485,6 +547,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "localhost:1234",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPEndPoint, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncIPEndpointTest() =>
             await RunPairAsyncTest(
@@ -492,6 +557,9 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:4321",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, string, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncHostEndpointTest() =>
             await RunPairAsyncTest(
@@ -499,62 +567,101 @@ namespace AdvancedSharpAdbClient.Tests
                 "localhost:9926",
                 "114514");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPAddress, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncIPAddressNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.PairAsync(DnsEndPoint, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncDnsEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync(null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPEndPoint, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncIPEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPEndPoint)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, string, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PairAsyncHostEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((string)null, "114514"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPAddress, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncIPAddressTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(IPAddress.Loopback),
                 "127.0.0.1:5555");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ConnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncDnsEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPEndPoint, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncIPEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, string, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncHostEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync("localhost:9926"),
                 "localhost:9926");
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPAddress, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncIPAddressNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPAddress)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ConnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncDnsEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPEndPoint, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncIPEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPEndPoint)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, string, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ConnectAsyncHostEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((string)null));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DisconnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void DisconnectAsyncTest()
         {
@@ -568,6 +675,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.DisconnectAsync(new DnsEndPoint("localhost", 5555)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RootAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RootAsyncTest()
         {
@@ -599,6 +709,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.RootAsync(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.UnrootAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void UnrootAsyncTest()
         {
@@ -630,6 +743,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.UnrootAsync(device)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, string[])"/> method.
+        /// </summary>
         [Fact]
         public async void InstallAsyncTest()
         {
@@ -687,6 +803,9 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCreateAsync(DeviceData, string, string[])"/> method.
+        /// </summary>
         [Fact]
         public async void InstallCreateAsyncTest()
         {
@@ -721,6 +840,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("936013062", session);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void InstallWriteAsyncTest()
         {
@@ -778,6 +900,9 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallCommitAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void InstallCommitAsyncTest()
         {
@@ -808,6 +933,9 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.InstallCommitAsync(device, "936013062"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetFeatureSetAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetFeatureSetAsyncTest()
         {
@@ -843,6 +971,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("stat_v2", features.Last());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void DumpScreenStringAsyncTest()
         {
@@ -878,6 +1009,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void DumpScreenAsyncTest()
         {
@@ -916,6 +1050,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(doc, xml);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ClickAsync(DeviceData, int, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ClickAsyncTest()
         {
@@ -992,6 +1129,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ClickAsync(DeviceData, Cords, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ClickCordsAsyncTest()
         {
@@ -1006,32 +1146,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 "host:transport:009d1cd696d5194a",
                 "shell:input tap 100 100"
             };
-
-            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
-        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
-        at android.os.Parcel.createException(Parcel.java:2357)
-        at android.os.Parcel.readException(Parcel.java:2340)
-        at android.os.Parcel.readException(Parcel.java:2282)
-        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
-        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
-        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
-        at com.android.commands.input.Input.access$200(Input.java:41)
-        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
-        at com.android.commands.input.Input$InputTap.run(Input.java:217)
-        at com.android.commands.input.Input.onRun(Input.java:107)
-        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
-        at com.android.commands.input.Input.main(Input.java:71)
-        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
-        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
-Caused by: android.os.RemoteException: Remote stack trace:
-        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
-        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
-        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
-        at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)");
+            
+            byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
             using MemoryStream shellStream = new(streamData);
 
-            JavaException exception = await Assert.ThrowsAsync<JavaException>(() =>
+            _ = await Assert.ThrowsAsync<ElementNotFoundException>(() =>
             RunTestAsync(
                 new AdbResponse[]
                 {
@@ -1042,32 +1161,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 requests,
                 shellStream,
                 () => TestClient.ClickAsync(device, new Cords(100, 100))));
-
-            Assert.Equal("SecurityException", exception.JavaName);
-            Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
-            Assert.Equal(@"        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
-        at android.os.Parcel.createException(Parcel.java:2357)
-        at android.os.Parcel.readException(Parcel.java:2340)
-        at android.os.Parcel.readException(Parcel.java:2282)
-        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
-        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
-        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
-        at com.android.commands.input.Input.access$200(Input.java:41)
-        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
-        at com.android.commands.input.Input$InputTap.run(Input.java:217)
-        at com.android.commands.input.Input.onRun(Input.java:107)
-        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
-        at com.android.commands.input.Input.main(Input.java:71)
-        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
-        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
-Caused by: android.os.RemoteException: Remote stack trace:
-        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
-        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
-        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
-        at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElementAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void FindElementAsyncTest()
         {
@@ -1106,6 +1204,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 });
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindElementsAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void FindElementsAsyncTest()
         {
