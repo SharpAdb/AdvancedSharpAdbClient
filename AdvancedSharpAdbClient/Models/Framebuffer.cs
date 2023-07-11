@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
             EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
             // Initialize the headerData buffer
-#if WINDOWS_UWP
+#if NETCORE || WINDOWS_UWP
             headerData = new byte[56];
 #else
 #if !NETFRAMEWORK || NET451_OR_GREATER
