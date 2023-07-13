@@ -57,7 +57,6 @@
                      or '$(TargetFramework)' == 'netstandard1.3'
                      or '$(TargetFramework)' == 'uap10.0'">
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
