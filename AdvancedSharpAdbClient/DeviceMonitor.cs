@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    public partial class DeviceMonitor : IDeviceMonitor, IDisposable
+    public partial class DeviceMonitor : IDeviceMonitor
     {
 #if HAS_LOGGER
         /// <summary>

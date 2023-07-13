@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
     /// II Protocol Details, section 1. Client &lt;-&gt;Server protocol at
     /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.</para>
     /// </summary>
-    public partial class AdbSocket : IAdbSocket, IDisposable
+    public partial class AdbSocket : IAdbSocket
     {
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
@@ -52,6 +52,43 @@ namespace AdvancedSharpAdbClient
 #endif
             )
         {
+            socket = new TcpSocket();
+            socket.Connect(endPoint);
+            socket.ReceiveBufferSize = ReceiveBufferSize;
+#if HAS_LOGGER
+            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
+#endif
+        }
+#if !HAS_LOGGER
+#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
+
+#if !HAS_LOGGER
+#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
+#endif
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbSocket"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the Android Debug Bridge is listening for clients.</param>
+        /// <param name="port">The port at which the Android Debug Bridge is listening for clients.</param>
+        /// <param name="logger">The logger to use when logging.</param>
+        public AdbSocket(string host, int port
+#if HAS_LOGGER
+            , ILogger<AdbSocket> logger = null
+#endif
+            )
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            DnsEndPoint endPoint = values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
+            
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;

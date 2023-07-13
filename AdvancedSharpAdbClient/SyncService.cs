@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    public partial class SyncService : ISyncService, IDisposable
+    public partial class SyncService : ISyncService
     {
         /// <summary>
         /// The maximum length of a path on the remote device.
@@ -203,7 +203,7 @@ namespace AdvancedSharpAdbClient
             int time = (int)timestamp.ToUnixTimeSeconds();
             Socket.SendSyncRequest(SyncCommand.DONE, time);
 
-            // read the result, in a byte array containing 2 ints
+            // read the result, in a byte array containing 2 int
             // (id, size)
             SyncCommand result = Socket.ReadSyncResponse();
 

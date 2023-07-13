@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
-        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
+        Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/> into the specified offset position of the

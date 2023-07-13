@@ -74,8 +74,8 @@ namespace AdvancedSharpAdbClient
             socket.Send(buffer, offset, size, socketFlags);
 
         /// <inheritdoc/>
-        public int Receive(byte[] buffer, int offset, SocketFlags socketFlags) =>
-            socket.Receive(buffer, offset, socketFlags);
+        public int Receive(byte[] buffer, int size, SocketFlags socketFlags) =>
+            socket.Receive(buffer, size, socketFlags);
 
         /// <inheritdoc/>
         public Stream GetStream() => new NetworkStream(socket);
