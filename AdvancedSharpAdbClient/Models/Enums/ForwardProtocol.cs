@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Represents a protocol which is being forwarded over adb.
     /// </summary>
-    public enum ForwardProtocol
+    public enum ForwardProtocol : byte
     {
         /// <summary>
         /// Enables the forwarding of a TCP port.

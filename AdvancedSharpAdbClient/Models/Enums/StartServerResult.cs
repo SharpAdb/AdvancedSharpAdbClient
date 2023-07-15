@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Gives information about a <see cref="AdbServer.StartServer(string, bool)"/> operation.
     /// </summary>
-    public enum StartServerResult
+    public enum StartServerResult : byte
     {
         /// <summary>
         /// The adb server was already running. The server was not restarted.

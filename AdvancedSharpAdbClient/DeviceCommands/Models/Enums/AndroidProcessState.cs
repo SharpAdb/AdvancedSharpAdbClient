@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Represents the state of a process running on an Android device.
     /// </summary>
-    public enum AndroidProcessState
+    public enum AndroidProcessState : byte
     {
         /// <summary>
         /// The process state is unknown.

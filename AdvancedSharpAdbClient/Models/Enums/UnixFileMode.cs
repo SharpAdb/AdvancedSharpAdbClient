@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
     /// Describes the properties of a file on an Android device.
     /// </summary>
     [Flags]
-    public enum UnixFileMode
+    public enum UnixFileMode : ushort
     {
         /// <summary>
         /// The mask that can be used to retrieve the file type from a <see cref="UnixFileMode"/>.

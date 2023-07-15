@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Represents the different types of values that can be stored in an event log entry.
     /// </summary>
-    public enum EventLogType
+    public enum EventLogType : byte
     {
         /// <summary>
         /// The value is a four-byte signed integer.

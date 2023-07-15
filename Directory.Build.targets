@@ -6,10 +6,6 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="!$(IsTestProject)">
-    <None Include="$(MSBuildThisFileDirectory)logo.png" Pack="true" PackagePath="\Icon.png" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'">
     <PackageReference Include="Microsoft.NETCore" Version="5.0.2" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.2" PrivateAssets="all" IsImplicitlyDefined="true" />
@@ -17,7 +13,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0'
                      or '$(TargetFramework)' == 'uap10.0.15138.0'">
-    <EmbeddedResource Remove="Properties\AdvancedSharpAdbClient.rd.xml" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.14" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>
 

@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// The status of an application if it is stopped or running in foreground or background.
     /// </summary>
-    public enum AppStatus
+    public enum AppStatus : byte
     {
         /// <summary>
         /// The application is stopped.

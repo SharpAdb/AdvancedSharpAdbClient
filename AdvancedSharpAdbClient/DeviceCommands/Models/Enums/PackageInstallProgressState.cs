@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the state of the installation.
     /// </summary>
-    public enum PackageInstallProgressState
+    public enum PackageInstallProgressState : byte
     {
         /// <summary>
         /// Uploading packages to the device.

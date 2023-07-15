@@ -23,6 +23,10 @@
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\logo.png" Pack="true" PackagePath="\Icon.png" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'">
     <PackageReference Include="LinqBridge" Version="1.3.0" />
   </ItemGroup>

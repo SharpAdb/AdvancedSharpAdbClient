@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/adb.h"/></para>
     /// <para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/transport.cpp"/></para>
     /// </remarks>
-    public enum DeviceState
+    public enum DeviceState : byte
     {
         /// <summary>
         /// The instance is not connected to adb or is not responding.

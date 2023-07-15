@@ -30,6 +30,11 @@ namespace AdvancedSharpAdbClient.Logs
         public DateTimeOffset TimeStamp { get; set; }
 
         /// <summary>
+        /// Gets or sets the nanoseconds at which the message was logged.
+        /// </summary>
+        public int NanoSeconds { get; set; }
+
+        /// <summary>
         /// Gets or sets the log id (v3) of the payload effective UID of logger (v2);
         /// this value is not available for v1 entries.
         /// </summary>

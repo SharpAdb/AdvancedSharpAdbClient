@@ -126,6 +126,7 @@ namespace AdvancedSharpAdbClient.Logs
                             ProcessId = pid,
                             ThreadId = tid,
                             TimeStamp = timestamp,
+                            NanoSeconds = nsec,
                             Id = id,
                             Priority = (Priority)priority,
                             Message = message,
@@ -142,6 +143,7 @@ namespace AdvancedSharpAdbClient.Logs
                             ProcessId = pid,
                             ThreadId = tid,
                             TimeStamp = timestamp,
+                            NanoSeconds = nsec,
                             Id = id
                         };
 
@@ -169,6 +171,7 @@ namespace AdvancedSharpAdbClient.Logs
                         ProcessId = pid,
                         ThreadId = tid,
                         TimeStamp = timestamp,
+                        NanoSeconds = nsec,
                         Id = id
                     };
             }
