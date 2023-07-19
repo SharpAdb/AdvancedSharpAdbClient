@@ -8,19 +8,19 @@ AdvancedSharpAdbClient is a .NET library that allows .NET applications to commun
 It provides a .NET implementation of the `adb` protocol, giving more flexibility to the developer than launching an 
 `adb.exe` process and parsing the console output.
 
-It's upgraded verion of [SharpAdbClient](https://github.com/quamotion/madb).
+It's upgraded version of [SharpAdbClient](https://github.com/quamotion/madb).
 Added important features.
 
 ## Support Platform
 - .NET Framework 2.0 (Without Task)
-- .NET Framework 3.5 (Maybe unstable)
+- .NET Framework 3.5
 - .NET Framework 4.0 (Need [Microsoft.Bcl.Async](https://www.nuget.org/packages/Microsoft.Bcl.Async))
 - .NET Framework 4.5.2
 - .NET Framework 4.6.2
 - .NET Framework 4.7.2
 - .NET Framework 4.8.1
-- .NET Standard 1.3 (Not fully supported)
-- .NET Standard 2.0 (Support UWP if you don't use unsupported api like Process)
+- .NET Standard 1.3
+- .NET Standard 2.0
 - .NET Standard 2.1
 - .NET Core 5.0 (Support UAP 10.0 and UAP 10.0.15138.0)
 - .NET Core App 2.1
@@ -266,9 +266,9 @@ static void Main(string[] args)
 }
 ```
 
-### Sending keyevents
+### Sending key events
 
-You can see keyevents here https://developer.android.com/reference/android/view/KeyEvent#constants
+You can see key events here https://developer.android.com/reference/android/view/KeyEvent#constants
 
 ```cs
 static void Main(string[] args)
@@ -279,7 +279,7 @@ static void Main(string[] args)
 }
 ```
 
-The SendKeyEvent method throw InvalidKeyEventException if keyevent is incorrect
+The SendKeyEvent method throw InvalidKeyEventException if key event is incorrect
 
 ```cs
 try
