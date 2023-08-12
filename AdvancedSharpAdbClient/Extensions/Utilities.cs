@@ -229,6 +229,8 @@ namespace AdvancedSharpAdbClient
         public static bool IsWindowsPlatform() =>
 #if HAS_RUNTIMEINFORMATION
             RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+#elif NETCORE
+            true;
 #else
             Environment.OSVersion.Platform
                 is PlatformID.Win32S
@@ -246,6 +248,8 @@ namespace AdvancedSharpAdbClient
             || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
 #endif
             ;
+#elif NETCORE
+            false;
 #else
             Environment.OSVersion.Platform
                 is PlatformID.Unix

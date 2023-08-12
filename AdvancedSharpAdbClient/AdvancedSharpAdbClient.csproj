@@ -3,20 +3,29 @@
   <PropertyGroup>
     <FullTargets>False</FullTargets>
     <ImportAsync>True</ImportAsync>
+    <UseOldLogger>False</UseOldLogger>
     <NoWarn>CS1685;CA2254</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' == 'True'">
     <NoWarn>NU1603;$(NoWarn)</NoWarn>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' == 'True'">netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">net2.0-client;net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0;net6.0-windows10.0.17763.0;net8.0;net8.0-windows10.0.17763.0;netcore50;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1;uap10.0;uap10.0.15138.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' != 'True'">net6.0;net8.0;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True'">$(TargetFrameworks);net8.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;net6.0-windows10.0.17763.0;net8.0-windows10.0.17763.0;netcore50;uap10.0;uap10.0.15138.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' != 'True'">
-    <TargetFramework Condition="'$(GITHUB_ACTIONS)' == 'True'">netstandard2.0</TargetFramework>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">net2.0-client;net3.5-client;net4.5.2;net4.8.1;net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' != 'True'">net6.0;net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True'">$(TargetFrameworks);net6.0;net8.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.5.2;net4.8.1</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.15138.0'">
+    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,52 +48,37 @@
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'">
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'">
+    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'">
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
-    <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.15138.0'">
-    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
-  </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'
                      or '$(TargetFramework)' == 'netcoreapp1.0'
                      or '$(TargetFramework)' == 'netcoreapp1.1'
                      or '$(TargetFramework)' == 'netstandard1.3'
                      or '$(TargetFramework)' == 'uap10.0'">
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+  <ItemGroup Condition="'$(UseOldLogger)' == 'True'
+                   and ('$(TargetFramework)' == 'net4.5.2'
                      or '$(TargetFramework)' == 'netcore50'
                      or '$(TargetFramework)' == 'netcoreapp1.0'
                      or '$(TargetFramework)' == 'netcoreapp1.1'
                      or '$(TargetFramework)' == 'netstandard1.3'
-                     or '$(TargetFramework)' == 'uap10.0'">
+                     or '$(TargetFramework)' == 'uap10.0')">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
-                     or '$(TargetFramework)' == 'net4.7.2'
-                     or '$(TargetFramework)' == 'net4.8.1'
-                     or '$(TargetFramework)' == 'net6.0'
-                     or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
-                     or '$(TargetFramework)' == 'net8.0'
-                     or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
-                     or '$(TargetFramework)' == 'netcoreapp2.1'
-                     or '$(TargetFramework)' == 'netcoreapp3.1'
-                     or '$(TargetFramework)' == 'netstandard2.0'
-                     or '$(TargetFramework)' == 'netstandard2.1'
-                     or '$(TargetFramework)' == 'uap10.0.15138.0'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                    and '$(TargetFramework)' != 'net3.5-client'
+                    and '$(TargetFramework)' != 'net4.0-client'
+                    and '$(TargetFramework)' != 'net4.5.2'
+                    and '$(TargetFramework)' != 'netcore50'
+                    and '$(TargetFramework)' != 'netcoreapp1.0'
+                    and '$(TargetFramework)' != 'netcoreapp1.1'
+                    and '$(TargetFramework)' != 'netstandard1.3'
+                    and '$(TargetFramework)' != 'uap10.0'">
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
@@ -108,16 +102,34 @@
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
                         and '$(TargetFramework)' != 'net3.5-client'
-                        and '$(TargetFramework)' != 'net4.0-client'">
-    <DefineConstants>$(DefineConstants);HAS_LOGGER;HAS_BUFFERS;HAS_RUNTIMEINFORMATION</DefineConstants>
+                        and '$(TargetFramework)' != 'net4.0-client'
+                        and '$(TargetFramework)' != 'net4.5.2'
+                        and '$(TargetFramework)' != 'net4.6.2'
+                        and '$(TargetFramework)' != 'netcore50'
+                        and '$(TargetFramework)' != 'uap10.0'">
+    <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net4.5.2'
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.5-client'
+                        and '$(TargetFramework)' != 'net4.0-client'
+                       and ('$(UseOldLogger)' == 'True'
+                        or ('$(TargetFramework)' != 'net4.5.2'
+                        and '$(TargetFramework)' != 'netcore50'
+                        and '$(TargetFramework)' != 'netcoreapp1.0'
+                        and '$(TargetFramework)' != 'netcoreapp1.1'
+                        and '$(TargetFramework)' != 'netstandard1.3'
+                        and '$(TargetFramework)' != 'uap10.0'))">
+    <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseOldLogger)' == 'True'
+                       and ('$(TargetFramework)' == 'net4.5.2'
                          or '$(TargetFramework)' == 'netcore50'
                          or '$(TargetFramework)' == 'netcoreapp1.0'
                          or '$(TargetFramework)' == 'netcoreapp1.1'
                          or '$(TargetFramework)' == 'netstandard1.3'
-                         or '$(TargetFramework)' == 'uap10.0'">
+                         or '$(TargetFramework)' == 'uap10.0')">
     <DefineConstants>$(DefineConstants);HAS_OLDLOGGER</DefineConstants>
   </PropertyGroup>
  

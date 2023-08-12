@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
             EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
             // Initialize the headerData buffer
-#if NETCORE || WINDOWS_UWP
+#if NETCORE
             headerData = new byte[56];
 #else
 #if !NETFRAMEWORK || NET451_OR_GREATER
@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient
 
             if (Data == null || Data.Length < Header.Size)
             {
-#if HAS_BUFFERS
+#if NETCOREAPP || NETSTANDARD2_1
                 // Optimization on .NET Core App: Use the BufferPool to rent buffers
                 if (Data != null)
                 {
@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient
 
             if (Data == null || Data.Length < Header.Size)
             {
-#if HAS_BUFFERS
+#if NETCOREAPP || NETSTANDARD2_1
                 // Optimization on .NET Core App: Use the BufferPool to rent buffers
                 if (Data != null)
                 {
@@ -238,7 +238,7 @@ namespace AdvancedSharpAdbClient
         {
             if (!disposed)
             {
-#if HAS_BUFFERS
+#if NETCOREAPP || NETSTANDARD2_1
                 if (Data != null)
                 {
                     ArrayPool<byte>.Shared.Return(Data, clearArray: false);
