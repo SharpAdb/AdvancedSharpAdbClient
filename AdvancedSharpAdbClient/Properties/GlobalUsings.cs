@@ -1,8 +1,4 @@
-﻿#if NETCOREAPP || NETSTANDARD2_1
-global using System.Buffers;
-#endif
-
-#if NET
+﻿#if NET
 global using System.Runtime.Versioning;
 #endif
 
@@ -39,12 +35,16 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
-#if HAS_SERIALIZATION
-global using System.Runtime.Serialization;
+#if HAS_BUFFERS
+global using System.Buffers;
 #endif
 
 #if HAS_DRAWING
 global using System.Drawing;
 global using System.Drawing.Imaging;
 global using System.Runtime.InteropServices;
+#endif
+
+#if HAS_SERIALIZATION
+global using System.Runtime.Serialization;
 #endif

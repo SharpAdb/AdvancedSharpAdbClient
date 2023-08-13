@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient
 
             if (Data == null || Data.Length < Header.Size)
             {
-#if NETCOREAPP || NETSTANDARD2_1
+#if HAS_BUFFERS
                 // Optimization on .NET Core App: Use the BufferPool to rent buffers
                 if (Data != null)
                 {
@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient
 
             if (Data == null || Data.Length < Header.Size)
             {
-#if NETCOREAPP || NETSTANDARD2_1
+#if HAS_BUFFERS
                 // Optimization on .NET Core App: Use the BufferPool to rent buffers
                 if (Data != null)
                 {
@@ -238,7 +238,7 @@ namespace AdvancedSharpAdbClient
         {
             if (!disposed)
             {
-#if NETCOREAPP || NETSTANDARD2_1
+#if HAS_BUFFERS
                 if (Data != null)
                 {
                     ArrayPool<byte>.Shared.Return(Data, clearArray: false);
