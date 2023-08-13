@@ -61,11 +61,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void Dispose()
         {
-#if NETFRAMEWORK && !NET40_OR_GREATER
-            socket.Close();
-#else
             socket.Dispose();
-#endif
             GC.SuppressFinalize(this);
         }
 

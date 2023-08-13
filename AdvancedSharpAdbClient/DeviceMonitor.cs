@@ -172,11 +172,7 @@ namespace AdvancedSharpAdbClient
                 Socket = null;
             }
 
-#if !NET35
             firstDeviceListParsed.Dispose();
-#else
-            firstDeviceListParsed.Close();
-#endif
             monitorTaskCancellationTokenSource.Dispose();
 #else
             // First kill the monitor task, which has a dependency on the socket,

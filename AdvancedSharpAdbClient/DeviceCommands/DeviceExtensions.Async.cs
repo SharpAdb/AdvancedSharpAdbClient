@@ -231,16 +231,7 @@ fi".Replace("\r\n", "\n"), receiver, cancellationToken);
             {
                 while (reader.Peek() > 0)
                 {
-                    string line =
-#if !NET35
-                        await reader.ReadLineAsync(
-#if NET7_0_OR_GREATER
-                            cancellationToken
-#endif
-                            ).ConfigureAwait(false);
-#else
-                        await Utilities.Run(reader.ReadLine, cancellationToken).ConfigureAwait(false);
-#endif
+                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
                     if (!line.All(char.IsDigit))
                     {

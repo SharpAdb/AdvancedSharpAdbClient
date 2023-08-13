@@ -94,11 +94,7 @@ namespace AdvancedSharpAdbClient
 
             StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken);
             manualResetEvent.Set();
-#if !NET35
             manualResetEvent.Dispose();
-#else
-            manualResetEvent.Close();
-#endif
             return result;
         }
 

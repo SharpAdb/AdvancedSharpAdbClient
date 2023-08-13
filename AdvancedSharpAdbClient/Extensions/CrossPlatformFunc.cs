@@ -86,21 +86,8 @@ namespace AdvancedSharpAdbClient
             };
 
             using Process process = Process.Start(psi);
-#if !NET35
-            string standardErrorString = await process.StandardError.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                );
-            string standardOutputString = await process.StandardOutput.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                );
-#else
-            string standardErrorString = await Utilities.Run(process.StandardError.ReadToEnd, cancellationToken).ConfigureAwait(false);
-            string standardOutputString = await Utilities.Run(process.StandardOutput.ReadToEnd, cancellationToken).ConfigureAwait(false);
-#endif
+            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
 
             errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
 

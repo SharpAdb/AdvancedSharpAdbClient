@@ -196,16 +196,7 @@ namespace AdvancedSharpAdbClient
                 // -- one of the integration test fetches output 1000 times and found no truncations.
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    string line =
-#if !NET35
-                        await reader.ReadLineAsync(
-#if NET7_0_OR_GREATER
-                            cancellationToken
-#endif
-                            ).ConfigureAwait(false);
-#else
-                        await Utilities.Run(reader.ReadLine, cancellationToken).ConfigureAwait(false);
-#endif
+                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
                     if (line == null) { break; }
 
@@ -562,20 +553,11 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result =
-#if !NET35
-                await reader.ReadLineAsync();
-#else
-                await Utilities.Run(reader.ReadLine, cancellationToken);
-#endif
+            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
             if (!result.Contains("Success"))
             {
-#if !NET35
-                throw new AdbException(await reader.ReadToEndAsync());
-#else
-                throw new AdbException(reader.ReadToEnd());
-#endif
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken));
             }
 
             int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
@@ -647,27 +629,10 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result =
-#if !NET35
-                await reader.ReadLineAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                );
-#else
-                await Utilities.Run(reader.ReadLine, cancellationToken);
-#endif
+            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
             if (!result.Contains("Success"))
             {
-#if !NET35
-                throw new AdbException(await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                    cancellationToken
-#endif
-                    ));
-#else
-                throw new AdbException(reader.ReadToEnd());
-#endif
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken));
             }
         }
 
@@ -693,15 +658,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync("shell:uiautomator dump /dev/tty", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string xmlString = await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                );
-#else
-            string xmlString = await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false);
-#endif
+            string xmlString = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
             xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
             return xmlString;
         }
@@ -748,15 +705,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input tap {cords.X} {cords.Y}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -777,15 +726,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input tap {x} {y}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -806,15 +747,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input swipe {first.Cords.X} {first.Cords.Y} {second.Cords.X} {second.Cords.Y} {speed}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -835,15 +768,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input swipe {x1} {y1} {x2} {y2} {speed}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -1017,15 +942,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input keyevent {key}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -1046,15 +963,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input text {text}", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-#if !NET35
-            string result = (await reader.ReadToEndAsync(
-#if NET7_0_OR_GREATER
-                cancellationToken
-#endif
-                )).TrimStart();
-#else
-            string result = (await Utilities.Run(reader.ReadToEnd, cancellationToken).ConfigureAwait(false)).TrimStart();
-#endif
+            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);

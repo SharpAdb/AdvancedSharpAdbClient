@@ -5,6 +5,8 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -135,6 +137,26 @@ namespace AdvancedSharpAdbClient
             builder.Length = 0;
             return builder;
         }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="Socket"/> class.
+        /// </summary>
+        /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        public static void Dispose(this Socket socket)
+        {
+            socket.Close();
+            GC.SuppressFinalize(socket);
+        }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="WaitHandle"/> class.
+        /// </summary>
+        /// <param name="waitHandle">The <see cref="WaitHandle"/> to release.</param>
+        public static void Dispose(this WaitHandle waitHandle)
+        {
+            waitHandle.Close();
+            GC.SuppressFinalize(waitHandle);
+        }
 #endif
 
 #if HAS_TASK
@@ -186,6 +208,52 @@ namespace AdvancedSharpAdbClient
             Task
 #endif
             .Run(function, cancellationToken);
+
+#if !NET7_0_OR_GREATER
+        /// <summary>
+        /// Reads a line of characters asynchronously and returns the data as a string.
+        /// </summary>
+        /// <param name="reader">The <see cref="TextReader"/> to read a line.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>A value task that represents the asynchronous read operation. The value of the
+        /// TResult parameter contains the next line from the text reader, or is null if
+        /// all of the characters have been read.</returns>
+        public static
+#if NET7_0_OR_GREATER
+            ValueTask<string>
+#else
+            Task<string>
+#endif
+            ReadLineAsync(this TextReader reader, CancellationToken cancellationToken) =>
+#if !NET35
+            reader.ReadLineAsync(
+#if NET7_0_OR_GREATER
+                cancellationToken
+#endif
+                );
+#else
+            Run(reader.ReadLine, cancellationToken);
+#endif
+
+        /// <summary>
+        /// Reads all characters from the current position to the end of the stream asynchronously and returns them as one string.
+        /// </summary>
+        /// <param name="reader">The <see cref="TextReader"/> to read all characters.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <returns>A task that represents the asynchronous read operation. The value of the TResult
+        /// parameter contains a string with the characters from the current position to
+        /// the end of the stream.</returns>
+        public static Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken) =>
+#if !NET35
+            reader.ReadToEndAsync(
+#if NET7_0_OR_GREATER
+                cancellationToken
+#endif
+                );
+#else
+            Run(reader.ReadToEnd, cancellationToken);
+#endif
+#endif
 #endif
 
 #if NET20
