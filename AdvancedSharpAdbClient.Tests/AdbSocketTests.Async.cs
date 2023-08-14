@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.Tests
             DummyTcpSocket tcpSocket = new();
             AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 await writer.WriteAsync("DENT");
             }
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
             DummyTcpSocket tcpSocket = new();
             AdbSocket socket = new(tcpSocket);
 
-            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
+            await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
             {
                 writer.Write(Encoding.ASCII.GetBytes(5.ToString("X4")));
                 writer.Write(Encoding.ASCII.GetBytes("Hello"));
@@ -72,7 +72,7 @@ namespace AdvancedSharpAdbClient.Tests
             DummyTcpSocket tcpSocket = new();
             AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 await writer.WriteAsync("OKAY");
             }
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Tests
             DummyTcpSocket tcpSocket = new();
             AdbSocket socket = new(tcpSocket);
 
-            using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
+            await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
                 await writer.WriteAsync("FAIL");
                 await writer.WriteAsync(17.ToString("X4"));

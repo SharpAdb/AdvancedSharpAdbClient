@@ -369,7 +369,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         sync.SyncProgressChanged += (sender, e) => progress(localFilePath, e);
                     }
 
-                    using Stream stream = File.OpenRead(localFilePath);
+#if NETCOREAPP3_0_OR_GREATER
+                    await
+#endif
+                        using Stream stream = File.OpenRead(localFilePath);
 #if HAS_LOGGER
                     logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif

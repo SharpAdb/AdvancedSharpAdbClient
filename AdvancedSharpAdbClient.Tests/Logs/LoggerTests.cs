@@ -40,8 +40,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void ReadLogAsyncTest()
         {
-            using Stream stream = File.OpenRead(@"Assets/logcat.bin");
-            using ShellStream shellStream = new(stream, false);
+            await using Stream stream = File.OpenRead(@"Assets/logcat.bin");
+            await using ShellStream shellStream = new(stream, false);
             LogReader reader = new(shellStream);
 
             // This stream contains 3 log entries. Read & validate the first one,
@@ -105,7 +105,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            using Stream stream = File.OpenRead(@"Assets/logcatevents.bin");
+            await using Stream stream = File.OpenRead(@"Assets/logcatevents.bin");
             LogReader reader = new(stream);
             LogEntry entry = await reader.ReadEntryAsync(CancellationToken.None);
 

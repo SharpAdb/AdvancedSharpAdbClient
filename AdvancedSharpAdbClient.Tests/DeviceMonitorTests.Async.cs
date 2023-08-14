@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
             Assert.Empty(monitor.Devices);
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
             Assert.Empty(monitor.Devices);
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
             Assert.Empty(monitor.Devices);
@@ -139,7 +139,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
             Assert.Empty(monitor.Devices);
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             DeviceMonitorSink sink = new(monitor);
 
             Assert.Empty(monitor.Devices);
@@ -253,7 +253,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Socket.WaitForNewData = true;
 
-            using DeviceMonitor monitor = new(Socket);
+            await using DeviceMonitor monitor = new(Socket);
             await RunTestAsync(
                 new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
                 ResponseMessages(

@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             ConsoleOutputReceiver receiver = new();
 
@@ -493,8 +493,8 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            using Stream stream = File.OpenRead("Assets/logcat.bin");
-            using ShellStream shellStream = new(stream, false);
+            await using Stream stream = File.OpenRead("Assets/logcat.bin");
+            await using ShellStream shellStream = new(stream, false);
             Collection<LogEntry> logs = new();
             Action<LogEntry> sink = logs.Add;
 
@@ -764,7 +764,7 @@ namespace AdvancedSharpAdbClient.Tests
             // The app data is sent in chunks of 32 kb
             Collection<byte[]> applicationDataChuncks = new();
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -785,7 +785,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success\n");
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
                     new AdbResponse[]
@@ -822,7 +822,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             string session = string.Empty;
 
@@ -861,7 +861,7 @@ namespace AdvancedSharpAdbClient.Tests
             // The app data is sent in chunks of 32 kb
             Collection<byte[]> applicationDataChuncks = new();
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -882,7 +882,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
                     new AdbResponse[]
@@ -919,7 +919,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             await RunTestAsync(
                 new AdbResponse[]
@@ -991,7 +991,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             string xml = string.Empty;
 
@@ -1029,7 +1029,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             XmlDocument xml = null;
 
@@ -1090,7 +1090,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
         at android.os.Binder.execTransactInternal(Binder.java:1165)
         at android.os.Binder.execTransact(Binder.java:1134)");
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             JavaException exception = await Assert.ThrowsAsync<JavaException>(() =>
             RunTestAsync(
@@ -1148,7 +1148,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             };
             
             byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             _ = await Assert.ThrowsAsync<ElementNotFoundException>(() =>
             RunTestAsync(
@@ -1183,7 +1183,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             await RunTestAsync(
                 new AdbResponse[]
@@ -1224,7 +1224,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
-            using MemoryStream shellStream = new(streamData);
+            await using MemoryStream shellStream = new(streamData);
 
             await RunTestAsync(
                 new AdbResponse[]

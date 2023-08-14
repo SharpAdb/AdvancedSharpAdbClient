@@ -150,7 +150,10 @@ namespace AdvancedSharpAdbClient.Logs
                         // Use a stream on the data buffer. This will make sure that,
                         // if anything goes wrong parsing the data, we never go past
                         // the message boundary itself.
-                        using (MemoryStream dataStream = new(data))
+#if NETCOREAPP3_0_OR_GREATER
+                        await
+#endif
+                            using (MemoryStream dataStream = new(data))
                         {
                             using BinaryReader reader = new(dataStream);
                             int priority = reader.ReadInt32();

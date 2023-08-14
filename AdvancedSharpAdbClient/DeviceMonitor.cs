@@ -33,6 +33,8 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
     {
+        private bool disposed = false;
+
 #if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
@@ -145,8 +147,9 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Stops the monitoring
         /// </summary>
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
+            if (!disposing || disposed) { return; }
 #if HAS_TASK
             // First kill the monitor task, which has a dependency on the socket,
             // then close the socket.
@@ -158,7 +161,6 @@ namespace AdvancedSharpAdbClient
                 // eternally, so we need to forcefully abort it here.
                 monitorTaskCancellationTokenSource.Cancel();
                 monitorTask.Wait();
-
 #if HAS_PROCESS
                 monitorTask.Dispose();
 #endif
@@ -197,7 +199,13 @@ namespace AdvancedSharpAdbClient
 
             firstDeviceListParsed.Close();
 #endif
+            disposed = true;
+        }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 

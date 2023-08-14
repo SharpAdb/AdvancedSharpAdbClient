@@ -43,6 +43,65 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
+        /// Stops the monitoring
+        /// </summary>
+        protected virtual async
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            ValueTask
+#else
+            Task
+#endif
+            DisposeAsyncCore()
+        {
+            if (disposed) { return; }
+
+            // First kill the monitor task, which has a dependency on the socket,
+            // then close the socket.
+            if (monitorTask != null)
+            {
+                IsRunning = false;
+
+                // Stop the thread. The tread will keep waiting for updated information from adb
+                // eternally, so we need to forcefully abort it here.
+                monitorTaskCancellationTokenSource.Cancel();
+                await monitorTask;
+#if HAS_PROCESS
+                monitorTask.Dispose();
+#endif
+                monitorTask = null;
+            }
+
+            // Close the connection to adb. To be done after the monitor task exited.
+            if (Socket != null)
+            {
+                Socket.Dispose();
+                Socket = null;
+            }
+
+            firstDeviceListParsed.Dispose();
+            monitorTaskCancellationTokenSource.Dispose();
+
+            disposed = true;
+        }
+
+        /// <inheritdoc/>
+        public async
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            ValueTask
+#else
+            Task
+#endif
+            DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            GC.SuppressFinalize(this);
+#else
+            Dispose();
+#endif
+        }
+
+        /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

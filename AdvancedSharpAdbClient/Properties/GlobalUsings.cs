@@ -42,7 +42,6 @@ global using System.Buffers;
 #if HAS_DRAWING
 global using System.Drawing;
 global using System.Drawing.Imaging;
-global using System.Runtime.InteropServices;
 #endif
 
 #if HAS_SERIALIZATION

@@ -5,7 +5,9 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -135,10 +137,8 @@ namespace AdvancedSharpAdbClient
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Bitmap"/>.
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
-        /// <returns>
-        /// A <see cref="Bitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
-        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
-        /// </returns>
+        /// <returns>A <see cref="Bitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
@@ -188,7 +188,7 @@ namespace AdvancedSharpAdbClient
 
             if (Width == 0 || Height == 0 || Bpp == 0)
             {
-                throw new InvalidOperationException("Cannot canulate the pixel format of an empty framebuffer");
+                throw new InvalidOperationException("Cannot cannulate the pixel format of an empty framebuffer");
             }
 
             // By far, the most common format is a 32-bit pixel format, which is either
@@ -282,17 +282,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
-        /// <returns>
-        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
-        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
-        /// </returns>
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
+        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             FramebufferHeader self = this;
 
             if (dispatcher.HasThreadAccess)
             {
-                return ToBitmap(buffer);
+                return ToBitmap(buffer, cancellationToken);
             }
             else
             {
@@ -302,7 +301,7 @@ namespace AdvancedSharpAdbClient
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await self.ToBitmap(buffer));
+                        taskCompletionSource.SetResult(await self.ToBitmap(buffer, cancellationToken));
                     }
                     catch (Exception e)
                     {
@@ -319,18 +318,17 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
-        /// <returns>
-        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
-        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
-        /// </returns>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher)
+        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             FramebufferHeader self = this;
 
             if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
             {
-                return ToBitmap(buffer);
+                return ToBitmap(buffer, cancellationToken);
             }
             else
             {
@@ -340,7 +338,7 @@ namespace AdvancedSharpAdbClient
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await self.ToBitmap(buffer));
+                        taskCompletionSource.SetResult(await self.ToBitmap(buffer, cancellationToken));
                     }
                     catch (Exception e)
                     {
@@ -359,11 +357,10 @@ namespace AdvancedSharpAdbClient
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
         /// <param name="buffer">The buffer containing the image data.</param>
-        /// <returns>
-        /// A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
-        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.
-        /// </returns>
-        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer)
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
+        /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
+        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
         {
             if (buffer == null)
             {
@@ -379,22 +376,22 @@ namespace AdvancedSharpAdbClient
 
             using MemoryStream stream = new(buffer);
             using IRandomAccessStream randomAccessStream = stream.AsRandomAccessStream();
-            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(randomAccessStream);
-            SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(randomAccessStream).AsTask(cancellationToken);
+            SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync().AsTask(cancellationToken);
             try
             {
                 WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                await WriteableImage.SetSourceAsync(randomAccessStream);
+                await WriteableImage.SetSourceAsync(randomAccessStream).AsTask(cancellationToken);
                 return WriteableImage;
             }
             catch (Exception)
             {
                 using InMemoryRandomAccessStream random = new();
-                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random);
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);
                 encoder.SetSoftwareBitmap(softwareBitmap);
-                await encoder.FlushAsync();
+                await encoder.FlushAsync().AsTask(cancellationToken);
                 WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                await WriteableImage.SetSourceAsync(random);
+                await WriteableImage.SetSourceAsync(random).AsTask(cancellationToken);
                 return WriteableImage;
             }
         }

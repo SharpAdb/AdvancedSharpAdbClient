@@ -258,7 +258,10 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
 
-            using Stream stream = socket.GetShellStream();
+#if NETCOREAPP3_0_OR_GREATER
+            await
+#endif
+                using Stream stream = socket.GetShellStream();
             LogReader reader = new(stream);
 
             while (!cancellationToken.IsCancellationRequested)

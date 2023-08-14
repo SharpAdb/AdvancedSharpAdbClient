@@ -106,8 +106,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void CRLFAtStartAsyncTest()
         {
-            using MemoryStream stream = GetStream("\r\nHello, World!");
-            using ShellStream shellStream = new(stream, false);
+            await using MemoryStream stream = GetStream("\r\nHello, World!");
+            await using ShellStream shellStream = new(stream, false);
             using StreamReader reader = new(shellStream);
             Assert.Equal('\n', shellStream.ReadByte());
 
@@ -125,8 +125,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void MultipleCRLFInStringAsyncTest()
         {
-            using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
-            using ShellStream shellStream = new(stream, false);
+            await using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
+            await using ShellStream shellStream = new(stream, false);
             using StreamReader reader = new(shellStream);
             Assert.Equal('\n', shellStream.ReadByte());
 
@@ -147,8 +147,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void PendingByteAsyncTest()
         {
-            using MemoryStream stream = GetStream("\r\nH\ra");
-            using ShellStream shellStream = new(stream, false);
+            await using MemoryStream stream = GetStream("\r\nH\ra");
+            await using ShellStream shellStream = new(stream, false);
             byte[] buffer = new byte[1];
             int read = await shellStream.ReadAsync(buffer.AsMemory(0, 1)).ConfigureAwait(false);
             Assert.Equal(1, read);

@@ -183,7 +183,7 @@ namespace AdvancedSharpAdbClient
         public Bitmap ToImage()
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToImage(Data);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(Refresh)} first") : Header.ToImage(Data);
         }
 
         /// <inheritdoc/>
@@ -203,33 +203,36 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap()
+        public Task<WriteableBitmap> ToBitmap(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, cancellationToken);
         }
 
         /// <summary>
         /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher)
+        public Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data, dispatcher);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
         }
 
         /// <summary>
         /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher)
+        public Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException("Call RefreshAsync first") : Header.ToBitmap(Data, dispatcher);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
         }
 #endif
 

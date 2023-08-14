@@ -5,6 +5,7 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Logs
@@ -332,13 +333,30 @@ namespace AdvancedSharpAdbClient.Logs
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
-            if (closeStream && Inner != null)
+            if (disposing)
             {
-                Inner.Dispose();
-                Inner = null;
+                if (closeStream && Inner != null)
+                {
+                    Inner.Dispose();
+                    Inner = null;
+                }
             }
 
             base.Dispose(disposing);
         }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <inheritdoc/>
+        public override async ValueTask DisposeAsync()
+        {
+            if (closeStream && Inner != null)
+            {
+                await Inner.DisposeAsync();
+                Inner = null;
+            }
+            await base.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+#endif
     }
 }

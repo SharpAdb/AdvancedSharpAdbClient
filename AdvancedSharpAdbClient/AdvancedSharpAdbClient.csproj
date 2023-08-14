@@ -3,6 +3,7 @@
   <PropertyGroup>
     <FullTargets>False</FullTargets>
     <ImportAsync>True</ImportAsync>
+    <ImportDrawing>True</ImportDrawing>
     <ImportLogger>True</ImportLogger>
     <ImportOldLogger>False</ImportOldLogger>
     <NoWarn>$(NoWarn);CS1685;CA2254</NoWarn>
@@ -85,7 +86,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'
+  <ItemGroup Condition="'$(ImportDrawing)' == 'True'
+                   and ('$(TargetFramework)' == 'net6.0'
                      or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                      or '$(TargetFramework)' == 'net8.0'
                      or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
@@ -93,7 +95,7 @@
                      or '$(TargetFramework)' == 'netcoreapp3.1'
                      or '$(TargetFramework)' == 'netstandard2.0'
                      or '$(TargetFramework)' == 'netstandard2.1'
-                     or '$(TargetFramework)' == 'uap10.0.15138.0'">
+                     or '$(TargetFramework)' == 'uap10.0.15138.0')">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
@@ -135,16 +137,29 @@
     <DefineConstants>$(DefineConstants);HAS_LOGGER</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(ImportOldLogger)' == 'True'
-                       and ('$(TargetFramework)' == 'net4.5.2'
-                         or '$(TargetFramework)' == 'netcore50'
-                         or '$(TargetFramework)' == 'netcoreapp1.0'
-                         or '$(TargetFramework)' == 'netcoreapp1.1'
-                         or '$(TargetFramework)' == 'netstandard1.3'
-                         or '$(TargetFramework)' == 'uap10.0')">
-    <DefineConstants>$(DefineConstants);HAS_LOGGER;HAS_OLDLOGGER</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net2.0-client'
+                         or '$(TargetFramework)' == 'net3.5-client'
+                         or '$(TargetFramework)' == 'net4.0-client'
+                         or '$(TargetFramework)' == 'net4.5.2'
+                         or '$(TargetFramework)' == 'net4.6.2'
+                         or '$(TargetFramework)' == 'net4.7.2'
+                         or '$(TargetFramework)' == 'net4.8.1'">
+    <DefineConstants>$(DefineConstants);HAS_DRAWING</DefineConstants>
   </PropertyGroup>
- 
+
+  <PropertyGroup Condition="'$(ImportDrawing)' == 'True'
+                       and ('$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
+                         or '$(TargetFramework)' == 'net8.0'
+                         or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
+                         or '$(TargetFramework)' == 'netcoreapp2.1'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+                         or '$(TargetFramework)' == 'netstandard2.0'
+                         or '$(TargetFramework)' == 'netstandard2.1'
+                         or '$(TargetFramework)' == 'uap10.0.15138.0')">
+    <DefineConstants>$(DefineConstants);HAS_DRAWING</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
                          or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'net8.0'
@@ -164,12 +179,22 @@
     <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(ImportOldLogger)' == 'True'
+                       and ('$(TargetFramework)' == 'net4.5.2'
+                         or '$(TargetFramework)' == 'netcore50'
+                         or '$(TargetFramework)' == 'netcoreapp1.0'
+                         or '$(TargetFramework)' == 'netcoreapp1.1'
+                         or '$(TargetFramework)' == 'netstandard1.3'
+                         or '$(TargetFramework)' == 'uap10.0')">
+    <DefineConstants>$(DefineConstants);HAS_LOGGER;HAS_OLDLOGGER</DefineConstants>
+  </PropertyGroup>
+ 
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcore50'
                         and '$(TargetFramework)' != 'netcoreapp1.0'
                         and '$(TargetFramework)' != 'netcoreapp1.1'
                         and '$(TargetFramework)' != 'netstandard1.3'
                         and '$(TargetFramework)' != 'uap10.0'">
-    <DefineConstants>$(DefineConstants);HAS_PROCESS;HAS_DRAWING;HAS_SERIALIZATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_PROCESS;HAS_SERIALIZATION</DefineConstants>
   </PropertyGroup>
 
 </Project>
