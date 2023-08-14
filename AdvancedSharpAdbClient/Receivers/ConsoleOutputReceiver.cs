@@ -14,21 +14,24 @@ namespace AdvancedSharpAdbClient
     /// Receives console output, and makes the console output available as a <see cref="string"/>. To
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
-    public class ConsoleOutputReceiver : MultiLineReceiver
+    public partial class ConsoleOutputReceiver : MultiLineReceiver
     {
-        private const RegexOptions DefaultRegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase;
+        /// <summary>
+        /// The default <see cref="RegexOptions"/> to use when parsing the output.
+        /// </summary>
+        protected const RegexOptions DefaultRegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase;
 
 #if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<ConsoleOutputReceiver> logger;
+        protected readonly ILogger<ConsoleOutputReceiver> logger;
 #endif
 
         /// <summary>
         /// A <see cref="StringBuilder"/> which receives all output from the device.
         /// </summary>
-        private readonly StringBuilder output = new();
+        protected readonly StringBuilder output = new();
 
 #if !HAS_LOGGER
 #pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
@@ -61,7 +64,7 @@ namespace AdvancedSharpAdbClient
         /// Throws an error message if the console output line contains an error message.
         /// </summary>
         /// <param name="line">The line to inspect.</param>
-        public void ThrowOnError(string line)
+        public virtual void ThrowOnError(string line)
         {
             if (!ParsesErrors)
             {
@@ -91,7 +94,7 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // for "aborting" commands
-                if (Regex.IsMatch(line, "Aborting.$", DefaultRegexOptions))
+                if (AbortingRegex().IsMatch(line))
                 {
 #if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: {line}");
@@ -101,7 +104,7 @@ namespace AdvancedSharpAdbClient
 
                 // for busybox applets
                 // cmd: applet not found
-                if (Regex.IsMatch(line, "applet not found$", DefaultRegexOptions))
+                if (AppletRegex().IsMatch(line))
                 {
 #if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
@@ -111,7 +114,7 @@ namespace AdvancedSharpAdbClient
 
                 // checks if the permission to execute the command was denied.
                 // workitem: 16822
-                if (Regex.IsMatch(line, "(permission|access) denied$", DefaultRegexOptions))
+                if (DeniedRegex().IsMatch(line))
                 {
 #if HAS_LOGGER
                     logger.LogWarning($"The remote execution returned: '{line}'");
@@ -141,5 +144,22 @@ namespace AdvancedSharpAdbClient
 #endif
             }
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex("Aborting.$", DefaultRegexOptions)]
+        private static partial Regex AbortingRegex();
+
+        [GeneratedRegex("applet not found$", DefaultRegexOptions)]
+        private static partial Regex AppletRegex();
+
+        [GeneratedRegex("(permission|access) denied$", DefaultRegexOptions)]
+        private static partial Regex DeniedRegex();
+#else
+        private static Regex AbortingRegex() => new("Aborting.$", DefaultRegexOptions);
+
+        private static Regex AppletRegex() => new("applet not found$", DefaultRegexOptions);
+
+        private static Regex DeniedRegex() => new("(permission|access) denied$", DefaultRegexOptions);
+#endif
     }
 }
