@@ -29,13 +29,13 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        private readonly ITcpSocket socket;
+        protected readonly ITcpSocket socket;
 
 #if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<AdbSocket> logger;
+        protected readonly ILogger<AdbSocket> logger;
 #endif
 
 #if !HAS_LOGGER
@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient
         public virtual void Reconnect() => socket.Reconnect();
 
         /// <inheritdoc/>
-        public virtual void Send(byte[] data, int length) => Send(data, 0, length);
+        public void Send(byte[] data, int length) => Send(data, 0, length);
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int offset, int length)
@@ -156,7 +156,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void SendSyncRequest(SyncCommand command, string path, int permissions) =>
+        public void SendSyncRequest(SyncCommand command, string path, int permissions) =>
             SendSyncRequest(command, $"{path},{permissions}");
 
         /// <inheritdoc/>
@@ -202,7 +202,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual int Read(byte[] data) => Read(data, data.Length);
+        public int Read(byte[] data) => Read(data, data.Length);
 
         /// <inheritdoc/>
         public virtual int Read(byte[] data, int length)
@@ -358,7 +358,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="data">The data to send.</param>
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
-        protected bool Write(byte[] data)
+        protected virtual bool Write(byte[] data)
         {
             try
             {
@@ -382,27 +382,27 @@ namespace AdvancedSharpAdbClient
         /// Reads the response from ADB after a command.
         /// </summary>
         /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
-        protected AdbResponse ReadAdbResponseInner()
+        protected virtual AdbResponse ReadAdbResponseInner()
         {
-            AdbResponse resp = new();
+            AdbResponse rasps = new();
 
             byte[] reply = new byte[4];
             Read(reply);
 
-            resp.IOSuccess = true;
+            rasps.IOSuccess = true;
 
-            resp.Okay = IsOkay(reply);
+            rasps.Okay = IsOkay(reply);
 
-            if (!resp.Okay)
+            if (!rasps.Okay)
             {
                 string message = ReadString();
-                resp.Message = message;
+                rasps.Message = message;
 #if HAS_LOGGER
-                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{resp.Message}'");
+                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
 #endif
             }
 
-            return resp;
+            return rasps;
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
         /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
-        protected string ReplyToString(byte[] reply)
+        protected virtual string ReplyToString(byte[] reply)
         {
             string result;
             try
@@ -434,9 +434,18 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
         /// </summary>
-        public virtual void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
-            socket.Dispose();
+            if (disposing)
+            {
+                socket.Dispose();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
     }

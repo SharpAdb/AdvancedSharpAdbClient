@@ -38,26 +38,12 @@ namespace AdvancedSharpAdbClient.Tests
 
         public bool WaitForNewData { get; set; }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (DoDispose)
             {
-                base.Dispose();
+                base.Dispose(disposing);
             }
-        }
-
-        public override int Read(byte[] data)
-        {
-            StackTrace trace = new();
-
-            int read = base.Read(data);
-
-            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
-            {
-                SyncDataReceived.Enqueue(data);
-            }
-
-            return read;
         }
 
         public override int Read(byte[] data, int length)
@@ -144,18 +130,6 @@ namespace AdvancedSharpAdbClient.Tests
             SyncCommand response = base.ReadSyncResponse();
             SyncResponses.Enqueue(response);
             return response;
-        }
-
-        public override void Send(byte[] data, int length)
-        {
-            StackTrace trace = new();
-
-            base.Send(data, length);
-
-            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
-            {
-                SyncDataSent.Enqueue(data.Take(length).ToArray());
-            }
         }
 
         public override void Reconnect()

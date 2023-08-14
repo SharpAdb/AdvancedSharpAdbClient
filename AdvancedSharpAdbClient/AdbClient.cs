@@ -48,7 +48,10 @@ namespace AdvancedSharpAdbClient
         [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
         public static IAdbClient Instance => new AdbClient();
 
-        private readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
+        /// <summary>
+        /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
+        /// </summary>
+        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
@@ -131,7 +134,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; private set; }
+        public EndPoint EndPoint { get; protected set; }
 
         /// <summary>
         /// Create an ASCII string preceded by four hex digits. The opening "####"

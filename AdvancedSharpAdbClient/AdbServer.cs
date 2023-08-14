@@ -49,25 +49,25 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
         /// </summary>
-        private static readonly object RestartLock = new();
+        protected static readonly object RestartLock = new();
 
         /// <summary>
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
-        private static string cachedAdbPath;
+        protected static string cachedAdbPath;
 
         /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        private readonly IAdbClient adbClient;
+        protected readonly IAdbClient adbClient;
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
         /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
         /// <c>adb.exe</c> command line client.
         /// </summary>
-        private readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
@@ -109,7 +109,7 @@ namespace AdvancedSharpAdbClient
         public static IAdbServer Instance { get; set; } = new AdbServer();
 
         /// <inheritdoc/>
-        public StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
+        public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
             AdbServerStatus serverStatus = GetStatus();
             Version commandLineVersion = null;
@@ -159,7 +159,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public StartServerResult RestartServer(string adbPath = null)
+        public virtual StartServerResult RestartServer(string adbPath = null)
         {
             adbPath ??= cachedAdbPath;
 
@@ -175,7 +175,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public AdbServerStatus GetStatus()
+        public virtual AdbServerStatus GetStatus()
         {
             // Try to connect to a running instance of the adb server
             try

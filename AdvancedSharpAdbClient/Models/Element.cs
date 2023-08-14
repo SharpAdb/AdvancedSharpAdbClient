@@ -17,12 +17,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the current ADB client that manages the connection.
         /// </summary>
-        private IAdbClient Client { get; set; }
+        protected IAdbClient Client { get; set; }
 
         /// <summary>
         /// Gets the current device containing the element.
         /// </summary>
-        private DeviceData Device { get; }
+        protected DeviceData Device { get; }
 
         /// <summary>
         /// Gets the coordinates and size of the element.
@@ -54,10 +54,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <returns>The element at the specified index.</returns>
-        public Element this[int index]
-        {
-            get => Children[index];
-        }
+        public Element this[int index] => Children[index];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Element"/> class.
@@ -110,6 +107,31 @@ namespace AdvancedSharpAdbClient
             Cords = area.Center; // Average x1, y1, x2, y2
         }
 
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="node">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
+        /// <param name="children">The children of the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
+        {
+            XmlDocument doc = new();
+            doc.LoadXml(node.GetXml());
+
+            Client = client;
+            Device = device;
+            Node = doc.FirstChild;
+            Children = children;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
+        }
+#endif
+
         /// <summary>
         /// Creates a new <see cref='Element'/> with the specified <see cref="XmlNode"/>.
         /// </summary>
@@ -147,10 +169,49 @@ namespace AdvancedSharpAdbClient
             return null;
         }
 
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Creates a new <see cref='Element'/> with the specified <see cref="Windows.Data.Xml.Dom.IXmlNode"/>.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
+        /// <returns>The new <see cref="Element"/> that this method creates.</returns>
+        public static Element FromIXmlNode(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
+        {
+            string bounds = xmlNode.Attributes?.GetNamedItem("bounds")?.NodeValue?.ToString();
+            if (bounds != null)
+            {
+                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
+                Dictionary<string, string> attributes = new(xmlNode.Attributes.Count);
+                foreach (Windows.Data.Xml.Dom.IXmlNode at in xmlNode.Attributes)
+                {
+                    attributes[at.NodeName] = at.NodeValue.ToString();
+                }
+                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
+                Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
+                List<Element> elements = new(childNodes?.Count ?? 0);
+                if (childNodes != null)
+                {
+                    foreach (Windows.Data.Xml.Dom.IXmlNode childNode in childNodes)
+                    {
+                        Element element = FromIXmlNode(client, device, childNode);
+                        if (element != null)
+                        {
+                            elements.Add(element);
+                        }
+                    }
+                }
+                return new Element(client, device, xmlNode, elements, area, attributes);
+            }
+            return null;
+        }
+#endif
+
         /// <summary>
         /// Gets the count of <see cref="Children"/> in this element.
         /// </summary>
-        public int GetChildCount()
+        public virtual int GetChildCount()
         {
             int count = Children.Count;
             Children.ForEach(x => count += x.GetChildCount());

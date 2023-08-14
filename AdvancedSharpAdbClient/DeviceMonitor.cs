@@ -39,13 +39,13 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<DeviceMonitor> logger;
+        protected readonly ILogger<DeviceMonitor> logger;
 #endif
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
         /// </summary>
-        private readonly List<DeviceData> devices;
+        protected readonly List<DeviceData> devices;
 
 #if !HAS_TASK
         /// <summary>
@@ -53,17 +53,17 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
         /// has processed the first list of devices.
         /// </summary>
-        private readonly ManualResetEvent firstDeviceListParsed = new(false);
+        protected readonly ManualResetEvent firstDeviceListParsed = new(false);
 
         /// <summary>
         /// A <see cref="bool"/> that can be used to cancel the <see cref="monitorThread"/>.
         /// </summary>
-        private bool isMonitorThreadCancel = false;
+        protected bool isMonitorThreadCancel = false;
 
         /// <summary>
         /// The <see cref="Thread"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        private Thread monitorThread;
+        protected Thread monitorThread;
 #endif
 
 #if !HAS_LOGGER
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         public bool IsRunning { get; private set; }
 
         /// <inheritdoc/>
-        public void Start()
+        public virtual void Start()
         {
 #if HAS_TASK
             if (monitorTask == null)
@@ -237,7 +237,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
         /// </summary>
-        private void DeviceMonitorLoop()
+        protected virtual void DeviceMonitorLoop()
         {
             IsRunning = true;
 
@@ -291,7 +291,10 @@ namespace AdvancedSharpAdbClient
             UpdateDevices(currentDevices);
         }
 
-        private void UpdateDevices(IEnumerable<DeviceData> devices)
+        /// <summary>
+        /// Processes the incoming <see cref="DeviceData"/>.
+        /// </summary>
+        protected virtual void UpdateDevices(IEnumerable<DeviceData> devices)
         {
             lock (this.devices)
             {

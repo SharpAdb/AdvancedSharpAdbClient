@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public Task RefreshPackagesAsync(CancellationToken cancellationToken = default)
+        public virtual Task RefreshPackagesAsync(CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed; otherwise, <see langword="false"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallPackageAsync(string packageFilePath, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallPackageAsync(string packageFilePath, bool reinstall, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallRemotePackageAsync(string remoteFilePath, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallRemotePackageAsync(string remoteFilePath, bool reinstall, CancellationToken cancellationToken = default)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallMultiplePackageAsync(string basePackageFilePath, IList<string> splitPackageFilePaths, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallMultiplePackageAsync(string basePackageFilePath, IList<string> splitPackageFilePaths, bool reinstall, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallMultiplePackageAsync(IList<string> splitPackageFilePaths, string packageName, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallMultiplePackageAsync(IList<string> splitPackageFilePaths, string packageName, bool reinstall, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -212,7 +212,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IList<string> splitRemoteFilePaths, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IList<string> splitRemoteFilePaths, bool reinstall, CancellationToken cancellationToken = default)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task InstallMultipleRemotePackageAsync(IList<string> splitRemoteFilePaths, string packageName, bool reinstall, CancellationToken cancellationToken = default)
+        public virtual async Task InstallMultipleRemotePackageAsync(IList<string> splitRemoteFilePaths, string packageName, bool reinstall, CancellationToken cancellationToken = default)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -308,7 +308,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task UninstallPackageAsync(string packageName, CancellationToken cancellationToken = default)
+        public virtual async Task UninstallPackageAsync(string packageName, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -326,7 +326,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the <see cref="VersionInfo"/> of target application.</returns>
-        public async Task<VersionInfo> GetVersionInfoAsync(string packageName, CancellationToken cancellationToken = default)
+        public virtual async Task<VersionInfo> GetVersionInfoAsync(string packageName, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-        private async Task<string> SyncPackageToDeviceAsync(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress, CancellationToken cancellationToken = default)
+        protected virtual async Task<string> SyncPackageToDeviceAsync(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress, CancellationToken cancellationToken = default)
         {
             progress(localFilePath, new SyncProgressChangedEventArgs(0, 0));
 
@@ -406,7 +406,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <exception cref="IOException">If file removal failed.</exception>
-        private async Task RemoveRemotePackageAsync(string remoteFilePath, CancellationToken cancellationToken = default)
+        protected virtual async Task RemoveRemotePackageAsync(string remoteFilePath, CancellationToken cancellationToken = default)
         {
             // now we delete the app we synced
             try
@@ -432,7 +432,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the session ID.</returns>
-        private async Task<string> CreateInstallSessionAsync(bool reinstall, string packageName = null, CancellationToken cancellationToken = default)
+        protected virtual async Task<string> CreateInstallSessionAsync(bool reinstall, string packageName = null, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -463,7 +463,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The absolute file path to package file on device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        private async Task WriteInstallSessionAsync(string session, string apkName, string path, CancellationToken cancellationToken = default)
+        protected virtual async Task WriteInstallSessionAsync(string session, string apkName, string path, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 

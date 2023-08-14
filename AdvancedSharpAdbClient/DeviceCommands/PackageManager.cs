@@ -24,31 +24,31 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// The command that list all packages installed on the device.
         /// </summary>
-        private const string ListFull = "pm list packages -f";
+        protected const string ListFull = "pm list packages -f";
 
         /// <summary>
         /// The command that list all third party packages installed on the device.
         /// </summary>
-        private const string ListThirdPartyOnly = "pm list packages -f -3";
+        protected const string ListThirdPartyOnly = "pm list packages -f -3";
 
 #if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<PackageManager> logger;
+        protected readonly ILogger<PackageManager> logger;
 #endif
 
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        private readonly IAdbClient client;
+        protected readonly IAdbClient client;
 
         /// <summary>
         /// A function which returns a new instance of a class
         /// that implements the <see cref="ISyncService"/> interface,
         /// that can be used to transfer files to and from a given device.
         /// </summary>
-        private readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
+        protected readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
 
         /// <summary>
         /// Occurs when there is a change in the status of the installing.
@@ -117,7 +117,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Refreshes the packages.
         /// </summary>
-        public void RefreshPackages()
+        public virtual void RefreshPackages()
         {
             ValidateDevice();
 
@@ -138,7 +138,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
         /// <param name="reinstall"><see langword="true"/> if re-install of app should be performed; otherwise, <see langword="false"/>.</param>
-        public void InstallPackage(string packageFilePath, bool reinstall)
+        public virtual void InstallPackage(string packageFilePath, bool reinstall)
         {
             ValidateDevice();
 
@@ -161,7 +161,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallRemotePackage(string remoteFilePath, bool reinstall)
+        public virtual void InstallRemotePackage(string remoteFilePath, bool reinstall)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
@@ -185,7 +185,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultiplePackage(string basePackageFilePath, IList<string> splitPackageFilePaths, bool reinstall)
+        public virtual void InstallMultiplePackage(string basePackageFilePath, IList<string> splitPackageFilePaths, bool reinstall)
         {
             ValidateDevice();
 
@@ -244,7 +244,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultiplePackage(IList<string> splitPackageFilePaths, string packageName, bool reinstall)
+        public virtual void InstallMultiplePackage(IList<string> splitPackageFilePaths, string packageName, bool reinstall)
         {
             ValidateDevice();
 
@@ -295,7 +295,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultipleRemotePackage(string baseRemoteFilePath, IList<string> splitRemoteFilePaths, bool reinstall)
+        public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IList<string> splitRemoteFilePaths, bool reinstall)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -340,7 +340,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
-        public void InstallMultipleRemotePackage(IList<string> splitRemoteFilePaths, string packageName, bool reinstall)
+        public virtual void InstallMultipleRemotePackage(IList<string> splitRemoteFilePaths, string packageName, bool reinstall)
         {
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -379,7 +379,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Uninstalls a package from the device.
         /// </summary>
         /// <param name="packageName">The name of the package to uninstall.</param>
-        public void UninstallPackage(string packageName)
+        public virtual void UninstallPackage(string packageName)
         {
             ValidateDevice();
 
@@ -396,7 +396,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <returns>The <see cref="VersionInfo"/> of target application.</returns>
-        public VersionInfo GetVersionInfo(string packageName)
+        public virtual VersionInfo GetVersionInfo(string packageName)
         {
             ValidateDevice();
 
@@ -405,7 +405,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return receiver.VersionInfo;
         }
 
-        private void ValidateDevice()
+        /// <summary>
+        /// Validates the device is online.
+        /// </summary>
+        protected void ValidateDevice()
         {
             if (Device.State != DeviceState.Online)
             {
@@ -420,7 +423,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-        private string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress)
+        protected virtual string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress)
         {
             progress(localFilePath, new SyncProgressChangedEventArgs(0, 0));
 
@@ -482,7 +485,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="remoteFilePath">Path on device of file to remove.</param>
         /// <exception cref="IOException">If file removal failed.</exception>
-        private void RemoveRemotePackage(string remoteFilePath)
+        protected virtual void RemoveRemotePackage(string remoteFilePath)
         {
             // now we delete the app we synced
             try
@@ -507,7 +510,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <returns>Session ID.</returns>
-        private string CreateInstallSession(bool reinstall, string packageName = null)
+        protected virtual string CreateInstallSession(bool reinstall, string packageName = null)
         {
             ValidateDevice();
 
@@ -536,7 +539,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="session">The session ID of the install session.</param>
         /// <param name="apkName">The name of the application.</param>
         /// <param name="path">The absolute file path to package file on device.</param>
-        private void WriteInstallSession(string session, string apkName, string path)
+        protected virtual void WriteInstallSession(string session, string apkName, string path)
         {
             ValidateDevice();
 
