@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
-        public void Refresh(bool reset = false)
+        public virtual void Refresh(bool reset = false)
         {
             EnsureNotDisposed();
 
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task RefreshAsync(bool reset = false, CancellationToken cancellationToken = default)
+        public virtual async Task RefreshAsync(bool reset = false, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
 
@@ -180,7 +180,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public Bitmap ToImage()
+        public virtual Bitmap ToImage()
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(Refresh)} first") : Header.ToImage(Data);
@@ -205,7 +205,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap(CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap> ToBitmap(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, cancellationToken);
@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -229,7 +229,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -263,6 +263,6 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
         /// </summary>
-        protected void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
+        protected virtual void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
     }
 }
