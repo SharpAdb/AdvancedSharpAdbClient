@@ -14,6 +14,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient
 {
@@ -764,8 +765,21 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest("shell:uiautomator dump /dev/tty");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string xmlString = reader.ReadToEnd().Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            return xmlString;
+            string xmlString = reader.ReadToEnd()
+                .Replace("Events injected: 1\r\n", string.Empty)
+                .Replace("UI hierchary dumped to: /dev/tty", string.Empty)
+                .Trim();
+            if (string.IsNullOrEmpty(xmlString))
+                return null;
+            if (xmlString.StartsWith("<?xml"))
+                return xmlString;
+            var xmlMatch = Regex.Match(xmlString, "<\\?xml(.?)*");
+            if (!xmlMatch.Success)
+            {
+                throw new XmlException("An error occurred while receiving xml: " + xmlString);
+            }
+            var cleanXml = xmlMatch.Value;
+            return cleanXml;
         }
 
         /// <inheritdoc/>
@@ -773,9 +787,7 @@ namespace AdvancedSharpAdbClient
         {
             XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
-            if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
-                && !xmlString.StartsWith("java.lang.Exception"))
+            if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
                 return doc;
@@ -789,9 +801,7 @@ namespace AdvancedSharpAdbClient
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
-            if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
-                && !xmlString.StartsWith("java.lang.Exception"))
+            if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
                 return doc;
