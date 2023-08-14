@@ -20,13 +20,13 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.
         /// </summary>
-        private const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
+        protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
 #if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<AdbCommandLineClient> logger;
+        protected readonly ILogger<AdbCommandLineClient> logger;
 #endif
 
 #if !HAS_LOGGER
@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
         /// <returns>A <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
-        public Version GetVersion()
+        public virtual Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = new();
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
-        public void StartServer()
+        public virtual void StartServer()
         {
             int status = RunAdbProcessInner("start-server", null, null);
 

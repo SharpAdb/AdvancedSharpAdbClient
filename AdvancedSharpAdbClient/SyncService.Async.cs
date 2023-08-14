@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     public partial class SyncService
     {
         /// <inheritdoc/>
-        public async Task OpenAsync(CancellationToken cancellationToken = default)
+        public virtual async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
             await Socket.SetDeviceAsync(Device, cancellationToken);
@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public Task ReopenAsync(IAdbSocket socket, CancellationToken cancellationToken = default)
+        public virtual Task ReopenAsync(IAdbSocket socket, CancellationToken cancellationToken = default)
         {
             if (Socket != null)
             {
@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient
         public Task ReopenAsync(IAdbClient client, CancellationToken cancellationToken = default) => ReopenAsync(Factories.AdbSocketFactory(client.EndPoint), cancellationToken);
 
         /// <inheritdoc/>
-        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)
+        public virtual async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.STAT, remotePath, cancellationToken);
@@ -238,7 +238,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
+        public virtual async Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             Collection<FileStatistics> value = new();
 
@@ -270,7 +270,7 @@ namespace AdvancedSharpAdbClient
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
-        public async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public virtual async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken);

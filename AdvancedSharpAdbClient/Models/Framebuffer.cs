@@ -239,7 +239,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposed)
+            if (!disposed && disposing)
             {
 #if HAS_BUFFERS
                 if (Data != null)

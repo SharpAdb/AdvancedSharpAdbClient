@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The maximum length of a path on the remote device.
         /// </summary>
-        private const int MaxPathLength = 1024;
+        protected const int MaxPathLength = 1024;
 
         /// <inheritdoc/>
         public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
@@ -91,7 +91,7 @@ namespace AdvancedSharpAdbClient
         public bool IsOpen => Socket != null && Socket.Connected;
 
         /// <inheritdoc/>
-        public void Open()
+        public virtual void Open()
         {
             // target a specific device
             Socket.SetDevice(Device);
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient
         /// Reopen this connection.
         /// </summary>
         /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
-        public void Reopen(IAdbSocket socket)
+        public virtual void Reopen(IAdbSocket socket)
         {
             if (Socket != null)
             {
@@ -122,7 +122,7 @@ namespace AdvancedSharpAdbClient
         public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
 #if HAS_TASK
             , CancellationToken cancellationToken = default
 #endif
@@ -220,7 +220,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Pull(string remoteFilePath, Stream stream, IProgress<int> progress
+        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int> progress
 #if HAS_TASK
             , CancellationToken cancellationToken = default
 #endif
@@ -291,7 +291,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public FileStatistics Stat(string remotePath)
+        public virtual FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
@@ -314,7 +314,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
+        public virtual IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
@@ -343,13 +343,22 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Socket != null)
+                {
+                    Socket.Dispose();
+                    Socket = null;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public void Dispose()
         {
-            if (Socket != null)
-            {
-                Socket.Dispose();
-                Socket = null;
-            }
+            Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 

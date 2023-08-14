@@ -16,20 +16,20 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
-        private readonly ManualResetEvent firstDeviceListParsed = new(false);
+        protected readonly ManualResetEvent firstDeviceListParsed = new(false);
 
         /// <summary>
         /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
         /// </summary>
-        private readonly CancellationTokenSource monitorTaskCancellationTokenSource = new();
+        protected readonly CancellationTokenSource monitorTaskCancellationTokenSource = new();
 
         /// <summary>
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        private Task monitorTask;
+        protected Task monitorTask;
 
         /// <inheritdoc/>
-        public async Task StartAsync(CancellationToken cancellationToken = default)
+        public virtual async Task StartAsync(CancellationToken cancellationToken = default)
         {
             if (monitorTask == null)
             {
@@ -94,6 +94,7 @@ namespace AdvancedSharpAdbClient
             DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
+            Dispose(disposing: false);
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             GC.SuppressFinalize(this);
 #else
@@ -106,7 +107,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        private async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
+        protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
 

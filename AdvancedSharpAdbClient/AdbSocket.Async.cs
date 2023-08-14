@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbSocket
     {
         /// <inheritdoc/>
-        public virtual Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default) => SendAsync(data, 0, length, cancellationToken);
+        public Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default) => SendAsync(data, 0, length, cancellationToken);
 
         /// <inheritdoc/>
         public virtual async Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default) =>
+        public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default) =>
             SendSyncRequestAsync(command, $"{path},{permissions}", cancellationToken);
 
         /// <inheritdoc/>
@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+        public Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
             ReadAsync(data, data.Length, cancellationToken);
 
         /// <inheritdoc/>
@@ -205,7 +205,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public virtual async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
@@ -238,7 +238,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
-        protected async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
+        protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -263,27 +263,27 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
-        protected async Task<AdbResponse> ReadAdbResponseInnerAsync(CancellationToken cancellationToken = default)
+        protected virtual async Task<AdbResponse> ReadAdbResponseInnerAsync(CancellationToken cancellationToken = default)
         {
-            AdbResponse resp = new();
+            AdbResponse rasps = new();
 
             byte[] reply = new byte[4];
             _ = await ReadAsync(reply, cancellationToken);
 
-            resp.IOSuccess = true;
+            rasps.IOSuccess = true;
 
-            resp.Okay = IsOkay(reply);
+            rasps.Okay = IsOkay(reply);
 
-            if (!resp.Okay)
+            if (!rasps.Okay)
             {
                 string message = await ReadStringAsync(cancellationToken);
-                resp.Message = message;
+                rasps.Message = message;
 #if HAS_LOGGER
-                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{resp.Message}'");
+                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
 #endif
             }
 
-            return resp;
+            return rasps;
         }
     }
 }

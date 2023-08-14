@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient
         [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
         public static IAdbClient Instance => new AdbClient();
 
-        private readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
+        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.

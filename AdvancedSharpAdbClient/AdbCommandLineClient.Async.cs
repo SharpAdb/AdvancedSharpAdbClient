@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
-        public async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = new();
@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task StartServerAsync(CancellationToken cancellationToken = default)
+        public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken);
 
