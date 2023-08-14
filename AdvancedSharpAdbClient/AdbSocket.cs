@@ -35,29 +35,18 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<AdbSocket> logger;
+        private readonly ILogger<AdbSocket> logger = LoggerProvider.CreateLogger<AdbSocket>();
 #endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
-        /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(EndPoint endPoint
-#if HAS_LOGGER
-            , ILogger<AdbSocket> logger = null
-#endif
-            )
+        public AdbSocket(EndPoint endPoint)
         {
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
-#endif
         }
 
         /// <summary>
@@ -65,12 +54,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="host">The host address at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="port">The port at which the Android Debug Bridge is listening for clients.</param>
-        /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(string host, int port
-#if HAS_LOGGER
-            , ILogger<AdbSocket> logger = null
-#endif
-            )
+        public AdbSocket(string host, int port)
         {
             if (string.IsNullOrEmpty(host))
             {
@@ -82,29 +66,17 @@ namespace AdvancedSharpAdbClient
             DnsEndPoint endPoint = values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
-            
+
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
-#endif
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
-        public AdbSocket(ITcpSocket socket)
-        {
-            this.socket = socket;
-#if HAS_LOGGER
-            logger ??= NullLogger<AdbSocket>.Instance;
-#endif
-        }
+        public AdbSocket(ITcpSocket socket) => this.socket = socket;
 
         /// <summary>
         /// Gets or sets the size of the receive buffer

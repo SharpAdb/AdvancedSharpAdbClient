@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<ConsoleOutputReceiver> logger;
+        private readonly ILogger<ConsoleOutputReceiver> logger = LoggerProvider.CreateLogger<ConsoleOutputReceiver>();
 #endif
 
         /// <summary>
@@ -33,26 +33,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected readonly StringBuilder output = new();
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleOutputReceiver"/> class.
         /// </summary>
-        /// <param name="logger">The logger to use when logging.</param>
-        public ConsoleOutputReceiver(
-#if HAS_LOGGER
-            ILogger<ConsoleOutputReceiver> logger = null
-#endif
-            )
-        {
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<ConsoleOutputReceiver>.Instance;
-#endif
-        }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
+        public ConsoleOutputReceiver() { }
 
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.

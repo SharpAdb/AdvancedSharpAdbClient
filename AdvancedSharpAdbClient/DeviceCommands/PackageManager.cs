@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<PackageManager> logger;
+        protected readonly ILogger<PackageManager> logger = LoggerProvider.CreateLogger<PackageManager>();
 #endif
 
         /// <summary>
@@ -55,9 +55,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public event EventHandler<InstallProgressEventArgs> InstallProgressChanged;
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
@@ -70,12 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// that can be used to transfer files to and from a given device.</param>
         /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not.
         /// Used mainly by unit tests.</param>
-        /// <param name="logger">The logger to use when logging.</param>
-        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
-#if HAS_LOGGER
-            , ILogger<PackageManager> logger = null
-#endif
-            )
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = new Dictionary<string, string>();
@@ -88,14 +80,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 RefreshPackages();
             }
-
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<PackageManager>.Instance;
-#endif
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets a value indicating whether this package manager only lists third party applications,

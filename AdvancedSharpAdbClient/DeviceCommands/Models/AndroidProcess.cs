@@ -314,6 +314,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public int ExitCode { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidProcess"/> class.
+        /// </summary>
+        public AndroidProcess() { }
+
+        /// <summary>
         /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
