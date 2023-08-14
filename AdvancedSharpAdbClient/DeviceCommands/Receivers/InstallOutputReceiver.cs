@@ -61,6 +61,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public bool Success { get; private set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InstallOutputReceiver"/> class.
+        /// </summary>
+        public InstallOutputReceiver() { }
+
+        /// <summary>
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>

@@ -18,6 +18,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public Collection<AndroidProcess> Processes { get; private set; } = new Collection<AndroidProcess>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessOutputReceiver"/> class.
+        /// </summary>
+        public ProcessOutputReceiver() { }
+
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {

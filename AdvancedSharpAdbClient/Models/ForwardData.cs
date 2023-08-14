@@ -35,14 +35,12 @@ namespace AdvancedSharpAdbClient
         public ForwardSpec RemoteSpec => ForwardSpec.Parse(Remote);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
+        /// Initializes a new instance of the <see cref="ForwardData"/> class.
         /// </summary>
-        public ForwardData()
-        {
-        }
+        public ForwardData() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
+        /// Initializes a new instance of the <see cref="ForwardData"/> class.
         /// </summary>
         /// <param name="serialNumber">The serial number of the device for which the port forwarding is configured.</param>
         /// <param name="local">The <see cref="string"/> that represents the local (PC) endpoint.</param>

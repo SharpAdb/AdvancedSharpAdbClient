@@ -54,6 +54,11 @@ namespace AdvancedSharpAdbClient
         public int ProcessId { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> class.
+        /// </summary>
+        public ForwardSpec() { }
+
+        /// <summary>
         /// Creates a <see cref="ForwardSpec"/> from its <see cref="string"/> representation.
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>

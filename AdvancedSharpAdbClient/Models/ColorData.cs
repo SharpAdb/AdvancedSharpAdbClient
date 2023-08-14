@@ -25,6 +25,23 @@ namespace AdvancedSharpAdbClient
         public uint Offset { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ColorData"/> struct.
+        /// </summary>
+        public ColorData() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColorData"/> struct.
+        /// </summary>
+        /// <param name="length">The number of bits that contain information for this color.</param>
+        /// <param name="offset">The offset, in bits, within the byte array for a pixel, at which the
+        /// bytes that contain information for this color are stored.</param>
+        public ColorData(uint length, uint offset)
+        {
+            Length = length;
+            Offset = offset;
+        }
+
+        /// <summary>
         /// Deconstruct the <see cref="Cords"/> struct.
         /// </summary>
         /// <param name="length">The number of bits that contain information for this color.</param>

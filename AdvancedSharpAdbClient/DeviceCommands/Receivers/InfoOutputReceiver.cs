@@ -24,6 +24,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private Dictionary<string, Func<string, object>> PropertyParsers { get; set; } = new Dictionary<string, Func<string, object>>();
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InfoOutputReceiver"/> class.
+        /// </summary>
+        public InfoOutputReceiver() { }
+
+        /// <summary>
         /// Gets the value of the property out of the Properties dictionary.
         /// Returns null if the property is not present in the directory.
         /// </summary>

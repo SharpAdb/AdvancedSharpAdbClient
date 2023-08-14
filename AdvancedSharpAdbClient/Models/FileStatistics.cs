@@ -32,6 +32,11 @@ namespace AdvancedSharpAdbClient
         public DateTimeOffset Time { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FileStatistics"/> class.
+        /// </summary>
+        public FileStatistics() { }
+
+        /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="FileStatistics"/> object.
         /// </summary>
         /// <returns>The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.</returns>

@@ -28,7 +28,10 @@ namespace AdvancedSharpAdbClient
         /// <value>An <see cref="long"/> representing the total size of the download, in bytes.</value>
         public long TotalBytesToReceive { get; }
 
-        internal SyncProgressChangedEventArgs(long received, long total)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> class.
+        /// </summary>
+        public SyncProgressChangedEventArgs(long received, long total)
         {
             ReceivedBytesSize = received;
             TotalBytesToReceive = total;

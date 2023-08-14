@@ -68,6 +68,11 @@ namespace AdvancedSharpAdbClient
         public string Message { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceData"/> class.
+        /// </summary>
+        public DeviceData() { }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>

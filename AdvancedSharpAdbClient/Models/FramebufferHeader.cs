@@ -69,6 +69,11 @@ namespace AdvancedSharpAdbClient
         public ColorData Alpha { get; set; }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct.
+        /// </summary>
+        public FramebufferHeader() { }
+
+        /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>

@@ -28,6 +28,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public Dictionary<string, string> Properties { get; private set; } = new Dictionary<string, string>();
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
+        /// </summary>
+        public GetPropReceiver() { }
+
+        /// <summary>
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines to process.</param>

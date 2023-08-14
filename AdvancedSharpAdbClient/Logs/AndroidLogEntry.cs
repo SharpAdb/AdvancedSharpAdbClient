@@ -41,6 +41,11 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         public string Message { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidLogEntry"/> class.
+        /// </summary>
+        public AndroidLogEntry() { }
+
         /// <inheritdoc/>
         public override string ToString() =>
             $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";

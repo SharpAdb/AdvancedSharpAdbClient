@@ -44,5 +44,10 @@ namespace AdvancedSharpAdbClient.Logs
         /// Gets or sets the entry's payload.
         /// </summary>
         public byte[] Data { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogEntry"/> class.
+        /// </summary>
+        public LogEntry() { }
     }
 }

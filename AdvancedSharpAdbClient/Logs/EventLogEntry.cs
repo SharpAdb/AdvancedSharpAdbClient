@@ -21,5 +21,10 @@ namespace AdvancedSharpAdbClient.Logs
         /// Gets or sets the values of this event log entry.
         /// </summary>
         public Collection<object> Values { get; set; } = new Collection<object>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventLogEntry"/> class.
+        /// </summary>
+        public EventLogEntry() { }
     }
 }
