@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; private set; }
+        public EndPoint EndPoint { get; protected set; }
 
         /// <summary>
         /// Create an ASCII string preceded by four hex digits. The opening "####"

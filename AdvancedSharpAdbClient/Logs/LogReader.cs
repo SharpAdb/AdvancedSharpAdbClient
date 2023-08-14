@@ -15,6 +15,9 @@ namespace AdvancedSharpAdbClient.Logs
     /// </summary>
     public partial class LogReader
     {
+        /// <summary>
+        /// The <see cref="Stream"/> that contains the logcat data.
+        /// </summary>
         private readonly Stream stream;
 
         /// <summary>
@@ -27,7 +30,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
         /// <returns>A new <see cref="LogEntry"/> object.</returns>
-        public LogEntry ReadEntry()
+        public virtual LogEntry ReadEntry()
         {
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
@@ -186,7 +189,10 @@ namespace AdvancedSharpAdbClient.Logs
             }
         }
 
-        private void ReadLogEntry(BinaryReader reader, Collection<object> parent)
+        /// <summary>
+        /// Reads a single log entry from the stream.
+        /// </summary>
+        protected void ReadLogEntry(BinaryReader reader, Collection<object> parent)
         {
             EventLogType type = (EventLogType)reader.ReadByte();
 
@@ -225,28 +231,42 @@ namespace AdvancedSharpAdbClient.Logs
                     break;
             }
         }
-        private ushort? ReadUInt16()
+
+        /// <summary>
+        /// Reads a <see cref="ushort"/> from the stream.
+        /// </summary>
+        protected ushort? ReadUInt16()
         {
             byte[] data = ReadBytesSafe(2);
 
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
-        private uint? ReadUInt32()
+        /// <summary>
+        /// Reads a <see cref="uint"/> from the stream.
+        /// </summary>
+        protected uint? ReadUInt32()
         {
             byte[] data = ReadBytesSafe(4);
 
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
-        private int? ReadInt32()
+        /// <summary>
+        /// Reads a <see cref="int"/> from the stream.
+        /// </summary>
+        protected int? ReadInt32()
         {
             byte[] data = ReadBytesSafe(4);
 
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
-        private byte[] ReadBytesSafe(int count)
+        /// <summary>
+        /// Reads bytes from the stream, making sure that the requested number of bytes
+        /// </summary>
+        /// <param name="count">The number of bytes to read.</param>
+        protected byte[] ReadBytesSafe(int count)
         {
             int totalRead = 0;
             byte[] data = new byte[count];
