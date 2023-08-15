@@ -55,7 +55,14 @@ namespace AdvancedSharpAdbClient
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
         /// the server to figure out where adb is located.
         /// </summary>
-        protected static string cachedAdbPath;
+        protected static string CachedAdbPath { get; set; }
+
+#if HAS_LOGGER
+        /// <summary>
+        /// The logger to use when logging messages.
+        /// </summary>
+        private readonly ILogger<AdbServer> logger = LoggerProvider.CreateLogger<AdbServer>();
+#endif
 
         /// <summary>
         /// The current ADB client that manages the connection.
@@ -118,7 +125,7 @@ namespace AdvancedSharpAdbClient
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
-                cachedAdbPath = adbPath;
+                CachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
@@ -161,7 +168,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual StartServerResult RestartServer(string adbPath = null)
         {
-            adbPath ??= cachedAdbPath;
+            adbPath ??= CachedAdbPath;
 
             if (!IsValidAdbFile(adbPath))
             {
@@ -187,10 +194,16 @@ namespace AdvancedSharpAdbClient
             {
                 if (ex.SocketErrorCode == SocketError.ConnectionRefused)
                 {
+#if HAS_LOGGER
+                    logger.LogWarning(ex, ex.Message);
+#endif
                     return new AdbServerStatus(false, null);
                 }
                 else
                 {
+#if HAS_LOGGER
+                    logger.LogError(ex, ex.Message);
+#endif
                     // An unexpected exception occurred; re-throw the exception
                     throw;
                 }

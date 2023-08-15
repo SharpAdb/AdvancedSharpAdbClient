@@ -104,7 +104,11 @@ namespace AdvancedSharpAdbClient
 
             if (status != 0)
             {
-                throw new AdbException($"The adb process returned error code {status} when running command {command}");
+                AdbException ex = new($"The adb process returned error code {status} when running command {command}");
+#if HAS_LOGGER
+                logger.LogError(ex, ex.Message);
+#endif
+                throw ex;
             }
         }
 
@@ -124,9 +128,13 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task<int> RunAdbProcessInnerAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(command);
-
+#if HAS_LOGGER
+            logger.LogInformation("Send command to adb.exe: {command}", command);
+#endif
             int status = await CrossPlatformFunc.RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken);
-
+#if HAS_LOGGER
+            logger.LogInformation("adb.exe exit with code {status}", status);
+#endif
             return status;
         }
     }

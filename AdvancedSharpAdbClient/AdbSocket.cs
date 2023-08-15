@@ -112,7 +112,11 @@ namespace AdvancedSharpAdbClient
                 int count = socket.Send(data, 0, length != -1 ? length : data.Length, SocketFlags.None);
                 if (count < 0)
                 {
-                    throw new AdbException("channel EOF");
+                    AdbException ex = new("channel EOF");
+#if HAS_LOGGER
+                    logger.LogError(ex, ex.Message);
+#endif
+                    throw ex;
                 }
             }
 #if HAS_LOGGER
@@ -135,8 +139,10 @@ namespace AdvancedSharpAdbClient
         public virtual void SendSyncRequest(SyncCommand command, string path)
         {
             ExceptionExtensions.ThrowIfNull(path);
-
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
+#if HAS_LOGGER
+            logger.LogInformation("Send sync request: {command} {path}", command, path);
+#endif
             SendSyncRequest(command, pathBytes.Length);
             _ = Write(pathBytes);
         }
@@ -157,7 +163,9 @@ namespace AdvancedSharpAdbClient
                 // Convert from big endian to little endian
                 Array.Reverse(lengthBytes);
             }
-
+#if HAS_LOGGER
+            logger.LogInformation("Send sync request: {command}", command);
+#endif
             _ = Write(commandBytes);
             _ = Write(lengthBytes);
         }
@@ -165,11 +173,18 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void SendAdbRequest(string request)
         {
+#if HAS_LOGGER
+            logger.LogInformation("Send adb request: {request}", request);
+#endif
             byte[] data = AdbClient.FormAdbRequest(request);
 
             if (!Write(data))
             {
-                throw new IOException($"Failed sending the request '{request}' to ADB");
+                IOException ex = new($"Failed sending the request '{request}' to ADB");
+#if HAS_LOGGER
+                logger.LogError(ex, ex.Message);
+#endif
+                throw ex;
             }
         }
 
@@ -194,10 +209,11 @@ namespace AdvancedSharpAdbClient
                     count = socket.Receive(buffer, bufferLength, SocketFlags.None);
                     if (count < 0)
                     {
+                        AdbException ex = new("EOF");
 #if HAS_LOGGER
-                        logger.LogError("read: channel EOF");
+                        logger.LogError(ex, "read: channel EOF");
 #endif
-                        throw new AdbException("EOF");
+                        throw ex;
                     }
                     else if (count == 0)
                     {
@@ -213,7 +229,11 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (SocketException sex)
                 {
-                    throw new AdbException($"No Data to read: {sex.Message}");
+                    AdbException ex = new($"No Data to read: {sex.Message}");
+#if HAS_LOGGER
+                    logger.LogError(sex, ex.Message);
+#endif
+                    throw ex;
                 }
             }
 
@@ -242,6 +262,9 @@ namespace AdvancedSharpAdbClient
             _ = Read(reply);
 
             string value = AdbClient.Encoding.GetString(reply);
+#if HAS_LOGGER
+            logger.LogInformation("Read string: {value}", value);
+#endif
             return value;
         }
 
@@ -264,6 +287,9 @@ namespace AdvancedSharpAdbClient
             _ = Read(reply);
 
             string value = AdbClient.Encoding.GetString(reply);
+#if HAS_LOGGER
+            logger.LogInformation("Read sync string: {value}", value);
+#endif
             return value;
         }
 
@@ -272,21 +298,29 @@ namespace AdvancedSharpAdbClient
         {
             byte[] data = new byte[4];
             _ = Read(data);
-
-            return SyncCommandConverter.GetCommand(data);
+            SyncCommand value = SyncCommandConverter.GetCommand(data);
+#if HAS_LOGGER
+            logger.LogInformation("Read sync response: {value}", value);
+#endif
+            return value;
         }
 
         /// <inheritdoc/>
         public virtual AdbResponse ReadAdbResponse()
         {
             AdbResponse response = ReadAdbResponseInner();
-
             if (!response.IOSuccess || !response.Okay)
             {
                 socket.Dispose();
-                throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
+                AdbException ex = new($"An error occurred while reading a response from ADB: {response.Message}", response);
+#if HAS_LOGGER
+                logger.LogError(ex, ex.Message);
+#endif
+                throw ex;
             }
-
+#if HAS_LOGGER
+            logger.LogInformation("Read adb response: {response}", response.Message);
+#endif
             return response;
         }
 
@@ -314,7 +348,11 @@ namespace AdvancedSharpAdbClient
                 {
                     if (string.Equals("device not found", e.AdbError, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new DeviceNotFoundException(device.Serial);
+                        DeviceNotFoundException ex = new(device.Serial);
+#if HAS_LOGGER
+                        logger.LogError(ex, ex.Message);
+#endif
+                        throw ex;
                     }
                     else
                     {
@@ -370,7 +408,7 @@ namespace AdvancedSharpAdbClient
                 string message = ReadString();
                 rasps.Message = message;
 #if HAS_LOGGER
-                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
+                logger.LogWarning($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
 #endif
             }
 
@@ -392,7 +430,7 @@ namespace AdvancedSharpAdbClient
 #if HAS_LOGGER
             catch (DecoderFallbackException e)
             {
-                logger.LogError(e, e.Message);
+                logger.LogWarning(e, e.Message);
 #else
             catch (DecoderFallbackException)
             {
