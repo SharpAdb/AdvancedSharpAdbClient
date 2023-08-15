@@ -1129,6 +1129,8 @@ namespace AdvancedSharpAdbClient.Tests
                 shellStream,
                 () => xml = TestClient.DumpScreenString(device));
 
+            Assert.Equal(cleanDump, xml);
+
             requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
@@ -1154,6 +1156,8 @@ namespace AdvancedSharpAdbClient.Tests
                 miuiStream,
                 () => miuiXml = TestClient.DumpScreenString(device));
 
+            Assert.Equal(cleanMiuiDump, miuiXml);
+
             requests = new string[]
             {
                 "host:transport:009d1cd696d5194a",
@@ -1177,6 +1181,8 @@ namespace AdvancedSharpAdbClient.Tests
                requests,
                nullStream,
                () => nullXml = TestClient.DumpScreenString(device));
+
+            Assert.True(string.IsNullOrEmpty(nullXml));
 
             requests = new string[]
             {
@@ -1204,9 +1210,6 @@ namespace AdvancedSharpAdbClient.Tests
                requests,
                errorStream,
                () => TestClient.DumpScreenString(device)));
-            Assert.Equal(cleanDump, xml);
-            Assert.Equal(cleanMiuiDump, miuiXml);
-            Assert.Null(nullXml);
         }
 
         /// <summary>

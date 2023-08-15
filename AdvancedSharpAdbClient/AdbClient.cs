@@ -769,17 +769,16 @@ namespace AdvancedSharpAdbClient
                 .Replace("Events injected: 1\r\n", string.Empty)
                 .Replace("UI hierchary dumped to: /dev/tty", string.Empty)
                 .Trim();
-            if (string.IsNullOrEmpty(xmlString))
-                return null;
-            if (xmlString.StartsWith("<?xml"))
+            if (string.IsNullOrEmpty(xmlString) || xmlString.StartsWith("<?xml"))
+            {
                 return xmlString;
-            var xmlMatch = Regex.Match(xmlString, "<\\?xml(.?)*");
+            }
+            Match xmlMatch = GetXMLRegex().Match(xmlString);
             if (!xmlMatch.Success)
             {
                 throw new XmlException("An error occurred while receiving xml: " + xmlString);
             }
-            var cleanXml = xmlMatch.Value;
-            return cleanXml;
+            return xmlMatch.Value;
         }
 
         /// <inheritdoc/>
@@ -1080,6 +1079,13 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
             }
         }
+
+#if NET7_0_OR_GREATER
+        [GeneratedRegex("<\\?xml(.?)*")]
+        private static partial Regex GetXMLRegex();
+#else
+        private static Regex GetXMLRegex() => new("<\\?xml(.?)*");
+#endif
     }
 
     /// <summary>

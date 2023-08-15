@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 
@@ -661,9 +662,20 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync("shell:uiautomator dump /dev/tty", cancellationToken);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string xmlString = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-            xmlString = xmlString.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim();
-            return xmlString;
+            string xmlString = reader.ReadToEnd()
+                .Replace("Events injected: 1\r\n", string.Empty)
+                .Replace("UI hierchary dumped to: /dev/tty", string.Empty)
+                .Trim();
+            if (string.IsNullOrEmpty(xmlString) || xmlString.StartsWith("<?xml"))
+            {
+                return xmlString;
+            }
+            Match xmlMatch = GetXMLRegex().Match(xmlString);
+            if (!xmlMatch.Success)
+            {
+                throw new XmlException("An error occurred while receiving xml: " + xmlString);
+            }
+            return xmlMatch.Value;
         }
 
         /// <inheritdoc/>
@@ -671,9 +683,7 @@ namespace AdvancedSharpAdbClient
         {
             XmlDocument doc = new();
             string xmlString = await DumpScreenStringAsync(device, cancellationToken);
-            if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
-                && !xmlString.StartsWith("java.lang."))
+            if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
                 return doc;
@@ -687,9 +697,7 @@ namespace AdvancedSharpAdbClient
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = await DumpScreenStringAsync(device, cancellationToken);
-            if (!string.IsNullOrEmpty(xmlString)
-                && !xmlString.StartsWith("ERROR", StringComparison.OrdinalIgnoreCase)
-                && !xmlString.StartsWith("java.lang."))
+            if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
                 return doc;
