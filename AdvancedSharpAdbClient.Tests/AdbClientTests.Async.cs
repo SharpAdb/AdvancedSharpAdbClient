@@ -1008,16 +1008,28 @@ namespace AdvancedSharpAdbClient.Tests
                 async () => xml = await TestClient.DumpScreenStringAsync(device));
 
             Assert.Equal(cleanDump, xml);
+        }
 
-            requests = new string[]
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncMIUITest()
+        {
+            DeviceData device = new()
             {
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
             };
+
             string miuiDump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
-            string cleanMiuiDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
+            string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
             byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuiDump);
             await using MemoryStream miuiStream = new(miuiStreamData);
 
@@ -1034,20 +1046,30 @@ namespace AdvancedSharpAdbClient.Tests
                 miuiStream,
                 async () => miuiXml = await TestClient.DumpScreenStringAsync(device));
 
-            Assert.Equal(cleanMiuiDump, miuiXml);
+            Assert.Equal(cleanMIUIDump, miuiXml);
+        }
 
-            requests = new string[]
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncEmptyTest()
+        {
+            DeviceData device = new()
             {
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
             };
-            byte[] nullStreamData = Encoding.UTF8.GetBytes(string.Empty);
-            using MemoryStream nullStream = new(nullStreamData);
-            string nullXml = string.Empty;
+
+            byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
+            await using MemoryStream emptyStream = new(emptyStreamData);
+            string emptyXml = string.Empty;
 
             await RunTestAsync(
                new AdbResponse[]
@@ -1057,22 +1079,30 @@ namespace AdvancedSharpAdbClient.Tests
                },
                NoResponseMessages,
                requests,
-               nullStream,
-               async () => nullXml = await TestClient.DumpScreenStringAsync(device));
+               emptyStream,
+               async () => emptyXml = await TestClient.DumpScreenStringAsync(device));
 
-            Assert.True(string.IsNullOrEmpty(nullXml));
+            Assert.True(string.IsNullOrEmpty(emptyXml));
+        }
 
-            requests = new string[]
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncErrorTest()
+        {
+            DeviceData device = new()
             {
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
-                "host:transport:009d1cd696d5194a",
-                "shell:uiautomator dump /dev/tty",
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
             };
+
             string errorXml = File.ReadAllText(@"Assets/dumpscreen_error.txt");
             byte[] errorStreamData = Encoding.UTF8.GetBytes(errorXml);
             await using MemoryStream errorStream = new(errorStreamData);
