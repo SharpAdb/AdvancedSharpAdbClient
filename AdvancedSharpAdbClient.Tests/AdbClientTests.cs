@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
-using System.Data.Common;
+using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -1112,6 +1112,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
@@ -1128,7 +1129,117 @@ namespace AdvancedSharpAdbClient.Tests
                 shellStream,
                 () => xml = TestClient.DumpScreenString(device));
 
-            Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
+            Assert.Equal(cleanDump, xml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenString(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenStringMIUITest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string miuidump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
+            string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
+            byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuidump);
+            using MemoryStream miuiStream = new(miuiStreamData);
+
+            string miuiXml = string.Empty;
+
+            RunTest(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                miuiStream,
+                () => miuiXml = TestClient.DumpScreenString(device));
+
+            Assert.Equal(cleanMIUIDump, miuiXml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenString(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenStringEmptyTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
+            using MemoryStream emptyStream = new(emptyStreamData);
+            string emptyXml = string.Empty;
+
+            RunTest(
+               new AdbResponse[]
+               {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+               },
+               NoResponseMessages,
+               requests,
+               emptyStream,
+               () => emptyXml = TestClient.DumpScreenString(device));
+
+            Assert.True(string.IsNullOrEmpty(emptyXml));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenString(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenStringErrorTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string errorXml = File.ReadAllText(@"Assets/dumpscreen_error.txt");
+            byte[] errorStreamData = Encoding.UTF8.GetBytes(errorXml);
+            using MemoryStream errorStream = new(errorStreamData);
+
+            Assert.Throws<XmlException>(() =>
+            RunTest(
+               new AdbResponse[]
+               {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+               },
+               NoResponseMessages,
+               requests,
+               errorStream,
+               () => TestClient.DumpScreenString(device)));
         }
 
         /// <summary>
@@ -1166,8 +1277,9 @@ namespace AdvancedSharpAdbClient.Tests
                 shellStream,
                 () => xml = TestClient.DumpScreen(device));
 
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
-            doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
+            doc.LoadXml(cleanDump);
 
             Assert.Equal(doc, xml);
         }

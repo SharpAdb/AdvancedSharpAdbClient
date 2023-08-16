@@ -990,6 +990,7 @@ namespace AdvancedSharpAdbClient.Tests
             };
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
@@ -1006,7 +1007,117 @@ namespace AdvancedSharpAdbClient.Tests
                 shellStream,
                 async () => xml = await TestClient.DumpScreenStringAsync(device));
 
-            Assert.Equal(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim(), xml);
+            Assert.Equal(cleanDump, xml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncMIUITest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string miuiDump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
+            string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
+            byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuiDump);
+            await using MemoryStream miuiStream = new(miuiStreamData);
+
+            string miuiXml = string.Empty;
+
+            await RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                miuiStream,
+                async () => miuiXml = await TestClient.DumpScreenStringAsync(device));
+
+            Assert.Equal(cleanMIUIDump, miuiXml);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncEmptyTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
+            await using MemoryStream emptyStream = new(emptyStreamData);
+            string emptyXml = string.Empty;
+
+            await RunTestAsync(
+               new AdbResponse[]
+               {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+               },
+               NoResponseMessages,
+               requests,
+               emptyStream,
+               async () => emptyXml = await TestClient.DumpScreenStringAsync(device));
+
+            Assert.True(string.IsNullOrEmpty(emptyXml));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenStringAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenStringAsyncErrorTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests = new string[]
+            {
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            };
+
+            string errorXml = File.ReadAllText(@"Assets/dumpscreen_error.txt");
+            byte[] errorStreamData = Encoding.UTF8.GetBytes(errorXml);
+            await using MemoryStream errorStream = new(errorStreamData);
+
+            await Assert.ThrowsAsync<XmlException>(() =>
+            RunTestAsync(
+                new AdbResponse[]
+                {
+                    AdbResponse.OK,
+                    AdbResponse.OK,
+                },
+                NoResponseMessages,
+                requests,
+                errorStream,
+                () => TestClient.DumpScreenStringAsync(device)));
         }
 
         /// <summary>
@@ -1044,8 +1155,9 @@ namespace AdvancedSharpAdbClient.Tests
                 shellStream,
                 async () => xml = await TestClient.DumpScreenAsync(device));
 
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
-            doc.LoadXml(dump.Replace("Events injected: 1\r\n", "").Replace("UI hierchary dumped to: /dev/tty", "").Trim());
+            doc.LoadXml(cleanDump);
 
             Assert.Equal(doc, xml);
         }
