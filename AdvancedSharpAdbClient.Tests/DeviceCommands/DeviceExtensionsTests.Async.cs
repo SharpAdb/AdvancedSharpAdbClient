@@ -1,5 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Tests;
-using Moq;
+using NSubstitute;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,16 +17,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             TaskCompletionSource<FileStatistics> tcs = new();
             tcs.SetResult(stats);
 
-            Mock<IAdbClient> client = new();
-            Mock<ISyncService> mock = new();
-            mock.Setup(m => m.StatAsync("/test", It.IsAny<CancellationToken>())).Returns(tcs.Task);
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.StatAsync("/test", Arg.Any<CancellationToken>()).Returns(tcs.Task);
 
             lock (FactoriesTests.locker)
             {
-                Factories.SyncServiceFactory = (c, d) => mock.Object;
+                Factories.SyncServiceFactory = (c, d) => mock;
 
                 DeviceData device = new();
-                Assert.Equal(tcs.Task.Result, client.Object.StatAsync(device, "/test").Result);
+                Assert.Equal(tcs.Task.Result, client.StatAsync(device, "/test").Result);
 
                 Factories.Reset();
             }

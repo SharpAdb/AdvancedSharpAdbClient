@@ -1,5 +1,6 @@
 ﻿using AdvancedSharpAdbClient.Exceptions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -36,11 +37,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetStatusNotRunningTest()
         {
-            Mock<IAdbClient> adbClientMock = new();
-            adbClientMock.Setup(c => c.GetAdbVersion())
-                .Throws(new SocketException(AdbServer.ConnectionRefused));
+            IAdbClient adbClientMock = Substitute.For<IAdbClient>();
+            adbClientMock.GetAdbVersion().Throws(new SocketException(AdbServer.ConnectionRefused));
 
-            AdbServer adbServer = new(adbClientMock.Object, adbCommandLineClientFactory);
+            AdbServer adbServer = new(adbClientMock, adbCommandLineClientFactory);
 
             AdbServerStatus status = adbServer.GetStatus();
             Assert.False(status.IsRunning);

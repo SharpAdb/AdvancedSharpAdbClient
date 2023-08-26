@@ -1,5 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Tests;
-using Moq;
+using NSubstitute;
 using System;
 using System.IO;
 using Xunit;
@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, null));
             _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData()));
-            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Mock.Of<IAdbClient>(), null));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Substitute.For<IAdbClient>(), null));
         }
 
         [Theory]
