@@ -1,4 +1,4 @@
-﻿using Moq;
+﻿using NSubstitute;
 using System;
 using System.IO;
 using Xunit;
@@ -17,10 +17,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EnsureIsValidAdbFileInvalidFileTest()
         {
-            Mock<IAdbCommandLineClient> clientMock = new();
-            clientMock.Setup(c => c.IsValidAdbFile(It.IsAny<string>())).Returns(false);
+            IAdbCommandLineClient clientMock = Substitute.For<IAdbCommandLineClient>();
+            clientMock.IsValidAdbFile(Arg.Any<string>()).Returns(false);
 
-            IAdbCommandLineClient client = clientMock.Object;
+            IAdbCommandLineClient client = clientMock;
 
             _ = Assert.Throws<FileNotFoundException>(() => client.EnsureIsValidAdbFile("xyz.exe"));
         }

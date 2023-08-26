@@ -1,5 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Tests;
-using Moq;
+using NSubstitute;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -16,16 +16,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             FileStatistics stats = new();
 
-            Mock<IAdbClient> client = new();
-            Mock<ISyncService> mock = new();
-            mock.Setup(m => m.Stat("/test")).Returns(stats);
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.Stat("/test").Returns(stats);
 
             lock (FactoriesTests.locker)
             {
-                Factories.SyncServiceFactory = (c, d) => mock.Object;
+                Factories.SyncServiceFactory = (c, d) => mock;
 
                 DeviceData device = new();
-                Assert.Equal(stats, client.Object.Stat(device, "/test"));
+                Assert.Equal(stats, client.Stat(device, "/test"));
 
                 Factories.Reset();
             }
