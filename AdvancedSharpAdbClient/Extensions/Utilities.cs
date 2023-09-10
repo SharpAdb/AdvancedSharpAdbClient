@@ -289,9 +289,9 @@ namespace AdvancedSharpAdbClient
         /// <returns>The number of seconds that have elapsed since 1970-01-01T00:00:00Z.</returns>
         public static long ToUnixTimeSeconds(this DateTimeOffset dateTimeOffset) =>
 #if NETFRAMEWORK && !NET46_OR_GREATER
-            (int)dateTimeOffset.DateTime.ToUnixEpoch();
+            dateTimeOffset.DateTime.ToUnixEpoch();
 #else
-            (int)dateTimeOffset.ToUnixTimeSeconds();
+            dateTimeOffset.ToUnixTimeSeconds();
 #endif
 
         public static bool IsWindowsPlatform() =>
