@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 
             stream.Position = 0;
             byte[] buffer = new byte[2];
-            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 2)).ConfigureAwait(false);
+            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 2));
             Assert.Equal(2, read);
             Assert.Equal((byte)'\n', buffer[0]);
             Assert.Equal((byte)'H', buffer[1]);
@@ -132,7 +132,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 
             stream.Position = 0;
             byte[] buffer = new byte[100];
-            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 100)).ConfigureAwait(false);
+            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 100));
 
             string actual = Encoding.ASCII.GetString(buffer, 0, read);
             Assert.Equal("\n1\n2\n3\n4\n5", actual);
@@ -150,19 +150,19 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             await using MemoryStream stream = GetStream("\r\nH\ra");
             await using ShellStream shellStream = new(stream, false);
             byte[] buffer = new byte[1];
-            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 1)).ConfigureAwait(false);
+            int read = await shellStream.ReadAsync(buffer.AsMemory(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'\n', buffer[0]);
 
-            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1)).ConfigureAwait(false);
+            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'H', buffer[0]);
 
-            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1)).ConfigureAwait(false);
+            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'\r', buffer[0]);
 
-            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1)).ConfigureAwait(false);
+            read = await shellStream.ReadAsync(buffer.AsMemory(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'a', buffer[0]);
         }

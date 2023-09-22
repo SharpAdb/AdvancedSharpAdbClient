@@ -544,11 +544,8 @@ namespace AdvancedSharpAdbClient.Tests
 
             Framebuffer framebuffer = null;
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer = TestClient.GetFrameBuffer(device);
-            }
+            Factories.AdbSocketFactory = (endPoint) => socket;
+            framebuffer = TestClient.GetFrameBuffer(device);
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);

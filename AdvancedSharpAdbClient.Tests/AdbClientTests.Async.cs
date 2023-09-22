@@ -398,7 +398,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetFrameBufferAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public void GetFrameBufferAsyncTest()
+        public async void GetFrameBufferAsyncTest()
         {
             DeviceData device = new()
             {
@@ -419,12 +419,9 @@ namespace AdvancedSharpAdbClient.Tests
 
             Framebuffer framebuffer = null;
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer = TestClient.GetFrameBufferAsync(device).Result;
-            }
-
+            Factories.AdbSocketFactory = (endPoint) => socket;
+            framebuffer = await TestClient.GetFrameBufferAsync(device);
+            
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
             Assert.Equal(16, framebuffer.Data.Length);

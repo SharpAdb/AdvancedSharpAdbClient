@@ -65,32 +65,30 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void InstallPackageTest()
         {
             DummySyncService syncService = new();
-            lock (FactoriesTests.locker)
+
+            Factories.SyncServiceFactory = (c, d) => syncService;
+
+            DummyAdbClient adbClient = new();
+
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["pm install \"/data/local/tmp/test.txt\""] = "Success";
+            adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
+
+            DeviceData device = new()
             {
-                Factories.SyncServiceFactory = (c, d) => syncService;
+                State = DeviceState.Online
+            };
 
-                DummyAdbClient adbClient = new();
+            PackageManager manager = new(adbClient, device);
+            manager.InstallPackage("Assets/test.txt", false);
+            Assert.Equal(3, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
+            Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
 
-                adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-                adbClient.Commands["pm install \"/data/local/tmp/test.txt\""] = "Success";
-                adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
+            Assert.Single(syncService.UploadedFiles);
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
 
-                DeviceData device = new()
-                {
-                    State = DeviceState.Online
-                };
-
-                PackageManager manager = new(adbClient, device);
-                manager.InstallPackage("Assets/test.txt", false);
-                Assert.Equal(3, adbClient.ReceivedCommands.Count);
-                Assert.Equal("pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
-                Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
-
-                Assert.Single(syncService.UploadedFiles);
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
-
-                Factories.Reset();
-            }
+            Factories.Reset();
         }
 
         [Fact]
@@ -153,61 +151,59 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void InstallMultiplePackageTest()
         {
             DummySyncService syncService = new();
-            lock (FactoriesTests.locker)
+
+            Factories.SyncServiceFactory = (c, d) => syncService;
+
+            DummyAdbClient adbClient = new();
+
+            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["pm install-create"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
+            adbClient.Commands["pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\""] = "Success";
+            adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\""] = "Success";
+            adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\""] = "Success";
+            adbClient.Commands["pm install-commit 936013062"] = "Success";
+            adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
+            adbClient.Commands["rm \"/data/local/tmp/gapps.txt\""] = string.Empty;
+            adbClient.Commands["rm \"/data/local/tmp/logcat.bin\""] = string.Empty;
+
+            DeviceData device = new()
             {
-                Factories.SyncServiceFactory = (c, d) => syncService;
+                State = DeviceState.Online
+            };
 
-                DummyAdbClient adbClient = new();
+            PackageManager manager = new(adbClient, device);
+            manager.InstallMultiplePackage("Assets/test.txt", new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, false);
+            Assert.Equal(9, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
+            Assert.Equal("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
+            Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[3]);
+            Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[4]);
+            Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
+            Assert.Equal("rm \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[6]);
+            Assert.Equal("rm \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[7]);
+            Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[8]);
 
-                adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-                adbClient.Commands["pm install-create"] = "Success: created install session [936013062]";
-                adbClient.Commands["pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
-                adbClient.Commands["pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\""] = "Success";
-                adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\""] = "Success";
-                adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\""] = "Success";
-                adbClient.Commands["pm install-commit 936013062"] = "Success";
-                adbClient.Commands["rm \"/data/local/tmp/test.txt\""] = string.Empty;
-                adbClient.Commands["rm \"/data/local/tmp/gapps.txt\""] = string.Empty;
-                adbClient.Commands["rm \"/data/local/tmp/logcat.bin\""] = string.Empty;
+            Assert.Equal(3, syncService.UploadedFiles.Count);
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
 
-                DeviceData device = new()
-                {
-                    State = DeviceState.Online
-                };
+            syncService.UploadedFiles.Clear();
+            manager.InstallMultiplePackage(new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, "com.google.android.gms", false);
+            Assert.Equal(15, adbClient.ReceivedCommands.Count);
+            Assert.Equal("pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[9]);
+            Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[10]);
+            Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[11]);
+            Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[12]);
+            Assert.Equal("rm \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[6]);
+            Assert.Equal("rm \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[7]);
 
-                PackageManager manager = new(adbClient, device);
-                manager.InstallMultiplePackage("Assets/test.txt", new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, false);
-                Assert.Equal(9, adbClient.ReceivedCommands.Count);
-                Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
-                Assert.Equal("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
-                Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[3]);
-                Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[4]);
-                Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
-                Assert.Equal("rm \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[6]);
-                Assert.Equal("rm \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[7]);
-                Assert.Equal("rm \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[8]);
+            Assert.Equal(2, syncService.UploadedFiles.Count);
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
+            Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
 
-                Assert.Equal(3, syncService.UploadedFiles.Count);
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
-
-                syncService.UploadedFiles.Clear();
-                manager.InstallMultiplePackage(new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, "com.google.android.gms", false);
-                Assert.Equal(15, adbClient.ReceivedCommands.Count);
-                Assert.Equal("pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[9]);
-                Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[10]);
-                Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[11]);
-                Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[12]);
-                Assert.Equal("rm \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[6]);
-                Assert.Equal("rm \"/data/local/tmp/logcat.bin\"", adbClient.ReceivedCommands[7]);
-
-                Assert.Equal(2, syncService.UploadedFiles.Count);
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
-                Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
-
-                Factories.Reset();
-            }
+            Factories.Reset();
         }
 
         [Fact]

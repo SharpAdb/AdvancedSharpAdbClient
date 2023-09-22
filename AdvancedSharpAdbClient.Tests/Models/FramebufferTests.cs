@@ -46,11 +46,8 @@ namespace AdvancedSharpAdbClient.Tests.Models
 
             using Framebuffer framebuffer = new(device);
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer.Refresh();
-            }
+            Factories.AdbSocketFactory = (endPoint) => socket;
+            framebuffer.Refresh();
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
@@ -91,7 +88,7 @@ namespace AdvancedSharpAdbClient.Tests.Models
         }
 
         [Fact]
-        public void RefreshAsyncTest()
+        public async void RefreshAsyncTest()
         {
             DeviceData device = new()
             {
@@ -112,11 +109,8 @@ namespace AdvancedSharpAdbClient.Tests.Models
 
             using Framebuffer framebuffer = new(device);
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer.RefreshAsync().Wait();
-            }
+            Factories.AdbSocketFactory = (endPoint) => socket;
+            await framebuffer.RefreshAsync();
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);

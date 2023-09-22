@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
     public partial class DeviceExtensionsTests
     {
         [Fact]
-        public void StatAsyncTest()
+        public async void StatAsyncTest()
         {
             FileStatistics stats = new();
             TaskCompletionSource<FileStatistics> tcs = new();
@@ -21,15 +21,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.StatAsync("/test", Arg.Any<CancellationToken>()).Returns(tcs.Task);
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.SyncServiceFactory = (c, d) => mock;
+            Factories.SyncServiceFactory = (c, d) => mock;
 
-                DeviceData device = new();
-                Assert.Equal(tcs.Task.Result, client.StatAsync(device, "/test").Result);
+            DeviceData device = new();
+            Assert.Equal(await tcs.Task, await client.StatAsync(device, "/test"));
 
-                Factories.Reset();
-            }
+            Factories.Reset();
         }
 
         [Fact]

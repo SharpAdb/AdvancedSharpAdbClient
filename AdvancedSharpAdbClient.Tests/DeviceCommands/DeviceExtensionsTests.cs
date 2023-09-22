@@ -20,15 +20,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.Stat("/test").Returns(stats);
 
-            lock (FactoriesTests.locker)
-            {
-                Factories.SyncServiceFactory = (c, d) => mock;
+            Factories.SyncServiceFactory = (c, d) => mock;
 
-                DeviceData device = new();
-                Assert.Equal(stats, client.Stat(device, "/test"));
+            DeviceData device = new();
+            Assert.Equal(stats, client.Stat(device, "/test"));
 
-                Factories.Reset();
-            }
+            Factories.Reset();
         }
 
         [Fact]
