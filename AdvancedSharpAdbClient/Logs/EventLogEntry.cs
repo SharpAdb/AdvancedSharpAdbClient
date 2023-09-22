@@ -13,6 +13,11 @@ namespace AdvancedSharpAdbClient.Logs
     public class EventLogEntry : LogEntry
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="EventLogEntry"/> class.
+        /// </summary>
+        public EventLogEntry() { }
+
+        /// <summary>
         /// Gets or sets the 4 bytes integer key from <c>"/system/etc/event-log-tags"</c> file.
         /// </summary>
         public int Tag { get; set; }

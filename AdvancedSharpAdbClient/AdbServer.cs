@@ -54,12 +54,6 @@ namespace AdvancedSharpAdbClient
         protected static readonly object RestartLock = new();
 
         /// <summary>
-        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
-        /// the server to figure out where adb is located.
-        /// </summary>
-        protected static string cachedAdbPath;
-
-        /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
         protected readonly IAdbClient adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
@@ -95,6 +89,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
+        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
+        /// the server to figure out where adb is located.
+        /// </summary>
+        protected static string CachedAdbPath { get; set; }
+
+        /// <summary>
         /// Gets or sets the default instance of the <see cref="IAdbServer"/> interface.
         /// </summary>
         public static IAdbServer Instance { get; set; } = new AdbServer();
@@ -109,7 +109,7 @@ namespace AdvancedSharpAdbClient
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
-                cachedAdbPath = adbPath;
+                CachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
@@ -130,9 +130,6 @@ namespace AdvancedSharpAdbClient
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
                 adbClient.KillAdb();
-                serverStatus.IsRunning = false;
-                serverStatus.Version = null;
-
                 commandLineClient.StartServer();
                 return StartServerResult.RestartedOutdatedDaemon;
             }
@@ -152,7 +149,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual StartServerResult RestartServer(string adbPath = null)
         {
-            adbPath ??= cachedAdbPath;
+            adbPath ??= CachedAdbPath;
 
             if (!IsValidAdbFile(adbPath))
             {

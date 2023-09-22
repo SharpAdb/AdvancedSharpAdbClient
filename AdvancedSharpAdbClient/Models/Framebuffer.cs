@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient
 
             if (reset || !headerInitialized)
             {
-                Header = FramebufferHeader.Read(headerData);
+                Header = new FramebufferHeader(headerData);
                 headerInitialized = true;
             }
 
@@ -148,7 +148,7 @@ namespace AdvancedSharpAdbClient
 
             if (reset || !headerInitialized)
             {
-                Header = FramebufferHeader.Read(headerData);
+                Header = new FramebufferHeader(headerData);
                 headerInitialized = true;
             }
 

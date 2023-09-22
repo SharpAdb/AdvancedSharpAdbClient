@@ -13,18 +13,13 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Processes Android log files in binary format. You usually get the binary format by running <c>logcat -B</c>.
     /// </summary>
-    public partial class LogReader
+    /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
+    public partial class LogReader(Stream stream)
     {
         /// <summary>
         /// The <see cref="Stream"/> that contains the logcat data.
         /// </summary>
-        private readonly Stream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogReader"/> class.
-        /// </summary>
-        /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
-        public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        private readonly Stream stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
@@ -59,7 +54,6 @@ namespace AdvancedSharpAdbClient.Logs
             // header size and payload length.
             // For both objects, the size should be 0x18
             uint id = 0;
-            uint uid = 0;
 
             if (headerSize != 0)
             {
@@ -84,7 +78,7 @@ namespace AdvancedSharpAdbClient.Logs
                         return null;
                     }
 
-                    uid = uidValue.Value;
+                    _ = uidValue.Value;
                 }
 
                 if (headerSize >= 0x20)

@@ -449,8 +449,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             string result = receiver.SuccessMessage;
-            int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
-            string session = result.Substring(result.IndexOf("[") + 1, arr);
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
 
             return session;
         }

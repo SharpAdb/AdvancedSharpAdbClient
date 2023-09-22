@@ -93,10 +93,26 @@ namespace AdvancedSharpAdbClient
         /// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
         /// <returns><see langword="true"/> if the <paramref name="value"/> parameter occurs within this string,
         /// or if <paramref name="value"/> is the empty string (""); otherwise, <see langword="false"/>.</returns>
-        public static bool Contains(this string text, string value, StringComparison comparisonType)
-        {
-            return text.IndexOf(value, comparisonType) != -1;
-        }
+        public static bool Contains(this string text, string value, StringComparison comparisonType) =>
+            text.IndexOf(value, comparisonType) != -1;
+
+        /// <summary>
+        /// Splits a string into substrings based on a specified delimiting character and, optionally, options.
+        /// </summary>
+        /// <param name="text">The string to split.</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
+        /// <returns>An array whose elements contain the substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+        public static string[] Split(this string text, char separator, StringSplitOptions options = StringSplitOptions.None) =>
+            text.Split(new[] { separator }, options);
+
+        /// <summary>
+        /// Determines whether this string instance starts with the specified character.
+        /// </summary>
+        /// <param name="text">A sequence in which to locate a value.</param>
+        /// <param name="value">The character to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+        public static bool StartsWith(this string text, char value) => text.StartsWith(new string([value]));
 #endif
 
         /// <summary>

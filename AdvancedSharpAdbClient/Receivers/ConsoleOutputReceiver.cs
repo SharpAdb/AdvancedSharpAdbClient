@@ -132,13 +132,11 @@ namespace AdvancedSharpAdbClient
         {
             foreach (string line in lines)
             {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
+                if (string.IsNullOrEmpty(line) || line.StartsWith('#') || line.StartsWith('$'))
                 {
                     continue;
                 }
-
                 output.AppendLine(line);
-
 #if HAS_LOGGER
                 logger.LogDebug(line);
 #endif

@@ -13,6 +13,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class InfoOutputReceiver : MultiLineReceiver
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="InfoOutputReceiver"/> class.
+        /// </summary>
+        public InfoOutputReceiver() { }
+
+        /// <summary>
         /// Gets or sets a dictionary with the extracted properties and their corresponding values.
         /// </summary>
         private Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();

@@ -26,10 +26,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
 
-        private static readonly char[] InvalidCharacters = new char[]
-        {
-            '|', '\\', '?', '*', '<', '\"', ':', '>'
-        };
+        private static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
 
         /// <summary>
         /// Combine the specified paths to form one path.
@@ -126,7 +123,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     if (tpath.EndsWith(DirectorySeparatorChar))
 #else
-                    if (tpath.EndsWith(new string(new char[] { DirectorySeparatorChar })))
+                    if (tpath.EndsWith(new string([DirectorySeparatorChar])))
 #endif
                     {
                         return tpath;
@@ -140,7 +137,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
                 else if (tpath.Length == 1)
                 {
-                    return new string(new char[] { DirectorySeparatorChar });
+                    return new string([DirectorySeparatorChar]);
                 }
             }
 
@@ -240,7 +237,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (sb != "." && !sb.StartsWith(DirectorySeparatorChar))
 #else
-            if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
+            if (sb != "." && !sb.StartsWith(new string([DirectorySeparatorChar])))
 #endif
             {
                 sb = $".{DirectorySeparatorChar}{sb}";
@@ -249,13 +246,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (!sb.EndsWith(DirectorySeparatorChar))
 #else
-            if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
+            if (!sb.EndsWith(new string([DirectorySeparatorChar])))
 #endif
             {
                 sb = $"{sb}{DirectorySeparatorChar}";
             }
 
-            sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
+            sb = sb.Replace("//", new string([DirectorySeparatorChar]));
 
             return sb;
         }

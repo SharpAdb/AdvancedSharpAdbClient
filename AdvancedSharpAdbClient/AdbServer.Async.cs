@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
-                cachedAdbPath = adbPath;
+                CachedAdbPath = adbPath;
                 commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken);
             }
 
@@ -43,9 +43,6 @@ namespace AdvancedSharpAdbClient
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
                 await adbClient.KillAdbAsync(cancellationToken);
-                serverStatus.IsRunning = false;
-                serverStatus.Version = null;
-
                 await commandLineClient.StartServerAsync(cancellationToken);
                 return StartServerResult.RestartedOutdatedDaemon;
             }
@@ -68,7 +65,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default)
         {
-            adbPath ??= cachedAdbPath;
+            adbPath ??= CachedAdbPath;
 
             if (!IsValidAdbFile(adbPath))
             {

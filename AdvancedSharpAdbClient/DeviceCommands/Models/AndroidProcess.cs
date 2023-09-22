@@ -13,6 +13,288 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class AndroidProcess
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidProcess"/> class.
+        /// </summary>
+        public AndroidProcess() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidProcess"/> class from it <see cref="string"/> representation.
+        /// </summary>
+        /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
+        /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
+        /// Because <c>stat</c> does not contain the full process name, this can be useful.</param>
+        public AndroidProcess(string line, bool cmdLinePrefix = false)
+        {
+            ExceptionExtensions.ThrowIfNull(line);
+
+            // See http://man7.org/linux/man-pages/man5/proc.5.html,
+            // section /proc/[pid]/stat, for more information about the file format
+
+            // Space delimited, so normally we would just do a string.split
+            // The process name may contain spaces but is wrapped within parentheses, all other values (we know of) are
+            // numeric.
+            // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
+            int processNameStart = line.IndexOf('(');
+            int processNameEnd = line.LastIndexOf(')');
+
+            int pid;
+            string comm;
+
+            bool parsedCmdLinePrefix = false;
+
+            if (cmdLinePrefix)
+            {
+#if HAS_INDEXRANGE
+                string[] cmdLineParts = line[..processNameStart]
+#else
+
+                string[] cmdLineParts = line.Substring(0, processNameStart)
+#endif
+                    .Split('\0');
+
+                if (cmdLineParts.Length <= 1)
+                {
+                    parsedCmdLinePrefix = false;
+                }
+                else
+                {
+#if HAS_INDEXRANGE
+                    pid = int.Parse(cmdLineParts[^1]);
+#else
+                    pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
+#endif
+                    ProcessId = pid;
+
+                    comm = cmdLineParts[0];
+                    Name = comm;
+
+                    // All the other parts are the command line arguments, skip them.
+                    parsedCmdLinePrefix = true;
+                }
+            }
+
+            if (!parsedCmdLinePrefix)
+            {
+#if HAS_INDEXRANGE
+                pid = int.Parse(line[..processNameStart]);
+#else
+                pid = int.Parse(line.Substring(0, processNameStart));
+#endif
+                ProcessId = pid;
+
+                comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
+                Name = comm;
+            }
+
+#if HAS_INDEXRANGE
+            string[] parts = line[(processNameEnd + 1)..]
+#else
+            string[] parts = line.Substring(processNameEnd + 1)
+#endif
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 35)
+            {
+                throw new ArgumentOutOfRangeException(nameof(line));
+            }
+
+            // Only fields in Linux 2.1.10 and earlier are listed here,
+            // additional fields exist in newer versions of Linux.
+            string state = parts[0];
+            State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true);
+
+            int ppid = ParseInt(parts[1]);
+            ParentProcessId = ppid;
+
+            int pgrp = ParseInt(parts[2]);
+            ProcessGroupId = pgrp;
+
+            int session = ParseInt(parts[3]);
+            SessionID = session;
+
+            int tty_nr = ParseInt(parts[4]);
+            TTYNumber = tty_nr;
+
+            int tpgid = ParseInt(parts[5]);
+            TopProcessGroupId = tpgid;
+
+            uint flags = ParseUInt(parts[6]);
+            Flags = (PerProcessFlags)flags;
+
+            ulong minflt = ParseULong(parts[7]);
+            MinorFaults = minflt;
+
+            ulong cminflt = ParseULong(parts[8]);
+            ChildMinorFaults = cminflt;
+
+            ulong majflt = ParseULong(parts[9]);
+            MajorFaults = majflt;
+
+            ulong cmajflt = ParseULong(parts[10]);
+            ChildMajorFaults = cmajflt;
+
+            ulong utime = ParseULong(parts[11]);
+            UserScheduledTime = utime;
+
+            ulong stime = ParseULong(parts[12]);
+            ScheduledTime = stime;
+
+            long cutime = ParseLong(parts[13]);
+            ChildUserScheduledTime = cutime;
+
+            long cstime = ParseLong(parts[14]);
+            ChildScheduledTime = cstime;
+
+            long priority = ParseLong(parts[15]);
+            Priority = priority;
+
+            long nice = ParseLong(parts[16]);
+            Nice = nice;
+
+            long num_threads = ParseLong(parts[17]);
+            ThreadsNumber = num_threads;
+
+            long itrealvalue = ParseLong(parts[18]);
+            Interval = itrealvalue;
+
+            ulong starttime = ParseULong(parts[19]);
+            StartTime = starttime;
+
+            ulong vsize = ParseULong(parts[20]);
+            VirtualSize = vsize;
+
+            int rss = int.Parse(parts[21]);
+            ResidentSetSize = rss;
+
+            ulong rsslim = ParseULong(parts[22]);
+            ResidentSetSizeLimit = rsslim;
+
+            ulong startcode = ParseULong(parts[23]);
+            StartCode = startcode;
+
+            ulong endcode = ParseULong(parts[24]);
+            EndCode = endcode;
+
+            ulong startstack = ParseULong(parts[25]);
+            StartStack = startstack;
+
+            ulong kstkesp = ParseULong(parts[26]);
+            ESP = kstkesp;
+
+            ulong kstkeip = ParseULong(parts[27]);
+            EIP = kstkeip;
+
+            ulong signal = ParseULong(parts[28]);
+            Signal = signal;
+
+            ulong blocked = ParseULong(parts[29]);
+            Blocked = blocked;
+
+            ulong sigignore = ParseULong(parts[30]);
+            IgnoredSignals = sigignore;
+
+            ulong sigcatch = ParseULong(parts[31]);
+            CaughtSignals = sigcatch;
+
+            ulong wchan = ParseULong(parts[32]);
+            WChan = wchan;
+
+            ulong nswap = ParseULong(parts[33]);
+            SwappedPagesNumber = nswap;
+
+            ulong cnswap = ParseULong(parts[34]);
+            CumulativeSwappedPagesNumber = cnswap;
+
+            if (parts.Length < 36)
+            {
+                return;
+            }
+
+            // Linux 2.1.22
+            int exit_signal = ParseInt(parts[35]);
+            ExitSignal = exit_signal;
+
+            if (parts.Length < 37)
+            {
+                return;
+            }
+
+            // Linux 2.2.8
+            int processor = ParseInt(parts[36]);
+            Processor = processor;
+
+            if (parts.Length < 39)
+            {
+                return;
+            }
+
+            // Linux 2.5.19
+            uint rt_priority = ParseUInt(parts[37]);
+            RealTimePriority = rt_priority;
+
+            uint policy = ParseUInt(parts[38]);
+            Policy = policy;
+
+            if (parts.Length < 40)
+            {
+                return;
+            }
+
+            // Linux 2.6.18
+            ulong delayacct_blkio_ticks = ParseULong(parts[39]);
+
+            IODelays = delayacct_blkio_ticks;
+
+            if (parts.Length < 42)
+            {
+                return;
+            }
+
+            // Linux 2.6.24
+            ulong guest_time = ParseULong(parts[40]);
+            GuestTime = guest_time;
+
+            long cguest_time = ParseLong(parts[41]);
+            ChildGuestTime = cguest_time;
+
+            if (parts.Length < 45)
+            {
+                return;
+            }
+
+            // Linux 3.3
+            ulong start_data = ParseULong(parts[42]);
+            StartData = start_data;
+
+            ulong end_data = ParseULong(parts[43]);
+            EndData = end_data;
+
+            ulong start_brk = ParseULong(parts[44]);
+            StartBrk = start_brk;
+
+            if (parts.Length < 50)
+            {
+                return;
+            }
+
+            // Linux 3.5
+            ulong arg_start = ParseULong(parts[45]);
+            ArgStart = arg_start;
+
+            ulong arg_end = ParseULong(parts[46]);
+            ArgEnd = arg_end;
+
+            ulong env_start = ParseULong(parts[47]);
+            EnvStart = env_start;
+
+            ulong env_end = ParseULong(parts[48]);
+            EnvEnd = env_end;
+
+            int exit_code = ParseInt(parts[49]);
+            ExitCode = exit_code;
+        }
+
+        /// <summary>
         /// Gets or sets the state of the process.
         /// </summary>
         public AndroidProcessState State { get; set; }
@@ -320,280 +602,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
         /// Because <c>stat</c> does not contain the full process name, this can be useful.</param>
         /// <returns>The equivalent <see cref="AndroidProcess"/>.</returns>
-        public static AndroidProcess Parse(string line, bool cmdLinePrefix = false)
-        {
-            ExceptionExtensions.ThrowIfNull(line);
-
-            AndroidProcess process = new();
-
-            // See http://man7.org/linux/man-pages/man5/proc.5.html,
-            // section /proc/[pid]/stat, for more information about the file format
-
-            // Space delimited, so normally we would just do a string.split
-            // The process name may contain spaces but is wrapped within parentheses, all other values (we know of) are
-            // numeric.
-            // So we parse the pid & process name manually, to account for this, and do the string.split afterwards :-)
-            int processNameStart = line.IndexOf('(');
-            int processNameEnd = line.LastIndexOf(')');
-
-            int pid;
-            string comm;
-
-            bool parsedCmdLinePrefix = false;
-
-            if (cmdLinePrefix)
-            {
-#if HAS_INDEXRANGE
-                string[] cmdLineParts = line[..processNameStart]
-#else
-
-                string[] cmdLineParts = line.Substring(0, processNameStart)
-#endif
-                    .Split(new char[] { '\0' });
-
-                if (cmdLineParts.Length <= 1)
-                {
-                    parsedCmdLinePrefix = false;
-                }
-                else
-                {
-#if HAS_INDEXRANGE
-                    pid = int.Parse(cmdLineParts[^1]);
-#else
-                    pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
-#endif
-                    process.ProcessId = pid;
-
-                    comm = cmdLineParts[0];
-                    process.Name = comm;
-
-                    // All the other parts are the command line arguments, skip them.
-                    parsedCmdLinePrefix = true;
-                }
-            }
-
-            if (!parsedCmdLinePrefix)
-            {
-#if HAS_INDEXRANGE
-                pid = int.Parse(line[..processNameStart]);
-#else
-                pid = int.Parse(line.Substring(0, processNameStart));
-#endif
-                process.ProcessId = pid;
-
-                comm = line.Substring(processNameStart + 1, processNameEnd - processNameStart - 1);
-                process.Name = comm;
-            }
-
-#if HAS_INDEXRANGE
-            string[] parts = line[(processNameEnd + 1)..]
-#else
-            string[] parts = line.Substring(processNameEnd + 1)
-#endif
-                .Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 35)
-            {
-                throw new ArgumentOutOfRangeException(nameof(line));
-            }
-
-            // Only fields in Linux 2.1.10 and earlier are listed here,
-            // additional fields exist in newer versions of Linux.
-            string state = parts[0];
-            process.State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true);
-
-            int ppid = ParseInt(parts[1]);
-            process.ParentProcessId = ppid;
-
-            int pgrp = ParseInt(parts[2]);
-            process.ProcessGroupId = pgrp;
-
-            int session = ParseInt(parts[3]);
-            process.SessionID = session;
-
-            int tty_nr = ParseInt(parts[4]);
-            process.TTYNumber = tty_nr;
-
-            int tpgid = ParseInt(parts[5]);
-            process.TopProcessGroupId = tpgid;
-
-            uint flags = ParseUInt(parts[6]);
-            process.Flags = (PerProcessFlags)flags;
-
-            ulong minflt = ParseULong(parts[7]);
-            process.MinorFaults = minflt;
-
-            ulong cminflt = ParseULong(parts[8]);
-            process.ChildMinorFaults = cminflt;
-
-            ulong majflt = ParseULong(parts[9]);
-            process.MajorFaults = majflt;
-
-            ulong cmajflt = ParseULong(parts[10]);
-            process.ChildMajorFaults = cmajflt;
-
-            ulong utime = ParseULong(parts[11]);
-            process.UserScheduledTime = utime;
-
-            ulong stime = ParseULong(parts[12]);
-            process.ScheduledTime = stime;
-
-            long cutime = ParseLong(parts[13]);
-            process.ChildUserScheduledTime = cutime;
-
-            long cstime = ParseLong(parts[14]);
-            process.ChildScheduledTime = cstime;
-
-            long priority = ParseLong(parts[15]);
-            process.Priority = priority;
-
-            long nice = ParseLong(parts[16]);
-            process.Nice = nice;
-
-            long num_threads = ParseLong(parts[17]);
-            process.ThreadsNumber = num_threads;
-
-            long itrealvalue = ParseLong(parts[18]);
-            process.Interval = itrealvalue;
-
-            ulong starttime = ParseULong(parts[19]);
-            process.StartTime = starttime;
-
-            ulong vsize = ParseULong(parts[20]);
-            process.VirtualSize = vsize;
-
-            int rss = int.Parse(parts[21]);
-            process.ResidentSetSize = rss;
-
-            ulong rsslim = ParseULong(parts[22]);
-            process.ResidentSetSizeLimit = rsslim;
-
-            ulong startcode = ParseULong(parts[23]);
-            process.StartCode = startcode;
-
-            ulong endcode = ParseULong(parts[24]);
-            process.EndCode = endcode;
-
-            ulong startstack = ParseULong(parts[25]);
-            process.StartStack = startstack;
-
-            ulong kstkesp = ParseULong(parts[26]);
-            process.ESP = kstkesp;
-
-            ulong kstkeip = ParseULong(parts[27]);
-            process.EIP = kstkeip;
-
-            ulong signal = ParseULong(parts[28]);
-            process.Signal = signal;
-
-            ulong blocked = ParseULong(parts[29]);
-            process.Blocked = blocked;
-
-            ulong sigignore = ParseULong(parts[30]);
-            process.IgnoredSignals = sigignore;
-
-            ulong sigcatch = ParseULong(parts[31]);
-            process.CaughtSignals = sigcatch;
-
-            ulong wchan = ParseULong(parts[32]);
-            process.WChan = wchan;
-
-            ulong nswap = ParseULong(parts[33]);
-            process.SwappedPagesNumber = nswap;
-
-            ulong cnswap = ParseULong(parts[34]);
-            process.CumulativeSwappedPagesNumber = cnswap;
-
-            if (parts.Length < 36)
-            {
-                return process;
-            }
-
-            // Linux 2.1.22
-            int exit_signal = ParseInt(parts[35]);
-            process.ExitSignal = exit_signal;
-
-            if (parts.Length < 37)
-            {
-                return process;
-            }
-
-            // Linux 2.2.8
-            int processor = ParseInt(parts[36]);
-            process.Processor = processor;
-
-            if (parts.Length < 39)
-            {
-                return process;
-            }
-
-            // Linux 2.5.19
-            uint rt_priority = ParseUInt(parts[37]);
-            process.RealTimePriority = rt_priority;
-
-            uint policy = ParseUInt(parts[38]);
-            process.Policy = policy;
-
-            if (parts.Length < 40)
-            {
-                return process;
-            }
-
-            // Linux 2.6.18
-            ulong delayacct_blkio_ticks = ParseULong(parts[39]);
-
-            process.IODelays = delayacct_blkio_ticks;
-
-            if (parts.Length < 42)
-            {
-                return process;
-            }
-
-            // Linux 2.6.24
-            ulong guest_time = ParseULong(parts[40]);
-            process.GuestTime = guest_time;
-
-            long cguest_time = ParseLong(parts[41]);
-            process.ChildGuestTime = cguest_time;
-
-            if (parts.Length < 45)
-            {
-                return process;
-            }
-
-            // Linux 3.3
-            ulong start_data = ParseULong(parts[42]);
-            process.StartData = start_data;
-
-            ulong end_data = ParseULong(parts[43]);
-            process.EndData = end_data;
-
-            ulong start_brk = ParseULong(parts[44]);
-            process.StartBrk = start_brk;
-
-            if (parts.Length < 50)
-            {
-                return process;
-            }
-
-            // Linux 3.5
-            ulong arg_start = ParseULong(parts[45]);
-            process.ArgStart = arg_start;
-
-            ulong arg_end = ParseULong(parts[46]);
-            process.ArgEnd = arg_end;
-
-            ulong env_start = ParseULong(parts[47]);
-            process.EnvStart = env_start;
-
-            ulong env_end = ParseULong(parts[48]);
-            process.EnvEnd = env_end;
-
-            int exit_code = ParseInt(parts[49]);
-            process.ExitCode = exit_code;
-
-            return process;
-        }
+        public static AndroidProcess Parse(string line, bool cmdLinePrefix = false) => new(line, cmdLinePrefix);
 
         /// <summary>
         /// Gets a <see cref="string"/> that represents this <see cref="AndroidProcess"/>,

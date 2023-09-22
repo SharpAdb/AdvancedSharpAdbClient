@@ -9,12 +9,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Represents the state of the installation for <see cref="PackageManager.InstallProgressChanged"/>.
     /// </summary>
-    public class InstallProgressEventArgs : EventArgs
+    public class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>
         /// State of the installation.
         /// </summary>
-        public PackageInstallProgressState State { get; }
+        public PackageInstallProgressState State { get; } = state;
 
         /// <summary>
         /// Number of packages which is finished operation.
@@ -37,11 +37,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Used only in <see cref="PackageInstallProgressState.Uploading"/> state.
         /// </summary>
         public double UploadProgress { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InstallProgressEventArgs"/> class.
-        /// </summary>
-        public InstallProgressEventArgs(PackageInstallProgressState state) => State = state;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstallProgressEventArgs"/> class.

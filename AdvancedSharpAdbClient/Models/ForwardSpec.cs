@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient
         /// value, used for the <see cref="string"/> representation of the <see cref="ForwardSpec"/>
         /// class.
         /// </summary>
-        private static readonly Dictionary<string, ForwardProtocol> Mappings = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, ForwardProtocol> Mappings = new(6, StringComparer.OrdinalIgnoreCase)
         {
             { "tcp", ForwardProtocol.Tcp },
             { "localabstract", ForwardProtocol.LocalAbstract },
@@ -28,6 +28,65 @@ namespace AdvancedSharpAdbClient
             { "dev", ForwardProtocol.Device },
             { "jdwp", ForwardProtocol.JavaDebugWireProtocol }
         };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> class.
+        /// </summary>
+        public ForwardSpec() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> class from its <see cref="string"/> representation.
+        /// </summary>
+        /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
+        public ForwardSpec(string spec)
+        {
+            ExceptionExtensions.ThrowIfNull(spec);
+
+            string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length != 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(spec));
+            }
+
+            if (!Mappings.ContainsKey(parts[0]))
+            {
+                throw new ArgumentOutOfRangeException(nameof(spec));
+            }
+
+            ForwardProtocol protocol = Mappings[parts[0]];
+            Protocol = protocol;
+
+            bool isInt = int.TryParse(parts[1], out int intValue);
+
+            switch (protocol)
+            {
+                case ForwardProtocol.JavaDebugWireProtocol:
+                    if (!isInt)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(spec));
+                    }
+
+                    ProcessId = intValue;
+                    break;
+
+                case ForwardProtocol.Tcp:
+                    if (!isInt)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(spec));
+                    }
+
+                    Port = intValue;
+                    break;
+
+                case ForwardProtocol.LocalAbstract
+                    or ForwardProtocol.LocalFilesystem
+                    or ForwardProtocol.LocalReserved
+                    or ForwardProtocol.Device:
+                    SocketName = parts[1];
+                    break;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the protocol which is being forwarded.
@@ -58,62 +117,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
         /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
-        public static ForwardSpec Parse(string spec)
-        {
-            ExceptionExtensions.ThrowIfNull(spec);
-
-            string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length != 2)
-            {
-                throw new ArgumentOutOfRangeException(nameof(spec));
-            }
-
-            if (!Mappings.ContainsKey(parts[0]))
-            {
-                throw new ArgumentOutOfRangeException(nameof(spec));
-            }
-
-            ForwardProtocol protocol = Mappings[parts[0]];
-
-            ForwardSpec value = new()
-            {
-                Protocol = protocol
-            };
-
-
-            bool isInt = int.TryParse(parts[1], out int intValue);
-
-            switch (protocol)
-            {
-                case ForwardProtocol.JavaDebugWireProtocol:
-                    if (!isInt)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(spec));
-                    }
-
-                    value.ProcessId = intValue;
-                    break;
-
-                case ForwardProtocol.Tcp:
-                    if (!isInt)
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(spec));
-                    }
-
-                    value.Port = intValue;
-                    break;
-
-                case ForwardProtocol.LocalAbstract
-                    or ForwardProtocol.LocalFilesystem
-                    or ForwardProtocol.LocalReserved
-                    or ForwardProtocol.Device:
-                    value.SocketName = parts[1];
-                    break;
-            }
-
-            return value;
-        }
+        public static ForwardSpec Parse(string spec) => new(spec);
 
         /// <inheritdoc/>
         public override string ToString()

@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
 
             string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return data.Select(DeviceData.CreateFromAdbData);
+            return data.Select((x) => new DeviceData(x));
         }
 
         /// <inheritdoc/>
@@ -151,7 +151,7 @@ namespace AdvancedSharpAdbClient
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return parts.Select(ForwardData.FromString);
+            return parts.Select((x) => new ForwardData(x));
         }
 
         /// <inheritdoc/>
@@ -169,7 +169,7 @@ namespace AdvancedSharpAdbClient
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return parts.Select(ForwardData.FromString);
+            return parts.Select((x) => new ForwardData(x));
         }
 
         /// <inheritdoc/>

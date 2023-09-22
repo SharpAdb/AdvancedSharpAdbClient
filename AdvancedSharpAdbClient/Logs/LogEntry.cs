@@ -15,6 +15,11 @@ namespace AdvancedSharpAdbClient.Logs
     public class LogEntry
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="LogEntry"/> class.
+        /// </summary>
+        public LogEntry() { }
+
+        /// <summary>
         /// Gets or sets the process ID of the code that generated the log message.
         /// </summary>
         public int ProcessId { get; set; }

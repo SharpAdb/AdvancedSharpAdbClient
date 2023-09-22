@@ -33,6 +33,8 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
     {
+        private static readonly string[] separator = ["\r\n", "\n"];
+
         private bool disposed = false;
 
 #if HAS_LOGGER
@@ -66,6 +68,18 @@ namespace AdvancedSharpAdbClient
         protected Thread monitorThread;
 #endif
 
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
+
 #if !HAS_LOGGER
 #pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
 #endif
@@ -90,18 +104,6 @@ namespace AdvancedSharpAdbClient
 #if !HAS_LOGGER
 #pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
 #endif
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
 
         /// <inheritdoc/>
         public ReadOnlyCollection<DeviceData> Devices { get; private set; }
@@ -285,9 +287,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private void ProcessIncomingDeviceData(string result)
         {
-            string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] deviceValues = result.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            IEnumerable<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData);
+            IEnumerable<DeviceData> currentDevices = deviceValues.Select((x) => new DeviceData(x));
             UpdateDevices(currentDevices);
         }
 

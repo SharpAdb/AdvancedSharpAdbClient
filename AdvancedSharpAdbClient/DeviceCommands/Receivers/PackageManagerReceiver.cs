@@ -9,28 +9,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Parses the output of the various <c>pm</c> commands.
     /// </summary>
-    public class PackageManagerReceiver : MultiLineReceiver
+    /// <param name="device">The device for which the package information is being received.</param>
+    /// <param name="packageManager">The parent package manager.</param>
+    public class PackageManagerReceiver(DeviceData device, PackageManager packageManager) : MultiLineReceiver
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PackageManagerReceiver"/> class.
-        /// </summary>
-        /// <param name="device">The device for which the package information is being received.</param>
-        /// <param name="packageManager">The parent package manager.</param>
-        public PackageManagerReceiver(DeviceData device, PackageManager packageManager)
-        {
-            Device = device;
-            PackageManager = packageManager;
-        }
-
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; private set; }
+        public DeviceData Device { get; private set; } = device;
 
         /// <summary>
         /// Gets the package manager.
         /// </summary>
-        public PackageManager PackageManager { get; private set; }
+        public PackageManager PackageManager { get; private set; } = packageManager;
 
         /// <summary>
         /// Processes the new lines.
