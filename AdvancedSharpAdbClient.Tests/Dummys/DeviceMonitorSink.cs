@@ -14,10 +14,10 @@ namespace AdvancedSharpAdbClient.Tests
             Monitor.DeviceConnected += OnDeviceConnected;
             Monitor.DeviceDisconnected += OnDeviceDisconnected;
 
-            ChangedEvents = new Collection<DeviceDataChangeEventArgs>();
-            NotifiedEvents = new Collection<DeviceDataNotifyEventArgs>();
-            ConnectedEvents = new Collection<DeviceDataConnectEventArgs>();
-            DisconnectedEvents = new Collection<DeviceDataConnectEventArgs>();
+            ChangedEvents = [];
+            NotifiedEvents = [];
+            ConnectedEvents = [];
+            DisconnectedEvents = [];
         }
 
         public void ResetSignals()

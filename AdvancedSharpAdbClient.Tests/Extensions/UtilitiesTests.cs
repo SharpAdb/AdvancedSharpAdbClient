@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         [Fact]
         public void JoinTest() =>
-            Assert.Equal("Hello World!", Utilities.Join(" ", new string[] { "Hello", "World!" }));
+            Assert.Equal("Hello World!", Utilities.Join(" ", ["Hello", "World!"]));
 
         [Fact]
         public void FromUnixTimeSecondsTest()

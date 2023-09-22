@@ -3,7 +3,7 @@ name: build and test
 on: [push, pull_request]
 
 env:
-  DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
+  DOTNET_VERSION: '8.0.x' # The .NET SDK version to use
 
 jobs:
   build-and-test:
@@ -16,10 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Setup .NET Core
+    - name: Setup .NET Core App
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{env.DOTNET_VERSION}}
+        dotnet-quality: 'preview'
 
     - name: Install dependencies
       run: dotnet restore -p:FullTargets=false

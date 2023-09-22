@@ -37,6 +37,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummySyncService syncService = new();
 
+            using FactoriesLocker locker = await FactoriesLocker.WaitAsync();
+
             Factories.SyncServiceFactory = (c, d) => syncService;
 
             DummyAdbClient adbClient = new();
@@ -122,6 +124,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async void InstallMultiplePackageAsyncTest()
         {
             DummySyncService syncService = new();
+
+            using FactoriesLocker locker = await FactoriesLocker.WaitAsync();
 
             Factories.SyncServiceFactory = (c, d) => syncService;
 

@@ -3,8 +3,8 @@ using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing.Imaging;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
-using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -85,18 +84,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetAdbVersionTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "0020"
-            };
-
-            string[] requests = new string[]
-            {
-                "host:version"
-            };
+            string[] responseMessages = ["0020"];
+            string[] requests = ["host:version"];
 
             int version = 0;
-
             RunTest(
                 OkResponse,
                 responseMessages,
@@ -113,10 +104,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void KillAdbTest()
         {
-            string[] requests = new string[]
-            {
-                "host:kill"
-            };
+            string[] requests = ["host:kill"];
 
             RunTest(
                 NoResponses,
@@ -131,18 +119,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetDevicesTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"
-            };
-
-            string[] requests = new string[]
-            {
-                "host:devices-l"
-            };
+            string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
+            string[] requests = ["host:devices-l"];
 
             IEnumerable<DeviceData> devices = null;
-
             RunTest(
                 OkResponse,
                 responseMessages,
@@ -167,10 +147,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetDeviceTest()
         {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
+            string[] requests = ["host:transport:169.254.109.177:5555"];
 
             RunTest(
                 OkResponse,
@@ -185,14 +162,11 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetInvalidDeviceTest()
         {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
+            string[] requests = ["host:transport:169.254.109.177:5555"];
 
             _ = Assert.Throws<DeviceNotFoundException>(() =>
             RunTest(
-                new AdbResponse[] { AdbResponse.FromError("device not found") },
+                [AdbResponse.FromError("device not found")],
                 NoResponseMessages,
                 requests,
                 () => Socket.SetDevice(Device)));
@@ -204,14 +178,11 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SetDeviceOtherException()
         {
-            string[] requests = new string[]
-            {
-                "host:transport:169.254.109.177:5555"
-            };
+            string[] requests = ["host:transport:169.254.109.177:5555"];
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
-                new AdbResponse[] { AdbResponse.FromError("Too many cats.") },
+                [AdbResponse.FromError("Too many cats.")],
                 NoResponseMessages,
                 requests,
                 () => Socket.SetDevice(Device)));
@@ -259,15 +230,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateDuplicateForwardTest()
         {
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.FromError("cannot rebind existing socket")
-            };
-
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
-            };
+            AdbResponse[] responses = [AdbResponse.FromError("cannot rebind existing socket")];
+            string[] requests = ["host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"];
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
@@ -283,10 +247,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveForwardTest()
         {
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:killforward:tcp:1"
-            };
+            string[] requests = ["host-serial:169.254.109.177:5555:killforward:tcp:1"];
 
             RunTest(
                 OkResponse,
@@ -301,17 +262,17 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveReverseForwardTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward:localabstract:test"
-            };
+            ];
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
+            AdbResponse[] responses =
+            [
                 AdbResponse.OK,
                 AdbResponse.OK,
-            };
+            ];
 
             RunTest(
                 responses,
@@ -326,10 +287,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveAllForwardsTest()
         {
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:killforward-all"
-            };
+            string[] requests = ["host-serial:169.254.109.177:5555:killforward-all"];
 
             RunTest(
                 OkResponse,
@@ -344,17 +302,17 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RemoveAllReversesTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward-all"
-            };
+            ];
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
+            AdbResponse[] responses =
+            [
                 AdbResponse.OK,
                 AdbResponse.OK,
-            };
+            ];
 
             RunTest(
                 responses,
@@ -369,18 +327,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ListForwardTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"
-            };
-
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:list-forward"
-            };
+            string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
+            string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
 
             ForwardData[] forwards = null;
-
             RunTest(
                 OkResponse,
                 responseMessages,
@@ -400,24 +350,21 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ListReverseForwardTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"
-            };
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK,
-            };
+            string[] responseMessages = ["(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"];
 
-            string[] requests = new string[]
-            {
+            AdbResponse[] responses =
+            [
+                AdbResponse.OK,
+                AdbResponse.OK,
+            ];
+
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:list-forward"
-            };
+            ];
 
             ForwardData[] forwards = null;
-
             RunTest(
                 responses,
                 responseMessages,
@@ -443,19 +390,19 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
+            AdbResponse[] responses =
+            [
                 AdbResponse.OK,
                 AdbResponse.OK
-            };
+            ];
 
-            string[] responseMessages = Array.Empty<string>();
+            string[] responseMessages = [];
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
             using MemoryStream shellStream = new(streamData);
@@ -484,19 +431,19 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
+            AdbResponse[] responses =
+            [
                 AdbResponse.OK,
                 AdbResponse.OK
-            };
+            ];
 
-            string[] responseMessages = Array.Empty<string>();
+            string[] responseMessages = [];
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
-            };
+            ];
 
             ConsoleOutputReceiver receiver = new();
 
@@ -544,8 +491,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             Framebuffer framebuffer = null;
 
-            Factories.AdbSocketFactory = (endPoint) => socket;
-            framebuffer = TestClient.GetFrameBuffer(device);
+            using (FactoriesLocker locker = FactoriesLocker.Wait())
+            {
+                Factories.AdbSocketFactory = (endPoint) => socket;
+                framebuffer = TestClient.GetFrameBuffer(device);
+                Factories.Reset();
+            }
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
@@ -596,25 +547,25 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            AdbResponse[] responses = new AdbResponse[]
-            {
+            AdbResponse[] responses =
+            [
                 AdbResponse.OK,
                 AdbResponse.OK
-            };
+            ];
 
-            string[] responseMessages = Array.Empty<string>();
+            string[] responseMessages = [];
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:logcat -B -b system"
-            };
+            ];
 
             ConsoleOutputReceiver receiver = new();
 
             using Stream stream = File.OpenRead("Assets/logcat.bin");
             using ShellStream shellStream = new(stream, false);
-            Collection<LogEntry> logs = new();
+            Collection<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
 
             RunTest(
@@ -633,14 +584,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RebootTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reboot:"
-            };
+            ];
 
             RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 () => TestClient.Reboot(Device));
@@ -784,8 +735,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DisconnectTest()
         {
-            string[] requests = new string[] { "host:disconnect:localhost:5555" };
-            string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
+            string[] requests = ["host:disconnect:localhost:5555"];
+            string[] responseMessages = ["disconnected 127.0.0.1:5555"];
 
             RunTest(
                 OkResponse,
@@ -806,11 +757,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "root:"
-            };
+            ];
 
             byte[] expectedData = new byte[1024];
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
@@ -818,12 +769,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 Array.Empty<(SyncCommand, string)>(),
                 Array.Empty<SyncCommand>(),
-                new byte[][] { expectedData },
+                [expectedData],
                 Array.Empty<byte[]>(),
                 () => TestClient.Root(device)));
         }
@@ -840,11 +791,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "unroot:"
-            };
+            ];
 
             byte[] expectedData = new byte[1024];
             byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
@@ -852,12 +803,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 Array.Empty<(SyncCommand, string)>(),
                 Array.Empty<SyncCommand>(),
-                new byte[][] { expectedData },
+                [expectedData],
                 Array.Empty<byte[]>(),
                 () => TestClient.Unroot(device)));
         }
@@ -874,14 +825,14 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "exec:cmd package 'install' -S 205774"
-            };
+            ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChuncks = new();
+            Collection<byte[]> applicationDataChunks = [];
 
             using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -897,7 +848,7 @@ namespace AdvancedSharpAdbClient.Tests
                     else
                     {
                         buffer = buffer.Take(read).ToArray();
-                        applicationDataChuncks.Add(buffer);
+                        applicationDataChunks.Add(buffer);
                     }
                 }
             }
@@ -907,17 +858,13 @@ namespace AdvancedSharpAdbClient.Tests
             using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
-                    new AdbResponse[]
-                    {
-                        AdbResponse.OK,
-                        AdbResponse.OK,
-                    },
+                    [AdbResponse.OK, AdbResponse.OK],
                     NoResponseMessages,
                     requests,
                     Array.Empty<(SyncCommand, string)>(),
                     Array.Empty<SyncCommand>(),
-                    new byte[][] { response },
-                    applicationDataChuncks.ToArray(),
+                    [response],
+                    applicationDataChunks.ToArray(),
                     () => TestClient.Install(device, stream));
             }
         }
@@ -934,23 +881,18 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "exec:cmd package 'install-create' -p com.google.android.gms"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
             using MemoryStream shellStream = new(streamData);
 
             string session = string.Empty;
-
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -971,14 +913,14 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
-            };
+            ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChuncks = new();
+            Collection<byte[]> applicationDataChunks = [];
 
             using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -994,7 +936,7 @@ namespace AdvancedSharpAdbClient.Tests
                     else
                     {
                         buffer = buffer.Take(read).ToArray();
-                        applicationDataChuncks.Add(buffer);
+                        applicationDataChunks.Add(buffer);
                     }
                 }
             }
@@ -1004,17 +946,13 @@ namespace AdvancedSharpAdbClient.Tests
             using (Stream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
-                    new AdbResponse[]
-                    {
-                        AdbResponse.OK,
-                        AdbResponse.OK,
-                    },
+                    [AdbResponse.OK, AdbResponse.OK],
                     NoResponseMessages,
                     requests,
                     Array.Empty<(SyncCommand, string)>(),
                     Array.Empty<SyncCommand>(),
-                    new byte[][] { response },
-                    applicationDataChuncks.ToArray(),
+                    [response],
+                    applicationDataChunks.ToArray(),
                     () => TestClient.InstallWrite(device, stream, "base", "936013062"));
             }
         }
@@ -1031,21 +969,17 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "exec:cmd package 'install-commit' 936013062"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
             using MemoryStream shellStream = new(streamData);
 
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1064,23 +998,12 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
-                "host-serial:009d1cd696d5194a:features"
-            };
-
-            string[] responses = new string[]
-            {
-                "sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"
-            };
+            string[] requests = ["host-serial:009d1cd696d5194a:features"];
+            string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
             IEnumerable<string> features = null;
-
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK],
                 responses,
                 requests,
                 () => features = TestClient.GetFeatureSet(device));
@@ -1102,11 +1025,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
@@ -1114,13 +1037,8 @@ namespace AdvancedSharpAdbClient.Tests
             using MemoryStream shellStream = new(streamData);
 
             string xml = string.Empty;
-
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1141,11 +1059,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string miuidump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
             string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
@@ -1153,13 +1071,8 @@ namespace AdvancedSharpAdbClient.Tests
             using MemoryStream miuiStream = new(miuiStreamData);
 
             string miuiXml = string.Empty;
-
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 miuiStream,
@@ -1180,26 +1093,22 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
             using MemoryStream emptyStream = new(emptyStreamData);
-            string emptyXml = string.Empty;
 
+            string emptyXml = string.Empty;
             RunTest(
-               new AdbResponse[]
-               {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-               },
-               NoResponseMessages,
-               requests,
-               emptyStream,
-               () => emptyXml = TestClient.DumpScreenString(device));
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                emptyStream,
+                () => emptyXml = TestClient.DumpScreenString(device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -1216,11 +1125,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string errorXml = File.ReadAllText(@"Assets/dumpscreen_error.txt");
             byte[] errorStreamData = Encoding.UTF8.GetBytes(errorXml);
@@ -1228,15 +1137,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.Throws<XmlException>(() =>
             RunTest(
-               new AdbResponse[]
-               {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-               },
-               NoResponseMessages,
-               requests,
-               errorStream,
-               () => TestClient.DumpScreenString(device)));
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                errorStream,
+                () => TestClient.DumpScreenString(device)));
         }
 
         /// <summary>
@@ -1251,24 +1156,19 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
             XmlDocument xml = null;
-
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1293,11 +1193,11 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:input tap 100 100"
-            };
+            ];
 
             byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
         at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
@@ -1325,11 +1225,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             JavaException exception = Assert.Throws<JavaException>(() =>
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1372,22 +1268,18 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:input tap 100 100"
-            };
+            ];
 
             byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
             using MemoryStream shellStream = new(streamData);
 
             _ = Assert.Throws<ElementNotFoundException>(() =>
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1406,22 +1298,18 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1447,22 +1335,18 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 State = DeviceState.Online
             };
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:009d1cd696d5194a",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
@@ -1480,15 +1364,8 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private void RunConnectTest(Action test, string connectString)
         {
-            string[] requests = new string[]
-            {
-                $"host:connect:{connectString}"
-            };
-
-            string[] responseMessages = new string[]
-            {
-                $"connected to {connectString}"
-            };
+            string[] requests = [$"host:connect:{connectString}"];
+            string[] responseMessages = [$"connected to {connectString}"];
 
             RunTest(
                 OkResponse,
@@ -1499,15 +1376,8 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private void RunPairTest(Action test, string connectString, string code)
         {
-            string[] requests = new string[]
-            {
-                $"host:pair:{code}:{connectString}"
-            };
-
-            string[] responseMessages = new string[]
-            {
-                $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
-            };
+            string[] requests = [$"host:pair:{code}:{connectString}"];
+            string[] responseMessages = [$"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"];
 
             RunTest(
                 OkResponse,
@@ -1518,44 +1388,26 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private void RunCreateReverseTest(Action<DeviceData> test, string reverseString)
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 $"reverse:forward:{reverseString}",
-            };
+            ];
 
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                    AdbResponse.OK
-                },
-                new string[]
-                {
-                    null
-                },
+                [AdbResponse.OK, AdbResponse.OK, AdbResponse.OK],
+                [null],
                 requests,
                 () => test(Device));
         }
 
         private void RunCreateForwardTest(Action<DeviceData> test, string forwardString)
         {
-            string[] requests = new string[]
-            {
-                $"host-serial:169.254.109.177:5555:forward:{forwardString}"
-            };
+            string[] requests = [$"host-serial:169.254.109.177:5555:forward:{forwardString}"];
 
             RunTest(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK
-                },
-                new string[]
-                {
-                    null
-                },
+                [AdbResponse.OK, AdbResponse.OK],
+                [null],
                 requests,
                 () => test(Device));
         }

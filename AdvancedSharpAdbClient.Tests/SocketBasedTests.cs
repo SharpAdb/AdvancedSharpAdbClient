@@ -15,6 +15,8 @@ namespace AdvancedSharpAdbClient
 
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
+            using FactoriesLocker locker = FactoriesLocker.Wait();
+
             // this.EndPoint = AdbClient.Instance.EndPoint;
 #if DEBUG
             // Use the tracing adb socket factory to run the tests on an actual device.
@@ -46,9 +48,9 @@ namespace AdvancedSharpAdbClient
             Factories.Reset();
         }
 
-        protected static AdbResponse[] NoResponses { get; } = Array.Empty<AdbResponse>();
-        protected static AdbResponse[] OkResponse { get; } = new AdbResponse[] { AdbResponse.OK };
-        protected static string[] NoResponseMessages { get; } = Array.Empty<string>();
+        protected static AdbResponse[] NoResponses { get; } = [];
+        protected static AdbResponse[] OkResponse { get; } = [AdbResponse.OK];
+        protected static string[] NoResponseMessages { get; } = [];
         protected static DeviceData Device { get; } = new()
         {
             Serial = "169.254.109.177:5555",

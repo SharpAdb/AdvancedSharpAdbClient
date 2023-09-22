@@ -21,6 +21,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.StatAsync("/test", Arg.Any<CancellationToken>()).Returns(tcs.Task);
 
+            using FactoriesLocker locker = await FactoriesLocker.WaitAsync();
+
             Factories.SyncServiceFactory = (c, d) => mock;
 
             DeviceData device = new();

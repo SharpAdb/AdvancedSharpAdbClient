@@ -10,12 +10,8 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    internal class TracingAdbSocket : AdbSocket, IDummyAdbSocket
+    internal class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
     {
-        public TracingAdbSocket(EndPoint endPoint) : base(endPoint)
-        {
-        }
-
         public Stream ShellStream { get; set; }
 
         public bool DoDispose { get; set; }

@@ -66,6 +66,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummySyncService syncService = new();
 
+            using FactoriesLocker locker = FactoriesLocker.Wait();
+
             Factories.SyncServiceFactory = (c, d) => syncService;
 
             DummyAdbClient adbClient = new();
@@ -104,7 +106,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["pm install-write 936013062 base.apk \"/data/base.apk\""] = "Success";
             adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\""] = "Success";
             adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\""] = "Success";
-            adbClient.Commands["pm install-commit 936013062"] = "Success"    ;
+            adbClient.Commands["pm install-commit 936013062"] = "Success";
 
             DeviceData device = new()
             {
@@ -151,6 +153,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void InstallMultiplePackageTest()
         {
             DummySyncService syncService = new();
+
+            using FactoriesLocker locker = FactoriesLocker.Wait();
 
             Factories.SyncServiceFactory = (c, d) => syncService;
 

@@ -26,6 +26,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void Close() => Connected = false;
 
         public void Connect(EndPoint endPoint) => Connected = true;
+
         public Task ConnectAsync(EndPoint endPoint)
         {
             Connected = true;

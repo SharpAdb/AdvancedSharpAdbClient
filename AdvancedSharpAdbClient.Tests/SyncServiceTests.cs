@@ -36,8 +36,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(SyncCommand.STAT, "/fstab.donatello"),
-                new SyncCommand[] { SyncCommand.STAT },
-                new byte[][] { new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 } },
+                new[] { SyncCommand.STAT },
+                new byte[][] { [160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0] },
                 null,
                 () =>
                 {
@@ -67,13 +67,13 @@ namespace AdvancedSharpAdbClient.Tests
                 ResponseMessages(".", "..", "sdcard0", "emulated"),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(SyncCommand.LIST, "/storage"),
-                new SyncCommand[] { SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE },
+                new[] { SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE },
                 new byte[][]
                 {
-                    new byte[] { 233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 },
-                    new byte[] { 237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 },
-                    new byte[] { 255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86 },
-                    new byte[] { 109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86 }
+                    [233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86],
+                    [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
                 },
                 null,
                 () =>
@@ -129,13 +129,12 @@ namespace AdvancedSharpAdbClient.Tests
                 ResponseMessages(),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(SyncCommand.STAT, "/fstab.donatello").Union(SyncRequests(SyncCommand.RECV, "/fstab.donatello")),
-                new SyncCommand[] { SyncCommand.STAT, SyncCommand.DATA, SyncCommand.DONE },
-                new byte[][]
-                {
-                    new byte[] { 160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0 },
+                [SyncCommand.STAT, SyncCommand.DATA, SyncCommand.DONE],
+                [
+                    [160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0],
                     contentLength,
                     content
-                },
+                ],
                 null,
                 () =>
                 {
@@ -158,10 +157,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             Stream stream = File.OpenRead("Assets/fstab.bin");
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
-            List<byte> contentMessage = new();
-            contentMessage.AddRange(SyncCommandConverter.GetBytes(SyncCommand.DATA));
-            contentMessage.AddRange(BitConverter.GetBytes(content.Length));
-            contentMessage.AddRange(content);
+            List<byte> contentMessage =
+            [
+                .. SyncCommandConverter.GetBytes(SyncCommand.DATA),
+                .. BitConverter.GetBytes(content.Length),
+                .. content,
+            ];
 
             RunTest(
                 OkResponses(2),
@@ -170,12 +171,9 @@ namespace AdvancedSharpAdbClient.Tests
                 SyncRequests(
                     SyncCommand.SEND, "/sdcard/test,644",
                     SyncCommand.DONE, "1446505200"),
-                new SyncCommand[] { SyncCommand.OKAY },
+                [SyncCommand.OKAY],
                 null,
-                new byte[][]
-                {
-                    contentMessage.ToArray()
-                },
+                [[.. contentMessage]],
                 () =>
                 {
                     using SyncService service = new(Socket, device);

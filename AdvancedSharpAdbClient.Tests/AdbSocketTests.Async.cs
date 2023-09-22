@@ -14,23 +14,23 @@ namespace AdvancedSharpAdbClient.Tests
         public async void SendSyncDATARequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, 2, CancellationToken.None),
-                new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
+                [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
         [Fact]
         public async void SendSyncSENDRequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", CancellationToken.None),
-                new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
+                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
 
         [Fact]
         public async void SendSyncDENTRequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", 633, CancellationToken.None),
-                new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });
+                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
         [Fact]
         public async void SendSyncNullRequestAsyncTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => RunTestAsync((socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, null, CancellationToken.None), Array.Empty<byte>()));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => RunTestAsync((socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, null, CancellationToken.None), []));
 
         [Fact]
         public async void ReadSyncResponseAsync()
@@ -117,7 +117,7 @@ namespace AdvancedSharpAdbClient.Tests
                 data[i] = (byte)i;
             }
 
-            await tcpSocket.InputStream.WriteAsync(data, 0, 101);
+            await tcpSocket.InputStream.WriteAsync(data.AsMemory(0, 101));
             tcpSocket.InputStream.Position = 0;
 
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
