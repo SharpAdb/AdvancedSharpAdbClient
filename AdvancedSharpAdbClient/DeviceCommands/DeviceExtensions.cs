@@ -213,7 +213,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = new();
+            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
@@ -237,7 +237,7 @@ else
     /system/bin/ls -1 /proc/
 fi".Replace("\r\n", "\n"), receiver);
 
-            Collection<int> pids = new();
+            Collection<int> pids = [];
 
             string output = receiver.ToString();
             using (StringReader reader = new(output))

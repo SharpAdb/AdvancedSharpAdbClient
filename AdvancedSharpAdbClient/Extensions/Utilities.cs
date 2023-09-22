@@ -84,6 +84,21 @@ namespace AdvancedSharpAdbClient
 #endif
         }
 
+#if !UAP10_0_15138_0 && !NETCOREAPP2_1_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Returns a value indicating whether a specified string occurs within this string, using the specified comparison rules.
+        /// </summary>
+        /// <param name="text">A sequence in which to locate a value.</param>
+        /// <param name="value">The string to seek.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+        /// <returns><see langword="true"/> if the <paramref name="value"/> parameter occurs within this string,
+        /// or if <paramref name="value"/> is the empty string (""); otherwise, <see langword="false"/>.</returns>
+        public static bool Contains(this string text, string value, StringComparison comparisonType)
+        {
+            return text.IndexOf(value, comparisonType) != -1;
+        }
+#endif
+
         /// <summary>
         /// Concatenates the members of a constructed <see cref="IEnumerable{T}"/> collection of type <see cref="string"/>,
         /// using the specified separator between each member.

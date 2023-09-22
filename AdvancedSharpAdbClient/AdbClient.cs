@@ -3,18 +3,18 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using AdvancedSharpAdbClient.Logs;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
-using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient
 {
@@ -33,6 +33,8 @@ namespace AdvancedSharpAdbClient
     /// </remarks>
     public partial class AdbClient : IAdbClient
     {
+        private static readonly char[] separator = ['\r', '\n'];
+
         /// <summary>
         /// The default port to use when connecting to a device over TCP/IP.
         /// </summary>
@@ -193,7 +195,7 @@ namespace AdvancedSharpAdbClient
             socket.ReadAdbResponse();
             string reply = socket.ReadString();
 
-            string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return data.Select(DeviceData.CreateFromAdbData);
         }
@@ -291,7 +293,7 @@ namespace AdvancedSharpAdbClient
 
             string data = socket.ReadString();
 
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return parts.Select(ForwardData.FromString);
         }
@@ -309,7 +311,7 @@ namespace AdvancedSharpAdbClient
 
             string data = socket.ReadString();
 
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return parts.Select(ForwardData.FromString);
         }
@@ -672,8 +674,8 @@ namespace AdvancedSharpAdbClient
                 throw new AdbException(reader.ReadToEnd());
             }
 
-            int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
-            string session = result.Substring(result.IndexOf("[") + 1, arr);
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
             return session;
         }
 
@@ -755,7 +757,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
             string features = socket.ReadString();
 
-            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split('\n', ',');
             return featureList;
         }
 
@@ -777,11 +779,7 @@ namespace AdvancedSharpAdbClient
                 return xmlString;
             }
             Match xmlMatch = GetXMLRegex().Match(xmlString);
-            if (!xmlMatch.Success)
-            {
-                throw new XmlException("An error occurred while receiving xml: " + xmlString);
-            }
-            return xmlMatch.Value;
+            return !xmlMatch.Success ? throw new XmlException("An error occurred while receiving xml: " + xmlString) : xmlMatch.Value;
         }
 
         /// <inheritdoc/>
@@ -827,7 +825,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -848,7 +846,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -869,7 +867,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -890,7 +888,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -1013,7 +1011,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidKeyEventException("KeyEvent is invalid");
             }
@@ -1034,7 +1032,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidTextException();
             }

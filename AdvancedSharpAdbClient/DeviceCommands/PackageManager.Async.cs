@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             string remoteFilePath = await SyncPackageToDeviceAsync(packageFilePath, OnSyncProgressChanged, cancellationToken);
-            
+
             await InstallRemotePackageAsync(remoteFilePath, reinstall, cancellationToken);
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 double present = 0;
                 foreach (KeyValuePair<string, double> info in progress)
                 {
-                    present += (info.Value / splitPackageFilePaths.Count) / 2;
+                    present += info.Value / splitPackageFilePaths.Count / 2;
                 }
 
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
@@ -174,7 +174,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 double present = 0;
                 foreach (KeyValuePair<string, double> info in progress)
                 {
-                    present += (info.Value / splitPackageFilePaths.Count) / 2;
+                    present += info.Value / splitPackageFilePaths.Count / 2;
                 }
 
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
@@ -372,7 +372,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP3_0_OR_GREATER
                     await
 #endif
-                        using Stream stream = File.OpenRead(localFilePath);
+                    using Stream stream = File.OpenRead(localFilePath);
 #if HAS_LOGGER
                     logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
 #endif

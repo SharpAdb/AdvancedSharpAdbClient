@@ -213,7 +213,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
 
-                    Collection<object> list = new();
+                    Collection<object> list = [];
 
                     for (int i = 0; i < listLength; i++)
                     {

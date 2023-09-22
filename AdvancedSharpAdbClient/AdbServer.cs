@@ -17,7 +17,9 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
-    public partial class AdbServer : IAdbServer
+    /// <param name="adbClient">The current ADB client that manages the connection.</param>
+    /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+    public partial class AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : IAdbServer
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -60,14 +62,14 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        protected readonly IAdbClient adbClient;
+        protected readonly IAdbClient adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
         /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
         /// <c>adb.exe</c> command line client.
         /// </summary>
-        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
@@ -90,17 +92,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
         public AdbServer(Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(new AdbClient(), adbCommandLineClientFactory)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbServer"/> class.
-        /// </summary>
-        /// <param name="adbClient">The current ADB client that manages the connection.</param>
-        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
-        public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
-        {
-            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
-            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
         }
 
         /// <summary>

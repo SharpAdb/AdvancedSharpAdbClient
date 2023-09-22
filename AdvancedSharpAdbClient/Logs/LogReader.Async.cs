@@ -153,7 +153,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if NETCOREAPP3_0_OR_GREATER
                         await
 #endif
-                            using (MemoryStream dataStream = new(data))
+                        using (MemoryStream dataStream = new(data))
                         {
                             using BinaryReader reader = new(dataStream);
                             int priority = reader.ReadInt32();

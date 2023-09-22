@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="local">The <see cref="string"/> that represents the local (PC) endpoint.</param>
         /// <param name="remote">The <see cref="string"/> that represents the remote (device) endpoint.</param>
         public ForwardData(string serialNumber, string local, string remote)
-        { 
+        {
             SerialNumber = serialNumber;
             Local = local;
             Remote = remote;

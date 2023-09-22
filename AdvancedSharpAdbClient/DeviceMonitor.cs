@@ -81,7 +81,7 @@ namespace AdvancedSharpAdbClient
             )
         {
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            devices = new List<DeviceData>();
+            devices = [];
             Devices = devices.AsReadOnly();
 #if HAS_LOGGER
             this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;

@@ -82,7 +82,7 @@ namespace AdvancedSharpAdbClient
             DnsEndPoint endPoint = values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
-            
+
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;

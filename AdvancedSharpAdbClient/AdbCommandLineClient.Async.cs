@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new();
+            List<string> standardOutput = [];
 
             await RunAdbProcessAsync("version", null, standardOutput, cancellationToken);
 

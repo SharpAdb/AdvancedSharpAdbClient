@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient
             await socket.ReadAdbResponseAsync(cancellationToken);
             string reply = await socket.ReadStringAsync(cancellationToken);
 
-            string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return data.Select(DeviceData.CreateFromAdbData);
         }
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient
 
             string data = await socket.ReadStringAsync(cancellationToken);
 
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return parts.Select(ForwardData.FromString);
         }
@@ -167,7 +167,7 @@ namespace AdvancedSharpAdbClient
 
             string data = await socket.ReadStringAsync(cancellationToken);
 
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return parts.Select(ForwardData.FromString);
         }
@@ -235,7 +235,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
             RunLogServiceAsync(device, messageSink, default, logNames);
-        
+
         /// <inheritdoc/>
         public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
@@ -262,7 +262,7 @@ namespace AdvancedSharpAdbClient
 #if NETCOREAPP3_0_OR_GREATER
             await
 #endif
-                using Stream stream = socket.GetShellStream();
+            using Stream stream = socket.GetShellStream();
             LogReader reader = new(stream);
 
             while (!cancellationToken.IsCancellationRequested)
@@ -564,8 +564,8 @@ namespace AdvancedSharpAdbClient
                 throw new AdbException(await reader.ReadToEndAsync(cancellationToken));
             }
 
-            int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
-            string session = result.Substring(result.IndexOf("[") + 1, arr);
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
             return session;
         }
 
@@ -649,7 +649,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
             string features = await socket.ReadStringAsync(cancellationToken);
 
-            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split('\n', ',');
             return featureList;
         }
 
@@ -671,11 +671,7 @@ namespace AdvancedSharpAdbClient
                 return xmlString;
             }
             Match xmlMatch = GetXMLRegex().Match(xmlString);
-            if (!xmlMatch.Success)
-            {
-                throw new XmlException("An error occurred while receiving xml: " + xmlString);
-            }
-            return xmlMatch.Value;
+            return !xmlMatch.Success ? throw new XmlException("An error occurred while receiving xml: " + xmlString) : xmlMatch.Value;
         }
 
         /// <inheritdoc/>
@@ -721,7 +717,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -742,7 +738,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -763,7 +759,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -784,7 +780,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -958,7 +954,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidKeyEventException("KeyEvent is invalid");
             }
@@ -979,7 +975,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidTextException();
             }

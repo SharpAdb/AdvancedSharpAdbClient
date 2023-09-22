@@ -97,7 +97,7 @@ namespace AdvancedSharpAdbClient
         public virtual Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new();
+            List<string> standardOutput = [];
 
             RunAdbProcess("version", null, standardOutput);
 

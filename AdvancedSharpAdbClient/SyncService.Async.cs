@@ -240,7 +240,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
-            Collection<FileStatistics> value = new();
+            Collection<FileStatistics> value = [];
 
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken);

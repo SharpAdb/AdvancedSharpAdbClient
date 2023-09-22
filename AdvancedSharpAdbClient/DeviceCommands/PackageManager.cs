@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             )
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
-            Packages = new Dictionary<string, string>();
+            Packages = [];
             ThirdPartyOnly = thirdPartyOnly;
             this.client = client ?? throw new ArgumentNullException(nameof(client));
 
@@ -208,9 +208,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
 
                 double present = 0;
-                foreach(KeyValuePair<string, double> info in progress)
+                foreach (KeyValuePair<string, double> info in progress)
                 {
-                    present += (info.Value / splitPackageFilePaths.Count) / 2;
+                    present += info.Value / splitPackageFilePaths.Count / 2;
                 }
 
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));

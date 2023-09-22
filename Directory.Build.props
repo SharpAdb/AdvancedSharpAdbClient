@@ -44,11 +44,20 @@
     <SuppressTfmSupportBuildWarnings>True</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.15138.0'">
+    <DefineConstants>$(DefineConstants);UAP10_0_15138_0</DefineConstants>
+    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'
                          or '$(TargetFramework)' == 'uap10.0.15138.0'">
     <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP;UAP10_0</DefineConstants>
     <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
     <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>

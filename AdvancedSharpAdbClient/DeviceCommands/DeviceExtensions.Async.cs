@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
+            IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
+            IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -200,7 +200,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = new();
+            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
@@ -224,7 +224,7 @@ else
     /system/bin/ls -1 /proc/
 fi".Replace("\r\n", "\n"), receiver, cancellationToken);
 
-            Collection<int> pids = new();
+            Collection<int> pids = [];
 
             string output = receiver.ToString();
             using (StringReader reader = new(output))

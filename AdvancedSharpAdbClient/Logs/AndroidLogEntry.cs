@@ -51,6 +51,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="value">The value to convert.</param>
         /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the system log.</returns>
         private static char FormatPriority(Priority value) =>
-            PriorityFormatters?.TryGetValue(value, out var result) == true ? result : '?';
+            PriorityFormatters?.TryGetValue(value, out char result) == true ? result : '?';
     }
 }
