@@ -107,6 +107,20 @@ namespace AdvancedSharpAdbClient
             text.Split(new[] { separator }, options);
 
         /// <summary>
+        /// Splits a string into a maximum number of substrings based on a specified delimiting
+        /// character and, optionally, options. Splits a string into a maximum number of
+        /// substrings based on the provided character separator, optionally omitting empty
+        /// substrings from the result.
+        /// </summary>
+        /// <param name="text">The string to split.</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="count">The maximum number of elements expected in the array.</param>
+        /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
+        /// <returns>An array that contains at most count substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+        public static string[] Split(this string text, char separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
+            text.Split(new[] { separator }, count, options);
+
+        /// <summary>
         /// Determines whether this string instance starts with the specified character.
         /// </summary>
         /// <param name="text">A sequence in which to locate a value.</param>

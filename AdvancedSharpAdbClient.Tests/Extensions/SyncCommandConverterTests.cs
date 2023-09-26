@@ -14,11 +14,11 @@ namespace AdvancedSharpAdbClient.Tests
 
         [Fact]
         public void GetCommandInvalidNumberOfBytesTest() =>
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(new byte[] { }));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand([]));
 
         [Fact]
         public void GetCommandInvalidCommandTest() =>
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(new byte[] { (byte)'Q', (byte)'M', (byte)'T', (byte)'V' }));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand("QMTV"u8.ToArray()));
 
         [Fact]
         public void GetBytesInvalidCommandTest() =>

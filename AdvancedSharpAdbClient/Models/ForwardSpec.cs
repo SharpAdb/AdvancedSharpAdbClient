@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(spec);
 
-            string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = spec.Split(':', 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {

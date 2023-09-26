@@ -15,6 +15,8 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public static class CrossPlatformFunc
     {
+        private static readonly char[] separator = ['\r', '\n'];
+
         /// <summary>
         /// Determines whether the specified file exists.
         /// </summary>
@@ -40,9 +42,9 @@ namespace AdvancedSharpAdbClient
             string standardErrorString = process.StandardError.ReadToEnd();
             string standardOutputString = process.StandardOutput.ReadToEnd();
 
-            errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
-            standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
             // get the return code from the process
             if (!process.WaitForExit(5000))
@@ -89,9 +91,9 @@ namespace AdvancedSharpAdbClient
             string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
             string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
 
-            errorOutput?.AddRange(standardErrorString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
-            standardOutput?.AddRange(standardOutputString.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
 #if NET5_0_OR_GREATER
             using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))

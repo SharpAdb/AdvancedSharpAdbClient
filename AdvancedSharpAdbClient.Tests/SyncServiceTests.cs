@@ -36,8 +36,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(SyncCommand.STAT, "/fstab.donatello"),
-                new[] { SyncCommand.STAT },
-                new byte[][] { [160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0] },
+                [SyncCommand.STAT],
+                [[160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0]],
                 null,
                 () =>
                 {
@@ -67,14 +67,13 @@ namespace AdvancedSharpAdbClient.Tests
                 ResponseMessages(".", "..", "sdcard0", "emulated"),
                 Requests("host:transport:169.254.109.177:5555", "sync:"),
                 SyncRequests(SyncCommand.LIST, "/storage"),
-                new[] { SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE },
-                new byte[][]
-                {
+                [SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE],
+                [
                     [233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
                     [237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
                     [255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86],
                     [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
-                },
+                ],
                 null,
                 () =>
                 {
