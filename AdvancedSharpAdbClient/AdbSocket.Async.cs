@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient
             {
                 string message = await ReadStringAsync(cancellationToken);
                 rasps.Message = message;
-                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
+                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), rasps.Message);
             }
 
             return rasps;
