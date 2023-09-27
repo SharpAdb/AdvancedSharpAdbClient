@@ -15,8 +15,8 @@ env:
 
 jobs:
   build-and-test:
-    name: build-and-test-${{matrix.os}}
-    runs-on: ${{matrix.os}}
+    name: build-and-test-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
@@ -30,7 +30,7 @@ jobs:
     - name: Setup .NET Core App
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{env.DOTNET_VERSION}}
+        dotnet-version: ${{ env.DOTNET_VERSION }}
         dotnet-quality: 'preview'
 
     - name: Install dependencies
@@ -42,8 +42,8 @@ jobs:
     - name: Test
       run: dotnet test --no-restore -p:FullTargets=false
 
-  pack-and-upload:
-    name: pack-and-upload
+  pack-and-publish:
+    name: pack-and-publish
     needs: build-and-test
     runs-on: ubuntu-latest
 
@@ -56,14 +56,18 @@ jobs:
       - name: Setup .NET Core App
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{env.DOTNET_VERSION}}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           dotnet-quality: 'preview'
 
       - name: Install dependencies
-        run: dotnet restore -p:FullTargets=false
+        run: dotnet restore -p:FullTargets=true
 
       - name: Pack
-        run: dotnet pack --no-restore -o "nugets" -p:FullTargets=false
+        run: dotnet pack --no-restore --version-suffix build.${{ github.run_number }}.${{ github.run_attempt }} -o "nugets" -p:FullTargets=true
+
+      - name: Publish
+        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        run: dotnet nuget push ./nugets/*nupkg --source "github" --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
