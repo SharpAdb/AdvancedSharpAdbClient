@@ -358,9 +358,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-#if HAS_LOGGER
                 logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{Device.Serial}'");
-#endif
 
                 using (ISyncService sync = syncServiceFactory(client, Device))
                 {
@@ -373,9 +371,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     await
 #endif
                     using Stream stream = File.OpenRead(localFilePath);
-#if HAS_LOGGER
+
                     logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
-#endif
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     await sync.PushAsync(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, cancellationToken);
@@ -383,14 +380,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 return remoteFilePath;
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
                 throw;
             }
             finally
@@ -413,14 +405,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 await client.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", null, cancellationToken);
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
                 throw;
             }
         }

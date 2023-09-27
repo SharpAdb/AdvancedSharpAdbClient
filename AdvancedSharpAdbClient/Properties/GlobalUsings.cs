@@ -30,11 +30,6 @@ global using TimeSpan = System.TimeSpan;
 global using System.Threading.Tasks;
 #endif
 
-#if HAS_LOGGER
-global using Microsoft.Extensions.Logging;
-global using Microsoft.Extensions.Logging.Abstractions;
-#endif
-
 #if HAS_BUFFERS
 global using System.Buffers;
 #endif

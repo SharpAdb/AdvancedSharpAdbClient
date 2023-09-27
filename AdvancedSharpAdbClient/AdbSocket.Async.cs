@@ -28,14 +28,9 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException("channel EOF");
                 }
             }
-#if HAS_LOGGER
             catch (SocketException ex)
             {
                 logger.LogError(ex, ex.Message);
-#else
-            catch (SocketException)
-            {
-#endif
                 throw;
             }
         }
@@ -115,16 +110,12 @@ namespace AdvancedSharpAdbClient
 
                     if (count < 0)
                     {
-#if HAS_LOGGER
                         logger.LogError("read: channel EOF");
-#endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-#if HAS_LOGGER
                         logger.LogInformation("DONE with Read");
-#endif
                     }
                     else
                     {
@@ -244,14 +235,9 @@ namespace AdvancedSharpAdbClient
             {
                 await SendAsync(data, -1, cancellationToken);
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, e.Message);
-#else
-            catch (IOException)
-            {
-#endif
                 return false;
             }
 
@@ -278,9 +264,7 @@ namespace AdvancedSharpAdbClient
             {
                 string message = await ReadStringAsync(cancellationToken);
                 rasps.Message = message;
-#if HAS_LOGGER
                 logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
-#endif
             }
 
             return rasps;

@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,27 +23,18 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
-#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<AdbCommandLineClient> logger;
-#endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Don't check adb file name when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbCommandLineClient(string adbPath, bool isForce = false
-#if HAS_LOGGER
-            , ILogger<AdbCommandLineClient> logger = null
-#endif
-            )
+        public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient> logger = null)
         {
             if (adbPath.IsNullOrWhiteSpace())
             {
@@ -77,13 +69,8 @@ namespace AdvancedSharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             AdbPath = adbPath;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<AdbCommandLineClient>();
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
@@ -107,9 +94,7 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
-#endif
                 throw ex;
             }
 

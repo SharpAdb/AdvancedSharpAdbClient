@@ -32,9 +32,7 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
-#endif
                 throw ex;
             }
 

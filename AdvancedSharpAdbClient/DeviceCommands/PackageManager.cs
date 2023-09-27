@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,12 +32,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         protected const string ListThirdPartyOnly = "pm list packages -f -3";
 
-#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<PackageManager> logger;
-#endif
 
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
@@ -55,9 +54,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         public event EventHandler<InstallProgressEventArgs> InstallProgressChanged;
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
         /// </summary>
@@ -71,11 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not.
         /// Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false
-#if HAS_LOGGER
-            , ILogger<PackageManager> logger = null
-#endif
-            )
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false            , ILogger<PackageManager> logger = null            )
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = [];
@@ -89,13 +81,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 RefreshPackages();
             }
 
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<PackageManager>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<PackageManager>();
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets a value indicating whether this package manager only lists third party applications,
@@ -438,9 +425,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-#if HAS_LOGGER
                 logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{Device.Serial}'");
-#endif
 
                 using (ISyncService sync = syncServiceFactory(client, Device))
                 {
@@ -450,9 +435,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
 
                     using Stream stream = File.OpenRead(localFilePath);
-#if HAS_LOGGER
+
                     logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
-#endif
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null
@@ -464,14 +448,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 return remoteFilePath;
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
                 throw;
             }
             finally
@@ -492,14 +471,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 client.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"", null);
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
                 throw;
             }
         }
