@@ -8,7 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient.Logs
+namespace AdvancedSharpAdbClient
 {
     /// <summary>Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
     /// output from an Android shell command. In the shell output, the LF character is replaced by a
@@ -114,8 +114,8 @@ namespace AdvancedSharpAdbClient.Logs
                         continue;
                     }
 
-                    byte[] minibuffer = new byte[1];
-                    int miniRead = Inner.Read(minibuffer, 0, 1);
+                    byte[] miniBuffer = new byte[1];
+                    int miniRead = Inner.Read(miniBuffer, 0, 1);
 
                     if (miniRead == 0)
                     {
@@ -126,7 +126,7 @@ namespace AdvancedSharpAdbClient.Logs
                     else
                     {
                         // Append the byte to the buffer.
-                        buffer[offset + read - 1] = minibuffer[0];
+                        buffer[offset + read - 1] = miniBuffer[0];
                     }
                 }
             }

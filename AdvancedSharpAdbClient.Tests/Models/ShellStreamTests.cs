@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Logs.Tests
+namespace AdvancedSharpAdbClient.Tests
 {
     public class ShellStreamTests
     {
