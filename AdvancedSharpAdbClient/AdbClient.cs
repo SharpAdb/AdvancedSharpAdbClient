@@ -519,7 +519,7 @@ namespace AdvancedSharpAdbClient
 #if HAS_PROCESS && !WINDOWS_UWP
                 Thread.Sleep(3000);
 #else
-                Utilities.Delay(3000).GetAwaiter().GetResult();
+                Extensions.Delay(3000).GetAwaiter().GetResult();
 #endif
             }
         }
@@ -1042,7 +1042,7 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommand("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
+            ExecuteRemoteCommand("input keyevent " + Extensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
         }
 
         /// <inheritdoc/>

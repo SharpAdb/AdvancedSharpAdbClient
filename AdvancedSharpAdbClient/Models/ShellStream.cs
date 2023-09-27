@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
-                    await Utilities.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
+                    await Extensions.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
 #endif
                 read++;
                 pendingByte = null;

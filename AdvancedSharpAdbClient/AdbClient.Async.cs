@@ -380,7 +380,7 @@ namespace AdvancedSharpAdbClient
             {
                 // Give adbd some time to kill itself and come back up.
                 // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
-                Utilities.Delay(3000, cancellationToken).GetAwaiter().GetResult();
+                Extensions.Delay(3000, cancellationToken).GetAwaiter().GetResult();
             }
         }
 
@@ -985,7 +985,7 @@ namespace AdvancedSharpAdbClient
         public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken);
-            await ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken);
+            await ExecuteRemoteCommandAsync("input keyevent " + Extensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken);
         }
 
         /// <inheritdoc/>

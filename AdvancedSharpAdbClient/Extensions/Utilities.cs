@@ -1,4 +1,4 @@
-﻿// <copyright file="Utilities.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="Extensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    internal static class Utilities
+    internal static class Extensions
     {
         /// <summary>
         /// Converts the string representation of the name or numeric value of one or more

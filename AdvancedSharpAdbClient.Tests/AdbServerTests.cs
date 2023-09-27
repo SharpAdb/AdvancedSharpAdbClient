@@ -27,7 +27,6 @@ namespace AdvancedSharpAdbClient.Tests
             adbSocketFactory = (endPoint) => socket;
 
             commandLineClient = new DummyAdbCommandLineClient();
-            AdbServer.IsValidAdbFile = commandLineClient.IsValidAdbFile;
             adbCommandLineClientFactory = (version) => commandLineClient;
 
             adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);

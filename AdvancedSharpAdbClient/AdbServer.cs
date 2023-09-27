@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>No connection could be made because the target computer actively refused it.This usually
         /// results from trying to connect to a service that is inactive on the foreign host—that is,
         ///  one with no server application running. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
-        internal const int ConnectionRefused = 10061;
+        public const int ConnectionRefused = 10061;
 
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection was reset by the peer.
@@ -41,12 +41,7 @@ namespace AdvancedSharpAdbClient
         /// remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote
         /// host uses a hard close. This error may also result if a connection was broken due to keep-alive activity detecting
         /// a failure while one or more operations are in progress. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
-        internal const int ConnectionReset = 10054;
-
-        /// <summary>
-        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
-        /// </summary>
-        internal static Func<string, bool> IsValidAdbFile = CrossPlatformFunc.CheckFileExists;
+        public const int ConnectionReset = 10054;
 
         /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
@@ -99,6 +94,11 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static IAdbServer Instance { get; set; } = new AdbServer();
 
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        protected static Func<string, bool> IsValidAdbFile { get; set; } = Factories.CheckFileExists;
+
         /// <inheritdoc/>
         public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
         {
@@ -106,6 +106,7 @@ namespace AdvancedSharpAdbClient
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+            IsValidAdbFile = commandLineClient.IsValidAdbFile;
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {

@@ -23,6 +23,8 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
+        private static readonly char[] separator = ['\r', '\n'];
+
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
@@ -43,8 +45,8 @@ namespace AdvancedSharpAdbClient
 
             if (!isForce)
             {
-                bool isWindows = Utilities.IsWindowsPlatform();
-                bool isUnix = Utilities.IsUnixPlatform();
+                bool isWindows = Extensions.IsWindowsPlatform();
+                bool isUnix = Extensions.IsUnixPlatform();
 
                 if (isWindows)
                 {
@@ -143,7 +145,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidAdbFile(string adbPath) => CrossPlatformFunc.CheckFileExists(adbPath);
+        public virtual bool IsValidAdbFile(string adbPath) => Factories.CheckFileExists(adbPath);
 
         /// <summary>
         /// Parses the output of the <c>adb.exe version</c> command and determines the adb version.
@@ -213,9 +215,45 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(command);
 
-            int status = CrossPlatformFunc.RunProcess(AdbPath, command, errorOutput, standardOutput);
+            int status = RunProcess(AdbPath, command, errorOutput, standardOutput);
 
             return status;
+        }
+
+        /// <summary>
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// </summary>
+        /// <returns>The return code of the process.</returns>
+        protected virtual int RunProcess(string filename, string command, List<string> errorOutput, List<string> standardOutput)
+        {
+#if HAS_PROCESS
+            ProcessStartInfo psi = new(filename, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            using Process process = Process.Start(psi);
+            string standardErrorString = process.StandardError.ReadToEnd();
+            string standardOutputString = process.StandardOutput.ReadToEnd();
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
+            {
+                process.Kill();
+            }
+
+            return process.ExitCode;
+#else
+            throw new PlatformNotSupportedException();
+#endif
         }
 
 #if NET7_0_OR_GREATER

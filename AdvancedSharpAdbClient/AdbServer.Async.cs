@@ -19,6 +19,7 @@ namespace AdvancedSharpAdbClient
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+            IsValidAdbFile = commandLineClient.IsValidAdbFile;
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
@@ -73,7 +74,7 @@ namespace AdvancedSharpAdbClient
             }
 
             ManualResetEvent manualResetEvent = null;
-            await Utilities.Run(() =>
+            await Extensions.Run(() =>
             {
                 lock (RestartLock)
                 {
@@ -81,7 +82,7 @@ namespace AdvancedSharpAdbClient
                 }
             }, cancellationToken);
 
-            _ = Utilities.Run(() =>
+            _ = Extensions.Run(() =>
             {
                 lock (RestartLock)
                 {

@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.IO;
 using System.Net;
 
 namespace AdvancedSharpAdbClient
@@ -13,6 +14,11 @@ namespace AdvancedSharpAdbClient
     public static class Factories
     {
         static Factories() => Reset();
+
+        /// <summary>
+        /// Determines whether the specified file exists.
+        /// </summary>
+        public static Func<string, bool> CheckFileExists { get; set; }
 
         /// <summary>
         /// Gets or sets a delegate which creates a new instance of the <see cref="AdbSocket"/> class.
@@ -45,6 +51,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public static void Reset()
         {
+            CheckFileExists = File.Exists;
             AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
             AdbClientFactory = (endPoint) => new AdbClient(endPoint, AdbSocketFactory);
             AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
