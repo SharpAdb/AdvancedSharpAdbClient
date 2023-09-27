@@ -12,6 +12,11 @@ namespace AdvancedSharpAdbClient
     public class FileStatistics
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="FileStatistics"/> class.
+        /// </summary>
+        public FileStatistics() { }
+
+        /// <summary>
         /// Gets or sets the path of the file.
         /// </summary>
         public string Path { get; set; }

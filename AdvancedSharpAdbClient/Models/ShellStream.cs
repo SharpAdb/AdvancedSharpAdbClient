@@ -8,7 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient.Logs
+namespace AdvancedSharpAdbClient
 {
     /// <summary>Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
     /// output from an Android shell command. In the shell output, the LF character is replaced by a
@@ -114,8 +114,8 @@ namespace AdvancedSharpAdbClient.Logs
                         continue;
                     }
 
-                    byte[] minibuffer = new byte[1];
-                    int miniRead = Inner.Read(minibuffer, 0, 1);
+                    byte[] miniBuffer = new byte[1];
+                    int miniRead = Inner.Read(miniBuffer, 0, 1);
 
                     if (miniRead == 0)
                     {
@@ -126,7 +126,7 @@ namespace AdvancedSharpAdbClient.Logs
                     else
                     {
                         // Append the byte to the buffer.
-                        buffer[offset + read - 1] = minibuffer[0];
+                        buffer[offset + read - 1] = miniBuffer[0];
                     }
                 }
             }
@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient.Logs
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
-                    await Utilities.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
+                    await Extensions.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
 #endif
                 read++;
                 pendingByte = null;
@@ -232,7 +232,7 @@ namespace AdvancedSharpAdbClient.Logs
 #endif
             }
 
-            byte[] minibuffer = new byte[1];
+            byte[] miniBuffer = new byte[1];
 
             // Loop over the data, and find a LF (0x0d) character. If it is
             // followed by a CR (0x0a) character, remove the LF character and
@@ -264,11 +264,11 @@ namespace AdvancedSharpAdbClient.Logs
 
                     int miniRead =
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-                        await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+                        await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
-                        await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                        await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                        Inner.Read(minibuffer, 0, 1);
+                        Inner.Read(miniBuffer, 0, 1);
 #endif
 
                     if (miniRead == 0)
@@ -280,7 +280,7 @@ namespace AdvancedSharpAdbClient.Logs
                     else
                     {
                         // Append the byte to the buffer.
-                        buffer[offset + read - 1] = minibuffer[0];
+                        buffer[offset + read - 1] = miniBuffer[0];
                     }
                 }
             }
@@ -291,13 +291,13 @@ namespace AdvancedSharpAdbClient.Logs
             {
                 int miniRead =
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-                    await Inner.ReadAsync(minibuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+                    await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
-                    await Inner.ReadAsync(minibuffer, 0, 1, cancellationToken).ConfigureAwait(false);
+                    await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                    Inner.Read(minibuffer, 0, 1);
+                    Inner.Read(miniBuffer, 0, 1);
 #endif
-                int nextByte = minibuffer[0];
+                int nextByte = miniBuffer[0];
 
                 if (nextByte == 0x0a)
                 {

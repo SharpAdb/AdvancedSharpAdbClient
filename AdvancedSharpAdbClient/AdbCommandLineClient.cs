@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,27 +23,20 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
-#if HAS_LOGGER
+        private static readonly char[] separator = ['\r', '\n'];
+
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<AdbCommandLineClient> logger;
-#endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Don't check adb file name when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbCommandLineClient(string adbPath, bool isForce = false
-#if HAS_LOGGER
-            , ILogger<AdbCommandLineClient> logger = null
-#endif
-            )
+        public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient> logger = null)
         {
             if (adbPath.IsNullOrWhiteSpace())
             {
@@ -51,8 +45,8 @@ namespace AdvancedSharpAdbClient
 
             if (!isForce)
             {
-                bool isWindows = Utilities.IsWindowsPlatform();
-                bool isUnix = Utilities.IsUnixPlatform();
+                bool isWindows = Extensions.IsWindowsPlatform();
+                bool isUnix = Extensions.IsUnixPlatform();
 
                 if (isWindows)
                 {
@@ -77,13 +71,8 @@ namespace AdvancedSharpAdbClient
             this.EnsureIsValidAdbFile(adbPath);
 
             AdbPath = adbPath;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbCommandLineClient>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<AdbCommandLineClient>();
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
@@ -97,7 +86,7 @@ namespace AdvancedSharpAdbClient
         public virtual Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new();
+            List<string> standardOutput = [];
 
             RunAdbProcess("version", null, standardOutput);
 
@@ -107,9 +96,7 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
-#endif
                 throw ex;
             }
 
@@ -158,7 +145,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidAdbFile(string adbPath) => CrossPlatformFunc.CheckFileExists(adbPath);
+        public virtual bool IsValidAdbFile(string adbPath) => Factories.CheckFileExists(adbPath);
 
         /// <summary>
         /// Parses the output of the <c>adb.exe version</c> command and determines the adb version.
@@ -228,9 +215,45 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(command);
 
-            int status = CrossPlatformFunc.RunProcess(AdbPath, command, errorOutput, standardOutput);
+            int status = RunProcess(AdbPath, command, errorOutput, standardOutput);
 
             return status;
+        }
+
+        /// <summary>
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// </summary>
+        /// <returns>The return code of the process.</returns>
+        protected virtual int RunProcess(string filename, string command, List<string> errorOutput, List<string> standardOutput)
+        {
+#if HAS_PROCESS
+            ProcessStartInfo psi = new(filename, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            using Process process = Process.Start(psi);
+            string standardErrorString = process.StandardError.ReadToEnd();
+            string standardOutputString = process.StandardOutput.ReadToEnd();
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
+            {
+                process.Kill();
+            }
+
+            return process.ExitCode;
+#else
+            throw new PlatformNotSupportedException();
+#endif
         }
 
 #if NET7_0_OR_GREATER

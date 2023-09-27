@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             string remoteFilePath = await SyncPackageToDeviceAsync(packageFilePath, OnSyncProgressChanged, cancellationToken);
-            
+
             await InstallRemotePackageAsync(remoteFilePath, reinstall, cancellationToken);
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 double present = 0;
                 foreach (KeyValuePair<string, double> info in progress)
                 {
-                    present += (info.Value / splitPackageFilePaths.Count) / 2;
+                    present += info.Value / splitPackageFilePaths.Count / 2;
                 }
 
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
@@ -174,7 +174,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 double present = 0;
                 foreach (KeyValuePair<string, double> info in progress)
                 {
-                    present += (info.Value / splitPackageFilePaths.Count) / 2;
+                    present += info.Value / splitPackageFilePaths.Count / 2;
                 }
 
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
@@ -358,9 +358,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 // workitem: 19711
                 string remoteFilePath = LinuxPath.Combine(TempInstallationDirectory, packageFileName);
 
-#if HAS_LOGGER
-                logger.LogDebug(packageFileName, $"Uploading {packageFileName} onto device '{Device.Serial}'");
-#endif
+                logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
                 using (ISyncService sync = syncServiceFactory(client, Device))
                 {
@@ -372,10 +370,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP3_0_OR_GREATER
                     await
 #endif
-                        using Stream stream = File.OpenRead(localFilePath);
-#if HAS_LOGGER
-                    logger.LogDebug($"Uploading file onto device '{Device.Serial}'");
-#endif
+                    using Stream stream = File.OpenRead(localFilePath);
+
+                    logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
                     await sync.PushAsync(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, cancellationToken);
@@ -383,14 +380,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 return remoteFilePath;
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
-                logger.LogError(e, $"Unable to open sync connection! reason: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
+                logger.LogError(e, "Unable to open sync connection! reason: {0}", e.Message);
                 throw;
             }
             finally
@@ -413,14 +405,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 await client.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", null, cancellationToken);
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
-                logger.LogError(e, $"Failed to delete temporary package: {e.Message}");
-#else
-            catch (IOException)
-            {
-#endif
+                logger.LogError(e, "Failed to delete temporary package: {0}", e.Message);
                 throw;
             }
         }
@@ -449,8 +436,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
 
             string result = receiver.SuccessMessage;
-            int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
-            string session = result.Substring(result.IndexOf("[") + 1, arr);
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
 
             return session;
         }

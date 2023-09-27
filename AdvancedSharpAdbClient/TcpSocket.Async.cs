@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient
 #else
         /// <inheritdoc/>
         public virtual async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            await Utilities.Run(() => Send(buffer, offset, size, socketFlags), cancellationToken);
+            await Extensions.Run(() => Send(buffer, offset, size, socketFlags), cancellationToken);
 #endif
 
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER

@@ -19,6 +19,65 @@ namespace AdvancedSharpAdbClient
     public struct FramebufferHeader
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
+        /// </summary>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
+        /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
+        public FramebufferHeader(byte[] data)
+        {
+            // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
+            using MemoryStream stream = new(data);
+            using BinaryReader reader = new(stream, Encoding.ASCII
+#if !NETFRAMEWORK || NET45_OR_GREATER
+                , leaveOpen: true
+#endif
+                );
+            Version = reader.ReadUInt32();
+
+            if (Version > 2)
+            {
+                // Technically, 0 is not a supported version either; we assume version 0 indicates
+                // an empty framebuffer.
+                throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
+            }
+
+            Bpp = reader.ReadUInt32();
+
+            if (Version >= 2)
+            {
+                ColorSpace = reader.ReadUInt32();
+            }
+
+            Size = reader.ReadUInt32();
+            Width = reader.ReadUInt32();
+            Height = reader.ReadUInt32();
+
+            Red = new ColorData
+            {
+                Offset = reader.ReadUInt32(),
+                Length = reader.ReadUInt32()
+            };
+
+            Blue = new ColorData
+            {
+                Offset = reader.ReadUInt32(),
+                Length = reader.ReadUInt32()
+            };
+
+            Green = new ColorData
+            {
+                Offset = reader.ReadUInt32(),
+                Length = reader.ReadUInt32()
+            };
+
+            Alpha = new ColorData
+            {
+                Offset = reader.ReadUInt32(),
+                Length = reader.ReadUInt32()
+            };
+        }
+
+        /// <summary>
         /// Gets or sets the version of the framebuffer struct.
         /// </summary>
         public uint Version { get; set; }
@@ -73,64 +132,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
-        public static FramebufferHeader Read(byte[] data)
-        {
-            // as defined in https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp
-            FramebufferHeader header = default;
-
-            // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
-            using MemoryStream stream = new(data);
-            using BinaryReader reader = new(stream, Encoding.ASCII
-#if !NETFRAMEWORK || NET45_OR_GREATER
-                , leaveOpen: true
-#endif
-                );
-            header.Version = reader.ReadUInt32();
-
-            if (header.Version > 2)
-            {
-                // Technically, 0 is not a supported version either; we assume version 0 indicates
-                // an empty framebuffer.
-                throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
-            }
-
-            header.Bpp = reader.ReadUInt32();
-
-            if (header.Version >= 2)
-            {
-                header.ColorSpace = reader.ReadUInt32();
-            }
-
-            header.Size = reader.ReadUInt32();
-            header.Width = reader.ReadUInt32();
-            header.Height = reader.ReadUInt32();
-
-            header.Red = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Blue = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Green = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Alpha = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            return header;
-        }
+        public static FramebufferHeader Read(byte[] data) => new(data);
 
 #if HAS_DRAWING
         /// <summary>

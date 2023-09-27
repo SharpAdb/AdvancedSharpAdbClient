@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Maps the <see cref="SyncCommand"/> values to their string representations.
         /// </summary>
-        private static readonly Dictionary<SyncCommand, string> Values = new()
+        private static readonly Dictionary<SyncCommand, string> Values = new(9)
         {
             { SyncCommand.DATA, "DATA" },
             { SyncCommand.DENT, "DENT" },

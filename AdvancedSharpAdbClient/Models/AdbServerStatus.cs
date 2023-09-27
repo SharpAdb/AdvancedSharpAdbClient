@@ -9,28 +9,19 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Represents the status of the adb server.
     /// </summary>
-    public struct AdbServerStatus
+    /// <param name="isRunning">The value indicating whether the server is currently running.</param>
+    /// <param name="version">The version of the server when it is running.</param>
+    public struct AdbServerStatus(bool isRunning, Version version)
     {
         /// <summary>
         /// Gets a value indicating whether the server is currently running.
         /// </summary>
-        public bool IsRunning { get; internal set; }
+        public bool IsRunning { get; set; } = isRunning;
 
         /// <summary>
         /// Gets the version of the server when it is running.
         /// </summary>
-        public Version Version { get; internal set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbServerStatus"/> struct.
-        /// </summary>
-        /// <param name="isRunning">The value indicating whether the server is currently running.</param>
-        /// <param name="version">The version of the server when it is running.</param>
-        public AdbServerStatus(bool isRunning, Version version)
-        {
-            IsRunning = isRunning;
-            Version = version;
-        }
+        public Version Version { get; set; } = version;
 
         /// <summary>
         /// Deconstruct the <see cref="AdbServerStatus"/> struct.

@@ -16,7 +16,6 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = new Version(1, 0, 32)
             };
-
             Assert.Equal(new Version(1, 0, 32), commandLine.GetVersion());
         }
 
@@ -37,7 +36,6 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = new Version(1, 0, 1)
             };
-
             _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 

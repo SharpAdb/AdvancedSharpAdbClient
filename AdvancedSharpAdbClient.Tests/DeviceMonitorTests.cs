@@ -280,7 +280,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             using DeviceMonitor monitor = new(Socket);
             RunTest(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                [AdbResponse.OK, AdbResponse.OK],
                 ResponseMessages(
                     DummyAdbSocket.ServerDisconnected,
                     string.Empty),

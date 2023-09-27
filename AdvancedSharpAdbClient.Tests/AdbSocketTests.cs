@@ -50,23 +50,23 @@ namespace AdvancedSharpAdbClient.Tests
         public void SendSyncDATARequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DATA, 2),
-                new byte[] { (byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0 });
+                [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
         [Fact]
         public void SendSyncSENDRequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
-                new byte[] { (byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t' });
+                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
 
         [Fact]
         public void SendSyncDENTRequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
-                new byte[] { (byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3' });
+                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
         [Fact]
         public void SendSyncNullRequestTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), Array.Empty<byte>()));
+            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), []));
 
         [Fact]
         public void ReadSyncResponse()

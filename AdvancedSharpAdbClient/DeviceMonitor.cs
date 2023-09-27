@@ -3,6 +3,7 @@
 // </copyright>
 
 using AdvancedSharpAdbClient.Exceptions;
+using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,14 +34,14 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
     {
+        private static readonly string[] separator = ["\r\n", "\n"];
+
         private bool disposed = false;
 
-#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<DeviceMonitor> logger;
-#endif
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
@@ -66,31 +67,6 @@ namespace AdvancedSharpAdbClient
         protected Thread monitorThread;
 #endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
-        /// </summary>
-        /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
-        /// <param name="logger">The logger to use when logging.</param>
-        public DeviceMonitor(IAdbSocket socket
-#if HAS_LOGGER
-            , ILogger<DeviceMonitor> logger = null
-#endif
-            )
-        {
-            Socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            devices = new List<DeviceData>();
-            Devices = devices.AsReadOnly();
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
-#endif
-        }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
-
         /// <inheritdoc/>
         public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
 
@@ -102,6 +78,19 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+        /// </summary>
+        /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
+        /// <param name="logger">The logger to use when logging.</param>
+        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor> logger = null)
+        {
+            Socket = socket ?? throw new ArgumentNullException(nameof(socket));
+            devices = [];
+            Devices = devices.AsReadOnly();
+            this.logger = logger ?? LoggerProvider.CreateLogger<DeviceMonitor>();
+        }
 
         /// <inheritdoc/>
         public ReadOnlyCollection<DeviceData> Devices { get; private set; }
@@ -126,7 +115,7 @@ namespace AdvancedSharpAdbClient
             {
                 _ = firstDeviceListParsed.Reset();
 
-                monitorTask = Utilities.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token));
+                monitorTask = Extensions.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token));
 
                 // Wait for the worker thread to have read the first list of devices.
                 _ = firstDeviceListParsed.WaitOne();
@@ -285,9 +274,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private void ProcessIncomingDeviceData(string result)
         {
-            string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] deviceValues = result.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            IEnumerable<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData);
+            IEnumerable<DeviceData> currentDevices = deviceValues.Select((x) => new DeviceData(x));
             UpdateDevices(currentDevices);
         }
 

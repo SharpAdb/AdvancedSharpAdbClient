@@ -17,7 +17,9 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
-    public partial class AdbServer : IAdbServer
+    /// <param name="adbClient">The current ADB client that manages the connection.</param>
+    /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+    public partial class AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : IAdbServer
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -30,7 +32,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>No connection could be made because the target computer actively refused it.This usually
         /// results from trying to connect to a service that is inactive on the foreign host—that is,
         ///  one with no server application running. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
-        internal const int ConnectionRefused = 10061;
+        public const int ConnectionRefused = 10061;
 
         /// <summary>
         /// The error code that is returned by the <see cref="SocketException"/> when the connection was reset by the peer.
@@ -39,12 +41,7 @@ namespace AdvancedSharpAdbClient
         /// remote host is suddenly stopped, the host is rebooted, the host or remote network interface is disabled, or the remote
         /// host uses a hard close. This error may also result if a connection was broken due to keep-alive activity detecting
         /// a failure while one or more operations are in progress. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
-        internal const int ConnectionReset = 10054;
-
-        /// <summary>
-        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
-        /// </summary>
-        internal static Func<string, bool> IsValidAdbFile = CrossPlatformFunc.CheckFileExists;
+        public const int ConnectionReset = 10054;
 
         /// <summary>
         /// A lock used to ensure only one caller at a time can attempt to restart adb.
@@ -52,22 +49,16 @@ namespace AdvancedSharpAdbClient
         protected static readonly object RestartLock = new();
 
         /// <summary>
-        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
-        /// the server to figure out where adb is located.
-        /// </summary>
-        protected static string cachedAdbPath;
-
-        /// <summary>
         /// The current ADB client that manages the connection.
         /// </summary>
-        protected readonly IAdbClient adbClient;
+        protected readonly IAdbClient adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
         /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
         /// <c>adb.exe</c> command line client.
         /// </summary>
-        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
@@ -93,20 +84,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
+        /// the server to figure out where adb is located.
         /// </summary>
-        /// <param name="adbClient">The current ADB client that manages the connection.</param>
-        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
-        public AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
-        {
-            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
-            this.adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
-        }
+        protected static string CachedAdbPath { get; set; }
 
         /// <summary>
         /// Gets or sets the default instance of the <see cref="IAdbServer"/> interface.
         /// </summary>
         public static IAdbServer Instance { get; set; } = new AdbServer();
+
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        protected static Func<string, bool> IsValidAdbFile { get; set; } = Factories.CheckFileExists;
 
         /// <inheritdoc/>
         public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
@@ -115,10 +106,11 @@ namespace AdvancedSharpAdbClient
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+            IsValidAdbFile = commandLineClient.IsValidAdbFile;
 
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
-                cachedAdbPath = adbPath;
+                CachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();
             }
 
@@ -139,9 +131,6 @@ namespace AdvancedSharpAdbClient
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
                 adbClient.KillAdb();
-                serverStatus.IsRunning = false;
-                serverStatus.Version = null;
-
                 commandLineClient.StartServer();
                 return StartServerResult.RestartedOutdatedDaemon;
             }
@@ -161,7 +150,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual StartServerResult RestartServer(string adbPath = null)
         {
-            adbPath ??= cachedAdbPath;
+            adbPath ??= CachedAdbPath;
 
             if (!IsValidAdbFile(adbPath))
             {

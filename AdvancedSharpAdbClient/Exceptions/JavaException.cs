@@ -15,6 +15,8 @@ namespace AdvancedSharpAdbClient.Exceptions
         private const string ExceptionOutput = "java.lang.";
         private const string ExceptionPattern = @"java.lang.(\w+Exception):\s+(.*)?";
 
+        private static readonly char[] separator = ['\r', '\n'];
+
         /// <summary>
         /// Gets the name of Java exception.
         /// </summary>
@@ -80,7 +82,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="JavaException"/>.</param>
         /// <returns>The equivalent <see cref="JavaException"/>.</returns>
-        public static JavaException Parse(string line) => Parse(line.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries));
+        public static JavaException Parse(string line) => Parse(line.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
 
         /// <summary>

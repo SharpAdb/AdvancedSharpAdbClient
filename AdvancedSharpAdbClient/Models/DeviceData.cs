@@ -15,12 +15,43 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
+        private const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
 
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
         private static readonly Regex Regex = DeviceDataRegex();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceData"/> class.
+        /// </summary>
+        public DeviceData() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceData"/> class based on
+        /// data retrieved from the Android Debug Bridge.
+        /// </summary>
+        /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
+        public DeviceData(string data)
+        {
+            Match match = Regex.Match(data);
+            if (!match.Success)
+            {
+                throw new ArgumentException($"Invalid device list data '{data}'");
+            }
+            else
+            {
+                Serial = match.Groups["serial"].Value;
+                State = GetStateFromString(match.Groups["state"].Value);
+                Model = match.Groups["model"].Value;
+                Product = match.Groups["product"].Value;
+                Name = match.Groups["device"].Value;
+                Features = match.Groups["features"].Value;
+                Usb = match.Groups["usb"].Value;
+                TransportId = match.Groups["transport_id"].Value;
+                Message = match.Groups["message"].Value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the device serial number.
@@ -73,24 +104,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
         /// <returns>A <see cref="DeviceData"/> object that represents the device.</returns>
-        public static DeviceData CreateFromAdbData(string data)
-        {
-            Match m = Regex.Match(data);
-            return m.Success
-                ? new DeviceData()
-                {
-                    Serial = m.Groups["serial"].Value,
-                    State = GetStateFromString(m.Groups["state"].Value),
-                    Model = m.Groups["model"].Value,
-                    Product = m.Groups["product"].Value,
-                    Name = m.Groups["device"].Value,
-                    Features = m.Groups["features"].Value,
-                    Usb = m.Groups["usb"].Value,
-                    TransportId = m.Groups["transport_id"].Value,
-                    Message = m.Groups["message"].Value
-                }
-                : throw new ArgumentException($"Invalid device list data '{data}'");
-        }
+        public static DeviceData CreateFromAdbData(string data) => new(data);
 
         /// <inheritdoc/>
         public override string ToString() => Serial;
@@ -118,7 +132,7 @@ namespace AdvancedSharpAdbClient
             else
             {
                 // Else, we try to match a value of the DeviceState enumeration.
-                if (!Utilities.TryParse(state, true, out value))
+                if (!Extensions.TryParse(state, true, out value))
                 {
                     value = DeviceState.Unknown;
                 }

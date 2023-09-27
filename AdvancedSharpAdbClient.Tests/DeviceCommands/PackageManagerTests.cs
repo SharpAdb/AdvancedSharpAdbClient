@@ -66,6 +66,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummySyncService syncService = new();
 
+            using FactoriesLocker locker = FactoriesLocker.Wait();
+
             Factories.SyncServiceFactory = (c, d) => syncService;
 
             DummyAdbClient adbClient = new();
@@ -104,7 +106,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["pm install-write 936013062 base.apk \"/data/base.apk\""] = "Success";
             adbClient.Commands["pm install-write 936013062 splitapp0.apk \"/data/split-dpi.apk\""] = "Success";
             adbClient.Commands["pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\""] = "Success";
-            adbClient.Commands["pm install-commit 936013062"] = "Success"    ;
+            adbClient.Commands["pm install-commit 936013062"] = "Success";
 
             DeviceData device = new()
             {
@@ -112,7 +114,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device);
-            manager.InstallMultipleRemotePackage("/data/base.apk", new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, false);
+            manager.InstallMultipleRemotePackage("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"], false);
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
@@ -121,7 +123,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", adbClient.ReceivedCommands[4]);
             Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[5]);
 
-            manager.InstallMultipleRemotePackage("/data/base.apk", new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, true);
+            manager.InstallMultipleRemotePackage("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"], true);
 
             Assert.Equal(11, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create -r", adbClient.ReceivedCommands[6]);
@@ -130,7 +132,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", adbClient.ReceivedCommands[9]);
             Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[10]);
 
-            manager.InstallMultipleRemotePackage(new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, "com.google.android.gms", false);
+            manager.InstallMultipleRemotePackage(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms", false);
 
             Assert.Equal(15, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[11]);
@@ -138,7 +140,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("pm install-write 936013062 splitapp1.apk \"/data/split-abi.apk\"", adbClient.ReceivedCommands[13]);
             Assert.Equal("pm install-commit 936013062", adbClient.ReceivedCommands[14]);
 
-            manager.InstallMultipleRemotePackage(new string[] { "/data/split-dpi.apk", "/data/split-abi.apk" }, "com.google.android.gms", true);
+            manager.InstallMultipleRemotePackage(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms", true);
 
             Assert.Equal(19, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create -r -p com.google.android.gms", adbClient.ReceivedCommands[15]);
@@ -151,6 +153,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void InstallMultiplePackageTest()
         {
             DummySyncService syncService = new();
+
+            using FactoriesLocker locker = FactoriesLocker.Wait();
 
             Factories.SyncServiceFactory = (c, d) => syncService;
 
@@ -173,7 +177,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device);
-            manager.InstallMultiplePackage("Assets/test.txt", new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, false);
+            manager.InstallMultiplePackage("Assets/test.txt", ["Assets/gapps.txt", "Assets/logcat.bin"], false);
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create", adbClient.ReceivedCommands[1]);
             Assert.Equal("pm install-write 936013062 base.apk \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[2]);
@@ -190,7 +194,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
 
             syncService.UploadedFiles.Clear();
-            manager.InstallMultiplePackage(new string[] { "Assets/gapps.txt", "Assets/logcat.bin" }, "com.google.android.gms", false);
+            manager.InstallMultiplePackage(["Assets/gapps.txt", "Assets/logcat.bin"], "com.google.android.gms", false);
             Assert.Equal(15, adbClient.ReceivedCommands.Count);
             Assert.Equal("pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[9]);
             Assert.Equal("pm install-write 936013062 splitapp0.apk \"/data/local/tmp/gapps.txt\"", adbClient.ReceivedCommands[10]);

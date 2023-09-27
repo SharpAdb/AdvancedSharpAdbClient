@@ -1,4 +1,4 @@
-﻿// <copyright file="Utilities.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="Extensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    internal static class Utilities
+    internal static class Extensions
     {
         /// <summary>
         /// Converts the string representation of the name or numeric value of one or more
@@ -83,6 +83,51 @@ namespace AdvancedSharpAdbClient
             return string.IsNullOrWhiteSpace(value);
 #endif
         }
+
+#if !UAP10_0_15138_0 && !NETCOREAPP2_1_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Returns a value indicating whether a specified string occurs within this string, using the specified comparison rules.
+        /// </summary>
+        /// <param name="text">A sequence in which to locate a value.</param>
+        /// <param name="value">The string to seek.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
+        /// <returns><see langword="true"/> if the <paramref name="value"/> parameter occurs within this string,
+        /// or if <paramref name="value"/> is the empty string (""); otherwise, <see langword="false"/>.</returns>
+        public static bool Contains(this string text, string value, StringComparison comparisonType) =>
+            text.IndexOf(value, comparisonType) != -1;
+
+        /// <summary>
+        /// Splits a string into substrings based on a specified delimiting character and, optionally, options.
+        /// </summary>
+        /// <param name="text">The string to split.</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
+        /// <returns>An array whose elements contain the substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+        public static string[] Split(this string text, char separator, StringSplitOptions options = StringSplitOptions.None) =>
+            text.Split(new[] { separator }, options);
+
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on a specified delimiting
+        /// character and, optionally, options. Splits a string into a maximum number of
+        /// substrings based on the provided character separator, optionally omitting empty
+        /// substrings from the result.
+        /// </summary>
+        /// <param name="text">The string to split.</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="count">The maximum number of elements expected in the array.</param>
+        /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
+        /// <returns>An array that contains at most count substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+        public static string[] Split(this string text, char separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
+            text.Split(new[] { separator }, count, options);
+
+        /// <summary>
+        /// Determines whether this string instance starts with the specified character.
+        /// </summary>
+        /// <param name="text">A sequence in which to locate a value.</param>
+        /// <param name="value">The character to compare.</param>
+        /// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+        public static bool StartsWith(this string text, char value) => text.StartsWith(new string([value]));
+#endif
 
         /// <summary>
         /// Concatenates the members of a constructed <see cref="IEnumerable{T}"/> collection of type <see cref="string"/>,

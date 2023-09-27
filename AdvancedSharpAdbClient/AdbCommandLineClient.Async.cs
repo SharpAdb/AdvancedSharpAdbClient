@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new();
+            List<string> standardOutput = [];
 
             await RunAdbProcessAsync("version", null, standardOutput, cancellationToken);
 
@@ -32,9 +32,7 @@ namespace AdvancedSharpAdbClient
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
-#endif
                 throw ex;
             }
 
@@ -125,9 +123,57 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(command);
 
-            int status = await CrossPlatformFunc.RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken);
+            int status = await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken);
 
             return status;
+        }
+
+        /// <summary>
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// </summary>
+        /// <returns>The return code of the process.</returns>
+        protected virtual async Task<int> RunProcessAsync(string filename, string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        {
+#if HAS_PROCESS
+            ProcessStartInfo psi = new(filename, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            using Process process = Process.Start(psi);
+            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+#if NET5_0_OR_GREATER
+            using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
+            {
+                await process.WaitForExitAsync(completionSource.Token);
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                }
+            }
+#else
+            // get the return code from the process
+            if (!process.WaitForExit(5000))
+            {
+                process.Kill();
+            }
+#endif
+            return process.ExitCode;
+#else
+            TaskCompletionSource<int> source = new();
+            source.SetException(new PlatformNotSupportedException());
+            return await source.Task;
+#endif
         }
     }
 }

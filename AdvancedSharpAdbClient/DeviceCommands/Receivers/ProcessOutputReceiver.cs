@@ -14,6 +14,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class ProcessOutputReceiver : MultiLineReceiver
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessOutputReceiver"/> class.
+        /// </summary>
+        public ProcessOutputReceiver() { }
+
+        /// <summary>
         /// Gets a list of all processes that have been received.
         /// </summary>
         public Collection<AndroidProcess> Processes { get; private set; } = new Collection<AndroidProcess>();
@@ -31,7 +36,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 try
                 {
-                    Processes.Add(AndroidProcess.Parse(line, cmdLinePrefix: true));
+                    Processes.Add(new AndroidProcess(line, cmdLinePrefix: true));
                 }
                 catch (Exception)
                 {

@@ -35,10 +35,10 @@ namespace AdvancedSharpAdbClient
             {
                 _ = firstDeviceListParsed.Reset();
 
-                monitorTask = Utilities.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token), cancellationToken);
+                monitorTask = Extensions.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token), cancellationToken);
 
                 // Wait for the worker thread to have read the first list of devices.
-                _ = await Utilities.Run(firstDeviceListParsed.WaitOne, cancellationToken);
+                _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken);
             }
         }
 
@@ -123,11 +123,7 @@ namespace AdvancedSharpAdbClient
 
                     firstDeviceListParsed.Set();
                 }
-#if HAS_LOGGER
                 catch (TaskCanceledException ex)
-#else
-                catch (TaskCanceledException)
-#endif
                 {
                     // We get a TaskCanceledException on Windows
                     if (cancellationToken.IsCancellationRequested)
@@ -139,17 +135,11 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
-#endif
                         throw;
                     }
                 }
-#if HAS_LOGGER
                 catch (ObjectDisposedException ex)
-#else
-                catch (ObjectDisposedException)
-#endif
                 {
                     // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
                     if (cancellationToken.IsCancellationRequested)
@@ -161,9 +151,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
-#endif
                         throw;
                     }
                 }
@@ -181,15 +169,10 @@ namespace AdvancedSharpAdbClient
                         throw;
                     }
                 }
-#if HAS_LOGGER
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
                     logger.LogError(ex, ex.Message);
-#else
-                catch (Exception)
-                {
-#endif
                     throw;
                 }
             }

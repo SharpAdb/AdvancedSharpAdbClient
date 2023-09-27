@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a <see cref="AdbResponse"/> that represents the OK response sent by ADB.
         /// </summary>
-        public static AdbResponse OK { get; } = new AdbResponse()
+        public static AdbResponse OK { get; } = new()
         {
             IOSuccess = true,
             Okay = true,

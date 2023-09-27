@@ -84,6 +84,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// that the connection was reset by the remote server. This happens when the adb server was killed.
         /// </summary>
         public bool ConnectionReset =>
-            InnerException is SocketException socketException && socketException.SocketErrorCode == SocketError.ConnectionReset;
+            InnerException is SocketException socketException
+            && socketException.SocketErrorCode == SocketError.ConnectionReset;
     }
 }

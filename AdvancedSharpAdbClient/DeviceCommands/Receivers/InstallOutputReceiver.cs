@@ -43,6 +43,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string ErrorPattern = @"Error:\s+(.*)?";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InstallOutputReceiver"/> class.
+        /// </summary>
+        public InstallOutputReceiver() { }
+
+        /// <summary>
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
         public string ErrorMessage { get; private set; }

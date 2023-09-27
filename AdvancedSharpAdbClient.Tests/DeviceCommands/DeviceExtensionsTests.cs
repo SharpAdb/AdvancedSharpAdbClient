@@ -20,6 +20,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.Stat("/test").Returns(stats);
 
+            using FactoriesLocker locker = FactoriesLocker.Wait();
+
             Factories.SyncServiceFactory = (c, d) => mock;
 
             DeviceData device = new();

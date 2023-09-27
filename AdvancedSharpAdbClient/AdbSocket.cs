@@ -31,33 +31,22 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected readonly ITcpSocket socket;
 
-#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<AdbSocket> logger;
-#endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(EndPoint endPoint
-#if HAS_LOGGER
-            , ILogger<AdbSocket> logger = null
-#endif
-            )
+        public AdbSocket(EndPoint endPoint, ILogger<AdbSocket> logger = null)
         {
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
         /// <summary>
@@ -66,11 +55,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="port">The port at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(string host, int port
-#if HAS_LOGGER
-            , ILogger<AdbSocket> logger = null
-#endif
-            )
+        public AdbSocket(string host, int port, ILogger<AdbSocket> logger = null)
         {
             if (string.IsNullOrEmpty(host))
             {
@@ -82,28 +67,22 @@ namespace AdvancedSharpAdbClient
             DnsEndPoint endPoint = values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
-            
+
             socket = new TcpSocket();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<AdbSocket>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
-        public AdbSocket(ITcpSocket socket)
+        /// <param name="logger">The logger to use when logging.</param>
+        public AdbSocket(ITcpSocket socket, ILogger<AdbSocket> logger = null)
         {
             this.socket = socket;
-#if HAS_LOGGER
-            logger ??= NullLogger<AdbSocket>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
         /// <summary>
@@ -143,14 +122,9 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException("channel EOF");
                 }
             }
-#if HAS_LOGGER
             catch (SocketException sex)
             {
                 logger.LogError(sex, sex.Message);
-#else
-            catch (SocketException)
-            {
-#endif
                 throw;
             }
         }
@@ -222,16 +196,12 @@ namespace AdvancedSharpAdbClient
                     count = socket.Receive(buffer, bufferLength, SocketFlags.None);
                     if (count < 0)
                     {
-#if HAS_LOGGER
                         logger.LogError("read: channel EOF");
-#endif
                         throw new AdbException("EOF");
                     }
                     else if (count == 0)
                     {
-#if HAS_LOGGER
                         logger.LogInformation("DONE with Read");
-#endif
                     }
                     else
                     {
@@ -364,14 +334,9 @@ namespace AdvancedSharpAdbClient
             {
                 Send(data, -1);
             }
-#if HAS_LOGGER
             catch (IOException e)
             {
                 logger.LogError(e, e.Message);
-#else
-            catch (IOException)
-            {
-#endif
                 return false;
             }
 
@@ -397,9 +362,7 @@ namespace AdvancedSharpAdbClient
             {
                 string message = ReadString();
                 rasps.Message = message;
-#if HAS_LOGGER
-                logger.LogError($"Got reply '{ReplyToString(reply)}', diag='{rasps.Message}'");
-#endif
+                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), rasps.Message);
             }
 
             return rasps;
@@ -417,17 +380,11 @@ namespace AdvancedSharpAdbClient
             {
                 result = Encoding.ASCII.GetString(reply);
             }
-#if HAS_LOGGER
             catch (DecoderFallbackException e)
             {
                 logger.LogError(e, e.Message);
-#else
-            catch (DecoderFallbackException)
-            {
-#endif
                 result = string.Empty;
             }
-
             return result;
         }
 

@@ -42,7 +42,7 @@ jobs:
     - name: Test
       run: dotnet test --no-restore -p:FullTargets=false
 
-  pack-and-upload:
+  pack-and-publish:
     name: pack-and-publish
     needs: build-and-test
     runs-on: ubuntu-latest
