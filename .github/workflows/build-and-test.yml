@@ -55,7 +55,7 @@ jobs:
       run: dotnet pack -c Release --no-build
     
     - name: Publish
-      run: dotnet nuget push ./AdvancedSharpAdbClient/bin/Release/*.nupkg --source "github" --skip-duplicate --api-key ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget push ./AdvancedSharpAdbClient/bin/Release/*.nupkg --source "github" --skip-duplicate --api-key ${{ secrets.API_KEY }}
 
     - name: Get version
       id: get_version
