@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.Tests
                 });
 
             Assert.NotNull(value);
-            Assert.Equal(UnixFileMode.Regular, value.FileMode & UnixFileMode.TypeMask);
+            Assert.Equal(UnixFileType.Regular, value.FileType & UnixFileType.TypeMask);
             Assert.Equal(597, value.Size);
             Assert.Equal(DateTimeHelper.Epoch.ToLocalTime(), value.Time);
         }
@@ -76,25 +76,25 @@ namespace AdvancedSharpAdbClient.Tests
 
             FileStatistics dir = value[0];
             Assert.Equal(".", dir.Path);
-            Assert.Equal((UnixFileMode)16873, dir.FileMode);
+            Assert.Equal((UnixFileType)16873, dir.FileType);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
 
             FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
-            Assert.Equal((UnixFileMode)16877, parentDir.FileMode);
+            Assert.Equal((UnixFileType)16877, parentDir.FileType);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
 
             FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
-            Assert.Equal((UnixFileMode)41471, sdcard0.FileMode);
+            Assert.Equal((UnixFileType)41471, sdcard0.FileType);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
 
             FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
-            Assert.Equal((UnixFileMode)16749, emulated.FileMode);
+            Assert.Equal((UnixFileType)16749, emulated.FileType);
             Assert.Equal(0, emulated.Size);
             Assert.Equal(time, emulated.Time);
         }

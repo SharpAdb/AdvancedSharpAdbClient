@@ -374,7 +374,7 @@ namespace AdvancedSharpAdbClient
                 Array.Reverse(statResult, 8, 4);
             }
 
-            value.FileMode = (UnixFileMode)BitConverter.ToInt32(statResult, 0);
+            value.FileType = (UnixFileType)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
             value.Time = Extensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
         }

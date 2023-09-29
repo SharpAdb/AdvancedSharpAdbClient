@@ -1,4 +1,4 @@
-﻿// <copyright file="UnixFileMode.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="UnixFileType.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -10,10 +10,10 @@ namespace AdvancedSharpAdbClient
     /// Describes the properties of a file on an Android device.
     /// </summary>
     [Flags]
-    public enum UnixFileMode : ushort
+    public enum UnixFileType : ushort
     {
         /// <summary>
-        /// The mask that can be used to retrieve the file type from a <see cref="UnixFileMode"/>.
+        /// The mask that can be used to retrieve the file type from a <see cref="UnixFileType"/>.
         /// </summary>
         TypeMask = 0x8000,
 
