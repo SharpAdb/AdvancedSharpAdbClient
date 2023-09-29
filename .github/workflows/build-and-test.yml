@@ -33,7 +33,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         dotnet-quality: 'preview'
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: dotnet restore -p:FullTargets=false
 
     - name: Build
@@ -46,6 +46,8 @@ jobs:
     name: pack-and-publish
     needs: build-and-test
     runs-on: ubuntu-latest
+    env:
+      NUGET_SOURCE: https://nuget.pkg.github.com/yungd1plomat/index.json
 
     steps:
       - name: Checkout
@@ -59,7 +61,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           dotnet-quality: 'preview'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: dotnet restore -p:FullTargets=true
 
       - name: Pack
@@ -67,7 +69,7 @@ jobs:
 
       - name: Publish
         if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        run: dotnet nuget push ./nugets/*nupkg --source "github" --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
+        run: dotnet nuget push ./nugets/*nupkg --source "$env:NUGET_SOURCE" --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
