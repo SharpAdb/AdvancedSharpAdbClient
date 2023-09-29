@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
@@ -13,6 +14,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<DeviceNotFoundException>.MessageAndInnerConstructorTest((message, inner) => new DeviceNotFoundException(message, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<DeviceNotFoundException>.SerializationConstructorTest((info, context) => new DeviceNotFoundException(info, context));
     }

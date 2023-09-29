@@ -1290,10 +1290,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private Task RunCreateForwardAsyncTest(Func<DeviceData, Task> test, string forwardString)
         {
-            string[] requests = new string[]
-            {
-                $"host-serial:169.254.109.177:5555:forward:{forwardString}"
-            };
+            string[] requests = [$"host-serial:169.254.109.177:5555:forward:{forwardString}"];
 
             return RunTestAsync(
                 [AdbResponse.OK, AdbResponse.OK],

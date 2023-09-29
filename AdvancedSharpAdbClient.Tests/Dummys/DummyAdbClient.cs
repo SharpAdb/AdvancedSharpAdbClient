@@ -26,11 +26,11 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ReceivedCommands.Add(command);
 
-            if (Commands.ContainsKey(command))
+            if (Commands.TryGetValue(command, out string value))
             {
                 if (receiver != null)
                 {
-                    StringReader reader = new(Commands[command]);
+                    StringReader reader = new(value);
 
                     while (reader.Peek() != -1)
                     {
@@ -53,11 +53,11 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ReceivedCommands.Add(command);
 
-            if (Commands.ContainsKey(command))
+            if (Commands.TryGetValue(command, out string value))
             {
                 if (receiver != null)
                 {
-                    StringReader reader = new(Commands[command]);
+                    StringReader reader = new(value);
 
                     while (reader.Peek() != -1)
                     {

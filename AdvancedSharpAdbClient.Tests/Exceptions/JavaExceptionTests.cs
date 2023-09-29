@@ -18,6 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<JavaException>.MessageAndInnerConstructorTest((message, inner) => new JavaException(string.Empty, message, string.Empty, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<JavaException>.SerializationConstructorTest((info, context) => new JavaException(info, context));
 

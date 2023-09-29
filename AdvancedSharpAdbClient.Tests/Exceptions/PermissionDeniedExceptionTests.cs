@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
@@ -17,6 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<PermissionDeniedException>.MessageAndInnerConstructorTest((message, inner) => new PermissionDeniedException(message, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<PermissionDeniedException>.SerializationConstructorTest((info, context) => new PermissionDeniedException(info, context));
     }

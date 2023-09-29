@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
@@ -17,6 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<ShellCommandUnresponsiveException>.MessageAndInnerConstructorTest((message, inner) => new ShellCommandUnresponsiveException(message, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<ShellCommandUnresponsiveException>.SerializationConstructorTest((info, context) => new ShellCommandUnresponsiveException(info, context));
     }
