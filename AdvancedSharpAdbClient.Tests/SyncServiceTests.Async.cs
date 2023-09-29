@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.NotNull(value);
             Assert.Equal(UnixFileType.Regular, value.FileType & UnixFileType.TypeMask);
             Assert.Equal(597, value.Size);
-            Assert.Equal(DateTimeHelper.Epoch.ToLocalTime(), value.Time);
+            Assert.Equal(DateTimeExtension.Epoch.ToLocalTime(), value.Time);
         }
 
         [Fact]

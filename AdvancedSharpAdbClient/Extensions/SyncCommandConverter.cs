@@ -37,12 +37,12 @@ namespace AdvancedSharpAdbClient
         /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
         public static byte[] GetBytes(SyncCommand command)
         {
-            if (!Values.ContainsKey(command))
+            if (!Values.TryGetValue(command, out string value))
             {
                 throw new ArgumentOutOfRangeException(nameof(command), $"{command} is not a valid sync command");
             }
 
-            string commandText = Values[command];
+            string commandText = value;
             byte[] commandBytes = AdbClient.Encoding.GetBytes(commandText);
 
             return commandBytes;

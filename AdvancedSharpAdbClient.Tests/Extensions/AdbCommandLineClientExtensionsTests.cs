@@ -10,10 +10,16 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public class AdbCommandLineClientExtensionsTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClientExtensions.EnsureIsValidAdbFile(IAdbCommandLineClient, string)"/> method.
+        /// </summary>
         [Fact]
         public void EnsureIsValidAdbFileNullValueTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => AdbCommandLineClientExtensions.EnsureIsValidAdbFile(null, "adb.exe"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClientExtensions.EnsureIsValidAdbFile(IAdbCommandLineClient, string)"/> method.
+        /// </summary>
         [Fact]
         public void EnsureIsValidAdbFileInvalidFileTest()
         {

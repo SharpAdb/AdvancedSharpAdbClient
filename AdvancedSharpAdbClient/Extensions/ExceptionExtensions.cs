@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace AdvancedSharpAdbClient.Exceptions
+namespace AdvancedSharpAdbClient
 {
     internal static class ExceptionExtensions
     {

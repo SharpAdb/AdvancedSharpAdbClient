@@ -49,12 +49,12 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(spec));
             }
 
-            if (!Mappings.ContainsKey(parts[0]))
+            if (!Mappings.TryGetValue(parts[0], out ForwardProtocol value))
             {
                 throw new ArgumentOutOfRangeException(nameof(spec));
             }
 
-            ForwardProtocol protocol = Mappings[parts[0]];
+            ForwardProtocol protocol = value;
             Protocol = protocol;
 
             bool isInt = int.TryParse(parts[1], out int intValue);

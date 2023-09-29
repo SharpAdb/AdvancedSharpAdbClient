@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -8,6 +8,9 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public class ExtensionsTests
     {
+        /// <summary>
+        /// Tests the <see cref="Extensions.TryParse{TEnum}(string, bool, out TEnum)"/> method.
+        /// </summary>
         [Fact]
         public void TryParseTest()
         {
@@ -19,6 +22,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(Extensions.TryParse<DeviceState>("Reset", true, out _));
         }
 
+        /// <summary>
+        /// Tests the <see cref="Extensions.IsNullOrWhiteSpace(string)"/> method.
+        /// </summary>
         [Fact]
         public void IsNullOrWhiteSpaceTest()
         {
@@ -26,22 +32,11 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(" test ".IsNullOrWhiteSpace());
         }
 
+        /// <summary>
+        /// Tests the <see cref="Extensions.Join(string, IEnumerable{string})"/> method.
+        /// </summary>
         [Fact]
         public void JoinTest() =>
             Assert.Equal("Hello World!", Extensions.Join(" ", ["Hello", "World!"]));
-
-        [Fact]
-        public void FromUnixTimeSecondsTest()
-        {
-            DateTimeOffset time = new(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
-            Assert.Equal(time, Extensions.FromUnixTimeSeconds(1654085434));
-        }
-
-        [Fact]
-        public void ToUnixTimeSecondsTest()
-        {
-            DateTimeOffset time = new(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
-            Assert.Equal(1654085434, time.ToUnixTimeSeconds());
-        }
     }
 }
