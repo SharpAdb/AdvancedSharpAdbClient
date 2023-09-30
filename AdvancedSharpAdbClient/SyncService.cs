@@ -158,7 +158,11 @@ namespace AdvancedSharpAdbClient
             while (!isCancelled)
             {
                 // read up to SYNC_DATA_MAX
+#if HAS_BUFFERS
+                int read = stream.Read(buffer.AsSpan(headerSize, maxDataSize));
+#else
                 int read = stream.Read(buffer, headerSize, maxDataSize);
+#endif
                 totalBytesRead += read;
 
                 if (read == 0)
@@ -179,7 +183,11 @@ namespace AdvancedSharpAdbClient
                 Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                 // now send the data to the device
+#if HAS_BUFFERS
+                Socket.Send(buffer.AsSpan(startPosition, read + dataBytes.Length + lengthBytes.Length));
+#else
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
+#endif
 
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
@@ -261,8 +269,13 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // now read the length we received
+#if HAS_BUFFERS
+                _ = Socket.Read(buffer.AsSpan(0, size));
+                stream.Write(buffer.AsSpan(0, size));
+#else
                 _ = Socket.Read(buffer, size);
                 stream.Write(buffer, 0, size);
+#endif
                 totalBytesRead += size;
 
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));

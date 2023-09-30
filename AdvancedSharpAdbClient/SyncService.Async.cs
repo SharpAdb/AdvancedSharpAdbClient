@@ -90,7 +90,14 @@ namespace AdvancedSharpAdbClient
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // read up to SYNC_DATA_MAX
-                int read = stream.Read(buffer, headerSize, maxDataSize);
+                int read =
+#if HAS_BUFFERS
+                    await stream.ReadAsync(buffer.AsMemory(headerSize, maxDataSize), cancellationToken);
+#elif !NET35
+                    await stream.ReadAsync(buffer, headerSize, maxDataSize, cancellationToken);
+#else
+                    await Extensions.Run(() => stream.Read(buffer, headerSize, maxDataSize));
+#endif
                 totalBytesRead += read;
 
                 if (read == 0)
@@ -111,7 +118,11 @@ namespace AdvancedSharpAdbClient
                 Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                 // now send the data to the device
+#if HAS_BUFFERS
+                await Socket.SendAsync(buffer.AsMemory(startPosition, read + dataBytes.Length + lengthBytes.Length), cancellationToken);
+#else
                 await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken);
+#endif
 
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
@@ -194,13 +205,16 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // now read the length we received
-                await Socket.ReadAsync(buffer, size, cancellationToken);
 #if HAS_BUFFERS
+                await Socket.ReadAsync(buffer.AsMemory(0, size), cancellationToken);
                 await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken);
-#elif !NET35
+#else
+                await Socket.ReadAsync(buffer, size, cancellationToken);
+#if !NET35
                 await stream.WriteAsync(buffer, 0, size, cancellationToken);
 #else
                 await Extensions.Run(() => stream.Write(buffer, 0, size));
+#endif
 #endif
                 totalBytesRead += size;
 
