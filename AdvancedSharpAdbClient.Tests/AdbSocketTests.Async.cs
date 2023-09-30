@@ -35,8 +35,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ReadSyncResponseAsync()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -51,8 +51,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ReadStringAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
             {
@@ -69,8 +69,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ReadAdbOkayResponseAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -89,8 +89,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ReadAdbFailResponseAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             await using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -107,8 +107,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ReadAsyncTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             // Read 100 bytes from a stream which has 101 bytes available
             byte[] data = new byte[101];
@@ -117,13 +117,42 @@ namespace AdvancedSharpAdbClient.Tests
                 data[i] = (byte)i;
             }
 
-            await tcpSocket.InputStream.WriteAsync(data.AsMemory(0, 101));
+            await tcpSocket.InputStream.WriteAsync(data);
             tcpSocket.InputStream.Position = 0;
 
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
             await socket.ReadAsync(received, 100, CancellationToken.None);
+
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.Equal(received[i], (byte)i);
+            }
+
+            Assert.Equal(0, received[100]);
+        }
+
+        [Fact]
+        public async void ReadAsyncMemoryTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            // Read 100 bytes from a stream which has 101 bytes available
+            byte[] data = new byte[101];
+            for (int i = 0; i < 101; i++)
+            {
+                data[i] = (byte)i;
+            }
+
+            await tcpSocket.InputStream.WriteAsync(data);
+            tcpSocket.InputStream.Position = 0;
+
+            // Buffer has a capacity of 101, but we'll only want to read 100 bytes
+            byte[] received = new byte[101];
+
+            await socket.ReadAsync(received.AsMemory(0, 100), CancellationToken.None);
 
             for (int i = 0; i < 100; i++)
             {
@@ -141,8 +170,8 @@ namespace AdvancedSharpAdbClient.Tests
 
         private static async Task RunTestAsync(Func<IAdbSocket, Task> test, byte[] expectedDataSent)
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             // Run the test.
             await test(socket);

@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-            DateTimeOffset timestamp = DateTimeExtension.FromUnixTimeSeconds(sec);
+            DateTimeOffset timestamp = DateTimeExtensions.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {

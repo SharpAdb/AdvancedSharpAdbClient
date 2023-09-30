@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-            DateTimeOffset timestamp = DateTimeExtension.FromUnixTimeSeconds(sec);
+            DateTimeOffset timestamp = DateTimeExtensions.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {
@@ -208,7 +208,7 @@ namespace AdvancedSharpAdbClient.Logs
             byte[] data = new byte[count];
 
             while ((read =
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                 await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
 #elif !NET35
                 await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)

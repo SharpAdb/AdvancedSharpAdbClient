@@ -15,26 +15,43 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void LifecycleTest()
         {
-            TcpSocket socket = new();
+            using TcpSocket socket = new();
             Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.bing.com", 80));
             Assert.True(socket.Connected);
 
             byte[] data = Encoding.ASCII.GetBytes("GET / HTTP/1.1\n\n");
-            socket.Send(data, 0, data.Length, SocketFlags.None);
+            socket.Send(data, data.Length, SocketFlags.None);
 
             byte[] responseData = new byte[128];
-            socket.Receive(responseData, 0, SocketFlags.None);
+            socket.Receive(responseData, responseData.Length, SocketFlags.None);
 
             _ = Encoding.ASCII.GetString(responseData);
-            socket.Dispose();
+        }
+
+        [Fact]
+        public void LifecycleSpanTest()
+        {
+            using TcpSocket socket = new();
+            Assert.False(socket.Connected);
+
+            socket.Connect(new DnsEndPoint("www.bing.com", 80));
+            Assert.True(socket.Connected);
+
+            ReadOnlySpan<byte> data = Encoding.ASCII.GetBytes("GET / HTTP/1.1\n\n");
+            socket.Send(data, SocketFlags.None);
+
+            byte[] responseData = new byte[128];
+            socket.Receive([.. responseData], SocketFlags.None);
+
+            _ = Encoding.ASCII.GetString(responseData);
         }
 
         [Fact]
         public void ReconnectTest()
         {
-            TcpSocket socket = new();
+            using TcpSocket socket = new();
             Assert.False(socket.Connected);
 
             socket.Connect(new DnsEndPoint("www.bing.com", 80));
@@ -50,19 +67,18 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void BufferSizeTest()
         {
-            TcpSocket socket = new()
+            using TcpSocket socket = new()
             {
                 ReceiveBufferSize = 1024
             };
             // https://stackoverflow.com/questions/29356626/is-there-a-way-to-reduce-the-minimum-lower-limit-of-the-socket-send-buffer-size
             Assert.Equal(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 2304 : 1024, socket.ReceiveBufferSize);
-            socket.Dispose();
         }
 
         [Fact]
         public void CreateUnsupportedSocketTest()
         {
-            TcpSocket socket = new();
+            using TcpSocket socket = new();
             _ = Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
         }
     }

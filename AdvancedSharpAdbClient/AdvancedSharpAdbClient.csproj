@@ -104,6 +104,16 @@
     <DefineConstants>$(DefineConstants);HAS_DRAWING</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
+                         or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
+                         or '$(TargetFramework)' == 'net8.0'
+                         or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
+                         or '$(TargetFramework)' == 'netcoreapp3.1'
+                         or '$(TargetFramework)' == 'netstandard2.1'
+                         or '$(TargetFramework)' == 'uap10.0.15138.0'">
+    <DefineConstants>$(DefineConstants);HAS_FULLSTRING</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
                         and '$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'

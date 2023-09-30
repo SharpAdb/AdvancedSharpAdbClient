@@ -60,9 +60,12 @@ namespace AdvancedSharpAdbClient
                 // Already connected - nothing to do.
                 return;
             }
-
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            Connect(endPoint);
+            else
+            {
+                socket.Dispose();
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                Connect(endPoint);
+            }
         }
 
         /// <inheritdoc/>
@@ -82,6 +85,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public virtual void Close() =>
+#if HAS_PROCESS
+            socket.Close();
+#else
+            socket.Dispose();
+#endif
+
+        /// <inheritdoc/>
+        public virtual int Send(byte[] buffer, int size, SocketFlags socketFlags) =>
+            socket.Send(buffer, size, socketFlags);
+
+        /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
             socket.Send(buffer, offset, size, socketFlags);
 
@@ -90,6 +105,28 @@ namespace AdvancedSharpAdbClient
             socket.Receive(buffer, size, socketFlags);
 
         /// <inheritdoc/>
-        public Stream GetStream() => new NetworkStream(socket);
+        public virtual int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+            socket.Receive(buffer, offset, size, socketFlags);
+
+#if HAS_BUFFERS
+        /// <inheritdoc/>
+        public virtual int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags) =>
+            socket.Send(buffer, socketFlags);
+
+        /// <inheritdoc/>
+        public virtual int Receive(Span<byte> buffer, SocketFlags socketFlags) =>
+            socket.Receive(buffer, socketFlags);
+#else
+        /// <inheritdoc/>
+        public virtual int Send(byte[] buffer, SocketFlags socketFlags) =>
+            socket.Send(buffer, socketFlags);
+            
+        /// <inheritdoc/>
+        public virtual int Receive(byte[] buffer, SocketFlags socketFlags) =>
+            socket.Receive(buffer, socketFlags);
+#endif
+
+        /// <inheritdoc/>
+        public virtual Stream GetStream() => new NetworkStream(socket);
     }
 }

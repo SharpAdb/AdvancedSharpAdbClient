@@ -1,4 +1,4 @@
-﻿// <copyright file="DateTimeExtension.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="DateTimeExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides helper methods for working with Unix-based date formats.
     /// </summary>
-    public static class DateTimeExtension
+    public static class DateTimeExtensions
     {
 #if NETFRAMEWORK && !NET46_OR_GREATER
         // Number of 100ns ticks per time unit

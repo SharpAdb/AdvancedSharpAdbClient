@@ -155,7 +155,7 @@ namespace AdvancedSharpAdbClient
             return read;
         }
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
         /// <inheritdoc/>
         public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient
             {
                 buffer[offset] = pendingByte.Value;
                 read =
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                     await Inner.ReadAsync(buffer.AsMemory(offset + 1, count - 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient
             else
             {
                 read =
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                     await Inner.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
@@ -263,7 +263,7 @@ namespace AdvancedSharpAdbClient
                     }
 
                     int miniRead =
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                         await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                         await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
@@ -290,7 +290,7 @@ namespace AdvancedSharpAdbClient
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
                 int miniRead =
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                     await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
 #elif !NET35
                     await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);

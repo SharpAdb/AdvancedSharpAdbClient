@@ -195,7 +195,7 @@ namespace AdvancedSharpAdbClient
 
                 // now read the length we received
                 await Socket.ReadAsync(buffer, size, cancellationToken);
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
                 await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken);
 #elif !NET35
                 await stream.WriteAsync(buffer, 0, size, cancellationToken);
@@ -311,7 +311,7 @@ namespace AdvancedSharpAdbClient
 
             value.FileType = (UnixFileType)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = DateTimeExtension.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
+            value.Time = DateTimeExtensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
         }
     }
 }

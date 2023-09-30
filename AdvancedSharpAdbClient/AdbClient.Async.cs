@@ -368,7 +368,7 @@ namespace AdvancedSharpAdbClient
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_FULLSTRING
             if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
 #else
             if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
@@ -423,7 +423,7 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
 #elif !NET35
             while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
@@ -603,7 +603,7 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
 #elif !NET35
             while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)

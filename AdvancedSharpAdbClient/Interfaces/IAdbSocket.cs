@@ -5,6 +5,7 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
+using System.Net.Sockets;
 
 namespace AdvancedSharpAdbClient
 {
@@ -71,15 +72,6 @@ namespace AdvancedSharpAdbClient
         void SendAdbRequest(string request);
 
         /// <summary>
-        /// Reads from the socket until the array is filled, or no more data is coming(because
-        /// the socket closed or the timeout expired).
-        /// </summary>
-        /// <param name="data" >The buffer to store the read data into.</param>
-        /// <returns>The total number of bytes read.</returns>
-        /// <remarks>This uses the default time out value.</remarks>
-        int Read(byte[] data);
-
-        /// <summary>
         /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
         /// is reached, or no more data is coming (because the socket closed or the
         /// timeout expired).
@@ -89,6 +81,18 @@ namespace AdvancedSharpAdbClient
         /// <returns>The total number of bytes read.</returns>
         /// <exception cref="AdbException">EOF or No Data to read: exception.Message</exception>
         int Read(byte[] data, int length);
+
+        /// <summary>
+        /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
+        /// is reached, or no more data is coming (because the socket closed or the
+        /// timeout expired).
+        /// </summary>
+        /// <param name="data">The buffer to store the read data into.</param>
+        /// <param name="offset">The position to store the received data.</param>
+        /// <param name="length">The length to read or -1 to fill the data buffer completely</param>
+        /// <returns>The total number of bytes read.</returns>
+        /// <exception cref="AdbException">EOF or No Data to read: exception.Message</exception>
+        int Read(byte[] data, int offset, int length);
 
         /// <summary>
         /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
@@ -116,6 +120,39 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
         AdbResponse ReadAdbResponse();
 
+#if HAS_BUFFERS
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A span of bytes that acts as a buffer, containing the data to send.</param>
+        void Send(ReadOnlySpan<byte> data);
+
+        /// <summary>
+        /// Reads from the socket until the array is filled, or no more data is coming(because
+        /// the socket closed or the timeout expired).
+        /// </summary>
+        /// <param name="data" >A span of bytes to store the read data into.</param>
+        /// <returns>The total number of bytes read.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
+        int Read(Span<byte> data);
+#else
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        void Send(byte[] data);
+
+        /// <summary>
+        /// Reads from the socket until the array is filled, or no more data is coming(because
+        /// the socket closed or the timeout expired).
+        /// </summary>
+        /// <param name="data" >The buffer to store the read data into.</param>
+        /// <returns>The total number of bytes read.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
+        int Read(byte[] data);
+#endif
+
+
         /// <summary>
         /// Gets a <see cref="Stream"/> that can be used to send and receive shell output to and
         /// from the device.
@@ -134,5 +171,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device to which to connect.</param>
         /// <remarks>If <paramref name="device"/> is <see langword="null"/>, this method does nothing.</remarks>
         void SetDevice(DeviceData device);
+
+        /// <summary>
+        /// Closes the <see cref="Socket"/> connection and releases all associated resources.
+        /// </summary>
+        void Close();
     }
 }

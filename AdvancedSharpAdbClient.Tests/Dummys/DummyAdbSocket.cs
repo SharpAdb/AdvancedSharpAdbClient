@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,20 +45,19 @@ namespace AdvancedSharpAdbClient.Tests
         /// <inheritdoc/>
         public bool DidReconnect { get; private set; }
 
-        public Socket Socket => throw new NotImplementedException();
-
-        public void Send(byte[] data, int length) => SyncDataSent.Enqueue(data.Take(length).ToArray());
+        public void Send(byte[] data, int length)
+        {
+            SyncDataSent.Enqueue(data[..length]);
+        }
 
         public void Send(byte[] data, int offset, int length)
         {
-            if (offset == 0)
-            {
-                Send(data, length);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            SyncDataSent.Enqueue(data[offset..(offset + length)]);
+        }
+
+        public void Send(ReadOnlySpan<byte> data)
+        {
+            SyncDataSent.Enqueue(data.ToArray());
         }
 
         public void SendSyncRequest(string command, int value) => SyncRequests.Add((Enum.Parse<SyncCommand>(command), value.ToString()));
@@ -72,26 +70,29 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void SendAdbRequest(string request) => Requests.Add(request);
 
-        public int Read(byte[] data)
+        public int Read(byte[] data, int length)
         {
             byte[] actual = SyncDataReceived.Dequeue();
+            Assert.True(actual.Length >= length);
+            Buffer.BlockCopy(actual, 0, data, 0, length);
+            return Math.Min(actual.Length, length);
+        }
 
+        public int Read(byte[] data, int offset, int length)
+        {
+            byte[] actual = SyncDataReceived.Dequeue();
+            Assert.True(actual.Length >= length);
+            Buffer.BlockCopy(actual, 0, data, offset, length);
+            return Math.Min(actual.Length, length);
+        }
+
+        public int Read(Span<byte> data)
+        {
+            byte[] actual = SyncDataReceived.Dequeue();
             for (int i = 0; i < data.Length && i < actual.Length; i++)
             {
                 data[i] = actual[i];
             }
-
-            return actual.Length;
-        }
-
-        public int Read(byte[] data, int length)
-        {
-            byte[] actual = SyncDataReceived.Dequeue();
-
-            Assert.Equal(actual.Length, length);
-
-            Buffer.BlockCopy(actual, 0, data, 0, length);
-
             return actual.Length;
         }
 
@@ -159,6 +160,12 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
+        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            Send(data.Span);
+            return ValueTask.CompletedTask;
+        }
+
         public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default)
         {
             SendSyncRequest(command, path, permissions);
@@ -183,20 +190,18 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
-        public Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default)
-        {
-            int result = Read(data);
-            TaskCompletionSource<int> tcs = new();
-            tcs.SetResult(result);
-            return tcs.Task;
-        }
-
         public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
             int result = Read(data, length);
             TaskCompletionSource<int> tcs = new();
             tcs.SetResult(result);
             return tcs.Task;
+        }
+
+        public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
+        {
+            int result = Read(data.Span);
+            return new ValueTask<int>(result);
         }
 
         public async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
@@ -258,5 +263,11 @@ namespace AdvancedSharpAdbClient.Tests
         public void Close() => IsConnected = false;
 
         public void Reconnect() => DidReconnect = true;
+
+        public ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
+        {
+            DidReconnect = true;
+            return ValueTask.CompletedTask;
+        }
     }
 }

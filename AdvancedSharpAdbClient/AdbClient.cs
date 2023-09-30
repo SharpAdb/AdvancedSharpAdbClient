@@ -504,7 +504,7 @@ namespace AdvancedSharpAdbClient
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if HAS_FULLSTRING
             if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
 #else
             if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)

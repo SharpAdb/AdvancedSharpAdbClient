@@ -14,15 +14,35 @@ namespace AdvancedSharpAdbClient
 {
     public partial class AdbSocket
     {
+#if NET6_0_OR_GREATER
         /// <inheritdoc/>
-        public Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default) => SendAsync(data, 0, length, cancellationToken);
+        public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default) => socket.ReconnectAsync(cancellationToken);
+#endif
+
+        /// <inheritdoc/>
+        public virtual async Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken);
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
 
         /// <inheritdoc/>
         public virtual async Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
             try
             {
-                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken);
+                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -82,20 +102,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-            ReadAsync(data, data.Length, cancellationToken);
+        public virtual Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) =>
+            ReadAsync(data, 0, length, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
+        public virtual async Task<int> ReadAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNegative(length);
-
             ExceptionExtensions.ThrowIfNull(data);
+            ExceptionExtensions.ThrowIfNegative(offset);
 
+            length = length != -1 ? length : data.Length;
             ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
-            int totalRead = 0;
+            int totalRead = offset;
 
             while (count != 0 && totalRead < length)
             {
@@ -222,6 +242,91 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+#if HAS_BUFFERS
+        /// <inheritdoc/>
+        public virtual async ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken);
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
+        {
+            ExceptionExtensions.ThrowIfNull(data);
+
+            int count = -1;
+            int totalRead = 0;
+            int length = data.Length;
+
+            while (count != 0 && totalRead < length)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    int left = length - totalRead;
+                    int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
+
+                    count = await socket.ReceiveAsync(data.Slice(totalRead, bufferLength), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+
+                    if (count < 0)
+                    {
+                        logger.LogError("read: channel EOF");
+                        throw new AdbException("EOF");
+                    }
+                    else if (count == 0)
+                    {
+                        logger.LogInformation("DONE with Read");
+                    }
+                    else
+                    {
+                        totalRead += count;
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    throw new AdbException($"An error occurred while receiving data from the adb server: {ex.Message}.", ex);
+                }
+            }
+
+            return totalRead;
+        }
+#else
+        /// <inheritdoc/>
+        public virtual async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken);
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+        
+        /// <inheritdoc/>
+        public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+            ReadAsync(data, 0, data.Length, cancellationToken);
+#endif
+
         /// <summary>
         /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
@@ -233,7 +338,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                await SendAsync(data, -1, cancellationToken);
+                await SendAsync(data, cancellationToken);
             }
             catch (IOException e)
             {

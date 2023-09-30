@@ -14,20 +14,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CloseTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             Assert.True(socket.Connected);
 
-            socket.Dispose();
+            socket.Close();
             Assert.False(socket.Connected);
         }
 
         [Fact]
         public void DisposeTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             Assert.True(socket.Connected);
 
@@ -70,8 +70,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadSyncResponse()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -86,8 +86,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadSyncString()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
             {
@@ -104,8 +104,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadAdbOkayResponseTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -124,8 +124,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadAdbFailResponseTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             using (StreamWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, 4, true))
             {
@@ -142,8 +142,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ReadTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             // Read 100 bytes from a stream which has 101 bytes available
             byte[] data = new byte[101];
@@ -152,13 +152,42 @@ namespace AdvancedSharpAdbClient.Tests
                 data[i] = (byte)i;
             }
 
-            tcpSocket.InputStream.Write(data, 0, 101);
+            tcpSocket.InputStream.Write(data);
             tcpSocket.InputStream.Position = 0;
 
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
             socket.Read(received, 100);
+
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.Equal(received[i], (byte)i);
+            }
+
+            Assert.Equal(0, received[100]);
+        }
+
+        [Fact]
+        public void ReadSpanTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            // Read 100 bytes from a stream which has 101 bytes available
+            byte[] data = new byte[101];
+            for (int i = 0; i < 101; i++)
+            {
+                data[i] = (byte)i;
+            }
+
+            tcpSocket.InputStream.Write(data);
+            tcpSocket.InputStream.Position = 0;
+
+            // Buffer has a capacity of 101, but we'll only want to read 100 bytes
+            byte[] received = new byte[101];
+
+            socket.Read(received.AsSpan(0, 100));
 
             for (int i = 0; i < 100; i++)
             {
@@ -177,20 +206,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetShellStreamTest()
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
-            Stream stream = socket.GetShellStream();
+            using Stream stream = socket.GetShellStream();
             Assert.IsType<ShellStream>(stream);
 
-            ShellStream shellStream = (ShellStream)stream;
+            using ShellStream shellStream = (ShellStream)stream;
             Assert.Equal(tcpSocket.OutputStream, shellStream.Inner);
         }
 
         private static void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
         {
-            DummyTcpSocket tcpSocket = new();
-            AdbSocket socket = new(tcpSocket);
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
 
             // Run the test.
             test(socket);

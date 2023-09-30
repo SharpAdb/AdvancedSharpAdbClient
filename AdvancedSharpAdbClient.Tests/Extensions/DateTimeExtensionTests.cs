@@ -4,23 +4,23 @@ using Xunit;
 namespace AdvancedSharpAdbClient.Tests
 {
     /// <summary>
-    /// Tests the <see cref="DateTimeExtension"/> class.
+    /// Tests the <see cref="DateTimeExtensions"/> class.
     /// </summary>
     public class DateTimeExtensionTests
     {
         /// <summary>
-        /// Tests the <see cref="DateTimeExtension.FromUnixTimeSeconds(long)"/> method.
+        /// Tests the <see cref="DateTimeExtensions.FromUnixTimeSeconds(long)"/> method.
         /// </summary>
         [Fact]
         public void FromUnixTimeSecondsTest()
         {
             DateTimeOffset time = new(new DateTime(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc));
-            Assert.Equal(time, DateTimeExtension.FromUnixTimeSeconds(1654085434));
+            Assert.Equal(time, DateTimeExtensions.FromUnixTimeSeconds(1654085434));
         }
 
 #if NETFRAMEWORK && !NET46_OR_GREATER
         /// <summary>
-        /// Tests the <see cref="DateTimeOffset.ToUnixTimeSeconds(DateTimeOffset)"/> method.
+        /// Tests the <see cref="DateTimeExtensions.ToUnixTimeSeconds(DateTimeOffset)"/> method.
         /// </summary>
         [Fact]
         public void ToUnixTimeSecondsTest()
@@ -31,17 +31,17 @@ namespace AdvancedSharpAdbClient.Tests
 #endif
 
         /// <summary>
-        /// Tests the <see cref="DateTimeExtension.FromUnixEpoch(long)"/> method.
+        /// Tests the <see cref="DateTimeExtensions.FromUnixEpoch(long)"/> method.
         /// </summary>
         [Fact]
         public void FromUnixEpochTest()
         {
             DateTime time = new(2022, 6, 1, 12, 10, 34, DateTimeKind.Utc);
-            Assert.Equal(time, DateTimeExtension.FromUnixEpoch(1654085434));
+            Assert.Equal(time, DateTimeExtensions.FromUnixEpoch(1654085434));
         }
 
         /// <summary>
-        /// Tests the <see cref="DateTimeExtension.ToUnixEpoch(DateTime)"/> method.
+        /// Tests the <see cref="DateTimeExtensions.ToUnixEpoch(DateTime)"/> method.
         /// </summary>
         [Fact]
         public void ToUnixEpochTest()
