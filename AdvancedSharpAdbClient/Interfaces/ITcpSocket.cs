@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient
     {
         /// <summary>
         /// Gets a value indicating whether a <see cref="ITcpSocket"/> is connected to a remote host as of the last
-        /// <see cref="Send(byte[], SocketFlags)"/> or <see cref="Receive(byte[], SocketFlags)"/> operation.
+        /// <see cref="Send(byte[], int, SocketFlags)"/> or <see cref="Receive(byte[], int, SocketFlags)"/> operation.
         /// </summary>
         bool Connected { get; }
 

@@ -439,11 +439,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null
-#if HAS_TASK
-                        , CancellationToken.None
-#endif
-                        );
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), null, false);
                 }
 
                 return remoteFilePath;

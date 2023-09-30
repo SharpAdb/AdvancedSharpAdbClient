@@ -138,7 +138,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, device);
-                    service.Pull("/fstab.donatello", stream, null, CancellationToken.None);
+                    service.Pull("/fstab.donatello", stream);
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
@@ -176,7 +176,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, device);
-                    service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
+                    service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
                 });
         }
     }

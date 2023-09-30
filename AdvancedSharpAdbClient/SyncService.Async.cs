@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient
         public Task ReopenAsync(IAdbClient client, CancellationToken cancellationToken = default) => ReopenAsync(Factories.AdbSocketFactory(client.EndPoint), cancellationToken);
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int> progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 

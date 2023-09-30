@@ -122,11 +122,7 @@ namespace AdvancedSharpAdbClient
         public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -159,13 +155,8 @@ namespace AdvancedSharpAdbClient
             long totalBytesRead = 0;
 
             // look while there is something to read
-            while (true)
+            while (!isCancelled)
             {
-#if HAS_TASK
-                // check if we're canceled
-                cancellationToken.ThrowIfCancellationRequested();
-#endif
-
                 // read up to SYNC_DATA_MAX
                 int read = stream.Read(buffer, headerSize, maxDataSize);
                 totalBytesRead += read;
@@ -220,11 +211,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int> progress
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int> progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
@@ -239,12 +226,10 @@ namespace AdvancedSharpAdbClient
 
             Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
 
-            while (true)
+            while (!isCancelled)
             {
                 SyncCommand response = Socket.ReadSyncResponse();
-#if HAS_TASK
-                cancellationToken.ThrowIfCancellationRequested();
-#endif
+
                 if (response == SyncCommand.DONE)
                 {
                     break;

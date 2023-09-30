@@ -1195,19 +1195,18 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
+            Element element = null;
             await RunTestAsync(
                 [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
-                async () =>
-                {
-                    Element element = await TestClient.FindElementAsync(device);
-                    Assert.Equal(144, element.GetChildCount());
-                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
-                });
+                async () => element = await TestClient.FindElementAsync(device));
+
+            Assert.Equal(144, element.GetChildCount());
+            element = element[0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
         }
 
         /// <summary>
@@ -1232,6 +1231,45 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
+            List<Element> elements = null;
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => elements = await TestClient.FindElementsAsync(device));
+
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
+            Assert.Equal(145, childCount);
+            Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindAsyncElements(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void FindAsyncElementsTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:uiautomator dump /dev/tty"
+            ];
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            await using MemoryStream shellStream = new(streamData);
+
+            List<Element> elements = null;
             await RunTestAsync(
                 [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
@@ -1239,14 +1277,19 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 shellStream,
                 async () =>
                 {
-                    List<Element> elements = await TestClient.FindElementsAsync(device);
-                    int childCount = elements.Count;
-                    elements.ForEach(x => childCount += x.GetChildCount());
-                    Assert.Equal(145, childCount);
-                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                    elements = [];
+                    await foreach(Element element in TestClient.FindAsyncElements(device))
+                    {
+                        elements.Add(element);
+                    }
                 });
+
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
+            Assert.Equal(145, childCount);
+            Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
         }
 
         private Task RunConnectAsyncTest(Func<Task> test, string connectString)

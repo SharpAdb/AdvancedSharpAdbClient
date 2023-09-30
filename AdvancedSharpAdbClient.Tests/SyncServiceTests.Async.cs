@@ -100,6 +100,69 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
+        public async void GetAsyncListingTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "169.254.109.177:5555",
+                State = DeviceState.Online
+            };
+
+            List<FileStatistics> value = null;
+
+            await RunTestAsync(
+                OkResponses(2),
+                ResponseMessages(".", "..", "sdcard0", "emulated"),
+                Requests("host:transport:169.254.109.177:5555", "sync:"),
+                SyncRequests(SyncCommand.LIST, "/storage"),
+                [SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE],
+                [
+                    [233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86],
+                    [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
+                ],
+                null,
+                async () =>
+                {
+                    using SyncService service = new(Socket, device);
+                    value = [];
+                    await foreach (FileStatistics statistics in service.GetDirectoryAsyncListing("/storage"))
+                    {
+                        value.Add(statistics);
+                    }
+                });
+
+            Assert.Equal(4, value.Count);
+
+            DateTime time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
+
+            FileStatistics dir = value[0];
+            Assert.Equal(".", dir.Path);
+            Assert.Equal((UnixFileType)16873, dir.FileType);
+            Assert.Equal(0, dir.Size);
+            Assert.Equal(time, dir.Time);
+
+            FileStatistics parentDir = value[1];
+            Assert.Equal("..", parentDir.Path);
+            Assert.Equal((UnixFileType)16877, parentDir.FileType);
+            Assert.Equal(0, parentDir.Size);
+            Assert.Equal(time, parentDir.Time);
+
+            FileStatistics sdcard0 = value[2];
+            Assert.Equal("sdcard0", sdcard0.Path);
+            Assert.Equal((UnixFileType)41471, sdcard0.FileType);
+            Assert.Equal(24, sdcard0.Size);
+            Assert.Equal(time, sdcard0.Time);
+
+            FileStatistics emulated = value[3];
+            Assert.Equal("emulated", emulated.Path);
+            Assert.Equal((UnixFileType)16749, emulated.FileType);
+            Assert.Equal(0, emulated.Size);
+            Assert.Equal(time, emulated.Time);
+        }
+
+        [Fact]
         public async void PullAsyncTest()
         {
             DeviceData device = new()

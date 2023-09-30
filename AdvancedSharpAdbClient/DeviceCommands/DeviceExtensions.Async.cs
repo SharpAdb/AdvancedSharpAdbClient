@@ -76,7 +76,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
             await service.PullAsync(remotePath, stream, progress, cancellationToken);
         }
 
@@ -103,7 +102,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
             await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken);
         }
 

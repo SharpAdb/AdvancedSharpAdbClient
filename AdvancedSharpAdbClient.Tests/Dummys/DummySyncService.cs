@@ -10,13 +10,11 @@ namespace AdvancedSharpAdbClient.Tests
     {
         public Dictionary<string, Stream> UploadedFiles { get; private set; } = new Dictionary<string, Stream>();
 
-        public bool IsOpen => true;
+        public bool IsOpen { get; private set; }= true;
 
         public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() => IsOpen = false;
 
         public IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
@@ -24,13 +22,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public void Open()
+        public void Open() => IsOpen = true;
+
+        public Task OpenAsync(CancellationToken cancellationToken)
         {
+            IsOpen = true;
+            return Task.CompletedTask;
         }
 
-        public Task OpenAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
-        public void Pull(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default) =>
+        public void Pull(string remotePath, Stream stream, IProgress<int> progress = null, in bool isCancelled = false) =>
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
 
         public Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress = null, in bool isCancelled = false)
         {
             SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
             UploadedFiles[remotePath] = stream;

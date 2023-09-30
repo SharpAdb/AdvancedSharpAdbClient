@@ -54,10 +54,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return service.GetDirectoryListing(remotePath);
         }
 
-#if !HAS_TASK
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#pragma warning disable CS1574 // XML 注释中有未能解析的 cref 特性
-#endif
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
@@ -67,27 +63,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            IProgress<int> progress = null,
+            in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            service.Pull(remotePath, stream, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            service.Pull(remotePath, stream, progress, in isCancelled);
         }
 
         /// <summary>
@@ -101,32 +89,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            IProgress<int> progress = null,
+            in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            service.Push(stream, remotePath, permissions, timestamp, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            service.Push(stream, remotePath, permissions, timestamp, progress, in isCancelled);
         }
-#if !HAS_TASK
-#pragma warning restore CS1574 // XML 注释中有未能解析的 cref 特性
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets the property of a device.
