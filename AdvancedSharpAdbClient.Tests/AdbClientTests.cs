@@ -834,12 +834,12 @@ namespace AdvancedSharpAdbClient.Tests
             // The app data is sent in chunks of 32 kb
             Collection<byte[]> applicationDataChunks = [];
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
                     byte[] buffer = new byte[32 * 1024];
-                    int read = stream.Read(buffer, 0, buffer.Length);
+                    int read = stream.Read(buffer.AsSpan(0, buffer.Length));
 
                     if (read == 0)
                     {
@@ -922,12 +922,12 @@ namespace AdvancedSharpAdbClient.Tests
             // The app data is sent in chunks of 32 kb
             Collection<byte[]> applicationDataChunks = [];
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
                     byte[] buffer = new byte[32 * 1024];
-                    int read = stream.Read(buffer, 0, buffer.Length);
+                    int read = stream.Read(buffer.AsSpan(0, buffer.Length));
 
                     if (read == 0)
                     {

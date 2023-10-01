@@ -120,7 +120,11 @@ namespace AdvancedSharpAdbClient
             }
 
             // followed by the actual framebuffer content
+#if HAS_BUFFERS
+            _ = socket.Read(Data.AsSpan(0, (int)Header.Size));
+#else
             _ = socket.Read(Data, (int)Header.Size);
+#endif
         }
 
 #if HAS_TASK
@@ -168,17 +172,21 @@ namespace AdvancedSharpAdbClient
             }
 
             // followed by the actual framebuffer content
+#if HAS_BUFFERS
+            _ = await socket.ReadAsync(Data.AsMemory(0, (int)Header.Size), cancellationToken).ConfigureAwait(false);
+#else
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
+#endif
         }
 #endif
 
 #if HAS_DRAWING
-        /// <summary>
-        /// Converts the framebuffer data to a <see cref="Bitmap"/>.
-        /// </summary>
-        /// <returns>An <see cref="Bitmap"/> which represents the framebuffer data.</returns>
+            /// <summary>
+            /// Converts the framebuffer data to a <see cref="Bitmap"/>.
+            /// </summary>
+            /// <returns>An <see cref="Bitmap"/> which represents the framebuffer data.</returns>
 #if NET
-        [SupportedOSPlatform("windows")]
+            [SupportedOSPlatform("windows")]
 #endif
         public virtual Bitmap ToImage()
         {

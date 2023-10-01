@@ -93,10 +93,8 @@ namespace AdvancedSharpAdbClient
                 int read =
 #if HAS_BUFFERS
                     await stream.ReadAsync(buffer.AsMemory(headerSize, maxDataSize), cancellationToken);
-#elif !NET35
-                    await stream.ReadAsync(buffer, headerSize, maxDataSize, cancellationToken);
 #else
-                    await Extensions.Run(() => stream.Read(buffer, headerSize, maxDataSize));
+                    await stream.ReadAsync(buffer, headerSize, maxDataSize, cancellationToken);
 #endif
                 totalBytesRead += read;
 
@@ -210,11 +208,7 @@ namespace AdvancedSharpAdbClient
                 await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken);
 #else
                 await Socket.ReadAsync(buffer, size, cancellationToken);
-#if !NET35
-                await stream.WriteAsync(buffer, 0, size, cancellationToken);
-#else
-                await Extensions.Run(() => stream.Write(buffer, 0, size));
-#endif
+                await stream.WriteAsync(buffer, size, cancellationToken);
 #endif
                 totalBytesRead += size;
 

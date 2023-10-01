@@ -46,27 +46,17 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Stream GetStream() => OutputStream;
 
-        public int Receive(byte[] buffer, SocketFlags socketFlags) => InputStream.Read(buffer);
-
         public int Receive(byte[] buffer, int size, SocketFlags socketFlags) => InputStream.Read(buffer, 0, size);
 
         public int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) => InputStream.Read(buffer, offset, size);
 
         public int Receive(Span<byte> buffer, SocketFlags socketFlags) => InputStream.Read(buffer);
 
-        public Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken) => InputStream.ReadAsync(buffer, cancellationToken).AsTask();
-
         public Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken) => InputStream.ReadAsync(buffer, 0, size, cancellationToken);
 
         public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken) => InputStream.ReadAsync(buffer, offset, size, cancellationToken);
 
         public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) => InputStream.ReadAsync(buffer, cancellationToken);
-
-        public int Send(byte[] buffer, SocketFlags socketFlags)
-        {
-            OutputStream.Write(buffer);
-            return buffer.Length;
-        }
 
         public int Send(byte[] buffer, int size, SocketFlags socketFlags)
         {
@@ -83,12 +73,6 @@ namespace AdvancedSharpAdbClient.Tests
         public int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
         {
             OutputStream.Write(buffer);
-            return buffer.Length;
-        }
-
-        public async Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
-        {
-            await OutputStream.WriteAsync(buffer, cancellationToken);
             return buffer.Length;
         }
 

@@ -187,7 +187,7 @@ namespace AdvancedSharpAdbClient.Tests
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
-            socket.Read(received.AsSpan(0, 100));
+            _ = socket.Read(received.AsSpan(0, 100));
 
             for (int i = 0; i < 100; i++)
             {

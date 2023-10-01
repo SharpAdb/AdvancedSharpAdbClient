@@ -14,6 +14,8 @@ namespace AdvancedSharpAdbClient
 {
     internal static class Extensions
     {
+        public static char[] NewLineSeparator { get; } = ['\r', '\n'];
+
         /// <summary>
         /// Converts the string representation of the name or numeric value of one or more
         /// enumerated constants to an equivalent enumerated object. A parameter specifies

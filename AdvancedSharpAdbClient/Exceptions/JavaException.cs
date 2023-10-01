@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         private const string ExceptionOutput = "java.lang.";
         private const string ExceptionPattern = @"java.lang.(\w+Exception):\s+(.*)?";
 
-        private static readonly char[] separator = ['\r', '\n'];
+        private static readonly char[] separator = Extensions.NewLineSeparator;
 
         /// <summary>
         /// Gets the name of Java exception.

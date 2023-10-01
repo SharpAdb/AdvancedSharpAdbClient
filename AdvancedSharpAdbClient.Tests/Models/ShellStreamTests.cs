@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             stream.Position = 0;
             byte[] buffer = new byte[2];
-            int read = shellStream.Read(buffer, 0, 2);
+            int read = shellStream.Read(buffer.AsSpan(0, 2));
             Assert.Equal(2, read);
             Assert.Equal((byte)'\n', buffer[0]);
             Assert.Equal((byte)'H', buffer[1]);
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             stream.Position = 0;
             byte[] buffer = new byte[100];
-            int read = shellStream.Read(buffer, 0, 100);
+            int read = shellStream.Read(buffer.AsSpan(0, 100));
 
             string actual = Encoding.ASCII.GetString(buffer, 0, read);
             Assert.Equal("\n1\n2\n3\n4\n5", actual);
@@ -85,19 +85,19 @@ namespace AdvancedSharpAdbClient.Tests
             using MemoryStream stream = GetStream("\r\nH\ra");
             using ShellStream shellStream = new(stream, false);
             byte[] buffer = new byte[1];
-            int read = shellStream.Read(buffer, 0, 1);
+            int read = shellStream.Read(buffer.AsSpan(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'\n', buffer[0]);
 
-            read = shellStream.Read(buffer, 0, 1);
+            read = shellStream.Read(buffer.AsSpan(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'H', buffer[0]);
 
-            read = shellStream.Read(buffer, 0, 1);
+            read = shellStream.Read(buffer.AsSpan(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'\r', buffer[0]);
 
-            read = shellStream.Read(buffer, 0, 1);
+            read = shellStream.Read(buffer.AsSpan(0, 1));
             Assert.Equal(1, read);
             Assert.Equal((byte)'a', buffer[0]);
         }

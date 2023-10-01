@@ -73,14 +73,14 @@ namespace AdvancedSharpAdbClient
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }
 
-            ManualResetEvent manualResetEvent = null;
-            await Extensions.Run(() =>
-            {
-                lock (RestartLock)
+            using ManualResetEvent manualResetEvent =
+                await Extensions.Run(() =>
                 {
-                    manualResetEvent = new(false);
-                }
-            }, cancellationToken);
+                    lock (RestartLock)
+                    {
+                        return new ManualResetEvent(false);
+                    }
+                }, cancellationToken);
 
             _ = Extensions.Run(() =>
             {
@@ -92,7 +92,6 @@ namespace AdvancedSharpAdbClient
 
             StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken);
             manualResetEvent.Set();
-            manualResetEvent.Dispose();
             return result;
         }
 

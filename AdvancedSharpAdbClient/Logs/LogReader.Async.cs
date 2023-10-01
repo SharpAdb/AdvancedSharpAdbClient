@@ -207,15 +207,11 @@ namespace AdvancedSharpAdbClient.Logs
 
             byte[] data = new byte[count];
 
-            while ((read =
 #if HAS_BUFFERS
-                await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)
-#elif !NET35
-                await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)
+            while ((read = await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)) > 0)
 #else
-                await Extensions.Run(() => stream.Read(data, totalRead, count - totalRead)).ConfigureAwait(false)
+            while ((read = await stream.ReadAsync(data, totalRead, count - totalRead, cancellationToken).ConfigureAwait(false)) > 0)
 #endif
-                ) > 0)
             {
                 totalRead += read;
             }

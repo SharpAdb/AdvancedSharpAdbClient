@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default)
-            => ReceiveAsync(socket, buffer, 0, buffer.Length, socketFlags, cancellationToken);
+            => socket.ReceiveAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
 #endif
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
-            => ReceiveAsync(socket, buffer, 0, size, socketFlags, cancellationToken);
+            => socket.ReceiveAsync(buffer, 0, size, socketFlags, cancellationToken);
 
         /// <summary>
         /// Asynchronously receives data from a connected socket.
@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously sends data to a connected socket.
         /// </summary>
-        /// <param name="socket">The socket from which to read data.</param>
+        /// <param name="socket">The socket from which to send data.</param>
         /// <param name="buffer">An array of type <see cref="byte"/> that contains the data to be sent.</param>
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously sends data to a connected socket.
         /// </summary>
-        /// <param name="socket">The socket from which to read data.</param>
+        /// <param name="socket">The socket from which to send data.</param>
         /// <param name="buffer">An array of type <see cref="byte"/> that contains the data to be sent.</param>
         /// <param name="size">The number of bytes to send.</param>
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
@@ -126,7 +126,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously sends data to a connected socket.
         /// </summary>
-        /// <param name="socket">The socket from which to read data.</param>
+        /// <param name="socket">The socket from which to send data.</param>
         /// <param name="buffer">An array of type <see cref="byte"/> that contains the data to be sent.</param>
         /// <param name="offset">The position in the data buffer at which to begin sending data.</param>
         /// <param name="size">The number of bytes to send.</param>

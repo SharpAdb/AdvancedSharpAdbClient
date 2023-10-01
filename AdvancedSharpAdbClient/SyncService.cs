@@ -274,7 +274,7 @@ namespace AdvancedSharpAdbClient
                 stream.Write(buffer.AsSpan(0, size));
 #else
                 _ = Socket.Read(buffer, size);
-                stream.Write(buffer, 0, size);
+                stream.Write(buffer, size);
 #endif
                 totalBytesRead += size;
 

@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
-        private static readonly char[] separator = ['\r', '\n'];
+        private static readonly char[] separator = Extensions.NewLineSeparator;
 
         /// <summary>
         /// The logger to use when logging messages.

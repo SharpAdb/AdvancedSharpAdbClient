@@ -266,7 +266,11 @@ namespace AdvancedSharpAdbClient.Logs
             byte[] data = new byte[count];
 
             int read;
+#if HAS_BUFFERS
+            while ((read = stream.Read(data.AsSpan(totalRead, count - totalRead))) > 0)
+#else
             while ((read = stream.Read(data, totalRead, count - totalRead)) > 0)
+#endif
             {
                 totalRead += read;
             }

@@ -248,12 +248,11 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken);
 
-            StringBuilder request = new();
-            request.Append("shell:logcat -B");
+            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+                _ = request.Append($" -b {logName.ToString().ToLowerInvariant()}");
             }
 
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
@@ -364,15 +363,16 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[1024];
             int read = socket.Read(buffer);
 
-            string responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
+            string responseMessage =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
-#if HAS_FULLSTRING
             if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
-#else
-            if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
-#endif
             {
                 throw new AdbException(responseMessage);
             }
@@ -399,8 +399,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install'");
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install'");
 
             if (arguments != null)
             {
@@ -423,19 +422,22 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
-#elif !NET35
-            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
-#else
-            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
-#endif
             {
+#if HAS_BUFFERS
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken);
+#else
                 await socket.SendAsync(buffer, read, cancellationToken);
+#endif
             }
 
             read = await socket.ReadAsync(buffer, cancellationToken);
-            string value = Encoding.UTF8.GetString(buffer, 0, read);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             if (!value.Contains("Success"))
             {
@@ -603,19 +605,22 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
-#elif !NET35
-            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
-#else
-            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
-#endif
             {
+#if HAS_BUFFERS
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken);
+#else
                 await socket.SendAsync(buffer, read, cancellationToken);
+#endif
             }
 
             read = await socket.ReadAsync(buffer, cancellationToken);
-            string value = Encoding.UTF8.GetString(buffer, 0, read);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             if (!value.Contains("Success"))
             {

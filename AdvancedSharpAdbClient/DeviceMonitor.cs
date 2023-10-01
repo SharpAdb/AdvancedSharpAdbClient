@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
     {
-        private static readonly string[] separator = ["\r\n", "\n"];
+        private static readonly char[] separator = Extensions.NewLineSeparator;
 
         private bool disposed = false;
 

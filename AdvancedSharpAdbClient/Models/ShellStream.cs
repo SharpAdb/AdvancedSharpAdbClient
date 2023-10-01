@@ -2,10 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -61,6 +59,102 @@ namespace AdvancedSharpAdbClient
             set => throw new NotImplementedException();
         }
 
+#if HAS_BUFFERS
+        /// <inheritdoc/>
+        public override int Read(Span<byte> buffer)
+        {
+            if (buffer.Length == 0)
+            {
+                return 0;
+            }
+
+            // Read the raw data from the base stream. There may be a
+            // 'pending byte' from a previous operation; if that's the case,
+            // consume it.
+            int read;
+
+            if (pendingByte != null)
+            {
+                buffer[0] = pendingByte.Value;
+                read = Inner.Read(buffer[1..]);
+                read++;
+                pendingByte = null;
+            }
+            else
+            {
+                read = Inner.Read(buffer);
+            }
+
+            // Loop over the data, and find a LF (0x0d) character. If it is
+            // followed by a CR (0x0a) character, remove the LF chracter and
+            // keep only the LF character intact.
+            for (int i = 0; i < read - 1; i++)
+            {
+                if (buffer[i] == 0x0d && buffer[i + 1] == 0x0a)
+                {
+                    buffer[i] = 0x0a;
+
+                    for (int j = i + 1; j < read - 1; j++)
+                    {
+                        buffer[j] = buffer[j + 1];
+                    }
+
+                    // Reset unused data to \0
+                    buffer[read - 1] = 0;
+
+                    // We have removed one byte from the array of bytes which has
+                    // been read; but the caller asked for a fixed number of bytes.
+                    // So we need to get the next byte from the base stream.
+                    // If less bytes were received than asked, we know no more data is
+                    // available so we can skip this step
+                    if (read < buffer.Length)
+                    {
+                        read--;
+                        continue;
+                    }
+
+                    byte[] miniBuffer = new byte[1];
+                    int miniRead = Inner.Read(miniBuffer.AsSpan(0, 1));
+
+                    if (miniRead == 0)
+                    {
+                        // If no byte was read, no more data is (currently) available, and reduce the
+                        // number of bytes by 1.
+                        read--;
+                    }
+                    else
+                    {
+                        // Append the byte to the buffer.
+                        buffer[read - 1] = miniBuffer[0];
+                    }
+                }
+            }
+
+            // The last byte is a special case, to find out if the next byte is 0x0a
+            // we need to read one more byte from the inner stream.
+            if (read > 0 && buffer[read - 1] == 0x0d)
+            {
+                int nextByte = Inner.ReadByte();
+
+                if (nextByte == 0x0a)
+                {
+                    // If the next byte is 0x0a, set the last byte to 0x0a. The underlying
+                    // stream has already advanced because of the ReadByte call, so all is good.
+                    buffer[read - 1] = 0x0a;
+                }
+                else
+                {
+                    // If the next byte was not 0x0a, store it as the 'pending byte' --
+                    // the next read operation will fetch this byte. We can't do a Seek here,
+                    // because e.g. the network stream doesn't support seeking.
+                    pendingByte = (byte)nextByte;
+                }
+            }
+
+            return read;
+        }
+#endif
+
         /// <inheritdoc/>
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -77,13 +171,23 @@ namespace AdvancedSharpAdbClient
             if (pendingByte != null)
             {
                 buffer[offset] = pendingByte.Value;
-                read = Inner.Read(buffer, offset + 1, count - 1);
+                read =
+#if HAS_BUFFERS
+                    Inner.Read(buffer.AsSpan(offset + 1, count - 1));
+#else
+                    Inner.Read(buffer, offset + 1, count - 1);
+#endif
                 read++;
                 pendingByte = null;
             }
             else
             {
-                read = Inner.Read(buffer, offset, count);
+                read =
+#if HAS_BUFFERS
+                    Inner.Read(buffer.AsSpan(offset, count));
+#else
+                    Inner.Read(buffer, offset, count);
+#endif
             }
 
             // Loop over the data, and find a LF (0x0d) character. If it is
@@ -115,7 +219,12 @@ namespace AdvancedSharpAdbClient
                     }
 
                     byte[] miniBuffer = new byte[1];
-                    int miniRead = Inner.Read(miniBuffer, 0, 1);
+                    int miniRead =
+#if HAS_BUFFERS
+                        Inner.Read(miniBuffer.AsSpan(0, 1));
+#else
+                        Inner.Read(miniBuffer, 1);
+#endif
 
                     if (miniRead == 0)
                     {
@@ -157,34 +266,99 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_BUFFERS
         /// <inheritdoc/>
-        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
             if (buffer.Length == 0)
             {
-                return new ValueTask<int>(0);
+                return 0;
             }
 
-            if (MemoryMarshal.TryGetArray(buffer, out ArraySegment<byte> array))
+            // Read the raw data from the base stream. There may be a
+            // 'pending byte' from a previous operation; if that's the case,
+            // consume it.
+            int read;
+
+            if (pendingByte != null)
             {
-                return new ValueTask<int>(ReadAsync(array.Array!, array.Offset, array.Count, cancellationToken));
+                buffer.Span[0] = pendingByte.Value;
+                read = await Inner.ReadAsync(buffer[1..], cancellationToken).ConfigureAwait(false);
+                read++;
+                pendingByte = null;
             }
-
-            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
-            return FinishReadAsync(ReadAsync(sharedBuffer, 0, buffer.Length, cancellationToken), sharedBuffer, buffer);
-
-            static async ValueTask<int> FinishReadAsync(Task<int> readTask, byte[] localBuffer, Memory<byte> localDestination)
+            else
             {
-                try
+                read = await Inner.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            }
+
+            byte[] miniBuffer = new byte[1];
+
+            // Loop over the data, and find a LF (0x0d) character. If it is
+            // followed by a CR (0x0a) character, remove the LF character and
+            // keep only the LF character intact.
+            for (int i = 0; i < read - 1; i++)
+            {
+                if (buffer.Span[i] == 0x0d && buffer.Span[i + 1] == 0x0a)
                 {
-                    int result = await readTask.ConfigureAwait(false);
-                    new ReadOnlySpan<byte>(localBuffer, 0, result).CopyTo(localDestination.Span);
-                    return result;
-                }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(localBuffer);
+                    buffer.Span[i] = 0x0a;
+
+                    for (int j = i + 1; j < read - 1; j++)
+                    {
+                        buffer.Span[j] = buffer.Span[j + 1];
+                    }
+
+                    // Reset unused data to \0
+                    buffer.Span[read - 1] = 0;
+
+                    // We have removed one byte from the array of bytes which has
+                    // been read; but the caller asked for a fixed number of bytes.
+                    // So we need to get the next byte from the base stream.
+                    // If less bytes were received than asked, we know no more data is
+                    // available so we can skip this step
+                    if (read < buffer.Length)
+                    {
+                        read--;
+                        continue;
+                    }
+
+                    int miniRead = await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+
+                    if (miniRead == 0)
+                    {
+                        // If no byte was read, no more data is (currently) available, and reduce the
+                        // number of bytes by 1.
+                        read--;
+                    }
+                    else
+                    {
+                        // Append the byte to the buffer.
+                        buffer.Span[read - 1] = miniBuffer[0];
+                    }
                 }
             }
+
+            // The last byte is a special case, to find out if the next byte is 0x0a
+            // we need to read one more byte from the inner stream.
+            if (read > 0 && buffer.Span[read - 1] == 0x0d)
+            {
+                _ = await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+                int nextByte = miniBuffer[0];
+
+                if (nextByte == 0x0a)
+                {
+                    // If the next byte is 0x0a, set the last byte to 0x0a. The underlying
+                    // stream has already advanced because of the ReadByte call, so all is good.
+                    buffer.Span[read - 1] = 0x0a;
+                }
+                else
+                {
+                    // If the next byte was not 0x0a, store it as the 'pending byte' --
+                    // the next read operation will fetch this byte. We can't do a Seek here,
+                    // because e.g. the network stream doesn't support seeking.
+                    pendingByte = (byte)nextByte;
+                }
+            }
+
+            return read;
         }
 #endif
 
@@ -212,10 +386,8 @@ namespace AdvancedSharpAdbClient
                 read =
 #if HAS_BUFFERS
                     await Inner.ReadAsync(buffer.AsMemory(offset + 1, count - 1), cancellationToken).ConfigureAwait(false);
-#elif !NET35
-                    await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #else
-                    await Extensions.Run(() => Inner.Read(buffer, offset + 1, count - 1)).ConfigureAwait(false);
+                    await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
 #endif
                 read++;
                 pendingByte = null;
@@ -225,10 +397,8 @@ namespace AdvancedSharpAdbClient
                 read =
 #if HAS_BUFFERS
                     await Inner.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).ConfigureAwait(false);
-#elif !NET35
-                    await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
 #else
-                    Inner.Read(buffer, offset, count);
+                    await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
 #endif
             }
 
@@ -265,10 +435,8 @@ namespace AdvancedSharpAdbClient
                     int miniRead =
 #if HAS_BUFFERS
                         await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
-#elif !NET35
-                        await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                        Inner.Read(miniBuffer, 0, 1);
+                        await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
 #endif
 
                     if (miniRead == 0)
@@ -292,10 +460,8 @@ namespace AdvancedSharpAdbClient
                 int miniRead =
 #if HAS_BUFFERS
                     await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
-#elif !NET35
-                    await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 #else
-                    Inner.Read(miniBuffer, 0, 1);
+                    await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
 #endif
                 int nextByte = miniBuffer[0];
 
