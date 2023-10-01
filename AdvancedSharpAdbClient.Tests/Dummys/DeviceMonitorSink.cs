@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -28,13 +28,13 @@ namespace AdvancedSharpAdbClient.Tests
             DisconnectedEvents.Clear();
         }
 
-        public Collection<DeviceDataConnectEventArgs> DisconnectedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> DisconnectedEvents { get; private set; }
 
-        public Collection<DeviceDataConnectEventArgs> ConnectedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; private set; }
 
-        public Collection<DeviceDataNotifyEventArgs> NotifiedEvents { get; private set; }
+        public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; private set; }
 
-        public Collection<DeviceDataChangeEventArgs> ChangedEvents { get; private set; }
+        public List<DeviceDataChangeEventArgs> ChangedEvents { get; private set; }
 
         public DeviceMonitor Monitor { get; private set; }
 

@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         public Dictionary<string, string> Commands { get; private set; } = new Dictionary<string, string>();
 
-        public Collection<string> ReceivedCommands { get; private set; } = new Collection<string>();
+        public List<string> ReceivedCommands { get; private set; } = new List<string>();
 
         public EndPoint EndPoint { get; private set; }
 
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void BackBtn(DeviceData device) => throw new NotImplementedException();
 
-        public Task BackBtnAsync(DeviceData device) => throw new NotImplementedException();
+        public Task BackBtnAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void ClearInput(DeviceData device, int charCount) => throw new NotImplementedException();
 
@@ -155,7 +155,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void HomeBtn(DeviceData device) => throw new NotImplementedException();
 
-        public Task HomeBtnAsync(DeviceData device) => throw new NotImplementedException();
+        public Task HomeBtnAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void Install(DeviceData device, Stream apk, params string[] arguments) => throw new NotImplementedException();
 

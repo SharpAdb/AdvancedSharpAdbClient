@@ -4,7 +4,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a single log entry from the stream.
         /// </summary>
-        protected void ReadLogEntry(BinaryReader reader, Collection<object> parent)
+        protected void ReadLogEntry(BinaryReader reader, IList<object> parent)
         {
             EventLogType type = (EventLogType)reader.ReadByte();
 
@@ -207,7 +207,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
 
-                    Collection<object> list = [];
+                    List<object> list = [];
 
                     for (int i = 0; i < listLength; i++)
                     {

@@ -434,7 +434,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         sync.SyncProgressChanged += (sender, e) => progress(localFilePath, e);
                     }
 
-                    using Stream stream = File.OpenRead(localFilePath);
+                    using FileStream stream = File.OpenRead(localFilePath);
 
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 

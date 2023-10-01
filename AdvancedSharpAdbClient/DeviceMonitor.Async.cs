@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient
                 monitorTask = Extensions.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token), cancellationToken);
 
                 // Wait for the worker thread to have read the first list of devices.
-                _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken);
+                _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
                 monitorTaskCancellationTokenSource.Cancel();
-                await monitorTask;
+                await monitorTask.ConfigureAwait(false);
 #if HAS_PROCESS
                 monitorTask.Dispose();
 #endif
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
             IsRunning = true;
 
             // Set up the connection to track the list of devices.
-            await InitializeSocketAsync(cancellationToken);
+            await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
 
             do
             {
@@ -160,9 +160,9 @@ namespace AdvancedSharpAdbClient
                     if (adbException.ConnectionReset)
                     {
                         // The adb server was killed, for whatever reason. Try to restart it and recover from this.
-                        await AdbServer.Instance.RestartServerAsync(cancellationToken);
+                        await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
                         Socket.Reconnect();
-                        await InitializeSocketAsync(cancellationToken);
+                        await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
                     }
                     else
                     {
@@ -182,8 +182,8 @@ namespace AdvancedSharpAdbClient
         private async Task InitializeSocketAsync(CancellationToken cancellationToken)
         {
             // Set up the connection to track the list of devices.
-            await Socket.SendAdbRequestAsync("host:track-devices", cancellationToken);
-            _ = await Socket.ReadAdbResponseAsync(cancellationToken);
+            await Socket.SendAdbRequestAsync("host:track-devices", cancellationToken).ConfigureAwait(false);
+            _ = await Socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

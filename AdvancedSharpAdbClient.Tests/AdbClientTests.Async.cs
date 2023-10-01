@@ -450,9 +450,9 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            await using Stream stream = File.OpenRead("Assets/logcat.bin");
+            await using FileStream stream = File.OpenRead("Assets/logcat.bin");
             await using ShellStream shellStream = new(stream, false);
-            Collection<LogEntry> logs = [];
+            List<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
 
             await RunTestAsync(
@@ -719,9 +719,9 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChunks = [];
+            List<byte[]> applicationDataChunks = [];
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -742,7 +742,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success\n");
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
                     [AdbResponse.OK, AdbResponse.OK],
@@ -807,9 +807,9 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChuncks = [];
+            List<byte[]> applicationDataChunks = [];
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -823,14 +823,14 @@ namespace AdvancedSharpAdbClient.Tests
                     else
                     {
                         buffer = buffer.Take(read).ToArray();
-                        applicationDataChuncks.Add(buffer);
+                        applicationDataChunks.Add(buffer);
                     }
                 }
             }
 
             byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
                     [AdbResponse.OK, AdbResponse.OK],
@@ -839,7 +839,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Array.Empty<(SyncCommand, string)>(),
                     Array.Empty<SyncCommand>(),
                     [response],
-                    applicationDataChuncks.ToArray(),
+                    applicationDataChunks.ToArray(),
                     () => TestClient.InstallWriteAsync(device, stream, "base", "936013062"));
             }
         }

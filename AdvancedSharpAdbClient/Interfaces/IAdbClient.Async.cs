@@ -590,15 +590,17 @@ namespace AdvancedSharpAdbClient
         /// Click BACK button.
         /// </summary>
         /// <param name="device">The device on which to click BACK button.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task BackBtnAsync(DeviceData device);
+        Task BackBtnAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Click HOME button.
         /// </summary>
         /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task HomeBtnAsync(DeviceData device);
+        Task HomeBtnAsync(DeviceData device, CancellationToken cancellationToken);
     }
 }
 #endif

@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
 
-            await RunAdbProcessAsync("version", null, standardOutput, cancellationToken);
+            await RunAdbProcessAsync("version", null, standardOutput, cancellationToken).ConfigureAwait(false);
 
             // Parse the output to get the version.
             Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
-            int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken);
+            int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
 
             if (status == 0)
             {
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
 
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
-            await RunAdbProcessAsync("start-server", null, null, cancellationToken);
+            await RunAdbProcessAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
         protected virtual async Task RunAdbProcessAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
         {
-            int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken);
+            int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
 
             if (status != 0)
             {
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(command);
 
-            int status = await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken);
+            int status = await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
 
             return status;
         }
@@ -155,7 +155,7 @@ namespace AdvancedSharpAdbClient
 #if NET5_0_OR_GREATER
             using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
             {
-                await process.WaitForExitAsync(completionSource.Token);
+                await process.WaitForExitAsync(completionSource.Token).ConfigureAwait(false);
                 if (!process.HasExited)
                 {
                     process.Kill();

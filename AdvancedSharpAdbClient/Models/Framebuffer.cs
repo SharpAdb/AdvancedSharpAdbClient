@@ -141,11 +141,11 @@ namespace AdvancedSharpAdbClient
 
             using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
             // Select the target device
-            socket.SetDevice(Device);
+            await socket.SetDeviceAsync(Device, cancellationToken).ConfigureAwait(false);
 
             // Send the framebuffer command
-            socket.SendAdbRequest("framebuffer:");
-            socket.ReadAdbResponse();
+            await socket.SendAdbRequestAsync("framebuffer:", cancellationToken).ConfigureAwait(false);
+            await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             // The result first is a FramebufferHeader object,
             _ = await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);

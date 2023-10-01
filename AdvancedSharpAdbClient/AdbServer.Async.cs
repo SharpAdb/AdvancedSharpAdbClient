@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
         {
-            AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken);
+            AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken).ConfigureAwait(false);
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
             if (commandLineClient.IsValidAdbFile(adbPath))
             {
                 CachedAdbPath = adbPath;
-                commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken);
+                commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ConfigureAwait(false);
             }
 
             // If the server is running, and no adb path is provided, check if we have the minimum version
@@ -43,15 +43,15 @@ namespace AdvancedSharpAdbClient
             {
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
-                await adbClient.KillAdbAsync(cancellationToken);
-                await commandLineClient.StartServerAsync(cancellationToken);
+                await adbClient.KillAdbAsync(cancellationToken).ConfigureAwait(false);
+                await commandLineClient.StartServerAsync(cancellationToken).ConfigureAwait(false);
                 return StartServerResult.RestartedOutdatedDaemon;
             }
             else if (!serverStatus.IsRunning)
             {
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
-                await commandLineClient.StartServerAsync(cancellationToken);
+                await commandLineClient.StartServerAsync(cancellationToken).ConfigureAwait(false);
                 return StartServerResult.Started;
             }
             else
@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient
                     {
                         return new ManualResetEvent(false);
                     }
-                }, cancellationToken);
+                }, cancellationToken).ConfigureAwait(false);
 
             _ = Extensions.Run(() =>
             {
@@ -90,7 +90,7 @@ namespace AdvancedSharpAdbClient
                 }
             }, cancellationToken);
 
-            StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken);
+            StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken).ConfigureAwait(false);
             manualResetEvent.Set();
             return result;
         }
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = await adbClient.GetAdbVersionAsync(cancellationToken);
+                int versionCode = await adbClient.GetAdbVersionAsync(cancellationToken).ConfigureAwait(false);
                 return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (AggregateException ex)

@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient.Tests
                 State = DeviceState.Online
             };
 
-            Stream stream = File.OpenRead("Assets/fstab.bin");
+            FileStream stream = File.OpenRead("Assets/fstab.bin");
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             List<byte> contentMessage =
             [

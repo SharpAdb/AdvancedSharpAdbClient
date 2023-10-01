@@ -228,8 +228,8 @@ namespace AdvancedSharpAdbClient
         /// Clicks on this coordinates.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        public async Task ClickAsync(CancellationToken cancellationToken = default) =>
-            await Client.ClickAsync(Device, Cords, cancellationToken);
+        public Task ClickAsync(CancellationToken cancellationToken = default) =>
+            Client.ClickAsync(Device, Cords, cancellationToken);
 #endif
 
         /// <summary>
@@ -251,8 +251,8 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
         {
-            await ClickAsync(cancellationToken);
-            await Client.SendTextAsync(Device, text, cancellationToken);
+            await ClickAsync(cancellationToken).ConfigureAwait(false);
+            await Client.SendTextAsync(Device, text, cancellationToken).ConfigureAwait(false);
         }
 #endif
 
@@ -282,14 +282,14 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public async Task ClearInputAsync(int charCount = 0, CancellationToken cancellationToken = default)
         {
-            await ClickAsync(cancellationToken); // focuses
+            await ClickAsync(cancellationToken).ConfigureAwait(false); // focuses
             if (charCount == 0)
             {
-                await Client.ClearInputAsync(Device, Attributes["text"].Length, cancellationToken);
+                await Client.ClearInputAsync(Device, Attributes["text"].Length, cancellationToken).ConfigureAwait(false);
             }
             else
             {
-                await Client.ClearInputAsync(Device, charCount, cancellationToken);
+                await Client.ClearInputAsync(Device, charCount, cancellationToken).ConfigureAwait(false);
             }
         }
 #endif

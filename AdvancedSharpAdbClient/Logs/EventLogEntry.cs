@@ -2,7 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace AdvancedSharpAdbClient.Logs
 {
@@ -25,6 +25,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Gets or sets the values of this event log entry.
         /// </summary>
-        public Collection<object> Values { get; set; } = new Collection<object>();
+        public List<object> Values { get; set; } = new List<object>();
     }
 }

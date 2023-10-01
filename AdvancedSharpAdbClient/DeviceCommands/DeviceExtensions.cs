@@ -4,11 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -213,7 +211,7 @@ else
     /system/bin/ls -1 /proc/
 fi".Replace("\r\n", "\n"), receiver);
 
-            Collection<int> pids = [];
+            List<int> pids = [];
 
             string output = receiver.ToString();
             using (StringReader reader = new(output))

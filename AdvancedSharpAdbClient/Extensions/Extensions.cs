@@ -255,6 +255,19 @@ namespace AdvancedSharpAdbClient
 #endif
             .Run(function, cancellationToken);
 
+        /// <summary>
+        /// Creates a task that will complete when all of the <see cref="Task"/> objects in an enumerable collection have completed.
+        /// </summary>
+        /// <param name="tasks">The tasks to wait on for completion.</param>
+        /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
+        public static Task WhenAll(IEnumerable<Task> tasks) =>
+#if NETFRAMEWORK && !NET45_OR_GREATER
+            TaskEx
+#else
+            Task
+#endif
+            .WhenAll(tasks);
+
 #if !NET7_0_OR_GREATER
         /// <summary>
         /// Reads a line of characters asynchronously and returns the data as a string.

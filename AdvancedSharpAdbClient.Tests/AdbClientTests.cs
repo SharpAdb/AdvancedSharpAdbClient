@@ -563,9 +563,9 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            using Stream stream = File.OpenRead("Assets/logcat.bin");
+            using FileStream stream = File.OpenRead("Assets/logcat.bin");
             using ShellStream shellStream = new(stream, false);
-            Collection<LogEntry> logs = [];
+            List<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
 
             RunTest(
@@ -832,7 +832,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChunks = [];
+            List<byte[]> applicationDataChunks = [];
 
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -855,7 +855,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success\n");
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
                     [AdbResponse.OK, AdbResponse.OK],
@@ -920,7 +920,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChunks = [];
+            List<byte[]> applicationDataChunks = [];
 
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -943,7 +943,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
 
-            using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
                     [AdbResponse.OK, AdbResponse.OK],

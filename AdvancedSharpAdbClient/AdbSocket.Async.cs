@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken);
+                int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken);
+                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -65,8 +65,8 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(path);
 
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
-            await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken);
-            _ = await WriteAsync(pathBytes, cancellationToken);
+            await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken).ConfigureAwait(false);
+            _ = await WriteAsync(pathBytes, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -86,8 +86,8 @@ namespace AdvancedSharpAdbClient
                 Array.Reverse(lengthBytes);
             }
 
-            _ = await WriteAsync(commandBytes, cancellationToken);
-            _ = await WriteAsync(lengthBytes, cancellationToken);
+            _ = await WriteAsync(commandBytes, cancellationToken).ConfigureAwait(false);
+            _ = await WriteAsync(lengthBytes, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -95,7 +95,7 @@ namespace AdvancedSharpAdbClient
         {
             byte[] data = AdbClient.FormAdbRequest(request);
 
-            if (!await WriteAsync(data, cancellationToken))
+            if (!await WriteAsync(data, cancellationToken).ConfigureAwait(false))
             {
                 throw new IOException($"Failed sending the request '{request}' to ADB");
             }
@@ -175,7 +175,7 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            _ = await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             if (!BitConverter.IsLittleEndian)
             {
@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient
 
             // And get the string
             reply = new byte[len];
-            _ = await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             string value = AdbClient.Encoding.GetString(reply);
             return value;
@@ -196,7 +196,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
         {
             byte[] data = new byte[4];
-            _ = await ReadAsync(data, cancellationToken);
+            _ = await ReadAsync(data, cancellationToken).ConfigureAwait(false);
 
             return SyncCommandConverter.GetCommand(data);
         }
@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
         {
-            AdbResponse response = await ReadAdbResponseInnerAsync(cancellationToken);
+            AdbResponse response = await ReadAdbResponseInnerAsync(cancellationToken).ConfigureAwait(false);
 
             if (!response.IOSuccess || !response.Okay)
             {
@@ -222,11 +222,11 @@ namespace AdvancedSharpAdbClient
             // to a specific device
             if (device != null)
             {
-                await SendAdbRequestAsync($"host:transport:{device.Serial}", cancellationToken);
+                await SendAdbRequestAsync($"host:transport:{device.Serial}", cancellationToken).ConfigureAwait(false);
 
                 try
                 {
-                    AdbResponse response = await ReadAdbResponseAsync(cancellationToken);
+                    AdbResponse response = await ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
                 }
                 catch (AdbException e)
                 {
@@ -248,7 +248,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken);
+                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -309,7 +309,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken);
+                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -338,7 +338,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                await SendAsync(data, cancellationToken);
+                await SendAsync(data, cancellationToken).ConfigureAwait(false);
             }
             catch (IOException e)
             {
@@ -359,7 +359,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse rasps = new();
 
             byte[] reply = new byte[4];
-            _ = await ReadAsync(reply, cancellationToken);
+            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
             rasps.IOSuccess = true;
 
@@ -367,7 +367,7 @@ namespace AdvancedSharpAdbClient
 
             if (!rasps.Okay)
             {
-                string message = await ReadStringAsync(cancellationToken);
+                string message = await ReadStringAsync(cancellationToken).ConfigureAwait(false);
                 rasps.Message = message;
                 logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), rasps.Message);
             }

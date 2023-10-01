@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -21,7 +20,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets a list of all processes that have been received.
         /// </summary>
-        public Collection<AndroidProcess> Processes { get; private set; } = new Collection<AndroidProcess>();
+        public List<AndroidProcess> Processes { get; private set; } = new List<AndroidProcess>();
 
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)

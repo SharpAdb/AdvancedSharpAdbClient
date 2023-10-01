@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
                 throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
-            await socket.ConnectAsync(endPoint, cancellationToken);
+            await socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
             socket.Blocking = true;
             this.endPoint = endPoint;
         }

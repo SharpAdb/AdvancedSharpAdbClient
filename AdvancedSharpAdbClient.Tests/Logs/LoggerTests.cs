@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public void ReadLogTest()
         {
-            using Stream stream = File.OpenRead(@"Assets/logcat.bin");
+            using FileStream stream = File.OpenRead(@"Assets/logcat.bin");
             using ShellStream shellStream = new(stream, false);
             LogReader reader = new(shellStream);
 
@@ -40,7 +41,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void ReadLogAsyncTest()
         {
-            await using Stream stream = File.OpenRead(@"Assets/logcat.bin");
+            await using FileStream stream = File.OpenRead(@"Assets/logcat.bin");
             await using ShellStream shellStream = new(stream, false);
             LogReader reader = new(shellStream);
 
@@ -71,7 +72,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            using Stream stream = File.OpenRead(@"Assets/logcatevents.bin");
+            using FileStream stream = File.OpenRead(@"Assets/logcatevents.bin");
             LogReader reader = new(stream);
             LogEntry entry = reader.ReadEntry();
 
@@ -88,9 +89,9 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.NotNull(eventLog.Values);
             Assert.Single(eventLog.Values);
             Assert.NotNull(eventLog.Values[0]);
-            Assert.IsType<Collection<object>>(eventLog.Values[0]);
+            Assert.IsType<List<object>>(eventLog.Values[0]);
 
-            Collection<object> list = (Collection<object>)eventLog.Values[0];
+            List<object> list = (List<object>)eventLog.Values[0];
             Assert.Equal(3, list.Count);
             Assert.Equal(0, list[0]);
             Assert.Equal(19512, list[1]);
@@ -105,7 +106,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            await using Stream stream = File.OpenRead(@"Assets/logcatevents.bin");
+            await using FileStream stream = File.OpenRead(@"Assets/logcatevents.bin");
             LogReader reader = new(stream);
             LogEntry entry = await reader.ReadEntryAsync(CancellationToken.None);
 
@@ -122,9 +123,9 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.NotNull(eventLog.Values);
             Assert.Single(eventLog.Values);
             Assert.NotNull(eventLog.Values[0]);
-            Assert.IsType<Collection<object>>(eventLog.Values[0]);
+            Assert.IsType<List<object>>(eventLog.Values[0]);
 
-            Collection<object> list = (Collection<object>)eventLog.Values[0];
+            List<object> list = (List<object>)eventLog.Values[0];
             Assert.Equal(3, list.Count);
             Assert.Equal(0, list[0]);
             Assert.Equal(19512, list[1]);
