@@ -2,14 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace AdvancedSharpAdbClient.Logs
 {
     /// <summary>
     /// Represents a type used to configure the logging system and create instances of <see cref="ILogger"/>.
     /// </summary>
-    public interface ILoggerFactory : IDisposable
+    public interface ILoggerFactory
     {
         /// <summary>
         /// Creates a new <see cref="ILogger"/> instance.

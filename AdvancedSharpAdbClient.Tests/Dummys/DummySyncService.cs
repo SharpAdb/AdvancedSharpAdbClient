@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         public Dictionary<string, Stream> UploadedFiles { get; private set; } = new Dictionary<string, Stream>();
 
-        public bool IsOpen { get; private set; }= true;
+        public bool IsOpen { get; private set; } = true;
 
         public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
 

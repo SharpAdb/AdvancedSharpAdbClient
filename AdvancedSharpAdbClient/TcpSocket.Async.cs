@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
             socket.SendAsync(buffer.AsMemory(offset, size), socketFlags, cancellationToken).AsTask();
 
         /// <inheritdoc/>
-        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default)=>
+        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.SendAsync(buffer, socketFlags, cancellationToken);
 
         /// <inheritdoc/>

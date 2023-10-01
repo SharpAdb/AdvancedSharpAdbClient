@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not.
         /// Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false            , ILogger<PackageManager> logger = null            )
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager> logger = null)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = [];

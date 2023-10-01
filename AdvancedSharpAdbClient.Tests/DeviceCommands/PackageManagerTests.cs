@@ -6,7 +6,6 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
-
     public partial class PackageManagerTests
     {
         [Fact]

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Logs.Tests
 {
-    public class LoggerTests
+    public class LogTests
     {
         [Fact]
         public void ReadLogTest()

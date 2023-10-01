@@ -2,7 +2,6 @@
 using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -1278,7 +1277,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 async () =>
                 {
                     elements = [];
-                    await foreach(Element element in TestClient.FindAsyncElements(device))
+                    await foreach (Element element in TestClient.FindAsyncElements(device))
                     {
                         elements.Add(element);
                     }

@@ -2,12 +2,10 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {

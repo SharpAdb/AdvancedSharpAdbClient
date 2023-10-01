@@ -2,7 +2,6 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -181,12 +180,12 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if HAS_DRAWING
-            /// <summary>
-            /// Converts the framebuffer data to a <see cref="Bitmap"/>.
-            /// </summary>
-            /// <returns>An <see cref="Bitmap"/> which represents the framebuffer data.</returns>
+        /// <summary>
+        /// Converts the framebuffer data to a <see cref="Bitmap"/>.
+        /// </summary>
+        /// <returns>An <see cref="Bitmap"/> which represents the framebuffer data.</returns>
 #if NET
-            [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("windows")]
 #endif
         public virtual Bitmap ToImage()
         {
