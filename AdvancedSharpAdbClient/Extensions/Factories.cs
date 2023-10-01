@@ -52,9 +52,9 @@ namespace AdvancedSharpAdbClient
         public static void Reset()
         {
             CheckFileExists = File.Exists;
-            AdbSocketFactory = (endPoint) => new AdbSocket(endPoint);
-            AdbClientFactory = (endPoint) => new AdbClient(endPoint, AdbSocketFactory);
-            AdbCommandLineClientFactory = (path) => new AdbCommandLineClient(path);
+            AdbSocketFactory = endPoint => new AdbSocket(endPoint);
+            AdbClientFactory = endPoint => new AdbClient(endPoint, AdbSocketFactory);
+            AdbCommandLineClientFactory = path => new AdbCommandLineClient(path);
             SyncServiceFactory = (client, device) => new SyncService(client, device);
         }
     }

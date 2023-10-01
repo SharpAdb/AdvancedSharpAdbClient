@@ -97,7 +97,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
-        protected static Func<string, bool> IsValidAdbFile { get; set; } = Factories.CheckFileExists;
+        protected static Func<string, bool> CheckFileExists { get; set; } = Factories.CheckFileExists;
 
         /// <inheritdoc/>
         public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
@@ -106,9 +106,9 @@ namespace AdvancedSharpAdbClient
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-            IsValidAdbFile = commandLineClient.IsValidAdbFile;
+            CheckFileExists = commandLineClient.CheckFileExists;
 
-            if (commandLineClient.IsValidAdbFile(adbPath))
+            if (commandLineClient.CheckFileExists(adbPath))
             {
                 CachedAdbPath = adbPath;
                 commandLineVersion = commandLineClient.GetVersion();
@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient
         {
             adbPath ??= CachedAdbPath;
 
-            if (!IsValidAdbFile(adbPath))
+            if (!CheckFileExists(adbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }

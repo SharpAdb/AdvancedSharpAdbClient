@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
 
             string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return data.Select((x) => new DeviceData(x));
+            return data.Select(x => new DeviceData(x));
         }
 
         /// <inheritdoc/>
@@ -151,7 +151,7 @@ namespace AdvancedSharpAdbClient
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return parts.Select((x) => new ForwardData(x));
+            return parts.Select(x => new ForwardData(x));
         }
 
         /// <inheritdoc/>
@@ -169,7 +169,7 @@ namespace AdvancedSharpAdbClient
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            return parts.Select((x) => new ForwardData(x));
+            return parts.Select(x => new ForwardData(x));
         }
 
         /// <inheritdoc/>
@@ -459,7 +459,7 @@ namespace AdvancedSharpAdbClient
             string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
 
             int i = 0;
-            await Extensions.WhenAll(splitAPKs.Select(async (splitAPK) =>
+            await Extensions.WhenAll(splitAPKs.Select(async splitAPK =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
@@ -501,7 +501,7 @@ namespace AdvancedSharpAdbClient
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, cancellationToken).ConfigureAwait(false);
 
             int i = 0;
-            await Extensions.WhenAll(splitAPKs.Select(async (splitAPK) =>
+            await Extensions.WhenAll(splitAPKs.Select(async splitAPK =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {

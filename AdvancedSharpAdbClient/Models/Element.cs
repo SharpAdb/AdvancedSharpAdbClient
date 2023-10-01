@@ -211,12 +211,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the count of <see cref="Children"/> in this element.
         /// </summary>
-        public virtual int GetChildCount()
-        {
-            int count = Children.Count;
-            Children.ForEach(x => count += x.GetChildCount());
-            return count;
-        }
+        public virtual int GetChildCount() => Children.Count + Children.Select(x => x.GetChildCount()).Sum();
 
         /// <summary>
         /// Clicks on this coordinates.

@@ -45,30 +45,13 @@ namespace AdvancedSharpAdbClient
 
             if (!isForce)
             {
-                bool isWindows = Extensions.IsWindowsPlatform();
-                bool isUnix = Extensions.IsUnixPlatform();
-
-                if (isWindows)
-                {
-                    if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
-                    }
-                }
-                else if (isUnix)
-                {
-                    if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
-                    }
-                }
-                else
-                {
-                    throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
-                }
+                EnsureIsValidAdbFile(adbPath);
             }
 
-            this.EnsureIsValidAdbFile(adbPath);
+            if (!CheckFileExists(adbPath))
+            {
+                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
+            }
 
             AdbPath = adbPath;
             this.logger = logger ?? LoggerProvider.CreateLogger<AdbCommandLineClient>();
@@ -77,7 +60,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
         /// </summary>
-        public string AdbPath { get; private set; }
+        public string AdbPath { get; protected set; }
 
         /// <summary>
         /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
@@ -145,14 +128,43 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool IsValidAdbFile(string adbPath) => Factories.CheckFileExists(adbPath);
+        public virtual bool CheckFileExists(string adbPath) => Factories.CheckFileExists(adbPath);
+
+        /// <summary>
+        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// </summary>
+        /// <param name="adbPath">The path to validate.</param>
+        protected virtual void EnsureIsValidAdbFile(string adbPath)
+        {
+            bool isWindows = Extensions.IsWindowsPlatform();
+            bool isUnix = Extensions.IsUnixPlatform();
+
+            if (isWindows)
+            {
+                if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
+                }
+            }
+            else if (isUnix)
+            {
+                if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb executable. The path must end with `adb`");
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+            }
+        }
 
         /// <summary>
         /// Parses the output of the <c>adb.exe version</c> command and determines the adb version.
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
-        internal static Version GetVersionFromOutput(IEnumerable<string> output)
+        protected static Version GetVersionFromOutput(IEnumerable<string> output)
         {
             Regex regex = AdbVersionRegex();
             foreach (string line in output)
@@ -189,7 +201,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual void RunAdbProcess(string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual void RunAdbProcess(string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
 
@@ -211,7 +223,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual int RunAdbProcessInner(string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
             ExceptionExtensions.ThrowIfNull(command);
 
@@ -224,7 +236,7 @@ namespace AdvancedSharpAdbClient
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
-        protected virtual int RunProcess(string filename, string command, List<string> errorOutput, List<string> standardOutput)
+        protected virtual int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
 #if HAS_PROCESS
             ProcessStartInfo psi = new(filename, command)

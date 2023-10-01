@@ -19,38 +19,40 @@ namespace AdvancedSharpAdbClient.Tests
 
         public bool ServerStarted { get; private set; }
 
-        public override bool IsValidAdbFile(string adbPath) =>
-            // No validation done in the dummy adb client.
-            true;
+        // No validation done in the dummy adb client.
+        public override bool CheckFileExists(string adbPath) => true;
 
-        protected override int RunAdbProcessInner(string command, List<string> errorOutput, List<string> standardOutput)
+        protected override int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
-            errorOutput?.Add(null);
-
-            standardOutput?.Add(null);
-
-            if (command == "start-server")
+            if (filename == AdbPath)
             {
-                ServerStarted = true;
-            }
-            else if (command == "version")
-            {
-                if (standardOutput != null && Version != null)
+                errorOutput?.Add(null);
+
+                standardOutput?.Add(null);
+
+                if (command == "start-server")
                 {
-                    standardOutput.Add($"Android Debug Bridge version {Version.ToString(3)}");
+                    ServerStarted = true;
                 }
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(command));
+                else if (command == "version")
+                {
+                    if (standardOutput != null && Version != null)
+                    {
+                        standardOutput.Add($"Android Debug Bridge version {Version.ToString(3)}");
+                    }
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(command));
+                }
             }
 
             return 0;
         }
 
-        protected override Task<int> RunAdbProcessInnerAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected override Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
-            int result = RunAdbProcessInner(command, errorOutput, standardOutput);
+            int result = RunProcess(filename, command, errorOutput, standardOutput);
             TaskCompletionSource<int> tcs = new();
             tcs.SetResult(result);
             return tcs.Task;

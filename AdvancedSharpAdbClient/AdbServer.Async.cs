@@ -19,9 +19,9 @@ namespace AdvancedSharpAdbClient
             Version commandLineVersion = null;
 
             IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-            IsValidAdbFile = commandLineClient.IsValidAdbFile;
+            CheckFileExists = commandLineClient.CheckFileExists;
 
-            if (commandLineClient.IsValidAdbFile(adbPath))
+            if (commandLineClient.CheckFileExists(adbPath))
             {
                 CachedAdbPath = adbPath;
                 commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ConfigureAwait(false);
@@ -68,7 +68,7 @@ namespace AdvancedSharpAdbClient
         {
             adbPath ??= CachedAdbPath;
 
-            if (!IsValidAdbFile(adbPath))
+            if (!CheckFileExists(adbPath))
             {
                 throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
             }

@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient
 
             TaskCompletionSource<int> taskCompletionSource = new(stream);
 
-            IAsyncResult asyncResult = stream.BeginRead(buffer, offset, count, (iar) =>
+            IAsyncResult asyncResult = stream.BeginRead(buffer, offset, count, iar =>
             {
                 // this is the callback
 
@@ -182,7 +182,7 @@ namespace AdvancedSharpAdbClient
 
             TaskCompletionSource<bool> taskCompletionSource = new(stream);
 
-            IAsyncResult asyncResult = stream.BeginWrite(buffer, offset, count, (iar) =>
+            IAsyncResult asyncResult = stream.BeginWrite(buffer, offset, count, iar =>
             {
                 // this is the callback
 

@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual async Task RunAdbProcessAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected virtual async Task RunAdbProcessAsync(string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
 
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which return the return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual async Task<int> RunAdbProcessInnerAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected virtual async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(command);
 
@@ -132,7 +132,7 @@ namespace AdvancedSharpAdbClient
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
-        protected virtual async Task<int> RunProcessAsync(string filename, string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected virtual async Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
 #if HAS_PROCESS
             ProcessStartInfo psi = new(filename, command)

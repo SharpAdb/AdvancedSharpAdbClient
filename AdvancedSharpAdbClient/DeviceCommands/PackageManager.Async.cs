@@ -109,18 +109,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 {
                     count++;
                 }
-                double present = progress.Values.Select((x) => x / splitPackageFilePaths.Count / 2).Sum();
+                double present = progress.Values.Select(x => x / splitPackageFilePaths.Count / 2).Sum();
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
             }
 
             List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
-            await Extensions.WhenAll(splitPackageFilePaths.Select(async (x) => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSplitSyncProgressChanged, cancellationToken).ConfigureAwait(false)))).ConfigureAwait(false);
+            await Extensions.WhenAll(splitPackageFilePaths.Select(async x => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSplitSyncProgressChanged, cancellationToken).ConfigureAwait(false)))).ConfigureAwait(false);
 
             await InstallMultipleRemotePackageAsync(baseRemoteFilePath, splitRemoteFilePaths, reinstall, cancellationToken);
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.PostInstall));
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async (x) =>
+            await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.PostInstall));
@@ -156,18 +156,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 {
                     count++;
                 }
-                double present = progress.Values.Select((x) => x / splitPackageFilePaths.Count / 2).Sum();
+                double present = progress.Values.Select(x => x / splitPackageFilePaths.Count).Sum();
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
             }
 
             List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
-            await Extensions.WhenAll(splitPackageFilePaths.Select(async (x) => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSyncProgressChanged, cancellationToken)))).ConfigureAwait(false);
+            await Extensions.WhenAll(splitPackageFilePaths.Select(async x => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSyncProgressChanged, cancellationToken)))).ConfigureAwait(false);
 
             await InstallMultipleRemotePackageAsync(splitRemoteFilePaths, packageName, reinstall, cancellationToken);
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Count, PackageInstallProgressState.PostInstall));
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async (x) =>
+            await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Count, PackageInstallProgressState.PostInstall));

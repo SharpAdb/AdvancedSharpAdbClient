@@ -276,7 +276,7 @@ namespace AdvancedSharpAdbClient
         {
             string[] deviceValues = result.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-            IEnumerable<DeviceData> currentDevices = deviceValues.Select((x) => new DeviceData(x));
+            IEnumerable<DeviceData> currentDevices = deviceValues.Select(x => new DeviceData(x));
             UpdateDevices(currentDevices);
         }
 

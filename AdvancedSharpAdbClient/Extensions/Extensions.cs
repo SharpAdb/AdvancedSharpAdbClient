@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,6 +16,39 @@ namespace AdvancedSharpAdbClient
     internal static class Extensions
     {
         public static char[] NewLineSeparator { get; } = ['\r', '\n'];
+
+        /// <summary>
+        /// Adds the elements of the specified collection to the end of the <see cref="ICollection{TSource}"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">The <see cref="ICollection{TSource}"/> to be added.</param>
+        /// <param name="collection">The collection whose elements should be added to the end of the <see cref="ICollection{TSource}"/>.
+        /// The collection itself cannot be <see langword="null"/>, but it can contain elements that are
+        /// <see langword="null"/>, if type <typeparamref name="TSource"/> is a reference type.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="collection"/> is null.</exception>
+        public static void AddRange<TSource>(this ICollection<TSource> source, IEnumerable<TSource> collection)
+        {
+            ExceptionExtensions.ThrowIfNull(source);
+            ExceptionExtensions.ThrowIfNull(collection);
+
+            if (source is List<TSource> list)
+            {
+                list.AddRange(collection);
+            }
+#if !NETFRAMEWORK || NET40_OR_GREATER
+            else if (source is ISet<TSource> set)
+            {
+                set.UnionWith(collection);
+            }
+#endif
+            else
+            {
+                foreach (TSource item in collection)
+                {
+                    source.Add(item);
+                }
+            }
+        }
 
         /// <summary>
         /// Converts the string representation of the name or numeric value of one or more

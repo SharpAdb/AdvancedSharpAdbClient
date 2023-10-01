@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a single log entry from the stream.
         /// </summary>
-        protected void ReadLogEntry(BinaryReader reader, IList<object> parent)
+        protected void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
         {
             EventLogType type = (EventLogType)reader.ReadByte();
 
