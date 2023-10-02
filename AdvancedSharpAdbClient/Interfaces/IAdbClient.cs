@@ -450,7 +450,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to check.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns><see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        bool IsCurrentApp(DeviceData device, string packageName);
+        bool IsAppInForeground(DeviceData device, string packageName);
 
         /// <summary>
         /// Check if the app is running in background.

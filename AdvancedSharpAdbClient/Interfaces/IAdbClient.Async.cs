@@ -504,7 +504,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the result. <see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
+        Task<bool> IsAppInForegroundAsync(DeviceData device, string packageName, CancellationToken cancellationToken);
 
         /// <summary>
         /// Check if the app is running in background.

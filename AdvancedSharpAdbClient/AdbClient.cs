@@ -931,22 +931,32 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public bool IsCurrentApp(DeviceData device, string packageName)
+        public bool IsAppRunning(DeviceData device, string packageName)
         {
-            ConsoleOutputReceiver receiver = new();
-            ExecuteRemoteCommand($"dumpsys activity activities | grep mResumedActivity", device, receiver, Encoding);
-            string response = receiver.ToString().Trim();
-            return response.ToString().Contains(packageName);
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+            socket.SendAdbRequest($"shell:pidof {packageName}");
+            AdbResponse response = socket.ReadAdbResponse();
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string result = reader.ReadToEnd().TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            bool intParsed = int.TryParse(result, out int pid);
+            return intParsed && pid > 0;
         }
 
         /// <inheritdoc/>
-        public bool IsAppRunning(DeviceData device, string packageName)
+        public bool IsAppInForeground(DeviceData device, string packageName)
         {
-            ConsoleOutputReceiver receiver = new();
-            ExecuteRemoteCommand($"pidof {packageName}", device, receiver, Encoding);
-            string response = receiver.ToString().Trim();
-            bool intParsed = int.TryParse(response, out int pid);
-            return intParsed && pid > 0;
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+            socket.SendAdbRequest($"shell:dumpsys activity activities | grep mResumedActivity");
+            AdbResponse response = socket.ReadAdbResponse();
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string result = reader.ReadToEnd();
+            return result.Contains(packageName);
         }
 
         /// <inheritdoc/>
@@ -955,7 +965,7 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             // Check if the app is in foreground
-            bool currentApp = IsCurrentApp(device, packageName);
+            bool currentApp = IsAppInForeground(device, packageName);
             if (currentApp)
             {
                 return AppStatus.Foreground;
@@ -1078,16 +1088,30 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommand("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, Encoding);
+            SendKeyEvent(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)));
         }
 
         /// <inheritdoc/>
-        public void StartApp(DeviceData device, string packageName) =>
-            ExecuteRemoteCommand($"monkey -p {packageName} 1", device, null, Encoding);
+        public void StartApp(DeviceData device, string packageName)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+            socket.SendAdbRequest($"shell:monkey -p {packageName} 1");
+            AdbResponse response = socket.ReadAdbResponse();
+        }
 
         /// <inheritdoc/>
-        public void StopApp(DeviceData device, string packageName) =>
-            ExecuteRemoteCommand($"am force-stop {packageName}", device, null, Encoding);
+        public void StopApp(DeviceData device, string packageName)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+            socket.SendAdbRequest($"shell:am force-stop {packageName}");
+            AdbResponse response = socket.ReadAdbResponse();
+        }
 
         /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");

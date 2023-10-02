@@ -212,9 +212,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        public bool IsCurrentApp(DeviceData device, string packageName) => throw new NotImplementedException();
+        public bool IsAppInForeground(DeviceData device, string packageName) => throw new NotImplementedException();
 
-        public Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<bool> IsAppInForegroundAsync(DeviceData device, string packageName, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public void KillAdb() => throw new NotImplementedException();
 

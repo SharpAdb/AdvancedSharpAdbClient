@@ -650,8 +650,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd cannot run as root in production builds\n"u8.CopyTo(expectedData);
 
             _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
@@ -684,8 +683,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd not running as root\n"u8.CopyTo(expectedData);
 
             _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
@@ -739,7 +737,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success\n");
+            byte[] response = "Success\n"u8.ToArray();
 
             await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -827,7 +825,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+            byte[] response = "Success: streamed 205774 bytes\n"u8.ToArray();
 
             await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -985,16 +983,15 @@ namespace AdvancedSharpAdbClient.Tests
                 "shell:uiautomator dump /dev/tty"
             ];
 
-            byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
-            await using MemoryStream emptyStream = new(emptyStreamData);
+            await using MemoryStream emptyStream = new();
 
             string emptyXml = string.Empty;
             await RunTestAsync(
                 [AdbResponse.OK, AdbResponse.OK],
-               NoResponseMessages,
-               requests,
-               emptyStream,
-               async () => emptyXml = await TestClient.DumpScreenStringAsync(device));
+                NoResponseMessages,
+                requests,
+                emptyStream,
+                async () => emptyXml = await TestClient.DumpScreenStringAsync(device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -1085,7 +1082,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "shell:input tap 100 100"
             ];
 
-            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+            byte[] streamData = @"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
         at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
         at android.os.Parcel.createException(Parcel.java:2357)
         at android.os.Parcel.readException(Parcel.java:2340)
@@ -1106,7 +1103,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
         at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
         at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)");
+        at android.os.Binder.execTransact(Binder.java:1134)"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
             JavaException exception = await Assert.ThrowsAsync<JavaException>(() =>
@@ -1160,7 +1157,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 "shell:input tap 100 100"
             ];
 
-            byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
+            byte[] streamData = "Error: Injecting to another application requires INJECT_EVENTS permission\r\n"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
             _ = await Assert.ThrowsAsync<ElementNotFoundException>(() =>
@@ -1170,6 +1167,108 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 requests,
                 shellStream,
                 () => TestClient.ClickAsync(device, new Cords(100, 100))));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SwipeAsync(DeviceData, int, int, int, int, long, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SwipeAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input swipe 100 200 300 400 500"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.SwipeAsync(device, 100, 200, 300, 400, 500));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppRunningAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("21216 27761\r\n", true)]
+        [InlineData(" 21216 27761\r\n", true)]
+        [InlineData(" \r\n", false)]
+        [InlineData("\r\n", false)]
+        [InlineData(" ", false)]
+        [InlineData("", false)]
+        public async void IsAppRunningAsyncTest(string response, bool expected)
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:pidof com.google.android.gms"
+            ];
+
+            byte[] streamData = Encoding.UTF8.GetBytes(response);
+            await using MemoryStream shellStream = new(streamData);
+
+            bool result = !expected;
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => result = await TestClient.IsAppRunningAsync(device, "com.google.android.gms"));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppInForegroundAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", true)]
+        [InlineData("com.android.settings", true)]
+        [InlineData("com.google.android.gms", false)]
+        public async void IsAppInForegroundAsyncTest(string packageName, bool expected)
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream shellStream = new(streamData);
+
+            bool result = !expected;
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                async () => result = await TestClient.IsAppInForegroundAsync(device, packageName));
+
+            Assert.Equal(expected, result);
         }
 
         /// <summary>
@@ -1289,6 +1388,174 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Attributes["text"]);
             Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendKeyEventAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SendKeyEventAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_MOVE_END"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.SendKeyEventAsync(device, "KEYCODE_MOVE_END"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendTextAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SendTextAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input text Hello, World",
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.SendTextAsync(device, "Hello, World"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StartAppAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StartAppAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:monkey -p com.android.settings 1",
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.StartAppAsync(device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StopAppAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StopAppAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:am force-stop com.android.settings",
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.StopAppAsync(device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.BackBtnAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void BackBtnAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_BACK"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.BackBtnAsync(device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.HomeBtnAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void HomeBtnAsyncTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_HOME"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.HomeBtnAsync(device));
         }
 
         private Task RunConnectAsyncTest(Func<Task> test, string connectString)

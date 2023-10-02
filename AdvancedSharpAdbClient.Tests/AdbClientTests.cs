@@ -395,8 +395,6 @@ namespace AdvancedSharpAdbClient.Tests
                 AdbResponse.OK
             ];
 
-            string[] responseMessages = [];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -410,7 +408,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             RunTest(
                 responses,
-                responseMessages,
+                NoResponseMessages,
                 requests,
                 shellStream,
                 () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver));
@@ -436,8 +434,6 @@ namespace AdvancedSharpAdbClient.Tests
                 AdbResponse.OK
             ];
 
-            string[] responseMessages = [];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -449,7 +445,7 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<ShellCommandUnresponsiveException>(() =>
             RunTest(
                 responses,
-                responseMessages,
+                NoResponseMessages,
                 requests,
                 null,
                 () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
@@ -552,8 +548,6 @@ namespace AdvancedSharpAdbClient.Tests
                 AdbResponse.OK
             ];
 
-            string[] responseMessages = [];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -569,7 +563,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             RunTest(
                 responses,
-                responseMessages,
+                NoResponseMessages,
                 requests,
                 shellStream,
                 () => TestClient.RunLogService(device, sink, LogId.System));
@@ -763,8 +757,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd cannot run as root in production builds\n"u8.CopyTo(expectedData);
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
@@ -797,8 +790,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd not running as root\n"u8.CopyTo(expectedData);
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
@@ -852,7 +844,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success\n");
+            byte[] response = "Success\n"u8.ToArray();
 
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -940,7 +932,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+            byte[] response = "Success: streamed 205774 bytes\n"u8.ToArray();
 
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
@@ -1198,7 +1190,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "shell:input tap 100 100"
             ];
 
-            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+            byte[] streamData = @"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
         at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
         at android.os.Parcel.createException(Parcel.java:2357)
         at android.os.Parcel.readException(Parcel.java:2340)
@@ -1219,7 +1211,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
         at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
         at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)");
+        at android.os.Binder.execTransact(Binder.java:1134)"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             JavaException exception = Assert.Throws<JavaException>(() =>
@@ -1273,7 +1265,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 "shell:input tap 100 100"
             ];
 
-            byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
+            byte[] streamData = "Error: Injecting to another application requires INJECT_EVENTS permission\r\n"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             _ = Assert.Throws<ElementNotFoundException>(() =>
@@ -1283,6 +1275,108 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 requests,
                 shellStream,
                 () => TestClient.Click(device, new Cords(100, 100))));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Swipe(DeviceData, int, int, int, int, long)"/> method.
+        /// </summary>
+        [Fact]
+        public void SwipeTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input swipe 100 200 300 400 500"
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.Swipe(device, 100, 200, 300, 400, 500));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppRunning(DeviceData, string)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("21216 27761\r\n", true)]
+        [InlineData(" 21216 27761\r\n", true)]
+        [InlineData(" \r\n", false)]
+        [InlineData("\r\n", false)]
+        [InlineData(" ", false)]
+        [InlineData("", false)]
+        public void IsAppRunningTest(string response, bool expected)
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:pidof com.google.android.gms"
+            ];
+
+            byte[] streamData = Encoding.UTF8.GetBytes(response);
+            using MemoryStream shellStream = new(streamData);
+
+            bool result = !expected;
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => result = TestClient.IsAppRunning(device, "com.google.android.gms"));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppInForeground(DeviceData, string)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", true)]
+        [InlineData("com.android.settings", true)]
+        [InlineData("com.google.android.gms", false)]
+        public void IsAppInForegroundTest(string packageName, bool expected)
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            using MemoryStream shellStream = new(streamData);
+
+            bool result = !expected;
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => result = TestClient.IsAppInForeground(device, packageName));
+
+            Assert.Equal(expected, result);
         }
 
         /// <summary>
@@ -1307,19 +1401,18 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
+            Element element = null;
             RunTest(
                 [AdbResponse.OK, AdbResponse.OK],
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () =>
-                {
-                    Element element = TestClient.FindElement(device);
-                    Assert.Equal(144, element.GetChildCount());
-                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
-                });
+                () => element = TestClient.FindElement(device));
+
+            Assert.Equal(144, element.GetChildCount());
+            element = element[0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
         }
 
         /// <summary>
@@ -1359,6 +1452,174 @@ Caused by: android.os.RemoteException: Remote stack trace:
                     Assert.Equal("where-where", element.Attributes["text"]);
                     Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
                 });
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendKeyEvent(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void SendKeyEventTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_MOVE_END"
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.SendKeyEvent(device, "KEYCODE_MOVE_END"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendText(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void SendTextTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input text Hello, World",
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.SendText(device, "Hello, World"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StartApp(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void StartAppTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:monkey -p com.android.settings 1",
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.StartApp(device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StopApp(DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void StopAppTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:am force-stop com.android.settings",
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.StopApp(device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.BackBtn(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void BackBtnTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_BACK"
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.BackBtn(device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.HomeBtn(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void HomeBtnTest()
+        {
+            DeviceData device = new()
+            {
+                Serial = "009d1cd696d5194a",
+                State = DeviceState.Online
+            };
+
+            string[] requests =
+            [
+                "host:transport:009d1cd696d5194a",
+                "shell:input keyevent KEYCODE_HOME"
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                [AdbResponse.OK, AdbResponse.OK],
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.HomeBtn(device));
         }
 
         private void RunConnectTest(Action test, string connectString)
