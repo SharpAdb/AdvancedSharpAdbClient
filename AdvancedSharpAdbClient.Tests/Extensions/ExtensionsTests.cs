@@ -32,36 +32,5 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(10, collection.Count);
             Assert.Equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], collection);
         }
-
-        /// <summary>
-        /// Tests the <see cref="Extensions.TryParse{TEnum}(string, bool, out TEnum)"/> method.
-        /// </summary>
-        [Fact]
-        public void TryParseTest()
-        {
-            Assert.True(Extensions.TryParse("BootLoader", false, out DeviceState result));
-            Assert.Equal(DeviceState.BootLoader, result);
-            Assert.True(Extensions.TryParse("Bootloader", true, out result));
-            Assert.Equal(DeviceState.BootLoader, result);
-            Assert.False(Extensions.TryParse<DeviceState>("Bootloader", false, out _));
-            Assert.False(Extensions.TryParse<DeviceState>("Reset", true, out _));
-        }
-
-        /// <summary>
-        /// Tests the <see cref="Extensions.IsNullOrWhiteSpace(string)"/> method.
-        /// </summary>
-        [Fact]
-        public void IsNullOrWhiteSpaceTest()
-        {
-            Assert.True(" ".IsNullOrWhiteSpace());
-            Assert.False(" test ".IsNullOrWhiteSpace());
-        }
-
-        /// <summary>
-        /// Tests the <see cref="Extensions.Join(string, IEnumerable{string})"/> method.
-        /// </summary>
-        [Fact]
-        public void JoinTest() =>
-            Assert.Equal("Hello World!", Extensions.Join(" ", ["Hello", "World!"]));
     }
 }

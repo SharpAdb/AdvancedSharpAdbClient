@@ -474,7 +474,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallOutputReceiver receiver = new();
             string reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
+            string addon = StringExtensions.IsNullOrWhiteSpace(packageName) ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
             client.ExecuteShellCommand(Device, cmd, receiver);

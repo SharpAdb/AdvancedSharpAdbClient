@@ -99,7 +99,11 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">The reply.</param>
         /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
+#if HAS_BUFFERS
+        public static bool IsOkay(ReadOnlySpan<byte> reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
+#else
         public static bool IsOkay(byte[] reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
+#endif
 
         /// <inheritdoc/>
         public bool Connected => socket.Connected;
@@ -112,7 +116,12 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
+                int count =
+#if HAS_BUFFERS
+                    socket.Send(data.AsSpan(0, length != -1 ? length : data.Length), SocketFlags.None);
+#else
+                    socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
+#endif
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -130,7 +139,12 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
+                int count =
+#if HAS_BUFFERS
+                    socket.Send(data.AsSpan(offset, length != -1 ? length : data.Length), SocketFlags.None);
+#else
+                    socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
+#endif
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -211,7 +225,12 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
+                    count =
+#if HAS_BUFFERS
+                        socket.Receive(data.AsSpan(totalRead, bufferLength), SocketFlags.None);
+#else
+                        socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
+#endif
 
                     if (count < 0)
                     {
@@ -475,7 +494,11 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
         /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
+#if HAS_BUFFERS
+        protected virtual string ReplyToString(ReadOnlySpan<byte> reply)
+#else
         protected virtual string ReplyToString(byte[] reply)
+#endif
         {
             string result;
             try

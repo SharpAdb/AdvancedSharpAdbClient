@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Regex regex = EnvRegex();
             foreach (string line in lines)
             {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                if (string.IsNullOrEmpty(line) || line.StartsWith('#'))
                 {
                     continue;
                 }

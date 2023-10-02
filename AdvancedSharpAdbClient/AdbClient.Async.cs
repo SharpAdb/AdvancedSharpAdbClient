@@ -532,9 +532,12 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder =
-                new StringBuilder().Append("exec:cmd package 'install-create'")
-                                   .Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install-create'");
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            {
+                requestBuilder.Append($" -p {packageName}");
+            }
 
             if (arguments != null)
             {
@@ -981,7 +984,7 @@ namespace AdvancedSharpAdbClient
         public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await ExecuteRemoteCommandAsync("input keyevent " + Extensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken).ConfigureAwait(false);
+            await ExecuteRemoteCommandAsync("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

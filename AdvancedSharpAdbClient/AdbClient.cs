@@ -656,9 +656,12 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install-create'");
-            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install-create'");
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            {
+                requestBuilder.Append($" -p {packageName}");
+            }
 
             if (arguments != null)
             {
@@ -1059,7 +1062,7 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommand("input keyevent " + Extensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
+            ExecuteRemoteCommand("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
         }
 
         /// <inheritdoc/>

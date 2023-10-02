@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">The logger to use when logging.</param>
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient> logger = null)
         {
-            if (adbPath.IsNullOrWhiteSpace())
+            if (StringExtensions.IsNullOrWhiteSpace(adbPath))
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }

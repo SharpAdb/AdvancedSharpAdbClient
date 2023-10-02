@@ -94,19 +94,35 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int size, SocketFlags socketFlags) =>
+#if HAS_BUFFERS
+            socket.Send(buffer.AsSpan(0, size), socketFlags);
+#else
             socket.Send(buffer, size, socketFlags);
+#endif
 
         /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+#if HAS_BUFFERS
+            socket.Send(buffer.AsSpan(offset, size), socketFlags);
+#else
             socket.Send(buffer, offset, size, socketFlags);
+#endif
 
         /// <inheritdoc/>
         public virtual int Receive(byte[] buffer, int size, SocketFlags socketFlags) =>
+#if HAS_BUFFERS
+            socket.Receive(buffer.AsSpan(0, size), socketFlags);
+#else
             socket.Receive(buffer, size, socketFlags);
+#endif
 
         /// <inheritdoc/>
         public virtual int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+#if HAS_BUFFERS
+            socket.Send(buffer.AsSpan(offset, size), socketFlags);
+#else
             socket.Receive(buffer, offset, size, socketFlags);
+#endif
 
 #if HAS_BUFFERS
         /// <inheritdoc/>

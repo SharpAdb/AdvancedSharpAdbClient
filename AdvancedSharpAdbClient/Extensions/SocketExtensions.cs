@@ -1,5 +1,4 @@
-﻿#if HAS_TASK
-// <copyright file="SocketExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="SocketExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -14,6 +13,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public static class SocketExtensions
     {
+#if HAS_TASK
 #if !HAS_BUFFERS
         /// <summary>
         /// Asynchronously receives data from a connected socket.
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient
             
             return taskCompletionSource.Task;
 #else
-            return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags));
+            return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
 
@@ -176,6 +176,18 @@ namespace AdvancedSharpAdbClient
             return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
+#endif
+
+#if NETFRAMEWORK && !NET40_OR_GREATER
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="Socket"/> class.
+        /// </summary>
+        /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        public static void Dispose(this Socket socket)
+        {
+            socket.Close();
+            GC.SuppressFinalize(socket);
+        }
+#endif
     }
 }
-#endif

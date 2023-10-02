@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         [Fact]
         public void GetCommandNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => SyncCommandConverter.GetCommand(null));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(null));
 
         [Fact]
         public void GetCommandInvalidNumberOfBytesTest() =>
@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         [Fact]
         public void GetCommandInvalidCommandTest() =>
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand("QMTV"u8.ToArray()));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand("QMTV"u8));
 
         [Fact]
         public void GetBytesInvalidCommandTest() =>

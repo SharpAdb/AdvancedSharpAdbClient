@@ -119,11 +119,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 string tpath = path;
                 if (tpath.Length > 1)
                 {
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     if (tpath.EndsWith(DirectorySeparatorChar))
-#else
-                    if (tpath.EndsWith(new string([DirectorySeparatorChar])))
-#endif
                     {
                         return tpath;
                     }
@@ -186,7 +182,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 CheckInvalidPathChars(path);
                 int length = path.Length;
                 if ((length >= 1 && (path[0] == DirectorySeparatorChar)) ||
-                    (length == 1))
+                    length == 1)
                 {
                     return true;
                 }
@@ -230,23 +226,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The fixup path</returns>
         private static string FixupPath(string path)
         {
-            string sb = path;
-            sb = sb.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
+            string sb = path.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
 
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (sb != "." && !sb.StartsWith(DirectorySeparatorChar))
-#else
-            if (sb != "." && !sb.StartsWith(new string([DirectorySeparatorChar])))
-#endif
             {
                 sb = $".{DirectorySeparatorChar}{sb}";
             }
 
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (!sb.EndsWith(DirectorySeparatorChar))
-#else
-            if (!sb.EndsWith(new string([DirectorySeparatorChar])))
-#endif
             {
                 sb = $"{sb}{DirectorySeparatorChar}";
             }

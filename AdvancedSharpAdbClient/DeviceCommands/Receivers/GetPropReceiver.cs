@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // after all that.
             foreach (string line in lines)
             {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
+                if (string.IsNullOrEmpty(line) || line.StartsWith('#') || line.StartsWith('$'))
                 {
                     continue;
                 }

@@ -24,7 +24,12 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count =
+#if HAS_BUFFERS
+                    await socket.SendAsync(data.AsMemory(0, length != -1 ? length : data.Length), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#else
+                    await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#endif
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -42,7 +47,12 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count =
+#if HAS_BUFFERS
+                    await socket.SendAsync(data.AsMemory(offset, length != -1 ? length : data.Length - offset), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#else
+                    await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#endif
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -126,7 +136,12 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = await socket.ReceiveAsync(data, totalRead, bufferLength, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count =
+#if HAS_BUFFERS
+                        await socket.ReceiveAsync(data.AsMemory(totalRead, bufferLength), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#else
+                        await socket.ReceiveAsync(data, totalRead, bufferLength, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+#endif
 
                     if (count < 0)
                     {
@@ -334,7 +349,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
+#if HAS_BUFFERS
+        protected virtual async Task<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
+#else
         protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
+#endif
         {
             try
             {

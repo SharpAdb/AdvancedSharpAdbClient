@@ -389,7 +389,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallOutputReceiver receiver = new();
             string reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string addon = packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}";
+            string addon = StringExtensions.IsNullOrWhiteSpace(packageName) ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
             await client.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);

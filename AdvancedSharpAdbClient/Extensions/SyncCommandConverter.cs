@@ -52,9 +52,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="value">A byte array that represents a <see cref="SyncCommand"/>.</param>
         /// <returns>The corresponding <see cref="SyncCommand"/>.</returns>
+#if HAS_BUFFERS
+        public static SyncCommand GetCommand(ReadOnlySpan<byte> value)
+#else
         public static SyncCommand GetCommand(byte[] value)
+#endif
         {
+#if !HAS_BUFFERS
             ExceptionExtensions.ThrowIfNull(value);
+#endif
 
             if (value.Length != 4)
             {

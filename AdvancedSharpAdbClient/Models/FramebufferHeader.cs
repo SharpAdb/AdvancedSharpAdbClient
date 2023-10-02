@@ -25,11 +25,7 @@ namespace AdvancedSharpAdbClient
         {
             // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
             using MemoryStream stream = new(data);
-            using BinaryReader reader = new(stream, Encoding.ASCII
-#if !NETFRAMEWORK || NET45_OR_GREATER
-                , leaveOpen: true
-#endif
-                );
+            using BinaryReader reader = new(stream, Encoding.ASCII);
             Version = reader.ReadUInt32();
 
             if (Version > 2)
@@ -41,7 +37,7 @@ namespace AdvancedSharpAdbClient
 
             Bpp = reader.ReadUInt32();
 
-            if (Version >= 2)
+            if (Version == 2)
             {
                 ColorSpace = reader.ReadUInt32();
             }
@@ -172,13 +168,19 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <returns>A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
+#if HAS_BUFFERS
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
+        private readonly PixelFormat StandardizePixelFormat(Span<byte> buffer)
+#else
         private readonly PixelFormat StandardizePixelFormat(byte[] buffer)
+#endif
         {
             // Initial parameter validation.
+#if !HAS_BUFFERS
             ExceptionExtensions.ThrowIfNull(buffer);
+#endif
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -208,10 +210,10 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Get the index at which the red, bue, green and alpha values are stored.
-                uint redIndex = Red.Offset / 8;
-                uint blueIndex = Blue.Offset / 8;
-                uint greenIndex = Green.Offset / 8;
-                uint alphaIndex = Alpha.Offset / 8;
+                int redIndex = (int)Red.Offset / 8;
+                int blueIndex = (int)Blue.Offset / 8;
+                int greenIndex = (int)Green.Offset / 8;
+                int alphaIndex = (int)Alpha.Offset / 8;
 
                 // Loop over the array and re-order as required
                 for (int i = 0; i < (int)Size; i += 4)
