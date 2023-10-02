@@ -218,19 +218,32 @@ namespace AdvancedSharpAdbClient
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Executes a command on the adb server.
         /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
-        /// <param name="device">The device on which to run the command.</param>
-        /// <param name="receiver">The receiver which will get the command output.</param>
-        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver);
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="receiver">The receiver which will get the command output.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 

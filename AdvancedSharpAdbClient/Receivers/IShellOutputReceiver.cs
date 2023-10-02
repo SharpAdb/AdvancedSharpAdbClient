@@ -2,11 +2,13 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System.Text;
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// This interface contains various receivers that are able to parse Android console output. You can use
-    /// the receivers in combination with the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/>
+    /// the receivers in combination with the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/>
     /// method to capture the output of any Android command.
     /// </summary>
     public interface IShellOutputReceiver

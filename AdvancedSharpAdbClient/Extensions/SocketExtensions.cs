@@ -39,7 +39,11 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
+#if HAS_BUFFERS
+            => socket.ReceiveAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
+#else
             => socket.ReceiveAsync(buffer, 0, size, socketFlags, cancellationToken);
+#endif
 
         /// <summary>
         /// Asynchronously receives data from a connected socket.
@@ -107,7 +111,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default)
-            => SendAsync(socket, buffer, 0, buffer.Length, socketFlags, cancellationToken);
+            => socket.SendAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
 #endif
 
         /// <summary>
@@ -121,7 +125,11 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
-            => SendAsync(socket, buffer, 0, size, socketFlags, cancellationToken);
+#if HAS_BUFFERS
+            => socket.SendAsync(buffer.AsMemory( 0, size), socketFlags, cancellationToken).AsTask();
+#else
+            => socket.SendAsync(buffer, 0, size, socketFlags, cancellationToken);
+#endif
 
         /// <summary>
         /// Asynchronously sends data to a connected socket.
@@ -176,6 +184,14 @@ namespace AdvancedSharpAdbClient
             return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
+#endif
+
+#if !HAS_PROCESS
+        /// <summary>
+        /// Closes the <see cref="Socket"/> connection and releases all associated resources.
+        /// </summary>
+        /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        public static void Close(this Socket socket) => socket.Dispose();
 #endif
 
 #if NETFRAMEWORK && !NET40_OR_GREATER

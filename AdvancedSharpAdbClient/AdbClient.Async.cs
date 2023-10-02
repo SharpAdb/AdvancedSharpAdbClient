@@ -171,25 +171,30 @@ namespace AdvancedSharpAdbClient
 
             return parts.Select(x => new ForwardData(x));
         }
-
+        
         /// <inheritdoc/>
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
-
-        /// <inheritdoc/>
-        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
-            EnsureDevice(device);
-
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            cancellationToken.Register(socket.Dispose);
+            await ExecuteServerCommandAsync(target, command, socket, receiver, encoding, cancellationToken);
+        }
 
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-            await socket.SendAdbRequestAsync($"shell:{command}", cancellationToken).ConfigureAwait(false);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+        /// <inheritdoc/>
+        public async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             try
             {
+                cancellationToken.Register(socket.Dispose);
                 using StreamReader reader = new(socket.GetShellStream(), encoding);
                 // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
                 // break too soon in certain cases (about every 10 loops, so it appears to be a timing
@@ -218,6 +223,17 @@ namespace AdvancedSharpAdbClient
             {
                 receiver?.Flush();
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken);
+
+            await ExecuteServerCommandAsync("shell", command, socket, receiver, encoding, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -669,7 +685,7 @@ namespace AdvancedSharpAdbClient
             {
                 return xmlString;
             }
-            Match xmlMatch = GetXMLRegex().Match(xmlString);
+            Match xmlMatch = GetXmlRegex().Match(xmlString);
             return !xmlMatch.Success ? throw new XmlException("An error occurred while receiving xml: " + xmlString) : xmlMatch.Value;
         }
 
@@ -789,7 +805,7 @@ namespace AdvancedSharpAdbClient
         public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, cancellationToken).ConfigureAwait(false);
+            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, Encoding, cancellationToken).ConfigureAwait(false);
             string response = receiver.ToString().Trim();
             return response.ToString().Contains(packageName);
         }
@@ -798,7 +814,7 @@ namespace AdvancedSharpAdbClient
         public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, cancellationToken).ConfigureAwait(false);
+            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, Encoding, cancellationToken).ConfigureAwait(false);
             string response = receiver.ToString().Trim();
             bool intParsed = int.TryParse(response, out int pid);
             return intParsed && pid > 0;
@@ -984,16 +1000,16 @@ namespace AdvancedSharpAdbClient
         public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await ExecuteRemoteCommandAsync("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken).ConfigureAwait(false);
+            await ExecuteRemoteCommandAsync("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, Encoding, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync($"monkey -p {packageName} 1", device, null, cancellationToken);
+            ExecuteRemoteCommandAsync($"monkey -p {packageName} 1", device, null, Encoding, cancellationToken);
 
         /// <inheritdoc/>
         public Task StopAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync($"am force-stop {packageName}", device, null, cancellationToken);
+            ExecuteRemoteCommandAsync($"am force-stop {packageName}", device, null, Encoding, cancellationToken);
 
         /// <inheritdoc/>
         public Task BackBtnAsync(DeviceData device, CancellationToken cancellationToken = default) => SendKeyEventAsync(device, "KEYCODE_BACK", cancellationToken);

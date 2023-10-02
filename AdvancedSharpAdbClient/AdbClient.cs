@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
     /// adb server and devices that are connected to that adb server.</para>
     /// <para>For example, to fetch a list of all devices that are currently connected to this PC, you can
     /// call the <see cref="GetDevices"/> method.</para>
-    /// <para>To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver)"/>
+    /// <para>To run a command on a device, you can use the <see cref="ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/>
     /// method.</para>
     /// </summary>
     /// <remarks>
@@ -192,7 +192,7 @@ namespace AdvancedSharpAdbClient
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SendAdbRequest("host:devices-l");
-            socket.ReadAdbResponse();
+            _ = socket.ReadAdbResponse();
             string reply = socket.ReadString();
 
             string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
@@ -317,19 +317,24 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver) =>
-            ExecuteRemoteCommand(command, device, receiver, Encoding);
+        public void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding)
+        {
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            ExecuteServerCommand(target, command, socket, receiver, encoding);
+        }
 
         /// <inheritdoc/>
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
+        public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding)
         {
-            EnsureDevice(device);
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
 
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
-
-            socket.SetDevice(device);
-            socket.SendAdbRequest($"shell:{command}");
-            AdbResponse response = socket.ReadAdbResponse();
+            socket.SendAdbRequest(request.ToString());
+            _ = socket.ReadAdbResponse();
 
             try
             {
@@ -355,6 +360,17 @@ namespace AdvancedSharpAdbClient
             {
                 receiver?.Flush();
             }
+        }
+
+        /// <inheritdoc/>
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            ExecuteServerCommand("shell", command, socket, receiver, encoding);
         }
 
         /// <inheritdoc/>
@@ -798,7 +814,7 @@ namespace AdvancedSharpAdbClient
             {
                 return xmlString;
             }
-            Match xmlMatch = GetXMLRegex().Match(xmlString);
+            Match xmlMatch = GetXmlRegex().Match(xmlString);
             return !xmlMatch.Success ? throw new XmlException("An error occurred while receiving xml: " + xmlString) : xmlMatch.Value;
         }
 
@@ -918,7 +934,7 @@ namespace AdvancedSharpAdbClient
         public bool IsCurrentApp(DeviceData device, string packageName)
         {
             ConsoleOutputReceiver receiver = new();
-            ExecuteRemoteCommand($"dumpsys activity activities | grep mResumedActivity", device, receiver);
+            ExecuteRemoteCommand($"dumpsys activity activities | grep mResumedActivity", device, receiver, Encoding);
             string response = receiver.ToString().Trim();
             return response.ToString().Contains(packageName);
         }
@@ -927,7 +943,7 @@ namespace AdvancedSharpAdbClient
         public bool IsAppRunning(DeviceData device, string packageName)
         {
             ConsoleOutputReceiver receiver = new();
-            ExecuteRemoteCommand($"pidof {packageName}", device, receiver);
+            ExecuteRemoteCommand($"pidof {packageName}", device, receiver, Encoding);
             string response = receiver.ToString().Trim();
             bool intParsed = int.TryParse(response, out int pid);
             return intParsed && pid > 0;
@@ -1062,16 +1078,16 @@ namespace AdvancedSharpAdbClient
         public void ClearInput(DeviceData device, int charCount)
         {
             SendKeyEvent(device, "KEYCODE_MOVE_END");
-            ExecuteRemoteCommand("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null);
+            ExecuteRemoteCommand("input keyevent " + StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, Encoding);
         }
 
         /// <inheritdoc/>
         public void StartApp(DeviceData device, string packageName) =>
-            ExecuteRemoteCommand($"monkey -p {packageName} 1", device, null);
+            ExecuteRemoteCommand($"monkey -p {packageName} 1", device, null, Encoding);
 
         /// <inheritdoc/>
         public void StopApp(DeviceData device, string packageName) =>
-            ExecuteRemoteCommand($"am force-stop {packageName}", device, null);
+            ExecuteRemoteCommand($"am force-stop {packageName}", device, null, Encoding);
 
         /// <inheritdoc/>
         public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
@@ -1103,9 +1119,9 @@ namespace AdvancedSharpAdbClient
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]
-        private static partial Regex GetXMLRegex();
+        private static partial Regex GetXmlRegex();
 #else
-        private static Regex GetXMLRegex() => new("<\\?xml(.?)*");
+        private static Regex GetXmlRegex() => new("<\\?xml(.?)*");
 #endif
     }
 

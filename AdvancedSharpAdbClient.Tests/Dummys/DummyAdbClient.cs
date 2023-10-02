@@ -18,14 +18,25 @@ namespace AdvancedSharpAdbClient.Tests
 
         public EndPoint EndPoint { get; private set; }
 
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver) =>
-            ExecuteRemoteCommand(command, device, receiver, Encoding.Default);
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding) =>
+            ExecuteServerCommand("shell", command, receiver, encoding);
 
-        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
+        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default) =>
+            ExecuteServerCommandAsync("shell", command, receiver, encoding, cancellationToken);
+
+        public void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding)
         {
-            ReceivedCommands.Add(command);
+            StringBuilder requestBuilder = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = requestBuilder.AppendFormat("{0}:", target);
+            }
+            _ = requestBuilder.Append(command);
 
-            if (Commands.TryGetValue(command, out string value))
+            string request = requestBuilder.ToString();
+            ReceivedCommands.Add(request);
+
+            if (Commands.TryGetValue(request, out string value))
             {
                 if (receiver != null)
                 {
@@ -41,18 +52,26 @@ namespace AdvancedSharpAdbClient.Tests
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{request}' was unexpected");
             }
         }
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync(command, device, receiver, Encoding.Default, cancellationToken);
+        public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding) =>
+            ExecuteServerCommand(target, command, receiver, encoding);
 
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
-            ReceivedCommands.Add(command);
+            StringBuilder requestBuilder = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = requestBuilder.AppendFormat("{0}:", target);
+            }
+            _ = requestBuilder.Append(command);
 
-            if (Commands.TryGetValue(command, out string value))
+            string request = requestBuilder.ToString();
+            ReceivedCommands.Add(request);
+
+            if (Commands.TryGetValue(request, out string value))
             {
                 if (receiver != null)
                 {
@@ -60,7 +79,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                     while (reader.Peek() != -1)
                     {
-                        receiver.AddOutput(reader.ReadLine());
+                        receiver.AddOutput(await reader.ReadLineAsync(cancellationToken));
                     }
 
                     receiver.Flush();
@@ -68,11 +87,12 @@ namespace AdvancedSharpAdbClient.Tests
             }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{command}' was unexpected");
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{request}' was unexpected");
             }
-
-            return Task.FromResult(true);
         }
+
+        public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default) =>
+            ExecuteServerCommandAsync(target, command, receiver, encoding, cancellationToken);
 
         #region Not Implemented
 

@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands["/system/bin/getprop"] = @"[init.svc.BGW]: [running]
+            client.Commands["shell:/system/bin/getprop"] = @"[init.svc.BGW]: [running]
 [init.svc.MtkCodecService]: [running]
 [init.svc.bootanim]: [stopped]";
 

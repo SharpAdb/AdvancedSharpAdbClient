@@ -14,6 +14,39 @@ namespace AdvancedSharpAdbClient
     public static partial class AdbClientExtensions
     {
         /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IShellOutputReceiver receiver) =>
+            client.ExecuteServerCommand(target, command, receiver, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver receiver) =>
+            client.ExecuteServerCommand(target, command, socket, receiver, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver) =>
+            client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
+
+        /// <summary>
         /// Creates a port forwarding between a local and a remote port.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>

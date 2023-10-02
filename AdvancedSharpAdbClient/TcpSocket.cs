@@ -85,12 +85,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Close() =>
-#if HAS_PROCESS
-            socket.Close();
-#else
-            socket.Dispose();
-#endif
+        public virtual void Close() => socket.Close();
 
         /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int size, SocketFlags socketFlags) =>

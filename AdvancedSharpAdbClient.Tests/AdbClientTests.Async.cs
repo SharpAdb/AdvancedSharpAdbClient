@@ -272,7 +272,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommandAsync(IAdbClient, string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncTest()
@@ -313,7 +313,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommandAsync(IAdbClient, string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncUnresponsiveTest()

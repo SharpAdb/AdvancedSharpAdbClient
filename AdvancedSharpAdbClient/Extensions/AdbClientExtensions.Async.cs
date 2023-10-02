@@ -6,12 +6,52 @@
 using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
     public static partial class AdbClientExtensions
     {
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken=default)=>
+            client.ExecuteServerCommandAsync(target, command, receiver, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
+            client.ExecuteServerCommandAsync(target, command, socket, receiver, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Executes a command on the device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
+
         /// <summary>
         /// Creates a port forwarding between a local and a remote port.
         /// </summary>
