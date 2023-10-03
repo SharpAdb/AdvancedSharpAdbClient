@@ -1178,6 +1178,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Theory]
         [InlineData("21216 27761\r\n", true)]
         [InlineData(" 21216 27761\r\n", true)]
+        [InlineData("12836\r\n", true)]
         [InlineData(" \r\n", false)]
         [InlineData("\r\n", false)]
         [InlineData(" ", false)]
@@ -1235,6 +1236,68 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatus(DeviceData, string)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("com.google.android.gms", "21216 27761\r\n", AppStatus.Background)]
+        [InlineData("com.android.gallery3d", "\r\n", AppStatus.Stopped)]
+        public void GetAppStatusTest(string packageName, string response, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity",
+                "host:transport:169.254.109.177:5555",
+                $"shell:pidof {packageName}"
+            ];
+
+            byte[] activityData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            using MemoryStream activityStream = new(activityData);
+            byte[] pidData = Encoding.UTF8.GetBytes(response);
+            using MemoryStream pidStream = new(pidData);
+
+            AppStatus result = AppStatus.Foreground;
+            RunTest(
+                OkResponses(4),
+                NoResponseMessages,
+                requests,
+                [activityStream, pidStream],
+                () => result = TestClient.GetAppStatus(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatus(DeviceData, string)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", AppStatus.Foreground)]
+        [InlineData("com.android.settings", AppStatus.Foreground)]
+        public void GetAppStatusForegroundTest(string packageName, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            using MemoryStream shellStream = new(streamData);
+
+            AppStatus result = default;
+            RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => result = TestClient.GetAppStatus(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.FindElement(DeviceData, string, TimeSpan)"/> method.
         /// </summary>
         [Fact]
@@ -1280,16 +1343,16 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
-            List<Element> elements = null;
+            Element[] elements = null;
             RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => elements = TestClient.FindElements(Device).ToList());
+                () => elements = TestClient.FindElements(Device).ToArray());
 
-            int childCount = elements.Count;
-            elements.ForEach(x => childCount += x.GetChildCount());
+            int childCount = elements.Length;
+            Array.ForEach(elements, x => childCount += x.GetChildCount());
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Attributes["text"]);

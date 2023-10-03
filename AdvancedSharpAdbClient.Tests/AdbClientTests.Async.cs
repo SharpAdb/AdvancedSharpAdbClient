@@ -1126,6 +1126,68 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatusAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("com.google.android.gms", "21216 27761\r\n", AppStatus.Background)]
+        [InlineData("com.android.gallery3d", "\r\n", AppStatus.Stopped)]
+        public async void GetAppStatusAsyncTest(string packageName, string response, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity",
+                "host:transport:169.254.109.177:5555",
+                $"shell:pidof {packageName}"
+            ];
+
+            byte[] activityData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream activityStream = new(activityData);
+            byte[] pidData = Encoding.UTF8.GetBytes(response);
+            await using MemoryStream pidStream = new(pidData);
+
+            AppStatus result = AppStatus.Foreground;
+            await RunTestAsync(
+                OkResponses(4),
+                NoResponseMessages,
+                requests,
+                [activityStream, pidStream],
+                async () => result = await TestClient.GetAppStatusAsync(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatusAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", AppStatus.Foreground)]
+        [InlineData("com.android.settings", AppStatus.Foreground)]
+        public async void GetAppStatusAsyncForegroundTest(string packageName, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream shellStream = new(streamData);
+
+            AppStatus result = default;
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                async () => result = await TestClient.GetAppStatusAsync(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.FindElementAsync(DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]

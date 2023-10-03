@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Get or set default encoding
+        /// Get or set default encoding.
         /// </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -1120,9 +1120,9 @@ namespace AdvancedSharpAdbClient
         public void HomeBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_HOME");
 
         /// <summary>
-        /// Sets default encoding (default - UTF8)
+        /// Sets default encoding (default - UTF8).
         /// </summary>
-        /// <param name="encoding"></param>
+        /// <param name="encoding">The <see cref="System.Text.Encoding"/> to set.</param>
         public static void SetEncoding(Encoding encoding) => Encoding = encoding;
 
         /// <summary>

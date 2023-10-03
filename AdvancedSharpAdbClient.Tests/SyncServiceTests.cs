@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetListingTest()
         {
-            List<FileStatistics> value = null;
+            FileStatistics[] value = null;
 
             RunTest(
                 OkResponses(2),
@@ -65,10 +65,10 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    value = service.GetDirectoryListing("/storage").ToList();
+                    value = service.GetDirectoryListing("/storage").ToArray();
                 });
 
-            Assert.Equal(4, value.Count);
+            Assert.Equal(4, value.Length);
 
             DateTime time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
 
