@@ -15,6 +15,82 @@ namespace AdvancedSharpAdbClient
     public class Element
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="cords">The coordinates of the element to click.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes = null)
+        {
+            Client = client;
+            Device = device;
+            Cords = cords;
+            Attributes = attributes;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, Area area, Dictionary<string, string> attributes = null)
+        {
+            Client = client;
+            Device = device;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="node">The <see cref="XmlNode"/> of the element.</param>
+        /// <param name="children">The children of the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, XmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes = null)
+        {
+            Client = client;
+            Device = device;
+            Node = node;
+            Children = children;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
+        }
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Element"/> class.
+        /// </summary>
+        /// <param name="client">The current ADB client that manages the connection.</param>
+        /// <param name="device">The current device containing the element.</param>
+        /// <param name="node">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
+        /// <param name="children">The children of the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
+        /// <param name="attributes">Gets or sets element attributes.</param>
+        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes = null)
+        {
+            XmlDocument doc = new();
+            doc.LoadXml(node.GetXml());
+
+            Client = client;
+            Device = device;
+            Node = doc.FirstChild;
+            Children = children;
+            Area = area;
+            Attributes = attributes;
+            Cords = area.Center; // Average x1, y1, x2, y2
+        }
+#endif
+
+        /// <summary>
         /// Gets or sets the current ADB client that manages the connection.
         /// </summary>
         protected IAdbClient Client { get; set; }
@@ -55,82 +131,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <returns>The element at the specified index.</returns>
         public Element this[int index] => Children[index];
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Element"/> class.
-        /// </summary>
-        /// <param name="client">The current ADB client that manages the connection.</param>
-        /// <param name="device">The current device containing the element.</param>
-        /// <param name="cords">The coordinates of the element to click.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
-        {
-            Client = client;
-            Device = device;
-            Cords = cords;
-            Attributes = attributes;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Element"/> class.
-        /// </summary>
-        /// <param name="client">The current ADB client that manages the connection.</param>
-        /// <param name="device">The current device containing the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Area area, Dictionary<string, string> attributes)
-        {
-            Client = client;
-            Device = device;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Element"/> class.
-        /// </summary>
-        /// <param name="client">The current ADB client that manages the connection.</param>
-        /// <param name="device">The current device containing the element.</param>
-        /// <param name="node">The <see cref="XmlNode"/> of the element.</param>
-        /// <param name="children">The children of the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, XmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
-        {
-            Client = client;
-            Device = device;
-            Node = node;
-            Children = children;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
-        }
-
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Element"/> class.
-        /// </summary>
-        /// <param name="client">The current ADB client that manages the connection.</param>
-        /// <param name="device">The current device containing the element.</param>
-        /// <param name="node">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
-        /// <param name="children">The children of the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
-        {
-            XmlDocument doc = new();
-            doc.LoadXml(node.GetXml());
-
-            Client = client;
-            Device = device;
-            Node = doc.FirstChild;
-            Children = children;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
-        }
-#endif
 
         /// <summary>
         /// Creates a new <see cref='Element'/> with the specified <see cref="XmlNode"/>.

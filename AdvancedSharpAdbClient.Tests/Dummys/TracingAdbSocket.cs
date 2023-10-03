@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -50,7 +49,35 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                SyncDataReceived.Enqueue(data.Take(length).ToArray());
+                SyncDataReceived.Enqueue(data[..length]);
+            }
+
+            return read;
+        }
+
+        public override int Read(byte[] data, int offset, int length)
+        {
+            StackTrace trace = new();
+
+            int read = base.Read(data, offset, length);
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                SyncDataReceived.Enqueue(data.AsSpan(offset, length).ToArray());
+            }
+
+            return read;
+        }
+
+        public override int Read(Span<byte> data)
+        {
+            StackTrace trace = new();
+
+            int read = base.Read(data);
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                SyncDataReceived.Enqueue(data.ToArray());
             }
 
             return read;

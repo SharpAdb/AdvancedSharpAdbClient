@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Tests
         [InlineData("name")]
         public void ThrowIfNullTest(string paramName)
         {
-            foreach (object o in new[] { new object(), "", "argument" })
+            foreach (object o in new[] { new object(), string.Empty, "argument" })
             {
                 ExceptionExtensions.ThrowIfNull(o);
                 ExceptionExtensions.ThrowIfNull(o, nameof(paramName));

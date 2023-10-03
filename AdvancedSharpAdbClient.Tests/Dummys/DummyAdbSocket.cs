@@ -9,7 +9,7 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    internal class DummyAdbSocket : IAdbSocket, IDummyAdbSocket
+    internal class DummyAdbSocket : IDummyAdbSocket
     {
         /// <summary>
         /// Use this message to cause <see cref="ReadString"/> and <see cref="ReadStringAsync(CancellationToken)"/> to throw
@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Send(byte[] data, int offset, int length)
         {
-            SyncDataSent.Enqueue(data[offset..(offset + length)]);
+            SyncDataSent.Enqueue(data.AsSpan(offset, length).ToArray());
         }
 
         public void Send(ReadOnlySpan<byte> data)
@@ -72,27 +72,24 @@ namespace AdvancedSharpAdbClient.Tests
 
         public int Read(byte[] data, int length)
         {
-            byte[] actual = SyncDataReceived.Dequeue();
+            Span<byte> actual = SyncDataReceived.Dequeue();
             Assert.True(actual.Length >= length);
-            Buffer.BlockCopy(actual, 0, data, 0, length);
-            return Math.Min(actual.Length, length);
+            Assert.True(actual[..length].TryCopyTo(data));
+            return length;
         }
 
         public int Read(byte[] data, int offset, int length)
         {
-            byte[] actual = SyncDataReceived.Dequeue();
+            Span<byte> actual = SyncDataReceived.Dequeue();
             Assert.True(actual.Length >= length);
-            Buffer.BlockCopy(actual, 0, data, offset, length);
-            return Math.Min(actual.Length, length);
+            Assert.True(actual[..length].TryCopyTo(data.AsSpan(offset)));
+            return length;
         }
 
         public int Read(Span<byte> data)
         {
-            byte[] actual = SyncDataReceived.Dequeue();
-            for (int i = 0; i < data.Length && i < actual.Length; i++)
-            {
-                data[i] = actual[i];
-            }
+            Span<byte> actual = SyncDataReceived.Dequeue();
+            Assert.True(actual[..Math.Min(actual.Length, data.Length)].TryCopyTo(data));
             return actual.Length;
         }
 

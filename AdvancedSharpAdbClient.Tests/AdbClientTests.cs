@@ -10,6 +10,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -267,14 +268,8 @@ namespace AdvancedSharpAdbClient.Tests
                 "reverse:killforward:localabstract:test"
             ];
 
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK,
-            ];
-
             RunTest(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.RemoveReverseForward(Device, "localabstract:test"));
@@ -307,14 +302,8 @@ namespace AdvancedSharpAdbClient.Tests
                 "reverse:killforward-all"
             ];
 
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK,
-            ];
-
             RunTest(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.RemoveAllReverseForwards(Device));
@@ -351,12 +340,6 @@ namespace AdvancedSharpAdbClient.Tests
         {
             string[] responseMessages = ["(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"];
 
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK,
-            ];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -365,7 +348,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             ForwardData[] forwards = null;
             RunTest(
-                responses,
+                OkResponses(2),
                 responseMessages,
                 requests,
                 () => forwards = TestClient.ListReverseForward(Device).ToArray());
@@ -383,18 +366,6 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ExecuteRemoteCommandTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK
-            ];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -407,11 +378,11 @@ namespace AdvancedSharpAdbClient.Tests
             ConsoleOutputReceiver receiver = new();
 
             RunTest(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver));
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver));
 
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
@@ -422,18 +393,6 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK
-            ];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -444,35 +403,24 @@ namespace AdvancedSharpAdbClient.Tests
 
             _ = Assert.Throws<ShellCommandUnresponsiveException>(() =>
             RunTest(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", device, receiver)));
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver)));
         }
 
         [Fact]
         public void CreateRefreshableFramebufferTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-            Framebuffer framebuffer = TestClient.CreateRefreshableFramebuffer(device);
+            Framebuffer framebuffer = TestClient.CreateRefreshableFramebuffer(Device);
             Assert.NotNull(framebuffer);
-            Assert.Equal(device, framebuffer.Device);
+            Assert.Equal(Device, framebuffer.Device);
         }
 
         [Fact]
         public void GetFrameBufferTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
             DummyAdbSocket socket = new();
 
             socket.Responses.Enqueue(AdbResponse.OK);
@@ -489,12 +437,12 @@ namespace AdvancedSharpAdbClient.Tests
             using (FactoriesLocker locker = FactoriesLocker.Wait())
             {
                 Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer = TestClient.GetFrameBuffer(device);
+                framebuffer = TestClient.GetFrameBuffer(Device);
                 Factories.Reset();
             }
 
             Assert.NotNull(framebuffer);
-            Assert.Equal(device, framebuffer.Device);
+            Assert.Equal(Device, framebuffer.Device);
             Assert.Equal(16, framebuffer.Data.Length);
 
             FramebufferHeader header = framebuffer.Header;
@@ -536,18 +484,6 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RunLogServiceTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses =
-            [
-                AdbResponse.OK,
-                AdbResponse.OK
-            ];
-
             string[] requests =
             [
                 "host:transport:169.254.109.177:5555",
@@ -562,11 +498,11 @@ namespace AdvancedSharpAdbClient.Tests
             Action<LogEntry> sink = logs.Add;
 
             RunTest(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.RunLogService(device, sink, LogId.System));
+                () => TestClient.RunLogService(Device, sink, LogId.System));
 
             Assert.Equal(3, logs.Count);
         }
@@ -584,7 +520,7 @@ namespace AdvancedSharpAdbClient.Tests
             ];
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.Reboot(Device));
@@ -744,15 +680,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void RootTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "root:"
             ];
 
@@ -761,14 +691,14 @@ namespace AdvancedSharpAdbClient.Tests
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                Array.Empty<(SyncCommand, string)>(),
-                Array.Empty<SyncCommand>(),
+                NoSyncRequests,
+                NoSyncResponses,
                 [expectedData],
-                Array.Empty<byte[]>(),
-                () => TestClient.Root(device)));
+                null,
+                () => TestClient.Root(Device)));
         }
 
         /// <summary>
@@ -777,15 +707,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void UnrootTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "unroot:"
             ];
 
@@ -794,14 +718,14 @@ namespace AdvancedSharpAdbClient.Tests
 
             _ = Assert.Throws<AdbException>(() =>
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                Array.Empty<(SyncCommand, string)>(),
-                Array.Empty<SyncCommand>(),
+                NoSyncRequests,
+                NoSyncResponses,
                 [expectedData],
-                Array.Empty<byte[]>(),
-                () => TestClient.Unroot(device)));
+                null,
+                () => TestClient.Unroot(Device)));
         }
 
         /// <summary>
@@ -810,15 +734,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void InstallTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install' -S 205774"
             ];
 
@@ -849,14 +767,14 @@ namespace AdvancedSharpAdbClient.Tests
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
-                    [AdbResponse.OK, AdbResponse.OK],
+                    OkResponses(2),
                     NoResponseMessages,
                     requests,
-                    Array.Empty<(SyncCommand, string)>(),
-                    Array.Empty<SyncCommand>(),
+                    NoSyncRequests,
+                    NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.Install(device, stream));
+                    () => TestClient.Install(Device, stream));
             }
         }
 
@@ -866,15 +784,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void InstallCreateTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-create' -p com.google.android.gms"
             ];
 
@@ -883,11 +795,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             string session = string.Empty;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => session = TestClient.InstallCreate(device, "com.google.android.gms"));
+                () => session = TestClient.InstallCreate(Device, "com.google.android.gms"));
 
             Assert.Equal("936013062", session);
         }
@@ -898,15 +810,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void InstallWriteTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
             ];
 
@@ -937,14 +843,14 @@ namespace AdvancedSharpAdbClient.Tests
             using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 RunTest(
-                    [AdbResponse.OK, AdbResponse.OK],
+                    OkResponses(2),
                     NoResponseMessages,
                     requests,
-                    Array.Empty<(SyncCommand, string)>(),
-                    Array.Empty<SyncCommand>(),
+                    NoSyncRequests,
+                    NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.InstallWrite(device, stream, "base", "936013062"));
+                    () => TestClient.InstallWrite(Device, stream, "base", "936013062"));
             }
         }
 
@@ -954,15 +860,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void InstallCommitTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-commit' 936013062"
             ];
 
@@ -970,11 +870,11 @@ namespace AdvancedSharpAdbClient.Tests
             using MemoryStream shellStream = new(streamData);
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.InstallCommit(device, "936013062"));
+                () => TestClient.InstallCommit(Device, "936013062"));
         }
 
         /// <summary>
@@ -983,21 +883,15 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetFeatureSetTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = ["host-serial:009d1cd696d5194a:features"];
+            string[] requests = ["host-serial:169.254.109.177:5555:features"];
             string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
             IEnumerable<string> features = null;
             RunTest(
-                [AdbResponse.OK],
+                OkResponse,
                 responses,
                 requests,
-                () => features = TestClient.GetFeatureSet(device));
+                () => features = TestClient.GetFeatureSet(Device));
 
             Assert.Equal(12, features.Count());
             Assert.Equal("sendrecv_v2_brotli", features.First());
@@ -1010,15 +904,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DumpScreenStringTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1029,11 +917,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             string xml = string.Empty;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => xml = TestClient.DumpScreenString(device));
+                () => xml = TestClient.DumpScreenString(Device));
 
             Assert.Equal(cleanDump, xml);
         }
@@ -1044,15 +932,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DumpScreenStringMIUITest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1063,11 +945,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             string miuiXml = string.Empty;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 miuiStream,
-                () => miuiXml = TestClient.DumpScreenString(device));
+                () => miuiXml = TestClient.DumpScreenString(Device));
 
             Assert.Equal(cleanMIUIDump, miuiXml);
         }
@@ -1078,15 +960,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DumpScreenStringEmptyTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1095,11 +971,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             string emptyXml = string.Empty;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 emptyStream,
-                () => emptyXml = TestClient.DumpScreenString(device));
+                () => emptyXml = TestClient.DumpScreenString(Device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -1110,15 +986,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DumpScreenStringErrorTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1128,11 +998,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.Throws<XmlException>(() =>
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 errorStream,
-                () => TestClient.DumpScreenString(device)));
+                () => TestClient.DumpScreenString(Device)));
         }
 
         /// <summary>
@@ -1141,15 +1011,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void DumpScreenTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1159,11 +1023,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             XmlDocument xml = null;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => xml = TestClient.DumpScreen(device));
+                () => xml = TestClient.DumpScreen(Device));
 
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
@@ -1178,15 +1042,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void ClickTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input tap 100 100"
             ];
 
@@ -1216,11 +1074,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             JavaException exception = Assert.Throws<JavaException>(() =>
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.Click(device, 100, 100)));
+                () => TestClient.Click(Device, 100, 100)));
 
             Assert.Equal("SecurityException", exception.JavaName);
             Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
@@ -1253,15 +1111,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void ClickCordsTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input tap 100 100"
             ];
 
@@ -1270,11 +1122,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             _ = Assert.Throws<ElementNotFoundException>(() =>
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.Click(device, new Cords(100, 100))));
+                () => TestClient.Click(Device, new Cords(100, 100))));
         }
 
         /// <summary>
@@ -1283,26 +1135,42 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void SwipeTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input swipe 100 200 300 400 500"
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.Swipe(device, 100, 200, 300, 400, 500));
+                () => TestClient.Swipe(Device, 100, 200, 300, 400, 500));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Swipe(DeviceData, Element, Element, long)"/> method.
+        /// </summary>
+        [Fact]
+        public void SwipeElementTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input swipe 100 200 300 400 500"
+            ];
+
+            using MemoryStream shellStream = new();
+
+            RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                shellStream,
+                () => TestClient.Swipe(Device, new Element(TestClient, Device, new Area(0, 0, 200, 400)), new Element(TestClient, Device, new Area(0, 0, 600, 800)), 500));
         }
 
         /// <summary>
@@ -1317,15 +1185,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [InlineData("", false)]
         public void IsAppRunningTest(string response, bool expected)
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:pidof com.google.android.gms"
             ];
 
@@ -1334,11 +1196,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             bool result = !expected;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => result = TestClient.IsAppRunning(device, "com.google.android.gms"));
+                () => result = TestClient.IsAppRunning(Device, "com.google.android.gms"));
 
             Assert.Equal(expected, result);
         }
@@ -1352,15 +1214,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [InlineData("com.google.android.gms", false)]
         public void IsAppInForegroundTest(string packageName, bool expected)
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:dumpsys activity activities | grep mResumedActivity"
             ];
 
@@ -1370,11 +1226,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             bool result = !expected;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => result = TestClient.IsAppInForeground(device, packageName));
+                () => result = TestClient.IsAppInForeground(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1385,15 +1241,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void FindElementTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1403,11 +1253,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             Element element = null;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => element = TestClient.FindElement(device));
+                () => element = TestClient.FindElement(Device));
 
             Assert.Equal(144, element.GetChildCount());
             element = element[0][0][0][0][0][0][0][0][2][1][0][0];
@@ -1421,15 +1271,9 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void FindElementsTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
             ];
 
@@ -1437,21 +1281,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
+            List<Element> elements = null;
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () =>
-                {
-                    List<Element> elements = TestClient.FindElements(device).ToList();
-                    int childCount = elements.Count;
-                    elements.ForEach(x => childCount += x.GetChildCount());
-                    Assert.Equal(145, childCount);
-                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
-                });
+                () => elements = TestClient.FindElements(Device).ToList());
+
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
+            Assert.Equal(145, childCount);
+            Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
         }
 
         /// <summary>
@@ -1460,26 +1303,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void SendKeyEventTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input keyevent KEYCODE_MOVE_END"
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.SendKeyEvent(device, "KEYCODE_MOVE_END"));
+                () => TestClient.SendKeyEvent(Device, "KEYCODE_MOVE_END"));
         }
 
         /// <summary>
@@ -1488,26 +1325,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void SendTextTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input text Hello, World",
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.SendText(device, "Hello, World"));
+                () => TestClient.SendText(Device, "Hello, World"));
         }
 
         /// <summary>
@@ -1516,26 +1347,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void StartAppTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:monkey -p com.android.settings 1",
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.StartApp(device, "com.android.settings"));
+                () => TestClient.StartApp(Device, "com.android.settings"));
         }
 
         /// <summary>
@@ -1544,26 +1369,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void StopAppTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:am force-stop com.android.settings",
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.StopApp(device, "com.android.settings"));
+                () => TestClient.StopApp(Device, "com.android.settings"));
         }
 
         /// <summary>
@@ -1572,26 +1391,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void BackBtnTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input keyevent KEYCODE_BACK"
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.BackBtn(device));
+                () => TestClient.BackBtn(Device));
         }
 
         /// <summary>
@@ -1600,26 +1413,20 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public void HomeBtnTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
             string[] requests =
             [
-                "host:transport:009d1cd696d5194a",
+                "host:transport:169.254.109.177:5555",
                 "shell:input keyevent KEYCODE_HOME"
             ];
 
             using MemoryStream shellStream = new();
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 shellStream,
-                () => TestClient.HomeBtn(device));
+                () => TestClient.HomeBtn(Device));
         }
 
         private void RunConnectTest(Action test, string connectString)
@@ -1655,7 +1462,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             ];
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK, AdbResponse.OK],
+                OkResponses(3),
                 [null],
                 requests,
                 () => test(Device));
@@ -1666,7 +1473,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             string[] requests = [$"host-serial:169.254.109.177:5555:forward:{forwardString}"];
 
             RunTest(
-                [AdbResponse.OK, AdbResponse.OK],
+                OkResponses(2),
                 [null],
                 requests,
                 () => test(Device));

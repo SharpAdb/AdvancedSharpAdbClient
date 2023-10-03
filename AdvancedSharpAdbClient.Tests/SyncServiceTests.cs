@@ -22,25 +22,19 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void StatTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
             FileStatistics value = null;
 
             RunTest(
                 OkResponses(2),
                 NoResponseMessages,
-                Requests("host:transport:169.254.109.177:5555", "sync:"),
-                SyncRequests(SyncCommand.STAT, "/fstab.donatello"),
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [(SyncCommand.STAT, "/fstab.donatello")],
                 [SyncCommand.STAT],
                 [[160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0]],
                 null,
                 () =>
                 {
-                    using SyncService service = new(Socket, device);
+                    using SyncService service = new(Socket, Device);
                     value = service.Stat("/fstab.donatello");
                 });
 
@@ -53,19 +47,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetListingTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
             List<FileStatistics> value = null;
 
             RunTest(
                 OkResponses(2),
-                ResponseMessages(".", "..", "sdcard0", "emulated"),
-                Requests("host:transport:169.254.109.177:5555", "sync:"),
-                SyncRequests(SyncCommand.LIST, "/storage"),
+                [".", "..", "sdcard0", "emulated"],
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [(SyncCommand.LIST, "/storage")],
                 [SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE],
                 [
                     [233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
@@ -76,7 +64,7 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using SyncService service = new(Socket, device);
+                    using SyncService service = new(Socket, Device);
                     value = service.GetDirectoryListing("/storage").ToList();
                 });
 
@@ -112,21 +100,18 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void PullTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
             using MemoryStream stream = new();
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             RunTest(
                 OkResponses(2),
-                ResponseMessages(),
-                Requests("host:transport:169.254.109.177:5555", "sync:"),
-                SyncRequests(SyncCommand.STAT, "/fstab.donatello").Union(SyncRequests(SyncCommand.RECV, "/fstab.donatello")),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [
+                    (SyncCommand.STAT, "/fstab.donatello"),
+                    (SyncCommand.RECV, "/fstab.donatello")
+                ],
                 [SyncCommand.STAT, SyncCommand.DATA, SyncCommand.DONE],
                 [
                     [160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0],
@@ -136,7 +121,7 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 () =>
                 {
-                    using SyncService service = new(Socket, device);
+                    using SyncService service = new(Socket, Device);
                     service.Pull("/fstab.donatello", stream);
                 });
 
@@ -147,15 +132,9 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void PushTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
             FileStream stream = File.OpenRead("Assets/fstab.bin");
             byte[] content = File.ReadAllBytes("Assets/fstab.bin");
-            List<byte> contentMessage =
+            byte[] contentMessage =
             [
                 .. SyncCommandConverter.GetBytes(SyncCommand.DATA),
                 .. BitConverter.GetBytes(content.Length),
@@ -164,17 +143,18 @@ namespace AdvancedSharpAdbClient.Tests
 
             RunTest(
                 OkResponses(2),
-                ResponseMessages(),
-                Requests("host:transport:169.254.109.177:5555", "sync:"),
-                SyncRequests(
-                    SyncCommand.SEND, "/sdcard/test,644",
-                    SyncCommand.DONE, "1446505200"),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [
+                    (SyncCommand.SEND, "/sdcard/test,644"),
+                    (SyncCommand.DONE, "1446505200")
+                ],
                 [SyncCommand.OKAY],
                 null,
-                [[.. contentMessage]],
+                [contentMessage],
                 () =>
                 {
-                    using SyncService service = new(Socket, device);
+                    using SyncService service = new(Socket, Device);
                     service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
                 });
         }
