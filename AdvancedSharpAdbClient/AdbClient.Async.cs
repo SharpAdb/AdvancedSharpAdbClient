@@ -1010,7 +1010,7 @@ namespace AdvancedSharpAdbClient
         public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount))).ConfigureAwait(false);
+            await SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount))).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

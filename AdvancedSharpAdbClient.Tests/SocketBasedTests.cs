@@ -114,15 +114,15 @@ namespace AdvancedSharpAdbClient
         /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Action test) =>
-            RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
+            RunTest(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
 
         /// <summary>
         /// <para>
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
@@ -203,15 +203,13 @@ namespace AdvancedSharpAdbClient
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Action test)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!IntegrationTest)
             {
-                Socket.ShellStream = shellStream;
-
                 foreach (AdbResponse response in responses)
                 {
                     Socket.Responses.Enqueue(response);
@@ -237,6 +235,14 @@ namespace AdvancedSharpAdbClient
                         Socket.SyncDataReceived.Enqueue(syncDatum);
                     }
                 }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
+                    }
+                }
             }
 
             Exception exception = null;
@@ -260,6 +266,7 @@ namespace AdvancedSharpAdbClient
                 Assert.Empty(Socket.Responses);
                 Assert.Empty(Socket.SyncResponses);
                 Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
                 Assert.Equal(requests.ToArray(), Socket.Requests);
@@ -326,6 +333,15 @@ namespace AdvancedSharpAdbClient
                 {
                     Assert.Empty(Socket.SyncDataSent);
                 }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
+                }
             }
 
             if (exception != null)
@@ -383,16 +399,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Func<Task> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStream, test);
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
 
         /// <summary>
         /// <para>
@@ -464,7 +480,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected async Task RunTestAsync(
@@ -475,15 +491,13 @@ namespace AdvancedSharpAdbClient
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Func<Task> test)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!IntegrationTest)
             {
-                Socket.ShellStream = shellStream;
-
                 foreach (AdbResponse response in responses)
                 {
                     Socket.Responses.Enqueue(response);
@@ -507,6 +521,14 @@ namespace AdvancedSharpAdbClient
                     foreach (byte[] syncDatum in syncDataReceived)
                     {
                         Socket.SyncDataReceived.Enqueue(syncDatum);
+                    }
+                }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
                     }
                 }
             }
@@ -536,6 +558,7 @@ namespace AdvancedSharpAdbClient
                 Assert.Empty(Socket.Responses);
                 Assert.Empty(Socket.SyncResponses);
                 Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
                 Assert.Equal(requests.ToArray(), Socket.Requests);
@@ -601,6 +624,15 @@ namespace AdvancedSharpAdbClient
                 else
                 {
                     Assert.Empty(Socket.SyncDataSent);
+                }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
                 }
             }
 

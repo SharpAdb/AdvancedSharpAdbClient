@@ -274,7 +274,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", Device, receiver));
 
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
@@ -392,7 +392,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.RunLogServiceAsync(Device, sink, CancellationToken.None, LogId.System));
 
             Assert.Equal(3, logs.Count);
@@ -689,7 +689,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => session = await TestClient.InstallCreateAsync(Device, "com.google.android.gms"));
 
             Assert.Equal("936013062", session);
@@ -764,7 +764,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.InstallCommitAsync(Device, "936013062"));
         }
 
@@ -811,7 +811,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => xml = await TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanDump, xml);
@@ -839,7 +839,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                miuiStream,
+                [miuiStream],
                 async () => miuiXml = await TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanMIUIDump, miuiXml);
@@ -864,7 +864,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                emptyStream,
+                [emptyStream],
                 async () => emptyXml = await TestClient.DumpScreenStringAsync(Device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
@@ -891,7 +891,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                errorStream,
+                [errorStream],
                 () => TestClient.DumpScreenStringAsync(Device)));
         }
 
@@ -916,7 +916,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => xml = await TestClient.DumpScreenAsync(Device));
 
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
@@ -967,7 +967,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.ClickAsync(Device, 100, 100)));
 
             Assert.Equal("SecurityException", exception.JavaName);
@@ -1015,7 +1015,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.ClickAsync(Device, new Cords(100, 100))));
         }
 
@@ -1037,7 +1037,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.SwipeAsync(Device, 100, 200, 300, 400, 500));
         }
 
@@ -1059,7 +1059,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.SwipeAsync(Device, new Element(TestClient, Device, new Area(0, 0, 200, 400)), new Element(TestClient, Device, new Area(0, 0, 600, 800)), 500));
         }
 
@@ -1089,7 +1089,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => result = await TestClient.IsAppRunningAsync(Device, "com.google.android.gms"));
 
             Assert.Equal(expected, result);
@@ -1119,7 +1119,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => result = await TestClient.IsAppInForegroundAsync(Device, packageName));
 
             Assert.Equal(expected, result);
@@ -1146,7 +1146,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => element = await TestClient.FindElementAsync(Device));
 
             Assert.Equal(144, element.GetChildCount());
@@ -1176,7 +1176,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () => elements = await TestClient.FindElementsAsync(Device));
 
             int childCount = elements.Count;
@@ -1208,7 +1208,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 async () =>
                 {
                     elements = [];
@@ -1244,7 +1244,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.SendKeyEventAsync(Device, "KEYCODE_MOVE_END"));
         }
 
@@ -1266,8 +1266,33 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.SendTextAsync(Device, "Hello, World"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClearInputAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_MOVE_END",
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"
+            ];
+
+            await using MemoryStream firstShellStream = new();
+            await using MemoryStream secondShellStream = new();
+
+            await RunTestAsync(
+                OkResponses(4),
+                NoResponseMessages,
+                requests,
+                [firstShellStream, secondShellStream],
+                () => TestClient.ClearInputAsync(Device, 3));
         }
 
         /// <summary>
@@ -1282,13 +1307,10 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 "shell:monkey -p com.android.settings 1",
             ];
 
-            await using MemoryStream shellStream = new();
-
             await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
                 () => TestClient.StartAppAsync(Device, "com.android.settings"));
         }
 
@@ -1304,13 +1326,10 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 "shell:am force-stop com.android.settings",
             ];
 
-            await using MemoryStream shellStream = new();
-
             await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
                 () => TestClient.StopAppAsync(Device, "com.android.settings"));
         }
 
@@ -1332,7 +1351,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.BackBtnAsync(Device));
         }
 
@@ -1354,7 +1373,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
                 () => TestClient.HomeBtnAsync(Device));
         }
 

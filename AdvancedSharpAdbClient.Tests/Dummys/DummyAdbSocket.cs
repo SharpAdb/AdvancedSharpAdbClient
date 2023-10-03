@@ -19,8 +19,6 @@ namespace AdvancedSharpAdbClient.Tests
 
         public DummyAdbSocket() => IsConnected = true;
 
-        public Stream ShellStream { get; set; }
-
         public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
 
         public Queue<SyncCommand> SyncResponses { get; } = new Queue<SyncCommand>();
@@ -34,6 +32,8 @@ namespace AdvancedSharpAdbClient.Tests
         public List<string> Requests { get; } = new List<string>();
 
         public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
+
+        public Queue<Stream> ShellStreams { get; } = new Queue<Stream>();
 
         public bool IsConnected { get; set; }
 
@@ -106,9 +106,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Stream GetShellStream()
         {
-            if (ShellStream != null)
+            if (ShellStreams.Dequeue() is Stream actual)
             {
-                return ShellStream;
+                return actual;
             }
             else
             {

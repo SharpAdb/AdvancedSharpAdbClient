@@ -11,8 +11,6 @@ namespace AdvancedSharpAdbClient.Tests
 {
     internal class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
     {
-        public Stream ShellStream { get; set; }
-
         public bool DoDispose { get; set; }
 
         public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
@@ -28,6 +26,8 @@ namespace AdvancedSharpAdbClient.Tests
         public List<string> Requests { get; } = new List<string>();
 
         public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
+
+        public Queue<Stream> ShellStreams { get; } = new Queue<Stream>();
 
         public bool DidReconnect { get; private set; }
 
@@ -101,6 +101,20 @@ namespace AdvancedSharpAdbClient.Tests
             Responses.Enqueue(response);
 
             return exception != null ? throw exception : response;
+        }
+
+        public override Stream GetShellStream()
+        {
+            StackTrace trace = new();
+
+            Stream stream = base.GetShellStream();
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                ShellStreams.Enqueue(stream);
+            }
+
+            return stream;
         }
 
         public override string ReadString()
