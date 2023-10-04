@@ -158,7 +158,7 @@ namespace AdvancedSharpAdbClient
                     cancellationTokenRegistration.Dispose();
                 }
             }, taskCompletionSource);
-            
+
             return taskCompletionSource.Task;
         }
 

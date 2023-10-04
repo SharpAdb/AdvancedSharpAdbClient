@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -251,6 +252,31 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("(reverse)", forwards[0].SerialNumber);
             Assert.Equal("localabstract:scrcpy", forwards[0].Local);
             Assert.Equal("tcp:100", forwards[0].Remote);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ExecuteServerCommandAsync(IAdbClient, string, string, IShellOutputReceiver, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ExecuteServerCommandAsyncTest()
+        {
+            string[] requests = ["host:version"];
+
+            byte[] streamData = Encoding.ASCII.GetBytes("0020");
+            await using MemoryStream shellStream = new(streamData);
+
+            ConsoleOutputReceiver receiver = new();
+
+            await RunTestAsync(
+                OkResponse,
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.ExecuteServerCommandAsync("host", "version", receiver));
+
+            string version = receiver.ToString();
+            Assert.Equal("0020\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
+            Assert.Equal(32, int.Parse(version, NumberStyles.HexNumber));
         }
 
         /// <summary>
@@ -1233,16 +1259,16 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            List<Element> elements = null;
+            Element[] elements = null;
             await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => elements = await TestClient.FindElementsAsync(Device));
+                async () => elements = (await TestClient.FindElementsAsync(Device)).ToArray());
 
-            int childCount = elements.Count;
-            elements.ForEach(x => childCount += x.GetChildCount());
+            int childCount = elements.Length;
+            Array.ForEach(elements, x => childCount += x.GetChildCount());
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Attributes["text"]);

@@ -109,7 +109,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
         int Send(byte[] buffer, SocketFlags socketFlags);
-        
+
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
         /// using the specified SocketFlags.

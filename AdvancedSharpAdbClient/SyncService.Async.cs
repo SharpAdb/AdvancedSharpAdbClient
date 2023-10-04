@@ -245,7 +245,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
+        public virtual async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             List<FileStatistics> value = [];
 

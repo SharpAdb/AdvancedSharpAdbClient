@@ -26,26 +26,26 @@ namespace AdvancedSharpAdbClient
         // Number of days in a non-leap year
         private const int DaysPerYear = 365;
         // Number of days in 4 years
-        private const int DaysPer4Years = DaysPerYear * 4 + 1;       // 1461
+        private const int DaysPer4Years = (DaysPerYear * 4) + 1;       // 1461
         // Number of days in 100 years
-        private const int DaysPer100Years = DaysPer4Years * 25 - 1;  // 36524
+        private const int DaysPer100Years = (DaysPer4Years * 25) - 1;  // 36524
         // Number of days in 400 years
-        private const int DaysPer400Years = DaysPer100Years * 4 + 1; // 146097
+        private const int DaysPer400Years = (DaysPer100Years * 4) + 1; // 146097
 
         // Number of days from 1/1/0001 to 12/31/1969
-        internal const int DaysTo1970 = DaysPer400Years * 4 + DaysPer100Years * 3 + DaysPer4Years * 17 + DaysPerYear; // 719,162
+        internal const int DaysTo1970 = (DaysPer400Years * 4) + (DaysPer100Years * 3) + (DaysPer4Years * 17) + DaysPerYear; // 719,162
         // Number of days from 1/1/0001 to 12/31/9999
-        private const int DaysTo10000 = DaysPer400Years * 25 - 366;  // 3652059
+        private const int DaysTo10000 = (DaysPer400Years * 25) - 366;  // 3652059
 
         internal const long MinTicks = 0;
-        internal const long MaxTicks = DaysTo10000 * TicksPerDay - 1;
+        internal const long MaxTicks = (DaysTo10000 * TicksPerDay) - 1;
 
         internal const long UnixEpochTicks = DaysTo1970 * TicksPerDay;
 
         private const long UnixEpochSeconds = UnixEpochTicks / TimeSpan.TicksPerSecond; // 62,135,596,800
 
-        internal const long UnixMinSeconds = MinTicks / TimeSpan.TicksPerSecond - UnixEpochSeconds;
-        internal const long UnixMaxSeconds = MaxTicks / TimeSpan.TicksPerSecond - UnixEpochSeconds;
+        internal const long UnixMinSeconds = (MinTicks / TimeSpan.TicksPerSecond) - UnixEpochSeconds;
+        internal const long UnixMaxSeconds = (MaxTicks / TimeSpan.TicksPerSecond) - UnixEpochSeconds;
 #endif
 
         /// <summary>
@@ -72,13 +72,13 @@ namespace AdvancedSharpAdbClient
         public static DateTimeOffset FromUnixTimeSeconds(long seconds)
         {
 #if NETFRAMEWORK && !NET46_OR_GREATER
-            if (seconds < UnixMinSeconds || seconds > UnixMaxSeconds)
+            if (seconds is < UnixMinSeconds or > UnixMaxSeconds)
             {
                 throw new ArgumentOutOfRangeException(nameof(seconds),
                     string.Format("Valid values are between {0} and {1}, inclusive.", UnixMinSeconds, UnixMaxSeconds));
             }
 
-            long ticks = seconds * TimeSpan.TicksPerSecond + UnixEpochTicks;
+            long ticks = (seconds * TimeSpan.TicksPerSecond) + UnixEpochTicks;
             return new DateTimeOffset(ticks, TimeSpan.Zero);
 #else
             return DateTimeOffset.FromUnixTimeSeconds(seconds);

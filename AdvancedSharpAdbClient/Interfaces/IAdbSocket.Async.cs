@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         Task SendAsync(byte[] data, CancellationToken cancellationToken);
-        
+
         /// <summary>
         /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
         /// the connection is in sync mode.

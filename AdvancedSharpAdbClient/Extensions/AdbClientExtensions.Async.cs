@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken=default)=>
+        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>

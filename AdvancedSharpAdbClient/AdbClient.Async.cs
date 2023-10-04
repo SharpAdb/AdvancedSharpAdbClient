@@ -171,7 +171,7 @@ namespace AdvancedSharpAdbClient
 
             return parts.Select(x => new ForwardData(x));
         }
-        
+
         /// <inheritdoc/>
         public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
@@ -885,7 +885,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<List<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -897,22 +897,21 @@ namespace AdvancedSharpAdbClient
                         XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                         if (xmlNodes != null)
                         {
-                            List<Element> elements = new(xmlNodes.Count);
-                            for (int i = 0; i < xmlNodes.Count; i++)
+                            IEnumerable<Element> FindElements()
                             {
-                                Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
-                                if (element != null)
+                                for (int i = 0; i < xmlNodes.Count; i++)
                                 {
-                                    elements.Add(element);
+                                    Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                    if (element != null)
+                                    {
+                                        yield return element;
+                                    }
                                 }
                             }
-                            return elements.Count == 0 ? null : elements;
+                            return FindElements();
                         }
                     }
-                    if (cancellationToken == default)
-                    {
-                        break;
-                    }
+                    if (cancellationToken == default) { break; }
                 }
             }
             catch (Exception e)
@@ -934,26 +933,37 @@ namespace AdvancedSharpAdbClient
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                XmlDocument doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                XmlDocument doc = null;
+
+                try
+                {
+                    doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    // If a cancellation was requested, this main loop is interrupted with an exception
+                    // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                    // In all other cases, something went wrong, and we want to report it to the user.
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        throw new ShellCommandUnresponsiveException(e);
+                    }
+                }
+
                 if (doc != null)
                 {
                     XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
-                        bool isBreak = false;
                         for (int i = 0; i < xmlNodes.Count; i++)
                         {
                             Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
                             if (element != null)
                             {
-                                isBreak = true;
                                 yield return element;
                             }
                         }
-                        if (isBreak)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
                 if (cancellationToken == default)

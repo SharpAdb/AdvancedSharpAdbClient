@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient
                     cancellationTokenRegistration.Dispose();
                 }
             }, taskCompletionSource);
-            
+
             return taskCompletionSource.Task;
 #else
             return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
@@ -126,7 +126,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The number of bytes received.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
 #if HAS_BUFFERS
-            => socket.SendAsync(buffer.AsMemory( 0, size), socketFlags, cancellationToken).AsTask();
+            => socket.SendAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
 #else
             => socket.SendAsync(buffer, 0, size, socketFlags, cancellationToken);
 #endif

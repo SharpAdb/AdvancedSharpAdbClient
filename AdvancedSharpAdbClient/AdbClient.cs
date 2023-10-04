@@ -1019,26 +1019,18 @@ namespace AdvancedSharpAdbClient
                     XmlNodeList xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
-                        bool isBreak = false;
                         for (int i = 0; i < xmlNodes.Count; i++)
                         {
                             Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
                             if (element != null)
                             {
-                                isBreak = true;
                                 yield return element;
                             }
                         }
-                        if (isBreak)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-                if (timeout == TimeSpan.Zero)
-                {
-                    break;
-                }
+                if (timeout == TimeSpan.Zero) { break; }
             }
         }
 

@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual int Send(byte[] buffer, SocketFlags socketFlags) =>
             socket.Send(buffer, socketFlags);
-            
+
         /// <inheritdoc/>
         public virtual int Receive(byte[] buffer, SocketFlags socketFlags) =>
             socket.Receive(buffer, socketFlags);

@@ -542,7 +542,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task"/> which return the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
-        Task<List<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
+        Task<IEnumerable<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <summary>

@@ -150,7 +150,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default) => throw new NotImplementedException();
 
-        public Task<List<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<IEnumerable<Element>> FindElementsAsync(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         public int GetAdbVersion() => throw new NotImplementedException();
 
