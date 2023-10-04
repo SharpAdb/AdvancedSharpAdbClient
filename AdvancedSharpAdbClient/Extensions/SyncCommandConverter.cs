@@ -3,8 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AdvancedSharpAdbClient
 {
@@ -14,34 +12,26 @@ namespace AdvancedSharpAdbClient
     public static class SyncCommandConverter
     {
         /// <summary>
-        /// Maps the <see cref="SyncCommand"/> values to their string representations.
-        /// </summary>
-        private static readonly Dictionary<SyncCommand, string> Values = new(9)
-        {
-            { SyncCommand.DATA, "DATA" },
-            { SyncCommand.DENT, "DENT" },
-            { SyncCommand.DONE, "DONE" },
-            { SyncCommand.FAIL, "FAIL" },
-            { SyncCommand.LIST, "LIST" },
-            { SyncCommand.OKAY, "OKAY" },
-            { SyncCommand.RECV, "RECV" },
-            { SyncCommand.SEND, "SEND" },
-            { SyncCommand.STAT, "STAT" }
-        };
-
-        /// <summary>
         /// Gets the byte array that represents the <see cref="SyncCommand"/>.
         /// </summary>
         /// <param name="command">The <see cref="SyncCommand"/> to convert.</param>
         /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
         public static byte[] GetBytes(SyncCommand command)
         {
-            if (!Values.TryGetValue(command, out string value))
+            if (command is not (SyncCommand.LIST
+                or SyncCommand.RECV
+                or SyncCommand.SEND
+                or SyncCommand.STAT
+                or SyncCommand.DENT
+                or SyncCommand.FAIL
+                or SyncCommand.DATA
+                or SyncCommand.OKAY
+                or SyncCommand.DONE))
             {
                 throw new ArgumentOutOfRangeException(nameof(command), $"{command} is not a valid sync command");
             }
 
-            string commandText = value;
+            string commandText = command.ToString();
             byte[] commandBytes = AdbClient.Encoding.GetBytes(commandText);
 
             return commandBytes;
@@ -69,9 +59,7 @@ namespace AdvancedSharpAdbClient
 
             string commandText = AdbClient.Encoding.GetString(value);
 
-            SyncCommand? key = Values.Where(d => string.Equals(d.Value, commandText, StringComparison.OrdinalIgnoreCase)).Select(d => new SyncCommand?(d.Key)).SingleOrDefault();
-
-            return key == null ? throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command") : key.Value;
+            return Extensions.TryParse(commandText, true, out SyncCommand command) ? command : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
         }
     }
 }

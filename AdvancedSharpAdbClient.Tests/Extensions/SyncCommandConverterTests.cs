@@ -23,5 +23,17 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetBytesInvalidCommandTest() =>
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetBytes((SyncCommand)99));
+
+        [Fact]
+        public void SyncCommandConverterTest()
+        {
+            SyncCommand[] commands = Enum.GetValues<SyncCommand>();
+            foreach (SyncCommand command in commands)
+            {
+                byte[] bytes = SyncCommandConverter.GetBytes(command);
+                Assert.Equal(4, bytes.Length);
+                Assert.Equal(command, SyncCommandConverter.GetCommand(bytes));
+            }
+        }
     }
 }
