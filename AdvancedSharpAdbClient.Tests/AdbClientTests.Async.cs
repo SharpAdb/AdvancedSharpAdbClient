@@ -66,7 +66,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => (await TestClient.GetDevicesAsync()).ToArray());
+                async () => await TestClient.GetDevicesAsync().ToArray());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
@@ -214,7 +214,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => (await TestClient.ListForwardAsync(Device)).ToArray());
+                async () => await TestClient.ListForwardAsync(Device).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -241,7 +241,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 responseMessages,
                 requests,
-                async () => (await TestClient.ListReverseForwardAsync(Device)).ToArray());
+                async () => await TestClient.ListReverseForwardAsync(Device).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -322,7 +322,7 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", Device, receiver, CancellationToken.None)));
+                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", Device, receiver)));
         }
 
         /// <summary>
@@ -392,7 +392,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, CancellationToken, LogId[])"/> method.
+        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, LogId[])"/> method.
         /// </summary>
         [Fact]
         public async void RunLogServiceAsyncTest()
@@ -415,7 +415,7 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.RunLogServiceAsync(Device, sink, CancellationToken.None, LogId.System));
+                () => TestClient.RunLogServiceAsync(Device, sink, LogId.System));
 
             Assert.Equal(3, logs.Count);
         }
@@ -802,7 +802,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responses,
                 requests,
-                async () => (await TestClient.GetFeatureSetAsync(Device)).ToArray());
+                async () => await TestClient.GetFeatureSetAsync(Device).ToArray());
 
             Assert.Equal(12, features.Length);
             Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
@@ -1249,7 +1249,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => (await TestClient.FindElementsAsync(Device)).ToArray());
+                async () => await TestClient.FindElementsAsync(Device).ToArray());
 
             int childCount = elements.Length;
             Array.ForEach(elements, x => childCount += x.GetChildCount());

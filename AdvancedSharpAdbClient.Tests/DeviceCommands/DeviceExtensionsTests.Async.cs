@@ -344,7 +344,7 @@ asound";
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
 
             DeviceData device = new();
-            AndroidProcess[] processes = (await adbClient.ListProcessesAsync(device)).ToArray();
+            AndroidProcess[] processes = await adbClient.ListProcessesAsync(device).ToArray();
 
             Assert.Equal(3, processes.Length);
             Assert.Equal("init", processes[0].Name);

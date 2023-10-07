@@ -93,7 +93,28 @@ namespace AdvancedSharpAdbClient.Tests
             return actual.Length;
         }
 
-        public string ReadString() => ReadStringAsync(CancellationToken.None).Result;
+        public string ReadString()
+        {
+            if (WaitForNewData)
+            {
+                while (ResponseMessages.Count == 0)
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+
+            string message = ResponseMessages.Dequeue();
+
+            if (message == ServerDisconnected)
+            {
+                SocketException socketException = new(AdbServer.ConnectionReset);
+                throw new AdbException(socketException.Message, socketException);
+            }
+            else
+            {
+                return message;
+            }
+        }
 
         public string ReadSyncString() => ResponseMessages.Dequeue();
 

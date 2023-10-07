@@ -227,7 +227,7 @@ namespace AdvancedSharpAdbClient
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.STAT, remotePath, cancellationToken).ConfigureAwait(false);
 
-            if (await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false) != SyncCommand.STAT)
+            if (await Socket.ReadSyncResponseAsync(cancellationToken).ContinueWith(x => x.Result != SyncCommand.STAT).ConfigureAwait(false))
             {
                 throw new AdbException($"The server returned an invalid sync response.");
             }

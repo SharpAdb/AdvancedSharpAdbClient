@@ -33,6 +33,9 @@ namespace AdvancedSharpAdbClient.Tests
             adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatus"/> method.
+        /// </summary>
         [Fact]
         public void GetStatusNotRunningTest()
         {
@@ -46,6 +49,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Null(status.Version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatus"/> method.
+        /// </summary>
         [Fact]
         public void GetStatusRunningTest()
         {
@@ -63,6 +69,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(new Version(1, 0, 32), status.Version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatus"/> method.
+        /// </summary>
         [Fact]
         public void GetStatusOtherSocketExceptionTest()
         {
@@ -74,6 +83,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<SocketException>(() => adbServer.GetStatus());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatus"/> method.
+        /// </summary>
         [Fact]
         public void GetStatusOtherExceptionTest()
         {
@@ -85,6 +97,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<Exception>(() => adbServer.GetStatus());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerAlreadyRunningTest()
         {
@@ -100,6 +115,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerOutdatedRunningNoExecutableTest()
         {
@@ -109,6 +127,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<AdbException>(() => adbServer.StartServer(null, false));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerNotRunningNoExecutableTest()
         {
@@ -120,6 +141,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<AdbException>(() => adbServer.StartServer(null, false));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerOutdatedRunningTest()
         {
@@ -138,6 +162,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:kill", socket.Requests[1]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerNotRunningTest()
         {
@@ -155,6 +182,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.True(commandLineClient.ServerStarted);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerIntermediateRestartRequestedRunningTest()
         {
@@ -173,6 +203,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:kill", socket.Requests[1]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServer(string, bool)"/> method.
+        /// </summary>
         [Fact]
         public void StartServerIntermediateRestartNotRequestedRunningTest()
         {
@@ -190,6 +223,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.RestartServer(string)"/> method.
+        /// </summary>
         [Fact]
         public void RestartServerTest()
         {
@@ -207,6 +243,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer(IAdbClient, Func{string, IAdbCommandLineClient})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorAdbClientNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => new AdbServer(null, adbCommandLineClientFactory));

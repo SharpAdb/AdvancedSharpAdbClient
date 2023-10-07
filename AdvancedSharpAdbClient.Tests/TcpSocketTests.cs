@@ -48,6 +48,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Encoding.ASCII.GetString(responseData);
         }
 
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.Reconnect"/> method.
+        /// </summary>
         [Fact]
         public void ReconnectTest()
         {
@@ -64,6 +67,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.True(socket.Connected);
         }
 
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.ReceiveBufferSize"/> property.
+        /// </summary>
         [Fact]
         public void BufferSizeTest()
         {
@@ -75,6 +81,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 2304 : 1024, socket.ReceiveBufferSize);
         }
 
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.Connect(EndPoint)"/> method.
+        /// </summary>
         [Fact]
         public void CreateUnsupportedSocketTest()
         {

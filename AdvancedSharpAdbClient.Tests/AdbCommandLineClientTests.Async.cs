@@ -6,6 +6,9 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public partial class AdbCommandLineClientTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(System.Threading.CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetVersionAsyncTest()
         {
@@ -16,6 +19,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(new Version(1, 0, 32), await commandLine.GetVersionAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(System.Threading.CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetVersionAsyncNullTest()
         {
@@ -26,6 +32,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(System.Threading.CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetOutdatedVersionAsyncTest()
         {
@@ -36,6 +45,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.StartServerAsync(System.Threading.CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncTest()
         {

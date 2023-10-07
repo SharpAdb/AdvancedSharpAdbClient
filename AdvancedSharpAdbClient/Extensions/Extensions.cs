@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -113,6 +114,15 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if HAS_TASK
+        /// <summary>
+        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
+        /// <returns>An array that contains the elements from the input sequence.</returns>
+        public static Task<TSource[]> ToArray<TSource>(this Task<IEnumerable<TSource>> source) =>
+            source.ContinueWith(x => x.Result.ToArray());
+
         /// <summary>
         /// Creates a task that completes after a specified number of milliseconds.
         /// </summary>

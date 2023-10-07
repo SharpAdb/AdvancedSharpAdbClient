@@ -18,6 +18,9 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.Stat(string)"/> method.
+        /// </summary>
         [Fact]
         public void StatTest()
         {
@@ -41,6 +44,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.GetDirectoryListing(string)"/> method.
+        /// </summary>
         [Fact]
         public void GetListingTest()
         {
@@ -92,6 +98,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(time, emulated.Time);
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.Pull(string, Stream, IProgress{int}, in bool)"/> method.
+        /// </summary>
         [Fact]
         public void PullTest()
         {
@@ -124,6 +133,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(content, stream.ToArray());
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, IProgress{int}, in bool)"/> method.
+        /// </summary>
         [Fact]
         public void PushTest()
         {

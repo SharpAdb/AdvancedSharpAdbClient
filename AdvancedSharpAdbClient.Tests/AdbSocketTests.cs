@@ -11,6 +11,9 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public partial class AdbSocketTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.Close"/> method.
+        /// </summary>
         [Fact]
         public void CloseTest()
         {
@@ -23,6 +26,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(socket.Connected);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.Dispose()"/> method.
+        /// </summary>
         [Fact]
         public void DisposeTest()
         {
@@ -35,6 +41,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(socket.Connected);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.IsOkay(ReadOnlySpan{byte})"/> method.
+        /// </summary>
         [Fact]
         public void IsOkayTest()
         {
@@ -45,30 +54,45 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(AdbSocket.IsOkay(fail));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, int)"/> method.
+        /// </summary>
         [Fact]
         public void SendSyncDATARequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DATA, 2),
                 [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string)"/> method.
+        /// </summary>
         [Fact]
         public void SendSyncSENDRequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
                 [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string, int)"/> method.
+        /// </summary>
         [Fact]
         public void SendSyncDENTRequestTest() =>
             RunTest(
                 (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
                 [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string)"/> method.
+        /// </summary>
         [Fact]
         public void SendSyncNullRequestTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), []));
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadSyncResponse"/> method.
+        /// </summary>
         [Fact]
-        public void ReadSyncResponse()
+        public void ReadSyncResponseTest()
         {
             using DummyTcpSocket tcpSocket = new();
             using AdbSocket socket = new(tcpSocket);
@@ -83,8 +107,11 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(SyncCommand.DENT, socket.ReadSyncResponse());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadSyncString"/> method.
+        /// </summary>
         [Fact]
-        public void ReadSyncString()
+        public void ReadSyncStringTest()
         {
             using DummyTcpSocket tcpSocket = new();
             using AdbSocket socket = new(tcpSocket);
@@ -101,6 +128,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("Hello", socket.ReadSyncString());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAdbResponse"/> method.
+        /// </summary>
         [Fact]
         public void ReadAdbOkayResponseTest()
         {
@@ -121,6 +151,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(response.Timeout);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAdbResponse"/> method.
+        /// </summary>
         [Fact]
         public void ReadAdbFailResponseTest()
         {
@@ -139,6 +172,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<AdbException>(socket.ReadAdbResponse);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.Read(byte[], int)"/> method.
+        /// </summary>
         [Fact]
         public void ReadTest()
         {
@@ -168,6 +204,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, received[100]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.Read(Span{byte})"/> method.
+        /// </summary>
         [Fact]
         public void ReadSpanTest()
         {
@@ -197,12 +236,18 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, received[100]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendAdbRequest(string)"/> method.
+        /// </summary>
         [Fact]
         public void SendAdbRequestTest() =>
             RunTest(
                 (socket) => socket.SendAdbRequest("Test"),
                 Encoding.ASCII.GetBytes("0004Test"));
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.GetShellStream"/> method.
+        /// </summary>
         [Fact]
         public void GetShellStreamTest()
         {

@@ -94,6 +94,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor.StartAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartInitialDeviceListAsyncTest()
         {

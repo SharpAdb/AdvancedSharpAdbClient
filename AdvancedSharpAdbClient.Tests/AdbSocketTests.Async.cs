@@ -10,28 +10,43 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public partial class AdbSocketTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void SendSyncDATARequestAsyncTest() =>
             await RunTestAsync(
-                (socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, 2, CancellationToken.None),
+                (socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, 2, default),
                 [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void SendSyncSENDRequestAsyncTest() =>
             await RunTestAsync(
-                (socket) => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", CancellationToken.None),
+                (socket) => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", default),
                 [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void SendSyncDENTRequestAsyncTest() =>
             await RunTestAsync(
-                (socket) => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", 633, CancellationToken.None),
+                (socket) => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", 633, default),
                 [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void SendSyncNullRequestAsyncTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => RunTestAsync((socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, null, CancellationToken.None), []));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => RunTestAsync((socket) => socket.SendSyncRequestAsync(SyncCommand.DATA, null, default), []));
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadSyncResponseAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadSyncResponseAsync()
         {
@@ -48,6 +63,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(SyncCommand.DENT, await socket.ReadSyncResponseAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadStringAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadStringAsyncTest()
         {
@@ -66,6 +84,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("Hello", await socket.ReadStringAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAdbResponseAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadAdbOkayResponseAsyncTest()
         {
@@ -86,6 +107,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(response.Timeout);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAdbResponseAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadAdbFailResponseAsyncTest()
         {
@@ -104,6 +128,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<AdbException>(() => socket.ReadAdbResponseAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAsync(byte[], int, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadAsyncTest()
         {
@@ -123,7 +150,7 @@ namespace AdvancedSharpAdbClient.Tests
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
-            await socket.ReadAsync(received, 100, CancellationToken.None);
+            await socket.ReadAsync(received, 100);
 
             for (int i = 0; i < 100; i++)
             {
@@ -133,6 +160,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, received[100]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadAsync(Memory{byte}, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReadAsyncMemoryTest()
         {
@@ -152,7 +182,7 @@ namespace AdvancedSharpAdbClient.Tests
             // Buffer has a capacity of 101, but we'll only want to read 100 bytes
             byte[] received = new byte[101];
 
-            await socket.ReadAsync(received.AsMemory(0, 100), CancellationToken.None);
+            await socket.ReadAsync(received.AsMemory(0, 100));
 
             for (int i = 0; i < 100; i++)
             {
@@ -162,10 +192,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0, received[100]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendAdbRequestAsync(string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void SendAdbRequestAsyncTest() =>
             await RunTestAsync(
-                (socket) => socket.SendAdbRequestAsync("Test", CancellationToken.None),
+                (socket) => socket.SendAdbRequestAsync("Test", default),
                 Encoding.ASCII.GetBytes("0004Test"));
 
         private static async Task RunTestAsync(Func<IAdbSocket, Task> test, byte[] expectedDataSent)

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -44,6 +45,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Encoding.ASCII.GetString(responseData);
         }
 
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.ReconnectAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void ReconnectAsyncTest()
         {
@@ -58,6 +62,16 @@ namespace AdvancedSharpAdbClient.Tests
 
             await socket.ReconnectAsync();
             Assert.True(socket.Connected);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.ConnectAsync(EndPoint, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void CreateUnsupportedSocketAsyncTest()
+        {
+            using TcpSocket socket = new();
+            _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint()).AsTask());
         }
     }
 }

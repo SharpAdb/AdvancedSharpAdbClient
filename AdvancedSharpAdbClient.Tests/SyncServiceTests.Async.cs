@@ -8,6 +8,9 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public partial class SyncServiceTests
     {
+        /// <summary>
+        /// Tests the <see cref="SyncService.StatAsync(string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StatAsyncTest()
         {
@@ -31,10 +34,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.GetDirectoryListingAsync(string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetListingAsyncTest()
         {
-            FileStatistics[] value = await RunTestAsync(
+            List<FileStatistics> value = await RunTestAsync(
                 OkResponses(2),
                 [".", "..", "sdcard0", "emulated"],
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -50,10 +56,10 @@ namespace AdvancedSharpAdbClient.Tests
                 async () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    return (await service.GetDirectoryListingAsync("/storage")).ToArray();
+                    return await service.GetDirectoryListingAsync("/storage");
                 });
 
-            Assert.Equal(4, value.Length);
+            Assert.Equal(4, value.Count);
 
             DateTime time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
 
@@ -82,6 +88,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(time, emulated.Time);
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.GetDirectoryAsyncListing(string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetAsyncListingTest()
         {
@@ -138,6 +147,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(time, emulated.Time);
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{int}, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PullAsyncTest()
         {
@@ -163,13 +175,16 @@ namespace AdvancedSharpAdbClient.Tests
                 async () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PullAsync("/fstab.donatello", stream, null, CancellationToken.None);
+                    await service.PullAsync("/fstab.donatello", stream, null);
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
             Assert.Equal(content, stream.ToArray());
         }
 
+        /// <summary>
+        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{int}, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void PushAsyncTest()
         {
@@ -196,7 +211,7 @@ namespace AdvancedSharpAdbClient.Tests
                 async () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PushAsync(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, CancellationToken.None);
+                    await service.PushAsync(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null);
                 });
         }
     }

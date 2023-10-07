@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AdvancedSharpAdbClient.Logs;
+using System;
 using System.Threading;
 using Xunit;
 
@@ -17,6 +18,9 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor(IAdbSocket, ILogger{DeviceMonitor})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -27,6 +31,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(monitor.IsRunning);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor(IAdbSocket, ILogger{DeviceMonitor})"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
 
@@ -118,6 +125,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor.Start"/> method.
+        /// </summary>
         [Fact]
         public void StartInitialDeviceListTest()
         {

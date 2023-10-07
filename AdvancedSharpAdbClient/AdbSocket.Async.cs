@@ -277,7 +277,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
+        public virtual async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(data);
 

@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 
             // This stream contains 3 log entries. Read & validate the first one,
             // read the next two ones (to be sure all data is read correctly).
-            LogEntry log = await reader.ReadEntryAsync(CancellationToken.None);
+            LogEntry log = await reader.ReadEntryAsync();
 
             Assert.IsType<AndroidLogEntry>(log);
 
@@ -62,8 +62,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Equal("ActivityManager", androidLog.Tag);
             Assert.Equal("Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={50066, 9997, 3003, 1028, 1015} abi=x86", androidLog.Message);
 
-            Assert.NotNull(await reader.ReadEntryAsync(CancellationToken.None));
-            Assert.NotNull(await reader.ReadEntryAsync(CancellationToken.None));
+            Assert.NotNull(await reader.ReadEntryAsync());
+            Assert.NotNull(await reader.ReadEntryAsync());
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             // has already taken place.
             await using FileStream stream = File.OpenRead(@"Assets/logcatevents.bin");
             LogReader reader = new(stream);
-            LogEntry entry = await reader.ReadEntryAsync(CancellationToken.None);
+            LogEntry entry = await reader.ReadEntryAsync();
 
             Assert.IsType<EventLogEntry>(entry);
             Assert.Equal(707, entry.ProcessId);
@@ -130,8 +130,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Equal(19512, list[1]);
             Assert.Equal("com.amazon.kindle", list[2]);
 
-            entry = await reader.ReadEntryAsync(CancellationToken.None);
-            entry = await reader.ReadEntryAsync(CancellationToken.None);
+            entry = await reader.ReadEntryAsync();
+            entry = await reader.ReadEntryAsync();
         }
     }
 }

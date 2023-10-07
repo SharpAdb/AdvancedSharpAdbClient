@@ -727,7 +727,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input tap {cords.X} {cords.Y}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -748,7 +748,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input tap {x} {y}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -769,7 +769,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input swipe {first.Cords.X} {first.Cords.Y} {second.Cords.X} {second.Cords.Y} {speed}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -790,7 +790,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input swipe {x1} {y1} {x2} {y2} {speed}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -811,7 +811,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:pidof {packageName}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()).ConfigureAwait(false);
             bool intParsed = int.TryParse(result, out int pid);
             return intParsed && pid > 0;
         }
@@ -984,7 +984,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input keyevent {key}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -1005,7 +1005,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:input text {text}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
@@ -1020,7 +1020,7 @@ namespace AdvancedSharpAdbClient
         public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount))).ConfigureAwait(false);
+            await SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
