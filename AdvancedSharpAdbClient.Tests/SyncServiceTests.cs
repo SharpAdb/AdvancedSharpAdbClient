@@ -21,9 +21,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void StatTest()
         {
-            FileStatistics value = null;
-
-            RunTest(
+            FileStatistics value = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -34,7 +32,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    value = service.Stat("/fstab.donatello");
+                    return service.Stat("/fstab.donatello");
                 });
 
             Assert.NotNull(value);
@@ -46,9 +44,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetListingTest()
         {
-            FileStatistics[] value = null;
-
-            RunTest(
+            FileStatistics[] value = RunTest(
                 OkResponses(2),
                 [".", "..", "sdcard0", "emulated"],
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -64,7 +60,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    value = service.GetDirectoryListing("/storage").ToArray();
+                    return service.GetDirectoryListing("/storage").ToArray();
                 });
 
             Assert.Equal(4, value.Length);

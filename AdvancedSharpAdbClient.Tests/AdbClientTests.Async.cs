@@ -28,12 +28,11 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["0020"];
             string[] requests = ["host:version"];
 
-            int version = 0;
-            await RunTestAsync(
+            int version = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => version = await TestClient.GetAdbVersionAsync());
+                () => TestClient.GetAdbVersionAsync());
 
             // Make sure and the correct value is returned.
             Assert.Equal(32, version);
@@ -63,18 +62,17 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
             string[] requests = ["host:devices-l"];
 
-            IEnumerable<DeviceData> devices = null;
-            await RunTestAsync(
+            DeviceData[] devices = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => devices = await TestClient.GetDevicesAsync());
+                async () => (await TestClient.GetDevicesAsync()).ToArray());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
             Assert.Single(devices);
 
-            DeviceData device = devices.Single();
+            DeviceData device = devices.SingleOrDefault();
 
             Assert.Equal("169.254.109.177:5555", device.Serial);
             Assert.Equal(DeviceState.Online, device.State);
@@ -212,12 +210,11 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
             string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
 
-            ForwardData[] forwards = null;
-            await RunTestAsync(
+            ForwardData[] forwards = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => forwards = (await TestClient.ListForwardAsync(Device)).ToArray());
+                async () => (await TestClient.ListForwardAsync(Device)).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -240,12 +237,11 @@ namespace AdvancedSharpAdbClient.Tests
                 "reverse:list-forward"
             ];
 
-            ForwardData[] forwards = null;
-            await RunTestAsync(
+            ForwardData[] forwards = await RunTestAsync(
                 OkResponses(2),
                 responseMessages,
                 requests,
-                async () => forwards = (await TestClient.ListReverseForwardAsync(Device)).ToArray());
+                async () => (await TestClient.ListReverseForwardAsync(Device)).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -710,13 +706,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
             await using MemoryStream shellStream = new(streamData);
 
-            string session = string.Empty;
-            await RunTestAsync(
+            string session = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => session = await TestClient.InstallCreateAsync(Device, "com.google.android.gms"));
+                () => TestClient.InstallCreateAsync(Device, "com.google.android.gms"));
 
             Assert.Equal("936013062", session);
         }
@@ -803,16 +798,15 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = ["host-serial:169.254.109.177:5555:features"];
             string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
-            IEnumerable<string> features = null;
-            await RunTestAsync(
+            string[] features = await RunTestAsync(
                 OkResponse,
                 responses,
                 requests,
-                async () => features = await TestClient.GetFeatureSetAsync(Device));
+                async () => (await TestClient.GetFeatureSetAsync(Device)).ToArray());
 
-            Assert.Equal(12, features.Count());
-            Assert.Equal("sendrecv_v2_brotli", features.First());
-            Assert.Equal("stat_v2", features.Last());
+            Assert.Equal(12, features.Length);
+            Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
+            Assert.Equal("stat_v2", features.LastOrDefault());
         }
 
         /// <summary>
@@ -832,13 +826,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            string xml = string.Empty;
-            await RunTestAsync(
+            string xml = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => xml = await TestClient.DumpScreenStringAsync(Device));
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanDump, xml);
         }
@@ -860,13 +853,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuiDump);
             await using MemoryStream miuiStream = new(miuiStreamData);
 
-            string miuiXml = string.Empty;
-            await RunTestAsync(
+            string miuiXml = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [miuiStream],
-                async () => miuiXml = await TestClient.DumpScreenStringAsync(Device));
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanMIUIDump, miuiXml);
         }
@@ -885,13 +877,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             await using MemoryStream emptyStream = new();
 
-            string emptyXml = string.Empty;
-            await RunTestAsync(
+            string emptyXml = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [emptyStream],
-                async () => emptyXml = await TestClient.DumpScreenStringAsync(Device));
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -937,13 +928,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            XmlDocument xml = null;
-            await RunTestAsync(
+            XmlDocument xml = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => xml = await TestClient.DumpScreenAsync(Device));
+                () => TestClient.DumpScreenAsync(Device));
 
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
@@ -1110,13 +1100,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(response);
             await using MemoryStream shellStream = new(streamData);
 
-            bool result = !expected;
-            await RunTestAsync(
+            bool result = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => result = await TestClient.IsAppRunningAsync(Device, "com.google.android.gms"));
+                () => TestClient.IsAppRunningAsync(Device, "com.google.android.gms"));
 
             Assert.Equal(expected, result);
         }
@@ -1140,13 +1129,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
-            bool result = !expected;
-            await RunTestAsync(
+            bool result = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => result = await TestClient.IsAppInForegroundAsync(Device, packageName));
+                () => TestClient.IsAppInForegroundAsync(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1173,13 +1161,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] pidData = Encoding.UTF8.GetBytes(response);
             await using MemoryStream pidStream = new(pidData);
 
-            AppStatus result = AppStatus.Foreground;
-            await RunTestAsync(
+            AppStatus result = await RunTestAsync(
                 OkResponses(4),
                 NoResponseMessages,
                 requests,
                 [activityStream, pidStream],
-                async () => result = await TestClient.GetAppStatusAsync(Device, packageName));
+                () => TestClient.GetAppStatusAsync(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1202,13 +1189,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
-            AppStatus result = default;
-            await RunTestAsync(
+            AppStatus result = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => result = await TestClient.GetAppStatusAsync(Device, packageName));
+                () => TestClient.GetAppStatusAsync(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1229,13 +1215,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            Element element = null;
-            await RunTestAsync(
+            Element element = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => element = await TestClient.FindElementAsync(Device));
+                () => TestClient.FindElementAsync(Device));
 
             Assert.Equal(144, element.GetChildCount());
             element = element[0][0][0][0][0][0][0][0][2][1][0][0];
@@ -1259,13 +1244,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            Element[] elements = null;
-            await RunTestAsync(
+            Element[] elements = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => elements = (await TestClient.FindElementsAsync(Device)).ToArray());
+                async () => (await TestClient.FindElementsAsync(Device)).ToArray());
 
             int childCount = elements.Length;
             Array.ForEach(elements, x => childCount += x.GetChildCount());
@@ -1291,19 +1275,19 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            List<Element> elements = null;
-            await RunTestAsync(
+            List<Element> elements = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
                 async () =>
                 {
-                    elements = [];
+                    List<Element> elements = [];
                     await foreach (Element element in TestClient.FindAsyncElements(Device))
                     {
                         elements.Add(element);
                     }
+                    return elements;
                 });
 
             int childCount = elements.Count;

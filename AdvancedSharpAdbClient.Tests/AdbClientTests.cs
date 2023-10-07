@@ -87,12 +87,11 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["0020"];
             string[] requests = ["host:version"];
 
-            int version = 0;
-            RunTest(
+            int version = RunTest(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => version = TestClient.GetAdbVersion());
+                TestClient.GetAdbVersion);
 
             // Make sure and the correct value is returned.
             Assert.Equal(32, version);
@@ -122,18 +121,17 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
             string[] requests = ["host:devices-l"];
 
-            IEnumerable<DeviceData> devices = null;
-            RunTest(
+            DeviceData[] devices = RunTest(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => devices = TestClient.GetDevices());
+                () => TestClient.GetDevices().ToArray());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
             Assert.Single(devices);
 
-            DeviceData device = devices.Single();
+            DeviceData device = devices.SingleOrDefault();
 
             Assert.Equal("169.254.109.177:5555", device.Serial);
             Assert.Equal(DeviceState.Online, device.State);
@@ -318,12 +316,11 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
             string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
 
-            ForwardData[] forwards = null;
-            RunTest(
+            ForwardData[] forwards = RunTest(
                 OkResponse,
                 responseMessages,
                 requests,
-                () => forwards = TestClient.ListForward(Device).ToArray());
+                () => TestClient.ListForward(Device).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -346,12 +343,11 @@ namespace AdvancedSharpAdbClient.Tests
                 "reverse:list-forward"
             ];
 
-            ForwardData[] forwards = null;
-            RunTest(
+            ForwardData[] forwards = RunTest(
                 OkResponses(2),
                 responseMessages,
                 requests,
-                () => forwards = TestClient.ListReverseForward(Device).ToArray());
+                () => TestClient.ListReverseForward(Device).ToArray());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -818,13 +814,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
             using MemoryStream shellStream = new(streamData);
 
-            string session = string.Empty;
-            RunTest(
+            string session = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => session = TestClient.InstallCreate(Device, "com.google.android.gms"));
+                () => TestClient.InstallCreate(Device, "com.google.android.gms"));
 
             Assert.Equal("936013062", session);
         }
@@ -911,16 +906,15 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = ["host-serial:169.254.109.177:5555:features"];
             string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
-            IEnumerable<string> features = null;
-            RunTest(
+            string[] features = RunTest(
                 OkResponse,
                 responses,
                 requests,
-                () => features = TestClient.GetFeatureSet(Device));
+                () => TestClient.GetFeatureSet(Device).ToArray());
 
-            Assert.Equal(12, features.Count());
-            Assert.Equal("sendrecv_v2_brotli", features.First());
-            Assert.Equal("stat_v2", features.Last());
+            Assert.Equal(12, features.Length);
+            Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
+            Assert.Equal("stat_v2", features.LastOrDefault());
         }
 
         /// <summary>
@@ -940,13 +934,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
-            string xml = string.Empty;
-            RunTest(
+            string xml = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => xml = TestClient.DumpScreenString(Device));
+                () => TestClient.DumpScreenString(Device));
 
             Assert.Equal(cleanDump, xml);
         }
@@ -968,13 +961,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuidump);
             using MemoryStream miuiStream = new(miuiStreamData);
 
-            string miuiXml = string.Empty;
-            RunTest(
+            string miuiXml = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [miuiStream],
-                () => miuiXml = TestClient.DumpScreenString(Device));
+                () => TestClient.DumpScreenString(Device));
 
             Assert.Equal(cleanMIUIDump, miuiXml);
         }
@@ -994,13 +986,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
             using MemoryStream emptyStream = new(emptyStreamData);
 
-            string emptyXml = string.Empty;
-            RunTest(
+            string emptyXml = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [emptyStream],
-                () => emptyXml = TestClient.DumpScreenString(Device));
+                () => TestClient.DumpScreenString(Device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -1046,13 +1037,12 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
-            XmlDocument xml = null;
-            RunTest(
+            XmlDocument xml = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => xml = TestClient.DumpScreen(Device));
+                () => TestClient.DumpScreen(Device));
 
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
@@ -1220,13 +1210,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(response);
             using MemoryStream shellStream = new(streamData);
 
-            bool result = !expected;
-            RunTest(
+            bool result = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => result = TestClient.IsAppRunning(Device, "com.google.android.gms"));
+                () => TestClient.IsAppRunning(Device, "com.google.android.gms"));
 
             Assert.Equal(expected, result);
         }
@@ -1250,13 +1239,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
-            bool result = !expected;
-            RunTest(
+            bool result = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => result = TestClient.IsAppInForeground(Device, packageName));
+                () => TestClient.IsAppInForeground(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1283,13 +1271,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] pidData = Encoding.UTF8.GetBytes(response);
             using MemoryStream pidStream = new(pidData);
 
-            AppStatus result = AppStatus.Foreground;
-            RunTest(
+            AppStatus result = RunTest(
                 OkResponses(4),
                 NoResponseMessages,
                 requests,
                 [activityStream, pidStream],
-                () => result = TestClient.GetAppStatus(Device, packageName));
+                () => TestClient.GetAppStatus(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1312,13 +1299,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
-            AppStatus result = default;
-            RunTest(
+            AppStatus result = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => result = TestClient.GetAppStatus(Device, packageName));
+                () => TestClient.GetAppStatus(Device, packageName));
 
             Assert.Equal(expected, result);
         }
@@ -1339,13 +1325,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
-            Element element = null;
-            RunTest(
+            Element element = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => element = TestClient.FindElement(Device));
+                () => TestClient.FindElement(Device));
 
             Assert.Equal(144, element.GetChildCount());
             element = element[0][0][0][0][0][0][0][0][2][1][0][0];
@@ -1369,13 +1354,12 @@ Caused by: android.os.RemoteException: Remote stack trace:
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             using MemoryStream shellStream = new(streamData);
 
-            Element[] elements = null;
-            RunTest(
+            Element[] elements = RunTest(
                 OkResponses(2),
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => elements = TestClient.FindElements(Device).ToArray());
+                () => TestClient.FindElements(Device).ToArray());
 
             int childCount = elements.Length;
             Array.ForEach(elements, x => childCount += x.GetChildCount());

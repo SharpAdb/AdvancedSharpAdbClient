@@ -11,9 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void StatAsyncTest()
         {
-            FileStatistics value = null;
-
-            await RunTestAsync(
+            FileStatistics value = await RunTestAsync(
                 OkResponses(2),
                 NoResponseMessages,
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -24,7 +22,7 @@ namespace AdvancedSharpAdbClient.Tests
                 async () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    value = await service.StatAsync("/fstab.donatello");
+                    return await service.StatAsync("/fstab.donatello");
                 });
 
             Assert.NotNull(value);
@@ -36,9 +34,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetListingAsyncTest()
         {
-            FileStatistics[] value = null;
-
-            await RunTestAsync(
+            FileStatistics[] value = await RunTestAsync(
                 OkResponses(2),
                 [".", "..", "sdcard0", "emulated"],
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -54,7 +50,7 @@ namespace AdvancedSharpAdbClient.Tests
                 async () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    value = (await service.GetDirectoryListingAsync("/storage")).ToArray();
+                    return (await service.GetDirectoryListingAsync("/storage")).ToArray();
                 });
 
             Assert.Equal(4, value.Length);
@@ -89,9 +85,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetAsyncListingTest()
         {
-            List<FileStatistics> value = null;
-
-            await RunTestAsync(
+            List<FileStatistics> value = await RunTestAsync(
                 OkResponses(2),
                 [".", "..", "sdcard0", "emulated"],
                 ["host:transport:169.254.109.177:5555", "sync:"],
@@ -106,12 +100,13 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 async () =>
                 {
+                    List<FileStatistics> value = [];
                     using SyncService service = new(Socket, Device);
-                    value = [];
                     await foreach (FileStatistics statistics in service.GetDirectoryAsyncListing("/storage"))
                     {
                         value.Add(statistics);
                     }
+                    return value;
                 });
 
             Assert.Equal(4, value.Count);

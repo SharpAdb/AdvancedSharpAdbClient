@@ -60,11 +60,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            RunTest(
+            _ = RunTest(
                 NoResponses,
                 [string.Empty],
                 NoRequests,
-                () => _ = eventWaiter.WaitOne(1000));
+                () => eventWaiter.WaitOne(1000));
 
             Assert.Empty(monitor.Devices);
             Assert.Single(sink.ConnectedEvents);
@@ -104,11 +104,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            RunTest(
+            _ = RunTest(
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => _ = eventWaiter.WaitOne(1000));
+                () => eventWaiter.WaitOne(1000));
 
             Assert.Single(monitor.Devices);
             Assert.Single(sink.ConnectedEvents);
@@ -176,11 +176,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            RunTest(
+            _ = RunTest(
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => _ = eventWaiter.WaitOne(1000));
+                () => eventWaiter.WaitOne(1000));
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Online, monitor.Devices[0].State);
@@ -224,11 +224,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Something happens but device does not change
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            RunTest(
+            _ = RunTest(
                 NoResponses,
                 ["169.254.109.177:5555\toffline\n"],
                 NoRequests,
-                () => _ = eventWaiter.WaitOne(1000));
+                () => eventWaiter.WaitOne(1000));
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Offline, monitor.Devices[0].State);
