@@ -45,9 +45,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the version code of the specified package.
         /// </summary>
         public VersionInfo VersionInfo =>
-            GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
-                ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
-                : null;
+            GetPropertyValue<string>(versionName) is string name
+                ? new VersionInfo(GetPropertyValue<int>(versionCode), name)
+                : default;
 
         private void CheckPackagesSection(string line)
         {

@@ -32,9 +32,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the value of the property out of the Properties dictionary.
         /// Returns null if the property is not present in the directory.
         /// </summary>
-        /// <param name="propertyName">The name of the property</param>
+        /// <param name="propertyName">The name of the property.</param>
         /// <returns>The received value</returns>
         public object GetPropertyValue(string propertyName) => Properties.TryGetValue(propertyName, out object property) ? property : null;
+
+        /// <summary>
+        /// Gets the value of the property out of the Properties dictionary.
+        /// Returns null if the property is not present in the directory.
+        /// </summary>
+        /// <typeparam name="T">The type of the property</typeparam>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <returns>The received value.</returns>
+        public T GetPropertyValue<T>(string propertyName) => Properties.TryGetValue(propertyName, out object property) && property is T value ? value : default;
 
         /// <summary>
         /// Adds a new parser to this receiver.

@@ -1,4 +1,4 @@
-﻿// <copyright file="SteamExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="StreamExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides extension methods for the <see cref="Stream"/> class.
     /// </summary>
-    public static class SteamExtensions
+    public static class StreamExtensions
     {
 #if !HAS_BUFFERS
         /// <summary>

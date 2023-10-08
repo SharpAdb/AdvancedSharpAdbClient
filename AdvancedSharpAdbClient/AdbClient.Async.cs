@@ -73,10 +73,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
-            CreateForwardAsync(device, local?.ToString(), remote?.ToString(), allowRebind, cancellationToken);
-
-        /// <inheritdoc/>
         public async Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -173,6 +169,38 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public async Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken);
+
+            await ExecuteServerCommandAsync("shell", command, socket, encoding, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
@@ -247,10 +275,6 @@ namespace AdvancedSharpAdbClient
             // Convert the framebuffer to an image, and return that.
             return framebuffer;
         }
-
-        /// <inheritdoc/>
-        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
-            RunLogServiceAsync(device, messageSink, default, logNames);
 
         /// <inheritdoc/>
         public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
@@ -401,9 +425,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task InstallAsync(DeviceData device, Stream apk, params string[] arguments) => InstallAsync(device, apk, default, arguments);
-
-        /// <inheritdoc/>
         public async Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
@@ -462,10 +483,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) =>
-            InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
-
-        /// <inheritdoc/>
         public async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
@@ -495,10 +512,6 @@ namespace AdvancedSharpAdbClient
 
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
         }
-
-        /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) =>
-            InstallMultipleAsync(device, baseAPK, splitAPKs, default, arguments);
 
         /// <inheritdoc/>
         public async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments)
@@ -537,11 +550,6 @@ namespace AdvancedSharpAdbClient
 
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
         }
-
-        /// <inheritdoc/>
-        public Task<string> InstallCreateAsync(DeviceData device, string packageName = null, params string[] arguments) =>
-            InstallCreateAsync(device, packageName, default, arguments);
-
 
         /// <inheritdoc/>
         public async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
@@ -1017,13 +1025,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
-        {
-            await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
         public async Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -1044,12 +1045,6 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:am force-stop {packageName}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
-
-        /// <inheritdoc/>
-        public Task BackBtnAsync(DeviceData device, CancellationToken cancellationToken = default) => SendKeyEventAsync(device, "KEYCODE_BACK", cancellationToken);
-
-        /// <inheritdoc/>
-        public Task HomeBtnAsync(DeviceData device, CancellationToken cancellationToken = default) => SendKeyEventAsync(device, "KEYCODE_HOME", cancellationToken);
     }
 }
 #endif

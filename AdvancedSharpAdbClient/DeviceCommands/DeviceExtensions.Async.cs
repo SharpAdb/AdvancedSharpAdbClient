@@ -20,11 +20,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            client.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken);
+            client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -115,7 +126,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<string> GetPropertyAsync(this IAdbClient client, DeviceData device, string property, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync($"{GetPropReceiver.GetPropCommand} {property}", device, receiver, cancellationToken).ConfigureAwait(false);
+            await client.ExecuteShellCommandAsync(device, $"{GetPropReceiver.GetPropCommand} {property}", receiver, cancellationToken).ConfigureAwait(false);
             return receiver.ToString();
         }
 
@@ -129,7 +140,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<Dictionary<string, string>> GetPropertiesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             GetPropReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync(GetPropReceiver.GetPropCommand, device, receiver, cancellationToken).ConfigureAwait(false);
+            await client.ExecuteShellCommandAsync(device, GetPropReceiver.GetPropCommand, receiver, cancellationToken).ConfigureAwait(false);
             return receiver.Properties;
         }
 
@@ -143,7 +154,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnvironmentVariablesReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver, cancellationToken).ConfigureAwait(false);
+            await client.ExecuteShellCommandAsync(device, EnvironmentVariablesReceiver.PrintEnvCommand, receiver, cancellationToken).ConfigureAwait(false);
             return receiver.EnvironmentVariables;
         }
 

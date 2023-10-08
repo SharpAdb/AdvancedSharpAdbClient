@@ -217,10 +217,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
-            CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
-
-        /// <inheritdoc/>
         public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
         {
             EnsureDevice(device);
@@ -314,6 +310,38 @@ namespace AdvancedSharpAdbClient
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
             return parts.Select(x => new ForwardData(x));
+        }
+
+        /// <inheritdoc/>
+        public void ExecuteServerCommand(string target, string command, Encoding encoding)
+        {
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            ExecuteServerCommand(target, command, socket, encoding);
+        }
+
+        /// <inheritdoc/>
+        public void ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding)
+        {
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            socket.SendAdbRequest(request.ToString());
+            _ = socket.ReadAdbResponse();
+        }
+
+        /// <inheritdoc/>
+        public void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
+        {
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            ExecuteServerCommand("shell", command, socket, encoding);
         }
 
         /// <inheritdoc/>
@@ -1075,14 +1103,6 @@ namespace AdvancedSharpAdbClient
                 throw new InvalidTextException();
             }
         }
-
-        /// <inheritdoc/>
-        public void ClearInput(DeviceData device, int charCount)
-        {
-            SendKeyEvent(device, "KEYCODE_MOVE_END");
-            SendKeyEvent(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)));
-        }
-
         /// <inheritdoc/>
         public void StartApp(DeviceData device, string packageName)
         {
@@ -1104,12 +1124,6 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:am force-stop {packageName}");
             AdbResponse response = socket.ReadAdbResponse();
         }
-
-        /// <inheritdoc/>
-        public void BackBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_BACK");
-
-        /// <inheritdoc/>
-        public void HomeBtn(DeviceData device) => SendKeyEvent(device, "KEYCODE_HOME");
 
         /// <summary>
         /// Sets default encoding (default - UTF8).

@@ -22,9 +22,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command) =>
+            client.ExecuteRemoteCommand(command, device, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
-            client.ExecuteRemoteCommand(command, device, receiver);
+            client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -112,7 +121,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static string GetProperty(this IAdbClient client, DeviceData device, string property)
         {
             ConsoleOutputReceiver receiver = new();
-            client.ExecuteRemoteCommand($"{GetPropReceiver.GetPropCommand} {property}", device, receiver);
+            client.ExecuteShellCommand(device, $"{GetPropReceiver.GetPropCommand} {property}", receiver);
             return receiver.ToString();
         }
 
@@ -125,7 +134,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
             GetPropReceiver receiver = new();
-            client.ExecuteRemoteCommand(GetPropReceiver.GetPropCommand, device, receiver);
+            client.ExecuteShellCommand(device, GetPropReceiver.GetPropCommand, receiver);
             return receiver.Properties;
         }
 
@@ -138,7 +147,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
             EnvironmentVariablesReceiver receiver = new();
-            client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            client.ExecuteShellCommand(device, EnvironmentVariablesReceiver.PrintEnvCommand, receiver);
             return receiver.EnvironmentVariables;
         }
 

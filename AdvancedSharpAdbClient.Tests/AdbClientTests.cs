@@ -1414,7 +1414,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ClearInput(DeviceData, int)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> method.
         /// </summary>
         [Fact]
         public void ClearInputTest()
@@ -1477,10 +1477,10 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.BackBtn(DeviceData)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClickBackButton(IAdbClient, DeviceData)"/> method.
         /// </summary>
         [Fact]
-        public void BackBtnTest()
+        public void ClickBackButtonTest()
         {
             string[] requests =
             [
@@ -1495,14 +1495,14 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.BackBtn(Device));
+                () => TestClient.ClickBackButton(Device));
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.HomeBtn(DeviceData)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClickHomeButton(IAdbClient, DeviceData)"/> method.
         /// </summary>
         [Fact]
-        public void HomeBtnTest()
+        public void ClickHomeButtonTest()
         {
             string[] requests =
             [
@@ -1517,7 +1517,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.HomeBtn(Device));
+                () => TestClient.ClickHomeButton(Device));
         }
 
         private void RunConnectTest(Action test, string connectString)

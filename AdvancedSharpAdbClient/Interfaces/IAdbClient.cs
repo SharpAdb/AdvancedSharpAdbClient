@@ -106,42 +106,6 @@ namespace AdvancedSharpAdbClient
         int CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
         /// <summary>
-        /// Asks the ADB server to forward local connections from <paramref name="local"/>
-        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
-        /// </summary>
-        /// <param name="device">The device on which to forward the connections.</param>
-        /// <param name="local">
-        /// <para>The local address to forward. This value can be in one of:</para>
-        /// <list type="ordered">
-        ///   <item>
-        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
-        ///   </item>
-        ///   <item>
-        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
-        ///   </item>
-        /// </list>
-        /// </param>
-        /// <param name="remote">
-        /// <para>The remote address to forward. This value can be in one of:</para>
-        /// <list type="ordered">
-        ///   <item>
-        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
-        ///   </item>
-        ///   <item>
-        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
-        ///   </item>
-        ///   <item>
-        ///     <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
-        ///   </item>
-        /// </list>
-        /// </param>
-        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.</param>
-        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.</returns>
-        int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
-
-        /// <summary>
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
@@ -216,6 +180,33 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to list the existing reverse forward connections.</param>
         /// <returns>A <see cref="ForwardData"/> entry for each existing reverse forward connection.</returns>
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, Encoding encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -503,13 +494,6 @@ namespace AdvancedSharpAdbClient
         void SendText(DeviceData device, string text);
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
-        /// </summary>
-        /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="charCount">The length of text to clear.</param>
-        void ClearInput(DeviceData device, int charCount);
-
-        /// <summary>
         /// Start an Android application on device.
         /// </summary>
         /// <param name="device">The device on which to start an application.</param>
@@ -522,18 +506,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to stop an application.</param>
         /// <param name="packageName">The package name of the application to stop.</param>
         void StopApp(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Click BACK button.
-        /// </summary>
-        /// <param name="device">The device on which to click BACK button.</param>
-        void BackBtn(DeviceData device);
-
-        /// <summary>
-        /// Click HOME button.
-        /// </summary>
-        /// <param name="device">The device on which to click HOME button.</param>
-        void HomeBtn(DeviceData device);
     }
 
     /// <summary>

@@ -7,6 +7,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+#if WINDOWS_UWP
+using System.Threading;
+#endif
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>

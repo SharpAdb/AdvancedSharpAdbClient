@@ -169,7 +169,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             tcpSocket.InputStream.Position = 0;
 
-            _ = Assert.Throws<AdbException>(socket.ReadAdbResponse);
+            _ = Assert.Throws<AdbException>(() => _ = socket.ReadAdbResponse());
         }
 
         /// <summary>

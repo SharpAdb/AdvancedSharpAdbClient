@@ -113,21 +113,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
             }
 
-            List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
-            await Extensions.WhenAll(splitPackageFilePaths.Select(async x => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSplitSyncProgressChanged, cancellationToken).ConfigureAwait(false)))).ConfigureAwait(false);
+            string[] splitRemoteFilePaths = await splitPackageFilePaths.Select(x => SyncPackageToDeviceAsync(x, OnSplitSyncProgressChanged, cancellationToken)).ToArrayAsync().ConfigureAwait(false);
 
             await InstallMultipleRemotePackageAsync(baseRemoteFilePath, splitRemoteFilePaths, reinstall, cancellationToken);
 
-            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.PostInstall));
+            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             int count = 0;
             await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
-                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.PostInstall));
+                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             })).ConfigureAwait(false);
 
             await RemoveRemotePackageAsync(baseRemoteFilePath, cancellationToken).ConfigureAwait(false);
-            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.PostInstall));
+            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
@@ -160,17 +159,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
             }
 
-            List<string> splitRemoteFilePaths = new(splitPackageFilePaths.Count);
-            await Extensions.WhenAll(splitPackageFilePaths.Select(async x => splitRemoteFilePaths.Add(await SyncPackageToDeviceAsync(x, OnSyncProgressChanged, cancellationToken)))).ConfigureAwait(false);
+            string[] splitRemoteFilePaths = await splitPackageFilePaths.Select(x => SyncPackageToDeviceAsync(x, OnSyncProgressChanged, cancellationToken)).ToArrayAsync().ConfigureAwait(false);
 
             await InstallMultipleRemotePackageAsync(splitRemoteFilePaths, packageName, reinstall, cancellationToken);
 
-            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Count, PackageInstallProgressState.PostInstall));
+            InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             int count = 0;
             await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
-                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Count, PackageInstallProgressState.PostInstall));
+                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             })).ConfigureAwait(false);
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Finished));
@@ -367,7 +365,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // now we delete the app we synced
             try
             {
-                await client.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", null, cancellationToken).ConfigureAwait(false);
+                await client.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", cancellationToken).ConfigureAwait(false);
             }
             catch (IOException e)
             {

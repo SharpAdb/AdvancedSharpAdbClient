@@ -10,18 +10,16 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void EqualsTest()
         {
-            AdbResponse first = new()
+            AdbResponse first = new("Hi")
             {
                 IOSuccess = false,
-                Message = "Hi",
                 Okay = false,
                 Timeout = false
             };
 
-            AdbResponse second = new()
+            AdbResponse second = new("Hi")
             {
                 IOSuccess = true,
-                Message = "Hi",
                 Okay = false,
                 Timeout = false
             };
@@ -34,18 +32,16 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetHashCodeTest()
         {
-            AdbResponse first = new()
+            AdbResponse first = new("Hi")
             {
                 IOSuccess = false,
-                Message = "Hi",
                 Okay = false,
                 Timeout = false
             };
 
-            AdbResponse second = new()
+            AdbResponse second = new("Hi")
             {
                 IOSuccess = false,
-                Message = "Hi",
                 Okay = false,
                 Timeout = false
             };

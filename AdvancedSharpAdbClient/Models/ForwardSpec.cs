@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
-    public class ForwardSpec
+    public class ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>
         /// Provides a mapping between a <see cref="string"/> and a <see cref="ForwardProtocol"/>
@@ -143,9 +143,8 @@ namespace AdvancedSharpAdbClient
                 ^ (SocketName == null ? 1 : SocketName.GetHashCode());
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            return obj is ForwardSpec other
+        public override bool Equals(object obj) =>
+            obj is ForwardSpec other
                 && other.Protocol == Protocol
                 && Protocol switch
                 {
@@ -157,6 +156,20 @@ namespace AdvancedSharpAdbClient
                     or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
                     _ => false,
                 };
-        }
+
+        /// <inheritdoc/>
+        public bool Equals(ForwardSpec other) =>
+            other != null
+                && other.Protocol == Protocol
+                && Protocol switch
+                {
+                    ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
+                    ForwardProtocol.Tcp => Port == other.Port,
+                    ForwardProtocol.LocalAbstract
+                    or ForwardProtocol.LocalFilesystem
+                    or ForwardProtocol.LocalReserved
+                    or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
+                    _ => false,
+                };
     }
 }

@@ -7,14 +7,20 @@ using System;
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
-    /// An Adb Communication Response.
+    /// The response returned by ADB server.
     /// </summary>
-    public class AdbResponse
+    public struct AdbResponse : IEquatable<AdbResponse>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbResponse"/> class.
+        /// Initializes a new instance of the <see cref="AdbResponse"/> struct.
         /// </summary>
         public AdbResponse() => Message = string.Empty;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbResponse"/> struct.
+        /// </summary>
+        /// <param name="message">the message of <see cref="AdbResponse"/>.</param>
+        public AdbResponse(string message) => Message = message;
 
         /// <summary>
         /// Gets a <see cref="AdbResponse"/> that represents the OK response sent by ADB.
@@ -23,7 +29,6 @@ namespace AdvancedSharpAdbClient
         {
             IOSuccess = true,
             Okay = true,
-            Message = string.Empty,
             Timeout = false
         };
 
@@ -57,10 +62,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="message">The error message returned by adb.</param>
         /// <returns>A new <see cref="AdbResponse"/> object that represents the error.</returns>
-        public static AdbResponse FromError(string message) => new()
+        public static AdbResponse FromError(string message) => new(message)
         {
             IOSuccess = true,
-            Message = message,
             Okay = false,
             Timeout = false
         };
@@ -70,7 +74,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object obj) =>
+        public override readonly bool Equals(object obj) =>
             obj is AdbResponse other
                 && other.IOSuccess == IOSuccess
                 && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
@@ -78,10 +82,21 @@ namespace AdvancedSharpAdbClient
                 && other.Timeout == Timeout;
 
         /// <summary>
+        /// Determines whether the specified <see cref="AdbResponse"/> is equal to the current <see cref="AdbResponse"/> object.
+        /// </summary>
+        /// <param name="other">The <see cref="AdbResponse"/> to compare with the current <see cref="AdbResponse"/> object.</param>
+        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
+        public readonly bool Equals(AdbResponse other) =>
+            other.IOSuccess == IOSuccess
+            && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
+            && other.Okay == Okay
+            && other.Timeout == Timeout;
+
+        /// <summary>
         /// Gets the hash code for the current <see cref="AdbResponse"/>.
         /// </summary>
         /// <returns>A hash code for the current <see cref="AdbResponse"/>.</returns>
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             int hash = 17;
             hash = (hash * 23) + IOSuccess.GetHashCode();
@@ -96,6 +111,22 @@ namespace AdvancedSharpAdbClient
         /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
         /// </summary>
         /// <returns><c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the response indicates an error.</returns>
-        public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
+        public override readonly string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
+
+        /// <summary>
+        /// Tests whether two <see cref='AdbResponse'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='AdbResponse'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='AdbResponse'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="AdbResponse"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(AdbResponse left, AdbResponse right) => left.Equals(right);
+
+        /// <summary>
+        /// Tests whether two <see cref='AdbResponse'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='AdbResponse'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='AdbResponse'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="AdbResponse"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(AdbResponse left, AdbResponse right) => !left.Equals(right);
     }
 }

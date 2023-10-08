@@ -66,7 +66,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => await TestClient.GetDevicesAsync().ToArray());
+                async () => await TestClient.GetDevicesAsync().ToArrayAsync());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
@@ -214,7 +214,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => await TestClient.ListForwardAsync(Device).ToArray());
+                async () => await TestClient.ListForwardAsync(Device).ToArrayAsync());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -241,7 +241,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 responseMessages,
                 requests,
-                async () => await TestClient.ListReverseForwardAsync(Device).ToArray());
+                async () => await TestClient.ListReverseForwardAsync(Device).ToArrayAsync());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -392,7 +392,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, LogId[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.RunLogServiceAsync(IAdbClient, DeviceData, Action{LogEntry}, LogId[])"/> method.
         /// </summary>
         [Fact]
         public async void RunLogServiceAsyncTest()
@@ -642,7 +642,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, string[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.InstallAsync(IAdbClient, DeviceData, Stream, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallAsyncTest()
@@ -692,7 +692,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallCreateAsync(DeviceData, string, string[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.InstallCreateAsync(IAdbClient, DeviceData, string, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallCreateAsyncTest()
@@ -802,7 +802,7 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 responses,
                 requests,
-                async () => await TestClient.GetFeatureSetAsync(Device).ToArray());
+                async () => await TestClient.GetFeatureSetAsync(Device).ToArrayAsync());
 
             Assert.Equal(12, features.Length);
             Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
@@ -1249,7 +1249,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                async () => await TestClient.FindElementsAsync(Device).ToArray());
+                async () => await TestClient.FindElementsAsync(Device).ToArrayAsync());
 
             int childCount = elements.Length;
             Array.ForEach(elements, x => childCount += x.GetChildCount());
@@ -1343,7 +1343,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ClearInputAsyncTest()
@@ -1406,10 +1406,10 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.BackBtnAsync(DeviceData, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClickBackButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void BackBtnAsyncTest()
+        public async void ClickBackButtonAsyncTest()
         {
             string[] requests =
             [
@@ -1424,14 +1424,14 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.BackBtnAsync(Device));
+                () => TestClient.ClickBackButtonAsync(Device));
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.HomeBtnAsync(DeviceData, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ClickHomeButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void HomeBtnAsyncTest()
+        public async void ClickHomeButtonAsyncTest()
         {
             string[] requests =
             [
@@ -1446,7 +1446,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.HomeBtnAsync(Device));
+                () => TestClient.ClickHomeButtonAsync(Device));
         }
 
         private Task RunConnectAsyncTest(Func<Task> test, string connectString)

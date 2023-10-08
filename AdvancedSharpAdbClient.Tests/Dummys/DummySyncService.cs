@@ -16,12 +16,6 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Dispose() => IsOpen = false;
 
-        public IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath) => throw new NotImplementedException();
-
-        public Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
-
         public void Open() => IsOpen = true;
 
         public Task OpenAsync(CancellationToken cancellationToken)
@@ -54,8 +48,18 @@ namespace AdvancedSharpAdbClient.Tests
             return Task.CompletedTask;
         }
 
-        public FileStatistics Stat(string remotePath) => throw new NotImplementedException();
+        #region Not Implemented
 
-        public Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        IAsyncEnumerable<FileStatistics> ISyncService.GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        IEnumerable<FileStatistics> ISyncService.GetDirectoryListing(string remotePath) => throw new NotImplementedException();
+
+        Task<List<FileStatistics>> ISyncService.GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        FileStatistics ISyncService.Stat(string remotePath) => throw new NotImplementedException();
+
+        Task<FileStatistics> ISyncService.StatAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+        #endregion
     }
 }

@@ -120,8 +120,16 @@ namespace AdvancedSharpAdbClient
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
         /// <returns>An array that contains the elements from the input sequence.</returns>
-        public static Task<TSource[]> ToArray<TSource>(this Task<IEnumerable<TSource>> source) =>
+        public static Task<TSource[]> ToArrayAsync<TSource>(this Task<IEnumerable<TSource>> source) =>
             source.ContinueWith(x => x.Result.ToArray());
+
+        /// <summary>
+        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
+        /// <returns>An array that contains the elements from the input sequence.</returns>
+        public static Task<TSource[]> ToArrayAsync<TSource>(this IEnumerable<Task<TSource>> source) => WhenAll(source);
 
         /// <summary>
         /// Creates a task that completes after a specified number of milliseconds.
@@ -178,6 +186,20 @@ namespace AdvancedSharpAdbClient
         /// <param name="tasks">The tasks to wait on for completion.</param>
         /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
         public static Task WhenAll(IEnumerable<Task> tasks) =>
+#if NETFRAMEWORK && !NET45_OR_GREATER
+            TaskEx
+#else
+            Task
+#endif
+            .WhenAll(tasks);
+
+        /// <summary>
+        /// Creates a task that will complete when all of the <see cref="Task{TResult}"/> objects in an enumerable collection have completed.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the completed task.</typeparam>
+        /// <param name="tasks">The tasks to wait on for completion.</param>
+        /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
+        public static Task<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else

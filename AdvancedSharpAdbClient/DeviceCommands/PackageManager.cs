@@ -453,7 +453,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // now we delete the app we synced
             try
             {
-                client.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"", null);
+                client.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"");
             }
             catch (IOException e)
             {

@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="children">The children of the element.</param>
         /// <param name="area">The coordinates and size of the element.</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, XmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes = null)
+        public Element(IAdbClient client, DeviceData device, XmlNode node, IEnumerable<Element> children, Area area, Dictionary<string, string> attributes = null)
         {
             Client = client;
             Device = device;
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="children">The children of the element.</param>
         /// <param name="area">The coordinates and size of the element.</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes = null)
+        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, IEnumerable<Element> children, Area area, Dictionary<string, string> attributes = null)
         {
             XmlDocument doc = new();
             doc.LoadXml(node.GetXml());
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the children of this element.
         /// </summary>
-        public List<Element> Children { get; }
+        public IEnumerable<Element> Children { get; }
 
         /// <summary>
         /// Gets the element attributes.
@@ -126,11 +126,12 @@ namespace AdvancedSharpAdbClient
         public XmlNode Node { get; }
 
         /// <summary>
-        /// Gets or sets the element at the specified index.
+        /// Gets the element at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <returns>The element at the specified index.</returns>
-        public Element this[int index] => Children[index];
+        /// <remarks>The index method is index by <see cref="Enumerable.ElementAt{TSource}(IEnumerable{TSource}, int)"/>.</remarks>
+        public Element this[int index] => Children.ElementAt(index);
 
         /// <summary>
         /// Creates a new <see cref='Element'/> with the specified <see cref="XmlNode"/>.
@@ -151,19 +152,22 @@ namespace AdvancedSharpAdbClient
                     attributes[at.Name] = at.Value;
                 }
                 Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                XmlNodeList childNodes = xmlNode.ChildNodes;
-                List<Element> elements = new(childNodes?.Count ?? 0);
-                if (childNodes != null)
+                IEnumerable<Element> FindElements()
                 {
-                    for (int i = 0; i < childNodes.Count; i++)
+                    XmlNodeList childNodes = xmlNode.ChildNodes;
+                    if (childNodes != null)
                     {
-                        Element element = FromXmlNode(client, device, childNodes[i]);
-                        if (element != null)
+                        for (int i = 0; i < childNodes.Count; i++)
                         {
-                            elements.Add(element);
+                            Element element = FromXmlNode(client, device, childNodes[i]);
+                            if (element != null)
+                            {
+                                yield return element;
+                            }
                         }
                     }
                 }
+                IEnumerable<Element> elements = FindElements();
                 return new Element(client, device, xmlNode, elements, area, attributes);
             }
             return null;
@@ -189,19 +193,22 @@ namespace AdvancedSharpAdbClient
                     attributes[at.NodeName] = at.NodeValue.ToString();
                 }
                 Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
-                List<Element> elements = new(childNodes?.Count ?? 0);
-                if (childNodes != null)
+                IEnumerable<Element> FindElements()
                 {
-                    foreach (Windows.Data.Xml.Dom.IXmlNode childNode in childNodes)
+                    Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
+                    if (childNodes != null)
                     {
-                        Element element = FromIXmlNode(client, device, childNode);
-                        if (element != null)
+                        foreach (Windows.Data.Xml.Dom.IXmlNode childNode in childNodes)
                         {
-                            elements.Add(element);
+                            Element element = FromIXmlNode(client, device, childNode);
+                            if (element != null)
+                            {
+                                yield return element;
+                            }
                         }
                     }
                 }
+                IEnumerable<Element> elements = FindElements();
                 return new Element(client, device, xmlNode, elements, area, attributes);
             }
             return null;
@@ -211,7 +218,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the count of <see cref="Children"/> in this element.
         /// </summary>
-        public virtual int GetChildCount() => Children.Count + Children.Select(x => x.GetChildCount()).Sum();
+        public virtual int GetChildCount() => Children.Count() + Children.Select(x => x.GetChildCount()).Sum();
 
         /// <summary>
         /// Clicks on this coordinates.
@@ -252,7 +259,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Clear the input text. Use <see cref="IAdbClient.ClearInput(DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         public void ClearInput(int charCount = 0)
@@ -270,7 +277,7 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_TASK
         /// <summary>
-        /// Clear the input text. Use <see cref="IAdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
