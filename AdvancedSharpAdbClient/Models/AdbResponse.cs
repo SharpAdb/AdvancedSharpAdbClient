@@ -74,12 +74,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override readonly bool Equals(object obj) =>
-            obj is AdbResponse other
-                && other.IOSuccess == IOSuccess
-                && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
-                && other.Okay == Okay
-                && other.Timeout == Timeout;
+        public override readonly bool Equals(object obj) => obj is AdbResponse other && Equals(other);
 
         /// <summary>
         /// Determines whether the specified <see cref="AdbResponse"/> is equal to the current <see cref="AdbResponse"/> object.

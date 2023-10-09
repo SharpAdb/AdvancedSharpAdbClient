@@ -774,7 +774,7 @@ namespace AdvancedSharpAdbClient
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-            await socket.SendAdbRequestAsync($"shell:input swipe {first.Cords.X} {first.Cords.Y} {second.Cords.X} {second.Cords.Y} {speed}", cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync($"shell:input swipe {first.Center.X} {first.Center.Y} {second.Center.X} {second.Center.Y} {speed}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
             string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);

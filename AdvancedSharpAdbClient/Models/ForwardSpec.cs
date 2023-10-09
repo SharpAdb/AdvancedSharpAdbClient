@@ -137,25 +137,17 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public override int GetHashCode() =>
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            HashCode.Combine((int)Protocol, Port, ProcessId, SocketName == null ? 1 : SocketName.GetHashCode());
+#else
             (int)Protocol
                 ^ Port
                 ^ ProcessId
                 ^ (SocketName == null ? 1 : SocketName.GetHashCode());
+#endif
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) =>
-            obj is ForwardSpec other
-                && other.Protocol == Protocol
-                && Protocol switch
-                {
-                    ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
-                    ForwardProtocol.Tcp => Port == other.Port,
-                    ForwardProtocol.LocalAbstract
-                    or ForwardProtocol.LocalFilesystem
-                    or ForwardProtocol.LocalReserved
-                    or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
-                    _ => false,
-                };
+        public override bool Equals(object obj) => Equals(obj as ForwardSpec);
 
         /// <inheritdoc/>
         public bool Equals(ForwardSpec other) =>

@@ -1333,9 +1333,14 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 () => TestClient.FindElement(Device));
 
             Assert.Equal(144, element.GetChildCount());
-            element = element[0][0][0][0][0][0][0][0][2][1][0][0];
-            Assert.Equal("where-where", element.Attributes["text"]);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+            Element child = element[0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", child.Text);
+            Assert.Equal("android.widget.TextView", child.Class);
+            Assert.Equal("com.bilibili.app.in", child.Package);
+            Assert.Equal("com.bilibili.app.in:id/header_info_name", child.ResourceID);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), child.Bounds);
+            Assert.Equal(child, element.FindDescendantOrSelf(x => x.Text == "where-where"));
+            Assert.Equal(2, element.FindDescendants().Where(x => x.Text == "where-where").Count());
         }
 
         /// <summary>
@@ -1365,8 +1370,8 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Array.ForEach(elements, x => childCount += x.GetChildCount());
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
-            Assert.Equal("where-where", element.Attributes["text"]);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+            Assert.Equal("where-where", element.Text);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Bounds);
         }
 
         /// <summary>
