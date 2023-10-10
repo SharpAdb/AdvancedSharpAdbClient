@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient
                 string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
                 Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
             }
-            
+
             Attributes = new(xmlNode.Attributes.Count);
             foreach (XmlAttribute at in xmlNode.Attributes)
             {
@@ -310,7 +310,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Find the first descendant (or self) element matching a given predicate, using a depth-first search.
         /// </summary>
-        /// <param name="predicate">The predicatee to use to match the descendant nodes.</param>
+        /// <param name="predicate">The predicate to use to match the descendant nodes.</param>
         /// <returns>The descendant (or self) that was found, or <see langword="null"/>.</returns>
         public Element FindDescendantOrSelf(Func<Element, bool> predicate) =>
             predicate(this) ? this : FindDescendant(predicate);
@@ -354,18 +354,9 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public override int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            HashCode.Combine(Client, Device, Node == null ? HashCode.Combine(Bounds, Attributes) : Node.GetHashCode());
-#else
-            Client.GetHashCode()
-            ^ Device.GetHashCode()
-            ^ (Node == null
-                ? Bounds.GetHashCode()
-                    ^ (Attributes == null
-                        ? 1
-                        : Attributes.GetHashCode())
-                : Node.GetHashCode());
-#endif
+            Node == null
+                ? HashCode.Combine(Client, Device, Bounds, Attributes)
+                : HashCode.Combine(Client, Device, Node);
 
         /// <inheritdoc/>
         public override string ToString() =>

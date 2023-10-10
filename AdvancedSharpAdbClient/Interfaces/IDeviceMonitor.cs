@@ -31,6 +31,11 @@ namespace AdvancedSharpAdbClient
         event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
 
         /// <summary>
+        /// Occurs when the list of the connected devices has changed.
+        /// </summary>
+        event EventHandler<DeviceDataNotifyEventArgs> DeviceListChanged;
+
+        /// <summary>
         /// Occurs when a device has disconnected from the Android Debug Bridge.
         /// </summary>
         event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;

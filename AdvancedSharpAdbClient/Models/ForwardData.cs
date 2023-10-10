@@ -2,12 +2,14 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// Contains information about port forwarding configured by the Android Debug Bridge.
     /// </summary>
-    public class ForwardData
+    public class ForwardData : IEquatable<ForwardData>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardData"/> class.
@@ -70,6 +72,19 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The <see cref="string"/> value to parse.</param>
         /// <returns>A <see cref="ForwardData"/> object that represents the port forwarding information contained in <paramref name="value"/>.</returns>
         public static ForwardData FromString(string value) => value == null ? null : new ForwardData(value);
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => Equals(obj as ForwardData);
+
+        /// <inheritdoc/>
+        public bool Equals(ForwardData other) =>
+            other is not null
+                && SerialNumber == other.SerialNumber
+                && Local == other.Local
+                && Remote == other.Remote;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(SerialNumber, Local, Remote);
 
         /// <inheritdoc/>
         public override string ToString() => $"{SerialNumber} {Local} {Remote}";

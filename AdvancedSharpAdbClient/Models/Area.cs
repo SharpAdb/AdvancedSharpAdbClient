@@ -453,12 +453,7 @@ namespace AdvancedSharpAdbClient
         /// Returns the hash code for this <see cref="Area"/> structure.
         /// </summary>
         /// <returns>An integer that represents the hash code for this rectangle.</returns>
-        public override readonly int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            HashCode.Combine(X, Y, Width, Height);
-#else
-            X ^ Y ^ Width ^ Height;
-#endif
+        public override readonly int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 
         /// <summary>
         /// Inflates this <see cref='Area'/> by the specified amount.

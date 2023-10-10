@@ -1,5 +1,6 @@
 ﻿using AdvancedSharpAdbClient.Logs;
 using System;
+using System.Linq;
 using System.Threading;
 using Xunit;
 
@@ -58,7 +59,10 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
+
+            sink.ResetSignals();
 
             Socket.ResponseMessages.Clear();
             Socket.Responses.Clear();
@@ -74,9 +78,10 @@ namespace AdvancedSharpAdbClient.Tests
                 () => eventWaiter.WaitOne(1000));
 
             Assert.Empty(monitor.Devices);
-            Assert.Single(sink.ConnectedEvents);
+            Assert.Empty(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Single(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
         }
@@ -101,12 +106,15 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Empty(monitor.Devices);
             Assert.Empty(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
-            Assert.Empty(sink.NotifiedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Empty(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
 
             Socket.ResponseMessages.Clear();
             Socket.Responses.Clear();
             Socket.Requests.Clear();
+
+            sink.ResetSignals();
 
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
@@ -121,6 +129,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
         }
@@ -150,11 +159,12 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
         }
 
         [Fact]
-        public void DeviceChanged_TriggeredWhenStatusChangedTest()
+        public void TriggeredWhenStatusChangedTest()
         {
             Socket.WaitForNewData = true;
 
@@ -175,6 +185,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
 
             Socket.ResponseMessages.Clear();
@@ -197,12 +208,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Empty(sink.ConnectedEvents);
             Assert.Single(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
         }
 
         [Fact]
-        public void DeviceChanged_NoTriggerIfStatusIsSameTest()
+        public void NoTriggerIfStatusIsSameTest()
         {
             Socket.WaitForNewData = true;
 
@@ -219,10 +231,11 @@ namespace AdvancedSharpAdbClient.Tests
                 monitor.Start);
 
             Assert.Single(monitor.Devices);
-            Assert.Equal(DeviceState.Offline, monitor.Devices[0].State);
+            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
             Assert.Single(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
 
             Socket.ResponseMessages.Clear();
@@ -241,10 +254,11 @@ namespace AdvancedSharpAdbClient.Tests
                 () => eventWaiter.WaitOne(1000));
 
             Assert.Single(monitor.Devices);
-            Assert.Equal(DeviceState.Offline, monitor.Devices[0].State);
+            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
             Assert.Empty(sink.ConnectedEvents);
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
+            Assert.Empty(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
         }
 

@@ -1,5 +1,4 @@
 ﻿#if NETFRAMEWORK && !NET40_OR_GREATER
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Net;
 using System.Net.Sockets;

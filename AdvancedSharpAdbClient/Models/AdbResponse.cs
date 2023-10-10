@@ -91,16 +91,7 @@ namespace AdvancedSharpAdbClient
         /// Gets the hash code for the current <see cref="AdbResponse"/>.
         /// </summary>
         /// <returns>A hash code for the current <see cref="AdbResponse"/>.</returns>
-        public override readonly int GetHashCode()
-        {
-            int hash = 17;
-            hash = (hash * 23) + IOSuccess.GetHashCode();
-            hash = (hash * 23) + Message == null ? 0 : Message.GetHashCode();
-            hash = (hash * 23) + Okay.GetHashCode();
-            hash = (hash * 23) + Timeout.GetHashCode();
-
-            return hash;
-        }
+        public override readonly int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);
 
         /// <summary>
         /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.

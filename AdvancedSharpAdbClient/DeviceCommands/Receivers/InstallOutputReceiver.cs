@@ -139,9 +139,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private static partial Regex ErrorRegex();
 #else
         private static Regex SuccessRegex() => new(SuccessPattern, RegexOptions.IgnoreCase);
-
+        
         private static Regex FailureRegex() => new(FailurePattern, RegexOptions.IgnoreCase);
-
+        
         private static Regex ErrorRegex() => new(ErrorPattern, RegexOptions.IgnoreCase);
 #endif
     }

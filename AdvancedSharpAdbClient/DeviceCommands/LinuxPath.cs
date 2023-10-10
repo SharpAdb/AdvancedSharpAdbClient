@@ -139,7 +139,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return null;
         }
 
-        /// <summary>Returns the file name and extension of the specified path string.</summary>
+        /// <summary>
+        /// Returns the file name and extension of the specified path string.
+        /// </summary>
         /// <returns>A <see cref="string"/> consisting of the characters after the last directory character in path.
         /// If the last character of path is a directory or volume separator character,
         /// this method returns <see cref="string.Empty"/>. If path is null, this method returns null.</returns>

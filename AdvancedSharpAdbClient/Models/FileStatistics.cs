@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Contains information about a file on the remote device.
     /// </summary>
-    public class FileStatistics
+    public class FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileStatistics"/> class.
@@ -41,5 +41,19 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <returns>The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.</returns>
         public override string ToString() => Path;
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => Equals(obj as FileStatistics);
+
+        /// <inheritdoc/>
+        public bool Equals(FileStatistics other) =>
+            other is not null
+                && Path == other.Path
+                && FileType == other.FileType
+                && Size == other.Size
+                && Time == other.Time;
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
     }
 }

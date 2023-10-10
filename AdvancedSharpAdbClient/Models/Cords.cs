@@ -320,12 +320,7 @@ namespace AdvancedSharpAdbClient
         /// Returns a hash code for this <see cref="Cords"/>.
         /// </summary>
         /// <returns>An integer value that specifies a hash value for this <see cref="Cords"/>.</returns>
-        public override readonly int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            HashCode.Combine(X, Y);
-#else
-            X ^ Y;
-#endif
+        public override readonly int GetHashCode() => HashCode.Combine(X, Y);
 
         /// <summary>
         /// Translates this <see cref='Cords'/> by the specified amount.

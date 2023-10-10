@@ -12,11 +12,13 @@ namespace AdvancedSharpAdbClient.Tests
             Monitor.DeviceChanged += OnDeviceChanged;
             Monitor.DeviceNotified += OnDeviceNotified;
             Monitor.DeviceConnected += OnDeviceConnected;
+            Monitor.DeviceListChanged += OnDeviceListChanged;
             Monitor.DeviceDisconnected += OnDeviceDisconnected;
 
             ChangedEvents = [];
             NotifiedEvents = [];
             ConnectedEvents = [];
+            ListChangedEvents = [];
             DisconnectedEvents = [];
         }
 
@@ -25,13 +27,16 @@ namespace AdvancedSharpAdbClient.Tests
             ChangedEvents.Clear();
             NotifiedEvents.Clear();
             ConnectedEvents.Clear();
+            ListChangedEvents.Clear();
             DisconnectedEvents.Clear();
         }
 
         public List<DeviceDataConnectEventArgs> DisconnectedEvents { get; init; }
 
-        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; init; }
+        public List<DeviceDataNotifyEventArgs> ListChangedEvents { get; init; }
 
+        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; init; }
+        
         public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; init; }
 
         public List<DeviceDataChangeEventArgs> ChangedEvents { get; init; }
@@ -42,11 +47,12 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ManualResetEvent signal = new(false);
             Monitor.DeviceNotified += (sender, e) => signal.Set();
-            Monitor.DeviceDisconnected += (sender, e) => signal.Set();
             return signal;
         }
 
         protected virtual void OnDeviceDisconnected(object sender, DeviceDataConnectEventArgs e) => DisconnectedEvents.Add(e);
+
+        protected virtual void OnDeviceListChanged(object sender, DeviceDataNotifyEventArgs e) => ListChangedEvents.Add(e);
 
         protected virtual void OnDeviceConnected(object sender, DeviceDataConnectEventArgs e) => ConnectedEvents.Add(e);
 

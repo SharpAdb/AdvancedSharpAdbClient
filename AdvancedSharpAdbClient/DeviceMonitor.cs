@@ -77,6 +77,9 @@ namespace AdvancedSharpAdbClient
         public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
 
         /// <inheritdoc/>
+        public event EventHandler<DeviceDataNotifyEventArgs> DeviceListChanged;
+
+        /// <inheritdoc/>
         public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
 
         /// <summary>
@@ -207,7 +210,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Raises the <see cref="DeviceNotified"/> event.
         /// </summary>
-        /// <param name="e">The <see cref="IEnumerable{DeviceData}"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DeviceDataNotifyEventArgs"/> instance containing the event data.</param>
         protected void OnDeviceNotified(DeviceDataNotifyEventArgs e) => DeviceNotified?.Invoke(this, e);
 
         /// <summary>
@@ -215,6 +218,12 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
         protected void OnDeviceConnected(DeviceDataConnectEventArgs e) => DeviceConnected?.Invoke(this, e);
+
+        /// <summary>
+        /// Raises the <see cref="DeviceListChanged"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="DeviceDataNotifyEventArgs"/> instance containing the event data.</param>
+        protected void OnDeviceListChanged(DeviceDataNotifyEventArgs e) => DeviceListChanged?.Invoke(this, e);
 
         /// <summary>
         /// Raises the <see cref="DeviceDisconnected"/> event.
@@ -278,14 +287,15 @@ namespace AdvancedSharpAdbClient
 
             IEnumerable<DeviceData> currentDevices = deviceValues.Select(x => new DeviceData(x));
             UpdateDevices(currentDevices);
+            OnDeviceNotified(new DeviceDataNotifyEventArgs(currentDevices));
         }
 
         /// <summary>
         /// Processes the incoming <see cref="DeviceData"/>.
         /// </summary>
-        protected virtual void UpdateDevices(IEnumerable<DeviceData> devices)
+        protected virtual void UpdateDevices(IEnumerable<DeviceData> collection)
         {
-            lock (this.devices)
+            lock (devices)
             {
                 // For each device in the current list, we look for a matching the new list.
                 // * if we find it, we update the current object with whatever new information
@@ -296,42 +306,50 @@ namespace AdvancedSharpAdbClient
                 // Once this is done, the new list contains device we aren't monitoring yet, so we
                 // add them to the list, and start monitoring them.
 
-                // Add or update existing devices
-                foreach (DeviceData device in devices)
+                bool isChanged = false;
+                int length = this.devices.Count;
+                List<DeviceData> devices = collection.ToList();
+                for (int i = 0; i < length;)
                 {
-                    DeviceData existingDevice = this.devices.SingleOrDefault(d => d.Serial == device.Serial);
+                    DeviceData currentDevice = this.devices[i];
+                    int index = devices.FindIndex(d => d.Serial == currentDevice.Serial);
+                    if (index == -1)
+                    {
+                        // Remove disconnected devices
+                        this.devices.RemoveAt(i);
+                        OnDeviceDisconnected(new DeviceDataConnectEventArgs(currentDevice, false));
+                        isChanged = true;
+                        length--;
+                    }
+                    else
+                    {
+                        DeviceData device = devices[index];
+                        if (currentDevice.State != device.State)
+                        {
+                            // Change device state
+                            this.devices[i] = device;
+                            OnDeviceChanged(new DeviceDataChangeEventArgs(device, device.State, currentDevice.State));
+                            isChanged = true;
+                        }
+                        devices.RemoveAt(index);
+                        i++;
+                    }
+                }
 
-                    if (existingDevice == null)
+                if (devices.Count > 0)
+                {
+                    // Add connected devices
+                    foreach (DeviceData device in devices)
                     {
                         this.devices.Add(device);
-                        OnDeviceConnected(new DeviceDataConnectEventArgs(device, true));
+                        OnDeviceConnected(new DeviceDataConnectEventArgs(device, false));
                     }
-                    else if (existingDevice.State != device.State)
-                    {
-                        DeviceState oldState = existingDevice.State;
-                        int index = this.devices.IndexOf(existingDevice);
-                        if (index != -1)
-                        {
-                            this.devices[index] = device;
-                        }
-                        else
-                        {
-                            this.devices.Add(device);
-                        }
-                        OnDeviceChanged(new DeviceDataChangeEventArgs(device, device.State, oldState));
-                    }
+                    isChanged = true;
                 }
 
-                // Remove devices
-                foreach (DeviceData device in this.devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
+                if (isChanged)
                 {
-                    this.devices.Remove(device);
-                    OnDeviceDisconnected(new DeviceDataConnectEventArgs(device, false));
-                }
-
-                if (devices.Any())
-                {
-                    OnDeviceNotified(new DeviceDataNotifyEventArgs(devices));
+                    OnDeviceListChanged(new DeviceDataNotifyEventArgs(devices));
                 }
             }
         }

@@ -136,15 +136,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() =>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            HashCode.Combine((int)Protocol, Port, ProcessId, SocketName == null ? 1 : SocketName.GetHashCode());
-#else
-            (int)Protocol
-                ^ Port
-                ^ ProcessId
-                ^ (SocketName == null ? 1 : SocketName.GetHashCode());
-#endif
+        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => Equals(obj as ForwardSpec);

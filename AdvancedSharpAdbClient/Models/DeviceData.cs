@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
-    public partial class DeviceData
+    public partial class DeviceData : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -105,6 +105,38 @@ namespace AdvancedSharpAdbClient
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
         /// <returns>A <see cref="DeviceData"/> object that represents the device.</returns>
         public static DeviceData CreateFromAdbData(string data) => new(data);
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => Equals(obj as DeviceData);
+
+        /// <inheritdoc/>
+        public bool Equals(DeviceData other) =>
+            other is not null
+                && Serial == other.Serial
+                && State == other.State
+                && Model == other.Model
+                && Product == other.Product
+                && Name == other.Name
+                && Features == other.Features
+                && Usb == other.Usb
+                && TransportId == other.TransportId
+                && Message == other.Message;
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            HashCode hash = new();
+            hash.Add(Serial);
+            hash.Add(State);
+            hash.Add(Model);
+            hash.Add(Product);
+            hash.Add(Name);
+            hash.Add(Features);
+            hash.Add(Usb);
+            hash.Add(TransportId);
+            hash.Add(Message);
+            return hash.ToHashCode();
+        }
 
         /// <inheritdoc/>
         public override string ToString() => Serial;
