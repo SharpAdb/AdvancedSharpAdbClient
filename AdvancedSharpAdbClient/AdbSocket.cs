@@ -470,23 +470,19 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected virtual AdbResponse ReadAdbResponseInner()
         {
-            AdbResponse rasps = new();
-
             byte[] reply = new byte[4];
             Read(reply);
 
-            rasps.IOSuccess = true;
-
-            rasps.Okay = IsOkay(reply);
-
-            if (!rasps.Okay)
+            if (IsOkay(reply))
+            {
+                return AdbResponse.OK;
+            }
+            else
             {
                 string message = ReadString();
-                rasps.Message = message;
-                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), rasps.Message);
+                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), message);
+                return AdbResponse.FromError(message);
             }
-
-            return rasps;
         }
 
         /// <summary>

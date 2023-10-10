@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// The response returned by ADB server.
     /// </summary>
-    public struct AdbResponse : IEquatable<AdbResponse>
+    public readonly struct AdbResponse : IEquatable<AdbResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> struct.
@@ -36,25 +36,25 @@ namespace AdvancedSharpAdbClient
         /// Gets or sets a value indicating whether the IO communication was a success.
         /// </summary>
         /// <value><see langword="true"/> if successful; otherwise, <see langword="false"/>.</value>
-        public bool IOSuccess { get; set; }
+        public bool IOSuccess { get; init; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is okay.
         /// </summary>
         /// <value><see langword="true"/> if okay; otherwise, <see langword="false"/>.</value>
-        public bool Okay { get; set; }
+        public bool Okay { get; init; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AdbResponse"/> is timeout.
         /// </summary>
         /// <value><see langword="true"/> if timeout; otherwise, <see langword="false"/>.</value>
-        public bool Timeout { get; set; }
+        public bool Timeout { get; init; }
 
         /// <summary>
         /// Gets or sets the message.
         /// </summary>
         /// <value>The message.</value>
-        public string Message { get; set; }
+        public string Message { get; init; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="AdbResponse"/> class, based on an

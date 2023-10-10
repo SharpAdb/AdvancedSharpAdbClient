@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the device on which the file operations are being executed.
         /// </summary>
-        public DeviceData Device { get; private set; }
+        public DeviceData Device { get; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that enables the connection with the adb server.

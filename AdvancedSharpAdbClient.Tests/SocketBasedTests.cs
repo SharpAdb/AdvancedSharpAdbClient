@@ -58,7 +58,7 @@ namespace AdvancedSharpAdbClient
             State = DeviceState.Online
         };
 
-        protected AdbClient TestClient { get; private set; }
+        protected AdbClient TestClient { get; init; }
 
         protected IDummyAdbSocket Socket { get; set; }
 

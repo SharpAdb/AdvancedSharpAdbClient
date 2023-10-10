@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <see cref="PackageInstallProgressState.WriteSession"/> and
         /// <see cref="PackageInstallProgressState.PostInstall"/> state.
         /// </summary>
-        public int PackageFinished { get; }
+        public int PackageFinished { get; init; }
 
         /// <summary>
         /// Number of packages required for this operation.
@@ -30,13 +30,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <see cref="PackageInstallProgressState.WriteSession"/> and
         /// <see cref="PackageInstallProgressState.PostInstall"/> state.
         /// </summary>
-        public int PackageRequired { get; }
+        public int PackageRequired { get; init; }
 
         /// <summary>
         /// Upload percentage completed.
         /// Used only in <see cref="PackageInstallProgressState.Uploading"/> state.
         /// </summary>
-        public double UploadProgress { get; }
+        public double UploadProgress { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InstallProgressEventArgs"/> class.

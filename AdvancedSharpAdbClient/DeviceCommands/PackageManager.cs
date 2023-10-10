@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets a value indicating whether this package manager only lists third party applications,
         /// or also includes built-in applications.
         /// </summary>
-        public bool ThirdPartyOnly { get; private set; }
+        public bool ThirdPartyOnly { get; private init; }
 
         /// <summary>
         /// Gets the list of packages currently installed on the device. They key is the name of the package;
@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; private set; }
+        public DeviceData Device { get; private init; }
 
         /// <summary>
         /// Refreshes the packages.
@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            PackageManagerReceiver pmr = new(Device, this);
+            PackageManagerReceiver pmr = new(this);
 
             if (ThirdPartyOnly)
             {

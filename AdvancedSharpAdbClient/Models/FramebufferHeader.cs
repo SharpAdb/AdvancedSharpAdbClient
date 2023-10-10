@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
     /// information about the framebuffer.
     /// </summary>
-    public struct FramebufferHeader
+    public readonly struct FramebufferHeader
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
@@ -78,52 +78,52 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the version of the framebuffer struct.
         /// </summary>
-        public uint Version { get; set; }
+        public uint Version { get; init; }
 
         /// <summary>
         /// Gets or sets the number of bytes per pixel. Usual values include 32 or 24.
         /// </summary>
-        public uint Bpp { get; set; }
+        public uint Bpp { get; init; }
 
         /// <summary>
         /// Gets or sets the color space. Only available starting with <see cref="Version"/> 2.
         /// </summary>
-        public uint ColorSpace { get; set; }
+        public uint ColorSpace { get; init; }
 
         /// <summary>
         /// Gets or sets the total size, in bits, of the framebuffer.
         /// </summary>
-        public uint Size { get; set; }
+        public uint Size { get; init; }
 
         /// <summary>
         /// Gets or sets the width, in pixels, of the framebuffer.
         /// </summary>
-        public uint Width { get; set; }
+        public uint Width { get; init; }
 
         /// <summary>
         /// Gets or sets the height, in pixels, of the framebuffer.
         /// </summary>
-        public uint Height { get; set; }
+        public uint Height { get; init; }
 
         /// <summary>
         /// Gets or sets information about the red color channel.
         /// </summary>
-        public ColorData Red { get; set; }
+        public ColorData Red { get; init; }
 
         /// <summary>
         /// Gets or sets information about the blue color channel.
         /// </summary>
-        public ColorData Blue { get; set; }
+        public ColorData Blue { get; init; }
 
         /// <summary>
         /// Gets or sets information about the green color channel.
         /// </summary>
-        public ColorData Green { get; set; }
+        public ColorData Green { get; init; }
 
         /// <summary>
         /// Gets or sets information about the alpha channel.
         /// </summary>
-        public ColorData Alpha { get; set; }
+        public ColorData Alpha { get; init; }
 
         /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.

@@ -129,27 +129,27 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the current device containing the element.
         /// </summary>
-        protected DeviceData Device { get; }
+        protected DeviceData Device { get; init; }
 
         /// <summary>
         /// Gets the coordinates and size of the element.
         /// </summary>
-        public Area Bounds { get; }
+        public Area Bounds { get; init; }
 
         /// <summary>
         /// Gets the children of this element.
         /// </summary>
-        public IEnumerable<Element> Children { get; }
+        public IEnumerable<Element> Children { get; init; }
 
         /// <summary>
         /// Gets the element attributes.
         /// </summary>
-        public Dictionary<string, string> Attributes { get; }
+        public Dictionary<string, string> Attributes { get; init; }
 
         /// <summary>
         /// Gets the <see cref="XmlNode"/> of this element.
         /// </summary>
-        public XmlNode Node { get; }
+        public XmlNode Node { get; init; }
 
         /// <summary>
         /// Gets the coordinates of the the center of the element.
@@ -361,7 +361,9 @@ namespace AdvancedSharpAdbClient
             ^ Device.GetHashCode()
             ^ (Node == null
                 ? Bounds.GetHashCode()
-                    ^ Attributes.GetHashCode()
+                    ^ (Attributes == null
+                        ? 1
+                        : Attributes.GetHashCode())
                 : Node.GetHashCode());
 #endif
 

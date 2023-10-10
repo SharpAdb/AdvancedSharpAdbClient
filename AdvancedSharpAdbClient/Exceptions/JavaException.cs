@@ -20,12 +20,12 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Gets the name of Java exception.
         /// </summary>
-        public string JavaName { get; }
+        public string JavaName { get; init; }
 
         /// <summary>
         /// Gets a string representation of the immediate frames on the call stack of Java exception.
         /// </summary>
-        public string JavaStackTrace { get; }
+        public string JavaStackTrace { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JavaException"/> class.

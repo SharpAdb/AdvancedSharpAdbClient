@@ -11,18 +11,18 @@ namespace AdvancedSharpAdbClient
     /// <para>For example, in a 24-bit RGB structure, the first byte contains the red color,
     /// the next byte the green color and the last byte the blue color.</para>
     /// </summary>
-    public struct ColorData
+    public readonly record struct ColorData(uint Length, uint Offset)
     {
         /// <summary>
         /// Gets or sets the number of bits that contain information for this color.
         /// </summary>
-        public uint Length { get; set; }
+        public uint Length { get; init; } = Length;
 
         /// <summary>
         /// Gets or sets the offset, in bits, within the byte array for a pixel, at which the
         /// bytes that contain information for this color are stored.
         /// </summary>
-        public uint Offset { get; set; }
+        public uint Offset { get; init; } = Offset;
 
         /// <summary>
         /// Deconstruct the <see cref="Cords"/> struct.

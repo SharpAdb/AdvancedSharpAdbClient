@@ -375,23 +375,19 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected virtual async Task<AdbResponse> ReadAdbResponseInnerAsync(CancellationToken cancellationToken = default)
         {
-            AdbResponse rasps = new();
-
             byte[] reply = new byte[4];
             _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-            rasps.IOSuccess = true;
-
-            rasps.Okay = IsOkay(reply);
-
-            if (!rasps.Okay)
+            if (IsOkay(reply))
+            {
+                return AdbResponse.OK;
+            }
+            else
             {
                 string message = await ReadStringAsync(cancellationToken).ConfigureAwait(false);
-                rasps.Message = message;
-                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), rasps.Message);
+                logger.LogError("Got reply '{0}', diag='{1}'", ReplyToString(reply), message);
+                return AdbResponse.FromError(message);
             }
-
-            return rasps;
         }
     }
 }

@@ -56,47 +56,47 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
-        public string Serial { get; set; }
+        public string Serial { get; init; }
 
         /// <summary>
         /// Gets or sets the device state.
         /// </summary>
-        public DeviceState State { get; set; }
+        public DeviceState State { get; init; }
 
         /// <summary>
         /// Gets or sets the device model name.
         /// </summary>
-        public string Model { get; set; }
+        public string Model { get; init; }
 
         /// <summary>
         /// Gets or sets the device product name.
         /// </summary>
-        public string Product { get; set; }
+        public string Product { get; init; }
 
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         /// <summary>
         /// Gets or sets the features available on the device.
         /// </summary>
-        public string Features { get; set; }
+        public string Features { get; init; }
 
         /// <summary>
         /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
         /// </summary>
-        public string Usb { get; set; }
+        public string Usb { get; init; }
 
         /// <summary>
         /// Gets or sets the transport ID for this device.
         /// </summary>
-        public string TransportId { get; set; }
+        public string TransportId { get; init; }
 
         /// <summary>
         /// Gets or sets the device info message. Currently only seen for NoPermissions state.
         /// </summary>
-        public string Message { get; set; }
+        public string Message { get; init; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on

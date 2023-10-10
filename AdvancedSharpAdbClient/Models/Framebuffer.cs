@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; }
+        public EndPoint EndPoint { get; init; }
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.

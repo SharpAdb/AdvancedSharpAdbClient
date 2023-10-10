@@ -296,32 +296,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets the state of the process.
         /// </summary>
-        public AndroidProcessState State { get; set; }
+        public AndroidProcessState State { get; init; }
 
         /// <summary>
         /// Gets or sets the name of the process, including arguments, if any.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         /// <summary>
         /// Gets or sets the parent Process ID number.
         /// </summary>
-        public int ParentProcessId { get; set; }
+        public int ParentProcessId { get; init; }
 
         /// <summary>
         /// Gets or sets the Process Group ID number.
         /// </summary>
-        public int ProcessGroupId { get; set; }
+        public int ProcessGroupId { get; init; }
 
         /// <summary>
         /// Gets or sets the session ID of the process number.
         /// </summary>
-        public int SessionID { get; set; }
+        public int SessionID { get; init; }
 
         /// <summary>
         /// Gets or sets the Process ID number.
         /// </summary>
-        public int ProcessId { get; set; }
+        public int ProcessId { get; init; }
 
         /// <summary>
         /// Gets or sets the controlling terminal of the process.
@@ -329,40 +329,40 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <value>The minor device number is contained in the combination of bits
         /// <see langword="31"/> to <see langword="20"/> and <see langword="7"/> to <see langword="0"/>;
         /// the major device number is in bits <see langword="15"/> to <see langword="8"/>.</value>
-        public int TTYNumber { get; set; }
+        public int TTYNumber { get; init; }
 
         /// <summary>
         /// Gets or sets the ID of the foreground process group of the controlling terminal of the process.
         /// </summary>
-        public int TopProcessGroupId { get; set; }
+        public int TopProcessGroupId { get; init; }
 
         /// <summary>
         /// Gets or sets The kernel flags word of the process. For bit meanings, see the <c>PF_*</c> defines
         /// in the Linux kernel source file <c>include/linux/sched.h</c>. Details depend on the kernel version.
         /// </summary>
-        public PerProcessFlags Flags { get; set; }
+        public PerProcessFlags Flags { get; init; }
 
         /// <summary>
         /// Gets or sets the number of minor faults the process has made
         /// which have not required loading a memory page from disk.
         /// </summary>
-        public ulong MinorFaults { get; set; }
+        public ulong MinorFaults { get; init; }
 
         /// <summary>
         /// Gets or sets the number of minor faults that the process's waited-for children have made.
         /// </summary>
-        public ulong ChildMinorFaults { get; set; }
+        public ulong ChildMinorFaults { get; init; }
 
         /// <summary>
         /// Gets or sets the number of major faults the process has made
         /// which have required loading a memory page from disk.
         /// </summary>
-        public ulong MajorFaults { get; set; }
+        public ulong MajorFaults { get; init; }
 
         /// <summary>
         /// Gets or sets the number of major faults that the process's waited-for children have made.
         /// </summary>
-        public ulong ChildMajorFaults { get; set; }
+        public ulong ChildMajorFaults { get; init; }
 
         /// <summary>
         /// Gets or sets the amount of time that this process has been scheduled in user mode,
@@ -370,26 +370,26 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// guest_time (time spent running a virtual CPU, see below), so that applications
         /// that are not aware of the guest time field do not lose that time from their calculations.
         /// </summary>
-        public ulong UserScheduledTime { get; set; }
+        public ulong UserScheduledTime { get; init; }
 
         /// <summary>
         /// Gets or sets the amount of time that this process has been scheduled in kernel mode,
         /// measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
         /// </summary>
-        public ulong ScheduledTime { get; set; }
+        public ulong ScheduledTime { get; init; }
 
         /// <summary>
         /// Gets or sets the amount of time that this process's waited-for children have been scheduled in user mode,
         /// measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>). (See also <c>times(2)</c>.)
         /// This includes guest time, cguest_time (time spent running a virtual CPU, see below).
         /// </summary>
-        public long ChildUserScheduledTime { get; set; }
+        public long ChildUserScheduledTime { get; init; }
 
         /// <summary>
         /// Gets or sets the Amount of time that this process's waited-for children have been scheduled in kernel mode,
         /// measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
         /// </summary>
-        public long ChildScheduledTime { get; set; }
+        public long ChildScheduledTime { get; init; }
 
         /// <summary>
         /// Gets or sets the value for processes running a real-time scheduling policy
@@ -401,25 +401,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// in the range <see langword="0"/> (high) to <see langword="39"/> (low),
         /// corresponding to the user-visible nice range of <see langword="-20"/> to <see langword="19"/>.
         /// </summary>
-        public long Priority { get; set; }
+        public long Priority { get; init; }
 
         /// <summary>
         /// Gets or sets the nice value (see <c>setpriority(2)</c>), a value in the range
         /// <see langword="19"/> (low priority) to <see langword="-20"/> (high priority).
         /// </summary>
-        public long Nice { get; set; }
+        public long Nice { get; init; }
 
         /// <summary>
         /// Gets or sets the number of threads in this process (since Linux 2.6).
         /// </summary>
         /// <remarks>Before kernel 2.6, this field was hard coded to 0 as a placeholder for an earlier removed field.</remarks>
-        public long ThreadsNumber { get; set; }
+        public long ThreadsNumber { get; init; }
 
         /// <summary>
         /// Gets or sets the time in jiffies before the next <c>SIGALRM</c> is sent to the process due to an interval timer.
         /// </summary>
         /// <remarks>Since kernel 2.6.17, this field is no longer maintained, and is hard coded as 0.</remarks>
-        public long Interval { get; set; }
+        public long Interval { get; init; }
 
         /// <summary>
         /// Gets or sets The time the process started after system boot. In kernels before Linux 2.6,
@@ -427,12 +427,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// (divide by <c>sysconf(_SC_CLK_TCK)</c>).
         /// </summary>
         /// <remarks>The format for this field was %lu before Linux 2.6.</remarks>
-        public ulong StartTime { get; set; }
+        public ulong StartTime { get; init; }
 
         /// <summary>
         /// Gets or sets total virtual memory size in bytes.
         /// </summary>
-        public ulong VirtualSize { get; set; }
+        public ulong VirtualSize { get; init; }
 
         /// <summary>
         /// Gets or sets the process resident set size.
@@ -441,62 +441,62 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// This is just the pages which count toward text, data, or stack space.
         /// This does not include pages which have not been demand-loaded in, or which are swapped out.
         /// This value is inaccurate; see <c>/proc/[pid]/statm</c> below.</value>
-        public int ResidentSetSize { get; set; }
+        public int ResidentSetSize { get; init; }
 
         /// <summary>
         /// Gets or sets current soft limit in bytes on the rss of the process;
         /// See the description of RLIMIT_RSS in <c>getrlimit(2)</c>.
         /// </summary>
-        public ulong ResidentSetSizeLimit { get; set; }
+        public ulong ResidentSetSizeLimit { get; init; }
 
         /// <summary>
         /// Gets or sets the address above which program text can run.
         /// </summary>
-        public ulong StartCode { get; set; }
+        public ulong StartCode { get; init; }
 
         /// <summary>
         /// Gets or sets the address below which program text can run.
         /// </summary>
-        public ulong EndCode { get; set; }
+        public ulong EndCode { get; init; }
 
         /// <summary>
         /// Gets or sets the address of the start (i.e., bottom) of the stack.
         /// </summary>
-        public ulong StartStack { get; set; }
+        public ulong StartStack { get; init; }
 
         /// <summary>
         /// Gets or sets the current value of ESP (stack pointer), as found in the kernel stack page for the process.
         /// </summary>
-        public ulong ESP { get; set; }
+        public ulong ESP { get; init; }
 
         /// <summary>
         /// Gets or sets the current EIP (instruction pointer).
         /// </summary>
-        public ulong EIP { get; set; }
+        public ulong EIP { get; init; }
 
         /// <summary>
         /// Gets or sets the bitmap of pending signals, displayed as a decimal number. Obsolete,
         /// because it does not provide information on real-time signals; Use <c>/proc/[pid]/status</c> instead.
         /// </summary>
-        public ulong Signal { get; set; }
+        public ulong Signal { get; init; }
 
         /// <summary>
         /// Gets or sets the bitmap of blocked signals, displayed as a decimal number. Obsolete,
         /// because it does not provide information on real-time signals; Use <c>/proc/[pid]/status</c> instead.
         /// </summary>
-        public ulong Blocked { get; set; }
+        public ulong Blocked { get; init; }
 
         /// <summary>
         /// Gets or sets the bitmap of ignored signals, displayed as a decimal number. Obsolete,
         /// because it does not provide information on real-time signals; Use <c>/proc/[pid]/status</c> instead.
         /// </summary>
-        public ulong IgnoredSignals { get; set; }
+        public ulong IgnoredSignals { get; init; }
 
         /// <summary>
         /// Gets or sets the bitmap of caught signals, displayed as a decimal number. Obsolete,
         /// because it does not provide information on real-time signals; Use <c>/proc/[pid]/status</c> instead.
         /// </summary>
-        public ulong CaughtSignals { get; set; }
+        public ulong CaughtSignals { get; init; }
 
         /// <summary>
         /// Gets or sets the memory address of the event the process is waiting for.
@@ -504,95 +504,95 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <value>This is the "channel" in which the process is waiting.
         /// It is the address of a location in the kernel where the process is sleeping.
         /// The corresponding symbolic name can be found in <c>/proc/[pid]/wchan</c>.</value>
-        public ulong WChan { get; set; }
+        public ulong WChan { get; init; }
 
         /// <summary>
         /// Gets or sets the number of pages swapped (not maintained).
         /// </summary>
-        public ulong SwappedPagesNumber { get; set; }
+        public ulong SwappedPagesNumber { get; init; }
 
         /// <summary>
         /// Gets or sets the cumulative number of pages swapped for child processes (not maintained).
         /// </summary>
-        public ulong CumulativeSwappedPagesNumber { get; set; }
+        public ulong CumulativeSwappedPagesNumber { get; init; }
 
         /// <summary>
         /// Gets or sets the signal to be sent to parent when we die.
         /// </summary>
-        public int ExitSignal { get; set; }
+        public int ExitSignal { get; init; }
 
         /// <summary>
         /// Gets or sets the CPU number last executed on.
         /// </summary>
-        public int Processor { get; set; }
+        public int Processor { get; init; }
 
         /// <summary>
         /// Gets or sets the real-time scheduling priority, a number in the range 1 to 99 for processes scheduled
         /// under a real-time policy, or 0, for non-real-time processes (see <c>sched_setscheduler(2)</c>).
         /// </summary>
-        public uint RealTimePriority { get; set; }
+        public uint RealTimePriority { get; init; }
 
         /// <summary>
         /// Gets or sets the scheduling policy (see <c>sched_setscheduler(2)</c>).
         /// Decode using the <c>SCHED_*</c> constants in <c>linux/sched.h</c>.
         /// </summary>
-        public uint Policy { get; set; }
+        public uint Policy { get; init; }
 
         /// <summary>
         /// Gets or sets the aggregated block I/O delays, measured in clock ticks (centiseconds).
         /// </summary>
-        public ulong IODelays { get; set; }
+        public ulong IODelays { get; init; }
 
         /// <summary>
         /// Gets or sets the guest time of the process (time spent running a virtual CPU for a guest operating system),
         /// measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
         /// </summary>
-        public ulong GuestTime { get; set; }
+        public ulong GuestTime { get; init; }
 
         /// <summary>
         /// Gets or sets the guest time of the process's children, measured in clock ticks (divide by <c>sysconf(_SC_CLK_TCK)</c>).
         /// </summary>
-        public long ChildGuestTime { get; set; }
+        public long ChildGuestTime { get; init; }
 
         /// <summary>
         /// Gets or sets the address above which program initialized and uninitialized(BSS) data are placed.
         /// </summary>
-        public ulong StartData { get; set; }
+        public ulong StartData { get; init; }
 
         /// <summary>
         /// Gets or sets the address below which program initialized and uninitialized(BSS) data are placed.
         /// </summary>
-        public ulong EndData { get; set; }
+        public ulong EndData { get; init; }
 
         /// <summary>
         /// Gets or sets the address above which program heap can be expanded with <c>brk(2)</c>.
         /// </summary>
-        public ulong StartBrk { get; set; }
+        public ulong StartBrk { get; init; }
 
         /// <summary>
         /// Gets or sets the address above which program command-line arguments (<c>argv</c>) are placed.
         /// </summary>
-        public ulong ArgStart { get; set; }
+        public ulong ArgStart { get; init; }
 
         /// <summary>
         /// Gets or sets the address below program command-line arguments (<c>argv</c>) are placed.
         /// </summary>
-        public ulong ArgEnd { get; set; }
+        public ulong ArgEnd { get; init; }
 
         /// <summary>
         /// Gets or sets the address above which program environment is placed.
         /// </summary>
-        public ulong EnvStart { get; set; }
+        public ulong EnvStart { get; init; }
 
         /// <summary>
         /// Gets or sets the address below which program environment is placed.
         /// </summary>
-        public ulong EnvEnd { get; set; }
+        public ulong EnvEnd { get; init; }
 
         /// <summary>
         /// Gets or sets the thread's exit status in the form reported by <c>waitpid(2)</c>.
         /// </summary>
-        public int ExitCode { get; set; }
+        public int ExitCode { get; init; }
 
         /// <summary>
         /// Creates a <see cref="AndroidProcess"/> from it <see cref="string"/> representation.

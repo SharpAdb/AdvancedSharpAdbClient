@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
 
             PackageManager manager = new(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
-            PackageManagerReceiver receiver = new(device, manager);
+            PackageManagerReceiver receiver = new(manager);
 
             // Act
             receiver.AddOutput("package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus");

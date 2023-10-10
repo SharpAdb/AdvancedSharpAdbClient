@@ -71,12 +71,12 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Gets the error message that was sent by adb.
         /// </summary>
-        public string AdbError { get; private set; }
+        public string AdbError { get; init; }
 
         /// <summary>
         /// Gets the response that was sent by adb.
         /// </summary>
-        public AdbResponse Response { get; private set; }
+        public AdbResponse Response { get; init; }
 
         /// <summary>
         /// Gets a value indicating whether the underlying error was a <see cref="SocketException"/> where the

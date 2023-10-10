@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            PackageManagerReceiver pmr = new(Device, this);
+            PackageManagerReceiver pmr = new(this);
 
             return ThirdPartyOnly
                 ? client.ExecuteShellCommandAsync(Device, ListThirdPartyOnly, pmr, cancellationToken)

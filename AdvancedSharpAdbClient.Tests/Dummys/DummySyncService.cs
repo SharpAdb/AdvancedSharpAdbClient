@@ -8,7 +8,7 @@ namespace AdvancedSharpAdbClient.Tests
 {
     internal class DummySyncService : ISyncService
     {
-        public Dictionary<string, Stream> UploadedFiles { get; private set; } = new Dictionary<string, Stream>();
+        public Dictionary<string, Stream> UploadedFiles { get; } = new Dictionary<string, Stream>();
 
         public bool IsOpen { get; private set; } = true;
 

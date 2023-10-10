@@ -12,11 +12,11 @@ namespace AdvancedSharpAdbClient.Tests
 {
     internal class DummyAdbClient : IAdbClient
     {
-        public Dictionary<string, string> Commands { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Commands { get; } = new Dictionary<string, string>();
 
-        public List<string> ReceivedCommands { get; private set; } = new List<string>();
+        public List<string> ReceivedCommands { get; } = new List<string>();
 
-        public EndPoint EndPoint { get; private set; }
+        public EndPoint EndPoint { get; init; }
 
         public void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding) =>
             ExecuteServerCommand("shell", command, encoding);

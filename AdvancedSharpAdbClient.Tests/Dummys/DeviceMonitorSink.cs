@@ -28,15 +28,15 @@ namespace AdvancedSharpAdbClient.Tests
             DisconnectedEvents.Clear();
         }
 
-        public List<DeviceDataConnectEventArgs> DisconnectedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> DisconnectedEvents { get; init; }
 
-        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; init; }
 
-        public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; private set; }
+        public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; init; }
 
-        public List<DeviceDataChangeEventArgs> ChangedEvents { get; private set; }
+        public List<DeviceDataChangeEventArgs> ChangedEvents { get; init; }
 
-        public DeviceMonitor Monitor { get; private set; }
+        public DeviceMonitor Monitor { get; init; }
 
         public ManualResetEvent CreateEventSignal()
         {

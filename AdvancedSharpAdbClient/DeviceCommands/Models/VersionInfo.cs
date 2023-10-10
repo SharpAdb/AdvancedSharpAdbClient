@@ -11,19 +11,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Represents a version of an Android application.
     /// </summary>
-    /// <param name="versionCode">The version code of the application.</param>
-    /// <param name="versionName">The version name of the application.</param>
-    public struct VersionInfo(int versionCode, string versionName) : IComparer, IComparer<VersionInfo>
+    /// <param name="VersionCode">The version code of the application.</param>
+    /// <param name="VersionName">The version name of the application.</param>
+    public readonly record struct VersionInfo(int VersionCode, string VersionName) : IComparer, IComparer<VersionInfo>
     {
         /// <summary>
         /// Gets or sets the version code of an Android application.
         /// </summary>
-        public int VersionCode { get; set; } = versionCode;
+        public int VersionCode { get; init; } = VersionCode;
 
         /// <summary>
         /// Gets or sets the version name of an Android application.
         /// </summary>
-        public string VersionName { get; set; } = versionName;
+        public string VersionName { get; init; } = VersionName;
 
         /// <inheritdoc/>
         public readonly int Compare(object x, object y) =>

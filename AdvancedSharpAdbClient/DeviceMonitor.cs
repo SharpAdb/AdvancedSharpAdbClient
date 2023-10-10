@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public ReadOnlyCollection<DeviceData> Devices { get; private set; }
+        public ReadOnlyCollection<DeviceData> Devices { get; init; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
@@ -299,7 +299,7 @@ namespace AdvancedSharpAdbClient
                 // Add or update existing devices
                 foreach (DeviceData device in devices)
                 {
-                    DeviceData existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
+                    DeviceData existingDevice = this.devices.SingleOrDefault(d => d.Serial == device.Serial);
 
                     if (existingDevice == null)
                     {
@@ -309,13 +309,21 @@ namespace AdvancedSharpAdbClient
                     else if (existingDevice.State != device.State)
                     {
                         DeviceState oldState = existingDevice.State;
-                        existingDevice.State = device.State;
-                        OnDeviceChanged(new DeviceDataChangeEventArgs(existingDevice, device.State, oldState));
+                        int index = this.devices.IndexOf(existingDevice);
+                        if (index != -1)
+                        {
+                            this.devices[index] = device;
+                        }
+                        else
+                        {
+                            this.devices.Add(device);
+                        }
+                        OnDeviceChanged(new DeviceDataChangeEventArgs(device, device.State, oldState));
                     }
                 }
 
                 // Remove devices
-                foreach (DeviceData device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
+                foreach (DeviceData device in this.devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
                 {
                     this.devices.Remove(device);
                     OnDeviceDisconnected(new DeviceDataConnectEventArgs(device, false));

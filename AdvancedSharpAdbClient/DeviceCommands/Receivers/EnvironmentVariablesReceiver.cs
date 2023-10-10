@@ -25,12 +25,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>
-        public EnvironmentVariablesReceiver() => EnvironmentVariables = new Dictionary<string, string>();
+        public EnvironmentVariablesReceiver() { }
 
         /// <summary>
         /// Gets the environment variables that are currently defined on the device.
         /// </summary>
-        public Dictionary<string, string> EnvironmentVariables { get; private set; }
+        public Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Processes the new lines.

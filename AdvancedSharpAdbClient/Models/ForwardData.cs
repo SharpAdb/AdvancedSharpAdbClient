@@ -42,12 +42,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the serial number of the device for which the port forwarding is configured.
         /// </summary>
-        public string SerialNumber { get; set; }
+        public string SerialNumber { get; init; }
 
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the local (PC) endpoint.
         /// </summary>
-        public string Local { get; set; }
+        public string Local { get; init; }
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the local (PC) endpoint.
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the remote (device) endpoint.
         /// </summary>
-        public string Remote { get; set; }
+        public string Remote { get; init; }
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the remote (device) endpoint.

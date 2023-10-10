@@ -90,26 +90,26 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the protocol which is being forwarded.
         /// </summary>
-        public ForwardProtocol Protocol { get; set; }
+        public ForwardProtocol Protocol { get; init; }
 
         /// <summary>
         /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.Tcp"/>, the port
         /// number of the port being forwarded.
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; init; }
 
         /// <summary>
         /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.LocalAbstract"/>,
         /// <see cref="ForwardProtocol.LocalReserved"/> or <see cref="ForwardProtocol.LocalFilesystem"/>,
         /// the Unix domain socket name of the socket being forwarded.
         /// </summary>
-        public string SocketName { get; set; }
+        public string SocketName { get; init; }
 
         /// <summary>
         /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.JavaDebugWireProtocol"/>,
         /// the process id of the process to which the debugger is attached.
         /// </summary>
-        public int ProcessId { get; set; }
+        public int ProcessId { get; init; }
 
         /// <summary>
         /// Creates a <see cref="ForwardSpec"/> from its <see cref="string"/> representation.
