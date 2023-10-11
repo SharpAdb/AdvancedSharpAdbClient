@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 
@@ -485,15 +486,19 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
+        [DoesNotReturn]
         public override void Flush() => throw new NotImplementedException();
 
         /// <inheritdoc/>
+        [DoesNotReturn]
         public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
 
         /// <inheritdoc/>
+        [DoesNotReturn]
         public override void SetLength(long value) => throw new NotImplementedException();
 
         /// <inheritdoc/>
+        [DoesNotReturn]
         public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
         /// <inheritdoc/>

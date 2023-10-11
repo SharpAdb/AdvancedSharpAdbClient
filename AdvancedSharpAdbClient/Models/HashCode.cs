@@ -44,6 +44,7 @@ https://raw.githubusercontent.com/Cyan4973/xxHash/5c174cfa4e45a42f94082dc0d4539b
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
@@ -543,11 +544,13 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [DoesNotReturn]
         public override readonly int GetHashCode() => throw new NotSupportedException("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.");
 
         /// <inheritdoc/>
         [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes.", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [DoesNotReturn]
         public override readonly bool Equals(object obj) => throw new NotSupportedException("HashCode is a mutable struct and should not be compared with other HashCodes.");
 
         /// <inheritdoc/>

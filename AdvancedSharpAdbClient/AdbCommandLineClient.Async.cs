@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -132,6 +133,9 @@ namespace AdvancedSharpAdbClient
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
+#if !HAS_PROCESS
+        [DoesNotReturn]
+#endif
         protected virtual async Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
 #if HAS_PROCESS

@@ -201,36 +201,6 @@ namespace AdvancedSharpAdbClient
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Raises the <see cref="DeviceChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataChangeEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceChanged(DeviceDataChangeEventArgs e) => DeviceChanged?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceNotified"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataNotifyEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceNotified(DeviceDataNotifyEventArgs e) => DeviceNotified?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceConnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceConnected(DeviceDataConnectEventArgs e) => DeviceConnected?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceListChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataNotifyEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceListChanged(DeviceDataNotifyEventArgs e) => DeviceListChanged?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceDisconnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceDisconnected(DeviceDataConnectEventArgs e) => DeviceDisconnected?.Invoke(this, e);
-
 #if !HAS_TASK
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge
@@ -284,10 +254,9 @@ namespace AdvancedSharpAdbClient
         private void ProcessIncomingDeviceData(string result)
         {
             string[] deviceValues = result.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
             IEnumerable<DeviceData> currentDevices = deviceValues.Select(x => new DeviceData(x));
             UpdateDevices(currentDevices);
-            OnDeviceNotified(new DeviceDataNotifyEventArgs(currentDevices));
+            DeviceNotified?.Invoke(this, new DeviceDataNotifyEventArgs(currentDevices));
         }
 
         /// <summary>
@@ -307,9 +276,8 @@ namespace AdvancedSharpAdbClient
                 // add them to the list, and start monitoring them.
 
                 bool isChanged = false;
-                int length = this.devices.Count;
                 List<DeviceData> devices = collection.ToList();
-                for (int i = 0; i < length;)
+                for (int i = this.devices.Count; --i >= 0;)
                 {
                     DeviceData currentDevice = this.devices[i];
                     int index = devices.FindIndex(d => d.Serial == currentDevice.Serial);
@@ -317,9 +285,8 @@ namespace AdvancedSharpAdbClient
                     {
                         // Remove disconnected devices
                         this.devices.RemoveAt(i);
-                        OnDeviceDisconnected(new DeviceDataConnectEventArgs(currentDevice, false));
+                        DeviceDisconnected?.Invoke(this, new DeviceDataConnectEventArgs(currentDevice, false));
                         isChanged = true;
-                        length--;
                     }
                     else
                     {
@@ -328,11 +295,10 @@ namespace AdvancedSharpAdbClient
                         {
                             // Change device state
                             this.devices[i] = device;
-                            OnDeviceChanged(new DeviceDataChangeEventArgs(device, device.State, currentDevice.State));
+                            DeviceChanged?.Invoke(this, new DeviceDataChangeEventArgs(device, device.State, currentDevice.State));
                             isChanged = true;
                         }
                         devices.RemoveAt(index);
-                        i++;
                     }
                 }
 
@@ -342,14 +308,14 @@ namespace AdvancedSharpAdbClient
                     foreach (DeviceData device in devices)
                     {
                         this.devices.Add(device);
-                        OnDeviceConnected(new DeviceDataConnectEventArgs(device, false));
+                        DeviceConnected?.Invoke(this, new DeviceDataConnectEventArgs(device, false));
                     }
                     isChanged = true;
                 }
 
                 if (isChanged)
                 {
-                    OnDeviceListChanged(new DeviceDataNotifyEventArgs(devices));
+                    DeviceListChanged?.Invoke(this, new DeviceDataNotifyEventArgs(devices));
                 }
             }
         }

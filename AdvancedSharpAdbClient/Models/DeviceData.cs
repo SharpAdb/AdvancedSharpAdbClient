@@ -35,11 +35,7 @@ namespace AdvancedSharpAdbClient
         public DeviceData(string data)
         {
             Match match = Regex.Match(data);
-            if (!match.Success)
-            {
-                throw new ArgumentException($"Invalid device list data '{data}'");
-            }
-            else
+            if (match.Success)
             {
                 Serial = match.Groups["serial"].Value;
                 State = GetStateFromString(match.Groups["state"].Value);
@@ -50,6 +46,10 @@ namespace AdvancedSharpAdbClient
                 Usb = match.Groups["usb"].Value;
                 TransportId = match.Groups["transport_id"].Value;
                 Message = match.Groups["message"].Value;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid device list data '{data}'");
             }
         }
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -236,6 +237,9 @@ namespace AdvancedSharpAdbClient
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
+#if !HAS_PROCESS
+        [DoesNotReturn]
+#endif
         protected virtual int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
 #if HAS_PROCESS

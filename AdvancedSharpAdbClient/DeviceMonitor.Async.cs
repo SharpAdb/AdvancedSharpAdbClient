@@ -45,13 +45,11 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Stops the monitoring
         /// </summary>
-        protected virtual async
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            ValueTask
+        protected virtual async ValueTask DisposeAsyncCore()
 #else
-            Task
+        protected virtual async Task DisposeAsyncCore()
 #endif
-            DisposeAsyncCore()
         {
             if (disposed) { return; }
 
@@ -85,13 +83,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            ValueTask
+        public async ValueTask DisposeAsync()
 #else
-            Task
+        public async Task DisposeAsync()
 #endif
-            DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);

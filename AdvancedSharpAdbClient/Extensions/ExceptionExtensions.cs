@@ -89,11 +89,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="instance">The object whose type's full name should be included in any resulting <see cref="ObjectDisposedException"/>.</param>
         /// <exception cref="ObjectDisposedException">The <paramref name="condition"/> is <see langword="true"/>.</exception>
         [StackTraceHidden]
-        public static void ThrowIf(
-#if HAS_INDEXRANGE
-            [DoesNotReturnIf(true)]
-#endif
-            bool condition, object instance)
+        public static void ThrowIf([DoesNotReturnIf(true)] bool condition, object instance)
         {
 #if NET7_0_OR_GREATER
             ObjectDisposedException.ThrowIf(condition, instance);

@@ -16,6 +16,9 @@ namespace System.Diagnostics.CodeAnalysis
         )]
     internal sealed class ExcludeFromCodeCoverageAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExcludeFromCodeCoverageAttribute"/> class.
+        /// </summary>
         public ExcludeFromCodeCoverageAttribute() { }
     }
 }
