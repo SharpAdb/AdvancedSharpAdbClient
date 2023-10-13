@@ -39,7 +39,10 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <inheritdoc/>
-        public StartServerResult RestartServer(string adbPath = null)
+        public StartServerResult RestartServer() => RestartServer(null);
+
+        /// <inheritdoc/>
+        public StartServerResult RestartServer(string adbPath)
         {
             WasRestarted = true;
             return StartServer(adbPath, false);

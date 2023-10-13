@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <remarks>No connection could be made because the target computer actively refused it.This usually
         /// results from trying to connect to a service that is inactive on the foreign host—that is,
-        ///  one with no server application running. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
+        /// one with no server application running. <seealso href="https://msdn.microsoft.com/en-us/library/ms740668.aspx"/></remarks>
         public const int ConnectionRefused = 10061;
 
         /// <summary>
@@ -44,9 +44,9 @@ namespace AdvancedSharpAdbClient
         public const int ConnectionReset = 10054;
 
         /// <summary>
-        /// A lock used to ensure only one caller at a time can attempt to restart adb.
+        /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
         /// </summary>
-        protected static readonly object RestartLock = new();
+        protected static bool IsStarting = false;
 
         /// <summary>
         /// The current ADB client that manages the connection.
@@ -102,68 +102,67 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
         {
-            AdbServerStatus serverStatus = GetStatus();
-            Version commandLineVersion = null;
-
-            IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-            CheckFileExists = commandLineClient.CheckFileExists;
-
-            if (commandLineClient.CheckFileExists(adbPath))
+            if (IsStarting) { return StartServerResult.Starting; }
+            try
             {
-                CachedAdbPath = adbPath;
-                commandLineVersion = commandLineClient.GetVersion();
-            }
+                AdbServerStatus serverStatus = GetStatus();
+                Version commandLineVersion = null;
 
-            // If the server is running, and no adb path is provided, check if we have the minimum version
-            if (adbPath == null)
-            {
-                return !serverStatus.IsRunning
-                    ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
-                    : serverStatus.Version >= RequiredAdbVersion
-                    ? StartServerResult.AlreadyRunning
-                    : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
-            }
+                IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+                CheckFileExists = commandLineClient.CheckFileExists;
 
-            if (serverStatus.IsRunning)
-            {
-                if (serverStatus.Version < RequiredAdbVersion
-                    || (serverStatus.Version < commandLineVersion && restartServerIfNewer))
+                if (commandLineClient.CheckFileExists(adbPath))
                 {
-                    ExceptionExtensions.ThrowIfNull(adbPath);
+                    CachedAdbPath = adbPath;
+                    commandLineVersion = commandLineClient.GetVersion();
+                }
 
-                    adbClient.KillAdb();
-                    commandLineClient.StartServer();
-                    return StartServerResult.RestartedOutdatedDaemon;
+                // If the server is running, and no adb path is provided, check if we have the minimum version
+                if (adbPath == null)
+                {
+                    return !serverStatus.IsRunning
+                        ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
+                        : serverStatus.Version >= RequiredAdbVersion
+                        ? StartServerResult.AlreadyRunning
+                        : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                }
+
+                if (serverStatus.IsRunning)
+                {
+                    if (serverStatus.Version < RequiredAdbVersion
+                        || (restartServerIfNewer && serverStatus.Version < commandLineVersion))
+                    {
+                        ExceptionExtensions.ThrowIfNull(adbPath);
+
+                        adbClient.KillAdb();
+                        commandLineClient.StartServer();
+                        return StartServerResult.RestartedOutdatedDaemon;
+                    }
+                    else
+                    {
+                        return StartServerResult.AlreadyRunning;
+                    }
                 }
                 else
                 {
-                    return StartServerResult.AlreadyRunning;
+                    ExceptionExtensions.ThrowIfNull(adbPath);
+
+                    commandLineClient.StartServer();
+                    return StartServerResult.Started;
                 }
             }
-            else
+            finally
             {
-                ExceptionExtensions.ThrowIfNull(adbPath);
-
-                commandLineClient.StartServer();
-                return StartServerResult.Started;
+                IsStarting = false;
             }
         }
 
         /// <inheritdoc/>
-        public virtual StartServerResult RestartServer(string adbPath = null)
-        {
-            adbPath ??= CachedAdbPath;
+        public virtual StartServerResult RestartServer() => StartServer(CachedAdbPath, true);
 
-            if (!CheckFileExists(adbPath))
-            {
-                throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
-            }
-
-            lock (RestartLock)
-            {
-                return StartServer(adbPath, true);
-            }
-        }
+        /// <inheritdoc/>
+        public virtual StartServerResult RestartServer(string adbPath) =>
+            StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
 
         /// <inheritdoc/>
         public virtual AdbServerStatus GetStatus()

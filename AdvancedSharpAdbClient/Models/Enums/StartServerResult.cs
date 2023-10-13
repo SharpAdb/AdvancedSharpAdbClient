@@ -23,6 +23,11 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The adb server was not running, and a new instance of the adb server was started.
         /// </summary>
-        Started
+        Started,
+
+        /// <summary>
+        /// An <see cref="IAdbServer.StartServer(string, bool)"/> operation is already in progress.
+        /// </summary>
+        Starting
     }
 }

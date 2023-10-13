@@ -237,10 +237,11 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(commandLineClient.ServerStarted);
             _ = adbServer.RestartServer(ServerName);
 
-            Assert.False(commandLineClient.ServerStarted);
+            Assert.True(commandLineClient.ServerStarted);
 
-            Assert.Single(socket.Requests);
+            Assert.Equal(2, socket.Requests.Count);
             Assert.Equal("host:version", socket.Requests[0]);
+            Assert.Equal("host:kill", socket.Requests[1]);
         }
 
         /// <summary>

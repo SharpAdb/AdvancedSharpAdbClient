@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="DeviceMonitor(IAdbSocket, ILogger{DeviceMonitor})"/> method.
         /// </summary>
         [Fact]
-        public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
+        public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor((IAdbSocket)null));
 
         [Fact]
         public void DeviceDisconnectedTest()
