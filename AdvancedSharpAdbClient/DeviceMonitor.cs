@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -57,6 +59,12 @@ namespace AdvancedSharpAdbClient
         protected readonly ManualResetEvent firstDeviceListParsed = new(false);
 
         /// <summary>
+        /// When the <see cref="DeviceMonitorLoop"/> method is called, this <see cref="ManualResetEvent"/>
+        /// is used to block until the <see cref="DeviceMonitorLoop"/> is finished.
+        /// </summary>
+        protected readonly ManualResetEvent monitorLoopFinished = new(false);
+
+        /// <summary>
         /// A <see cref="bool"/> that can be used to cancel the <see cref="monitorThread"/>.
         /// </summary>
         protected bool isMonitorThreadCancel = false;
@@ -81,6 +89,25 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger to use when logging.</param>
+        public DeviceMonitor(ILogger<DeviceMonitor> logger = null)
+            : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), logger)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="logger">The logger to use when logging.</param>
+        public DeviceMonitor(EndPoint endPoint, ILogger<DeviceMonitor> logger = null)
+            : this(Factories.AdbSocketFactory(endPoint), logger)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
@@ -128,7 +155,12 @@ namespace AdvancedSharpAdbClient
             {
                 _ = firstDeviceListParsed.Reset();
 
-                monitorThread = new Thread(DeviceMonitorLoop);
+                monitorThread = new Thread(DeviceMonitorLoop)
+                {
+                    Name = nameof(DeviceMonitorLoop),
+                    IsBackground = true
+                };
+                monitorThread.Start();
 
                 // Wait for the worker thread to have read the first list of devices.
                 _ = firstDeviceListParsed.WaitOne();
@@ -178,6 +210,8 @@ namespace AdvancedSharpAdbClient
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
                 isMonitorThreadCancel = true;
+                Socket?.Close();
+                _ = monitorLoopFinished.WaitOne();
 
                 monitorThread = null;
             }
@@ -208,6 +242,7 @@ namespace AdvancedSharpAdbClient
         protected virtual void DeviceMonitorLoop()
         {
             IsRunning = true;
+            monitorLoopFinished.Reset();
 
             // Set up the connection to track the list of devices.
             InitializeSocket();
@@ -223,7 +258,22 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (AdbException adbException)
                 {
-                    if (adbException.ConnectionReset)
+                    if (adbException.InnerException is SocketException ex)
+                    {
+                        if (isMonitorThreadCancel)
+                        {
+                            // The DeviceMonitor is shutting down (disposing) and Dispose()
+                            // has called Socket.Close(). This exception is expected,
+                            // so we can safely swallow it.
+                        }
+                        else
+                        {
+                            // The exception was unexpected, so log it & rethrow.
+                            logger.LogError(ex, ex.Message);
+                            throw ex;
+                        }
+                    }
+                    else if (adbException.ConnectionReset)
                     {
                         // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                         AdbServer.Instance.RestartServer();
@@ -238,6 +288,7 @@ namespace AdvancedSharpAdbClient
             }
             while (!isMonitorThreadCancel);
             isMonitorThreadCancel = false;
+            monitorLoopFinished.Set();
         }
 
         private void InitializeSocket()

@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient
         protected static Func<string, bool> CheckFileExists { get; set; } = Factories.CheckFileExists;
 
         /// <inheritdoc/>
-        public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer)
+        public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
         {
             AdbServerStatus serverStatus = GetStatus();
             Version commandLineVersion = null;
@@ -124,26 +124,28 @@ namespace AdvancedSharpAdbClient
                     : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
             }
 
-            if (serverStatus.IsRunning
-                && ((serverStatus.Version < RequiredAdbVersion)
-                    || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
+            if (serverStatus.IsRunning)
             {
-                ExceptionExtensions.ThrowIfNull(adbPath);
+                if (serverStatus.Version < RequiredAdbVersion
+                    || (serverStatus.Version < commandLineVersion && restartServerIfNewer))
+                {
+                    ExceptionExtensions.ThrowIfNull(adbPath);
 
-                adbClient.KillAdb();
-                commandLineClient.StartServer();
-                return StartServerResult.RestartedOutdatedDaemon;
+                    adbClient.KillAdb();
+                    commandLineClient.StartServer();
+                    return StartServerResult.RestartedOutdatedDaemon;
+                }
+                else
+                {
+                    return StartServerResult.AlreadyRunning;
+                }
             }
-            else if (!serverStatus.IsRunning)
+            else
             {
                 ExceptionExtensions.ThrowIfNull(adbPath);
 
                 commandLineClient.StartServer();
                 return StartServerResult.Started;
-            }
-            else
-            {
-                return StartServerResult.AlreadyRunning;
             }
         }
 
@@ -159,7 +161,7 @@ namespace AdvancedSharpAdbClient
 
             lock (RestartLock)
             {
-                return StartServer(adbPath, false);
+                return StartServer(adbPath, true);
             }
         }
 

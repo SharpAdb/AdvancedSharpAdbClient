@@ -5,6 +5,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -137,7 +138,23 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
+                    // ... but an ObjectDisposedException on .NET Core App on Linux and macOS.
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        // The DeviceMonitor is shutting down (disposing) and Dispose()
+                        // has called cancellationToken.Cancel(). This exception is expected,
+                        // so we can safely swallow it.
+                    }
+                    else
+                    {
+                        // The exception was unexpected, so log it & rethrow.
+                        logger.LogError(ex, ex.Message);
+                        throw;
+                    }
+                }
+                catch (OperationCanceledException ex)
+                {
+                    // ... and an OperationCanceledException on .NET Core App 2.1 or greater.
                     if (cancellationToken.IsCancellationRequested)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
@@ -153,7 +170,22 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (AdbException adbException)
                 {
-                    if (adbException.ConnectionReset)
+                    if (adbException.InnerException is SocketException ex)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            // The DeviceMonitor is shutting down (disposing) and Dispose()
+                            // has called Socket.Close(). This exception is expected,
+                            // so we can safely swallow it.
+                        }
+                        else
+                        {
+                            // The exception was unexpected, so log it & rethrow.
+                            logger.LogError(ex, ex.Message);
+                            throw ex;
+                        }
+                    }
+                    else if (adbException.ConnectionReset)
                     {
                         // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                         await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
