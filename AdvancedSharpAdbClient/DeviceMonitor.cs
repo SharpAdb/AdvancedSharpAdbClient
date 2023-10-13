@@ -244,51 +244,59 @@ namespace AdvancedSharpAdbClient
             IsRunning = true;
             monitorLoopFinished.Reset();
 
-            // Set up the connection to track the list of devices.
-            InitializeSocket();
-
-            do
+            try
             {
-                try
-                {
-                    string value = Socket.ReadString();
-                    ProcessIncomingDeviceData(value);
+                // Set up the connection to track the list of devices.
+                InitializeSocket();
 
-                    firstDeviceListParsed.Set();
-                }
-                catch (AdbException adbException)
+                do
                 {
-                    if (adbException.InnerException is SocketException ex)
+                    try
                     {
-                        if (isMonitorThreadCancel)
+                        string value = Socket.ReadString();
+                        ProcessIncomingDeviceData(value);
+
+                        firstDeviceListParsed.Set();
+                    }
+                    catch (AdbException adbException)
+                    {
+                        if (adbException.InnerException is SocketException ex)
                         {
-                            // The DeviceMonitor is shutting down (disposing) and Dispose()
-                            // has called Socket.Close(). This exception is expected,
-                            // so we can safely swallow it.
+                            if (isMonitorThreadCancel)
+                            {
+                                // The DeviceMonitor is shutting down (disposing) and Dispose()
+                                // has called Socket.Close(). This exception is expected,
+                                // so we can safely swallow it.
+                            }
+                            else if (adbException.ConnectionReset)
+                            {
+                                // The adb server was killed, for whatever reason. Try to restart it and recover from this.
+                                AdbServer.Instance.RestartServer();
+                                Socket.Reconnect();
+                                InitializeSocket();
+                            }
+                            else
+                            {
+                                // The exception was unexpected, so log it & rethrow.
+                                logger.LogError(ex, ex.Message);
+                                throw ex;
+                            }
                         }
                         else
                         {
                             // The exception was unexpected, so log it & rethrow.
-                            logger.LogError(ex, ex.Message);
-                            throw ex;
+                            logger.LogError(adbException, adbException.Message);
+                            throw;
                         }
                     }
-                    else if (adbException.ConnectionReset)
-                    {
-                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
-                        AdbServer.Instance.RestartServer();
-                        Socket.Reconnect();
-                        InitializeSocket();
-                    }
-                    else
-                    {
-                        throw;
-                    }
                 }
+                while (!isMonitorThreadCancel);
+                isMonitorThreadCancel = false;
             }
-            while (!isMonitorThreadCancel);
-            isMonitorThreadCancel = false;
-            monitorLoopFinished.Set();
+            finally
+            {
+                monitorLoopFinished.Set();
+            }
         }
 
         private void InitializeSocket()

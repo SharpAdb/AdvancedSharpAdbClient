@@ -178,6 +178,13 @@ namespace AdvancedSharpAdbClient
                             // has called Socket.Close(). This exception is expected,
                             // so we can safely swallow it.
                         }
+                        else if (adbException.ConnectionReset)
+                        {
+                            // The adb server was killed, for whatever reason. Try to restart it and recover from this.
+                            await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
+                            Socket.Reconnect();
+                            await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
+                        }
                         else
                         {
                             // The exception was unexpected, so log it & rethrow.
@@ -185,15 +192,10 @@ namespace AdvancedSharpAdbClient
                             throw ex;
                         }
                     }
-                    else if (adbException.ConnectionReset)
-                    {
-                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
-                        await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
-                        Socket.Reconnect();
-                        await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
-                    }
                     else
                     {
+                        // The exception was unexpected, so log it & rethrow.
+                        logger.LogError(adbException, adbException.Message);
                         throw;
                     }
                 }
