@@ -527,7 +527,7 @@ namespace AdvancedSharpAdbClient
             return (int)hash;
         }
 
-#pragma warning disable 0809
+#pragma warning disable CS0809
         // Obsolete member 'memberA' overrides non-obsolete member 'memberB'.
         // Disallowing GetHashCode and Equals is by design
 
@@ -558,7 +558,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public static bool operator !=(HashCode left, HashCode right) => !(left == right);
-#pragma warning restore 0809
+#pragma warning restore CS0809
     }
 }
 #endif

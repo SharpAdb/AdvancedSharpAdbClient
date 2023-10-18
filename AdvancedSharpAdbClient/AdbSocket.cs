@@ -116,12 +116,8 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count =
-#if HAS_BUFFERS
-                    socket.Send(data.AsSpan(0, length != -1 ? length : data.Length), SocketFlags.None);
-#else
-                    socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
-#endif
+                int count = socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
+                
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -139,12 +135,8 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count =
-#if HAS_BUFFERS
-                    socket.Send(data.AsSpan(offset, length != -1 ? length : data.Length), SocketFlags.None);
-#else
-                    socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
-#endif
+                int count = socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
+                
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -225,12 +217,7 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count =
-#if HAS_BUFFERS
-                        socket.Receive(data.AsSpan(totalRead, bufferLength), SocketFlags.None);
-#else
-                        socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
-#endif
+                    count = socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
 
                     if (count < 0)
                     {

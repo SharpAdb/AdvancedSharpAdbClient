@@ -43,26 +43,26 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-#if HAS_BUFFERS
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
+            socket.SendAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer.AsMemory(offset, size), socketFlags, cancellationToken).AsTask();
-
-        /// <inheritdoc/>
-        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, socketFlags, cancellationToken);
+            socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
+            socket.ReceiveAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer.AsMemory(offset, size), socketFlags, cancellationToken).AsTask();
+            socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+
+#if HAS_BUFFERS
+        /// <inheritdoc/>
+        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+            socket.SendAsync(buffer, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
@@ -73,24 +73,8 @@ namespace AdvancedSharpAdbClient
             socket.SendAsync(buffer, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, size, socketFlags, cancellationToken);
-
-        /// <inheritdoc/>
-        public virtual Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
-
-        /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, socketFlags, cancellationToken);
-
-        /// <inheritdoc/>
-        public virtual Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, size, socketFlags, cancellationToken);
-
-        /// <inheritdoc/>
-        public virtual Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
 #endif
     }
 }

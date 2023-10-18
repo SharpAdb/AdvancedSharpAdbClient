@@ -74,7 +74,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Initializes a new instance of the <see cref='Area'/> class with the specified rectangle.
         /// </summary>
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
             width = unchecked((int)size.Width);
             height = unchecked((int)size.Height);
         }
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Creates a <see cref='Rect'/> with the specified <see cref='Area'/>.
         /// </summary>
@@ -295,7 +295,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="rect">The <see cref='Rect'/> to convert.</param>
         /// <returns>The <see cref='Area'/> that results from the conversion.</returns>
         public static implicit operator Area(Rect rect) => new(rect);
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Converts a <see cref="Rect"/> to a <see cref="Area"/> by performing a ceiling operation on all the coordinates.
         /// </summary>
@@ -416,7 +416,7 @@ namespace AdvancedSharpAdbClient
                     (int)Math.Round(value.Height));
             }
         }
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>

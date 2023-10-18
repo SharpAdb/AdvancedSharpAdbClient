@@ -172,23 +172,13 @@ namespace AdvancedSharpAdbClient
             if (pendingByte != null)
             {
                 buffer[offset] = pendingByte.Value;
-                read =
-#if HAS_BUFFERS
-                    Inner.Read(buffer.AsSpan(offset + 1, count - 1));
-#else
-                    Inner.Read(buffer, offset + 1, count - 1);
-#endif
+                read = Inner.Read(buffer, offset + 1, count - 1);
                 read++;
                 pendingByte = null;
             }
             else
             {
-                read =
-#if HAS_BUFFERS
-                    Inner.Read(buffer.AsSpan(offset, count));
-#else
-                    Inner.Read(buffer, offset, count);
-#endif
+                read = Inner.Read(buffer, offset, count);
             }
 
             // Loop over the data, and find a LF (0x0d) character. If it is
@@ -220,12 +210,7 @@ namespace AdvancedSharpAdbClient
                     }
 
                     byte[] miniBuffer = new byte[1];
-                    int miniRead =
-#if HAS_BUFFERS
-                        Inner.Read(miniBuffer.AsSpan(0, 1));
-#else
-                        Inner.Read(miniBuffer, 1);
-#endif
+                    int miniRead = Inner.Read(miniBuffer, 1);
 
                     if (miniRead == 0)
                     {
@@ -364,6 +349,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if HAS_TASK
+#pragma warning disable CA1835
         /// <inheritdoc/>
         public
 #if !NETFRAMEWORK || NET45_OR_GREATER
@@ -379,28 +365,18 @@ namespace AdvancedSharpAdbClient
             // Read the raw data from the base stream. There may be a
             // 'pending byte' from a previous operation; if that's the case,
             // consume it.
-            int read = 0;
+            int read;
 
             if (pendingByte != null)
             {
                 buffer[offset] = pendingByte.Value;
-                read =
-#if HAS_BUFFERS
-                    await Inner.ReadAsync(buffer.AsMemory(offset + 1, count - 1), cancellationToken).ConfigureAwait(false);
-#else
-                    await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
-#endif
+                read = await Inner.ReadAsync(buffer, offset + 1, count - 1, cancellationToken).ConfigureAwait(false);
                 read++;
                 pendingByte = null;
             }
             else
             {
-                read =
-#if HAS_BUFFERS
-                    await Inner.ReadAsync(buffer.AsMemory(offset, count), cancellationToken).ConfigureAwait(false);
-#else
-                    await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
-#endif
+                read = await Inner.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
             }
 
             byte[] miniBuffer = new byte[1];
@@ -433,12 +409,7 @@ namespace AdvancedSharpAdbClient
                         continue;
                     }
 
-                    int miniRead =
-#if HAS_BUFFERS
-                        await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
-#else
-                        await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
-#endif
+                    int miniRead = await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
 
                     if (miniRead == 0)
                     {
@@ -458,12 +429,7 @@ namespace AdvancedSharpAdbClient
             // we need to read one more byte from the inner stream.
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
-                int miniRead =
-#if HAS_BUFFERS
-                    await Inner.ReadAsync(miniBuffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
-#else
-                    await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
-#endif
+                _ = await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
                 int nextByte = miniBuffer[0];
 
                 if (nextByte == 0x0a)
@@ -483,6 +449,7 @@ namespace AdvancedSharpAdbClient
 
             return read;
         }
+#pragma warning restore CA1835
 #endif
 
         /// <inheritdoc/>

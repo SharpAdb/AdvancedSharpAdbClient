@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
         public static DateTime Epoch { get; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 #if NET20
-#pragma warning disable CS1574 // XML 注释中有无法解析的 cref 特性
+#pragma warning disable CS1574
 #endif
         /// <summary>
         /// Converts a Unix time expressed as the number of seconds that have elapsed
@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
 #endif
         }
 #if NET20
-#pragma warning restore CS1574 // XML 注释中有无法解析的 cref 特性
+#pragma warning restore CS1574
 #endif
 
 #if NETFRAMEWORK && !NET46_OR_GREATER

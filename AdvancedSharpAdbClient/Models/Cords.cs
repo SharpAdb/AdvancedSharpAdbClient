@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Initializes a new instance of the <see cref='Cords'/> class from a <see cref='Windows.Foundation.Point'/> .
         /// </summary>
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
             X = unchecked((int)sz.Width);
             Y = unchecked((int)sz.Height);
         }
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Creates a <see cref='Windows.Foundation.Point'/> with the coordinates of the specified <see cref='Cords'/>.
         /// </summary>
@@ -195,7 +195,7 @@ namespace AdvancedSharpAdbClient
         /// to subtract from the coordinates of <paramref name="pt"/>.</param>
         /// <returns>A <see cref='Cords'/> structure that is translated by the negative of a given <see cref='Windows.Foundation.Size'/> structure.</returns>
         public static Cords operator -(Cords pt, Windows.Foundation.Size sz) => Subtract(pt, sz);
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-#pragma warning disable CS0419 // cref 特性中有不明确的引用
+#pragma warning disable CS0419
         /// <summary>
         /// Translates a <see cref='Cords'/> by a given <see cref='Windows.Foundation.Size'/>.
         /// </summary>
@@ -297,7 +297,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The <see cref='Windows.Foundation.Point'/> to convert.</param>
         /// <returns>The <see cref='Cords'/> this method converts to.</returns>
         public static Cords Round(Windows.Foundation.Point value) => new(unchecked((int)Math.Round(value.X)), unchecked((int)Math.Round(value.Y)));
-#pragma warning restore CS0419 // cref 特性中有不明确的引用
+#pragma warning restore CS0419
 #endif
 
         /// <summary>
