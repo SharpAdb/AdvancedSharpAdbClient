@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the environment variables that are currently defined on the device.
         /// </summary>
-        public Dictionary<string, string> EnvironmentVariables { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> EnvironmentVariables { get; } = [];
 
         /// <summary>
         /// Processes the new lines.

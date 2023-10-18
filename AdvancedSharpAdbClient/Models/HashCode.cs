@@ -68,7 +68,7 @@ namespace AdvancedSharpAdbClient
         private uint _v1, _v2, _v3, _v4;
         private uint _queue1, _queue2, _queue3;
         private uint _length;
-        
+
         private static uint GenerateGlobalSeed() => (uint)new Random().Next(int.MinValue, int.MaxValue);
 
         /// <summary>
@@ -368,13 +368,13 @@ namespace AdvancedSharpAdbClient
         [MethodImpl((MethodImplOptions)256)]
         private static uint Round(uint hash, uint input)
         {
-            return RotateLeft(hash + input * Prime2, 13) * Prime1;
+            return RotateLeft(hash + (input * Prime2), 13) * Prime1;
         }
 
         [MethodImpl((MethodImplOptions)256)]
         private static uint QueueRound(uint hash, uint queuedValue)
         {
-            return RotateLeft(hash + queuedValue * Prime3, 17) * Prime4;
+            return RotateLeft(hash + (queuedValue * Prime3), 17) * Prime4;
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -387,7 +387,7 @@ namespace AdvancedSharpAdbClient
         {
             return s_seed + Prime5;
         }
-        
+
         [MethodImpl((MethodImplOptions)256)]
         private static uint MixFinal(uint hash)
         {
@@ -465,15 +465,23 @@ namespace AdvancedSharpAdbClient
             // Switch can't be inlined.
 
             if (position == 0)
+            {
                 _queue1 = val;
+            }
             else if (position == 1)
+            {
                 _queue2 = val;
+            }
             else if (position == 2)
+            {
                 _queue3 = val;
+            }
             else // position == 3
             {
                 if (previousLength == 3)
+                {
                     Initialize(out _v1, out _v2, out _v3, out _v4);
+                }
 
                 _v1 = Round(_v1, _queue1);
                 _v2 = Round(_v2, _queue2);
@@ -519,7 +527,9 @@ namespace AdvancedSharpAdbClient
                 {
                     hash = QueueRound(hash, _queue2);
                     if (position > 2)
+                    {
                         hash = QueueRound(hash, _queue3);
+                    }
                 }
             }
 

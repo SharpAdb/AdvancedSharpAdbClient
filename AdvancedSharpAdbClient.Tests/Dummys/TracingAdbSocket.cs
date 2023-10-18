@@ -23,9 +23,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Queue<byte[]> SyncDataSent { get; } = new Queue<byte[]>();
 
-        public List<string> Requests { get; } = new List<string>();
+        public List<string> Requests { get; } = [];
 
-        public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
+        public List<(SyncCommand, string)> SyncRequests { get; } = [];
 
         public Queue<Stream> ShellStreams { get; } = new Queue<Stream>();
 

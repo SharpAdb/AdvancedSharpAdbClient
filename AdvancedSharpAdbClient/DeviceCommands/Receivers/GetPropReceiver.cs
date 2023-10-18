@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the list of properties which have been retrieved.
         /// </summary>
-        public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Properties { get; } = [];
 
         /// <summary>
         /// Processes the new lines.

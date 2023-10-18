@@ -1,6 +1,7 @@
 ﻿using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -12,9 +13,9 @@ namespace AdvancedSharpAdbClient.Tests
 {
     internal class DummyAdbClient : IAdbClient
     {
-        public Dictionary<string, string> Commands { get; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Commands { get; } = [];
 
-        public List<string> ReceivedCommands { get; } = new List<string>();
+        public List<string> ReceivedCommands { get; } = [];
 
         public EndPoint EndPoint { get; init; }
 
@@ -130,16 +131,16 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken)=>
+        public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken) =>
             ExecuteServerCommandAsync(target, command, receiver, encoding, cancellationToken);
 
         #region Not Implemented
 
-        void IAdbClient.Click(DeviceData device, Cords cords) => throw new NotImplementedException();
+        void IAdbClient.Click(DeviceData device, Point cords) => throw new NotImplementedException();
 
         void IAdbClient.Click(DeviceData device, int x, int y) => throw new NotImplementedException();
 
-        Task IAdbClient.ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task IAdbClient.ClickAsync(DeviceData device, Point cords, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         Task IAdbClient.ClickAsync(DeviceData device, int x, int y, CancellationToken cancellationToken) => throw new NotImplementedException();
 
@@ -168,6 +169,12 @@ namespace AdvancedSharpAdbClient.Tests
         string IAdbClient.DumpScreenString(DeviceData device) => throw new NotImplementedException();
 
         Task<string> IAdbClient.DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+
+#if WINDOWS10_0_17763_0_OR_GREATER
+        Windows.Data.Xml.Dom.XmlDocument IAdbClient.DumpScreenWinRT(DeviceData device) => throw new NotImplementedException();
+
+        Task<Windows.Data.Xml.Dom.XmlDocument> IAdbClient.DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
+#endif
 
         IAsyncEnumerable<Element> IAdbClient.FindAsyncElements(DeviceData device, string xpath, CancellationToken cancellationToken) => throw new NotImplementedException();
 

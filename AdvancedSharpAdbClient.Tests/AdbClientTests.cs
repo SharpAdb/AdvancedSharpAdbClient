@@ -8,7 +8,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -483,21 +482,20 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                using Bitmap image = framebuffer.ToImage();
-                Assert.NotNull(image);
-                Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
+#if WINDOWS
+            using Bitmap image = framebuffer.ToImage();
+            Assert.NotNull(image);
+            Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+            Assert.Equal(1, image.Width);
+            Assert.Equal(1, image.Height);
 
-                Color pixel = image.GetPixel(0, 0);
-                Assert.Equal(0x35, pixel.R);
-                Assert.Equal(0x4a, pixel.G);
-                Assert.Equal(0x4c, pixel.B);
-                Assert.Equal(0xff, pixel.A);
-            }
+            Color pixel = image.GetPixel(0, 0);
+            Assert.Equal(0x35, pixel.R);
+            Assert.Equal(0x4a, pixel.G);
+            Assert.Equal(0x4c, pixel.B);
+            Assert.Equal(0xff, pixel.A);
+#endif
 
             framebuffer.Dispose();
         }
@@ -1051,6 +1049,39 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(doc, xml);
         }
 
+#if WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenWinRT(DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DumpScreenWinRTTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:uiautomator dump /dev/tty"
+            ];
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            using MemoryStream shellStream = new(streamData);
+
+            Windows.Data.Xml.Dom.XmlDocument xml = RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.DumpScreenWinRT(Device));
+
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
+            Windows.Data.Xml.Dom.XmlDocument doc = new();
+            doc.LoadXml(cleanDump);
+
+            Assert.Equal(doc.InnerText, xml.InnerText);
+        }
+
+#endif
+
         /// <summary>
         /// Tests the <see cref="AdbClient.Click(DeviceData, int, int)"/> method.
         /// </summary>
@@ -1121,7 +1152,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Click(DeviceData, Cords)"/> method.
+        /// Tests the <see cref="AdbClient.Click(DeviceData, Point)"/> method.
         /// </summary>
         [Fact]
         public void ClickCordsTest()
@@ -1141,7 +1172,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.Click(Device, new Cords(100, 100))));
+                () => TestClient.Click(Device, new Point(100, 100))));
         }
 
         /// <summary>
@@ -1185,7 +1216,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.Swipe(Device, new Element(TestClient, Device, new Area(0, 0, 200, 400)), new Element(TestClient, Device, new Area(0, 0, 600, 800)), 500));
+                () => TestClient.Swipe(Device, new Element(TestClient, Device, new Rectangle(0, 0, 200, 400)), new Element(TestClient, Device, new Rectangle(0, 0, 600, 800)), 500));
         }
 
         /// <summary>
@@ -1338,7 +1369,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal("android.widget.TextView", child.Class);
             Assert.Equal("com.bilibili.app.in", child.Package);
             Assert.Equal("com.bilibili.app.in:id/header_info_name", child.ResourceID);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), child.Bounds);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), child.Bounds);
             Assert.Equal(child, element.FindDescendantOrSelf(x => x.Text == "where-where"));
             Assert.Equal(2, element.FindDescendants().Where(x => x.Text == "where-where").Count());
         }
@@ -1371,7 +1402,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Bounds);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
         }
 
         /// <summary>

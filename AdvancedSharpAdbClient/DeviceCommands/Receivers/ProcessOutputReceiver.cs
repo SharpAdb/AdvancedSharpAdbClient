@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets a list of all processes that have been received.
         /// </summary>
-        public List<AndroidProcess> Processes { get; } = new List<AndroidProcess>();
+        public List<AndroidProcess> Processes { get; } = [];
 
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)

@@ -404,8 +404,8 @@ namespace AdvancedSharpAdbClient
         /// Clicks on the specified coordinates.
         /// </summary>
         /// <param name="device">The device on which to click.</param>
-        /// <param name="cords">The <see cref="Cords"/> to click.</param>
-        void Click(DeviceData device, Cords cords);
+        /// <param name="cords">The <see cref="Point"/> to click.</param>
+        void Click(DeviceData device, Point cords);
 
         /// <summary>
         /// Clicks on the specified coordinates.

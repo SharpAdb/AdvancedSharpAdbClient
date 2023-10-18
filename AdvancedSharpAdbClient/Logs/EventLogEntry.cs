@@ -25,6 +25,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Gets or sets the values of this event log entry.
         /// </summary>
-        public List<object> Values { get; set; } = new List<object>();
+        public List<object> Values { get; set; } = [];
     }
 }

@@ -117,7 +117,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
-                
+
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -136,7 +136,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
-                
+
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");

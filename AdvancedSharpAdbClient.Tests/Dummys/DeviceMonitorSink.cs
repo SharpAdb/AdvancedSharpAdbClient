@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Tests
         public List<DeviceDataNotifyEventArgs> ListChangedEvents { get; init; }
 
         public List<DeviceDataConnectEventArgs> ConnectedEvents { get; init; }
-        
+
         public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; init; }
 
         public List<DeviceDataChangeEventArgs> ChangedEvents { get; init; }

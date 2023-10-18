@@ -20,13 +20,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets a dictionary with the extracted properties and their corresponding values.
         /// </summary>
-        private Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
+        private Dictionary<string, object> Properties { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the dictionary with all properties and their corresponding property parsers.
         /// A property parser extracts the property value out of a <see cref="string"/> if possible.
         /// </summary>
-        private Dictionary<string, Func<string, object>> PropertyParsers { get; set; } = new Dictionary<string, Func<string, object>>();
+        private Dictionary<string, Func<string, object>> PropertyParsers { get; set; } = [];
 
         /// <summary>
         /// Gets the value of the property out of the Properties dictionary.

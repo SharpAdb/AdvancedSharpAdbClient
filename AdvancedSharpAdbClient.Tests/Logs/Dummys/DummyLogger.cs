@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
     {
         public string Name { get; } = name;
 
-        public List<LogMessage> LogMessages { get; } = new();
+        public List<LogMessage> LogMessages { get; } = [];
 
         public void Log(LogLevel logLevel, Exception exception, string message, params object[] args) =>
             LogMessages.Add(new LogMessage(logLevel, exception, message, args));

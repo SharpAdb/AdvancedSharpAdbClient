@@ -406,10 +406,10 @@ namespace AdvancedSharpAdbClient
         /// Clicks on the specified coordinates.
         /// </summary>
         /// <param name="device">The device on which to click.</param>
-        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        /// <param name="cords">The <see cref="Point"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken);
+        Task ClickAsync(DeviceData device, Point cords, CancellationToken cancellationToken);
 
         /// <summary>
         /// Clicks on the specified coordinates.

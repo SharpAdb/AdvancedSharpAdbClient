@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
         public uint Offset { get; init; } = Offset;
 
         /// <summary>
-        /// Deconstruct the <see cref="Cords"/> struct.
+        /// Deconstruct the <see cref="ColorData"/> struct.
         /// </summary>
         /// <param name="length">The number of bits that contain information for this color.</param>
         /// <param name="offset">The offset, in bits, within the byte array for a pixel, at which the

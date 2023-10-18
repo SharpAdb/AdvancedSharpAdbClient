@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-                
+
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -312,7 +312,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-                
+
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");

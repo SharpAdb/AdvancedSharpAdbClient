@@ -17,12 +17,15 @@ global using Windows.UI.Xaml.Media.Imaging;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
 global using TimeSpan = System.TimeSpan;
+#if HAS_DRAWING
+global using Point = System.Drawing.Point;
+#endif
 #endif
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-global using Windows.Foundation;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
+global using Point = System.Drawing.Point;
 global using TimeSpan = System.TimeSpan;
 #endif
 
@@ -36,6 +39,9 @@ global using System.Buffers;
 
 #if HAS_DRAWING
 global using System.Drawing;
+#endif
+
+#if HAS_IMAGING
 global using System.Drawing.Imaging;
 #endif
 

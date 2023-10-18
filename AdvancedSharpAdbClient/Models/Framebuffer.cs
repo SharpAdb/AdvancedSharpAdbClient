@@ -4,7 +4,6 @@
 
 using System;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -12,35 +11,13 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).
     /// </summary>
-    public class Framebuffer : IDisposable
+    /// <param name="device">The device for which to fetch the frame buffer.</param>
+    /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+    public class Framebuffer(DeviceData device, EndPoint endPoint) : IDisposable
     {
-        private byte[] headerData;
+        private byte[] headerData = new byte[56];
         private bool headerInitialized;
         private bool disposed = false;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
-        /// </summary>
-        /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
-        public Framebuffer(DeviceData device, EndPoint endPoint)
-        {
-            Device = device ?? throw new ArgumentNullException(nameof(device));
-
-            EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
-
-            // Initialize the headerData buffer
-#if NETCORE
-            headerData = new byte[56];
-#else
-#if !NETFRAMEWORK || NET451_OR_GREATER
-            int size = Marshal.SizeOf<FramebufferHeader>();
-#else
-            int size = Marshal.SizeOf(default(FramebufferHeader));
-#endif
-            headerData = new byte[size];
-#endif
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -58,12 +35,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; }
+        public DeviceData Device { get; } = device ?? throw new ArgumentNullException(nameof(device));
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; init; }
+        public EndPoint EndPoint { get; init; } = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
@@ -179,7 +156,7 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-#if HAS_DRAWING
+#if HAS_IMAGING
         /// <summary>
         /// Converts the framebuffer data to a <see cref="Bitmap"/>.
         /// </summary>

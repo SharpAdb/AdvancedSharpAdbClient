@@ -726,7 +726,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public async Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(DeviceData device, Point cords, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 

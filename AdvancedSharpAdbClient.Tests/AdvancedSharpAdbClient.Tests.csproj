@@ -3,7 +3,8 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <NoWarn>CS1591</NoWarn>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework Condition="'$(IsWindows)' != 'True'">net8.0</TargetFramework>
+    <TargetFramework Condition="'$(IsWindows)' == 'True'">net8.0-windows10.0.17763.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

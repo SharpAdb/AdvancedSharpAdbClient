@@ -119,9 +119,9 @@ namespace AdvancedSharpAdbClient
         private static partial Regex DeniedRegex();
 #else
         private static Regex AbortingRegex() => new("Aborting.$", DefaultRegexOptions);
-        
+
         private static Regex AppletRegex() => new("applet not found$", DefaultRegexOptions);
-        
+
         private static Regex DeniedRegex() => new("(permission|access) denied$", DefaultRegexOptions);
 #endif
     }

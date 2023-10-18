@@ -875,7 +875,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public void Click(DeviceData device, Cords cords)
+        public void Click(DeviceData device, Point cords)
         {
             EnsureDevice(device);
 

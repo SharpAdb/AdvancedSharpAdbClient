@@ -132,7 +132,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
         public static FramebufferHeader Read(byte[] data) => new(data);
 
-#if HAS_DRAWING
+#if HAS_IMAGING
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Bitmap"/>.
         /// </summary>
