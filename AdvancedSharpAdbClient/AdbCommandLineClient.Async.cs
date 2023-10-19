@@ -55,26 +55,33 @@ namespace AdvancedSharpAdbClient
             }
 
 #if HAS_PROCESS && !WINDOWS_UWP
-            // Starting the adb server failed for whatever reason. This can happen if adb.exe
-            // is running but is not accepting requests. In that case, try to kill it & start again.
-            // It kills all processes named "adb", so let's hope nobody else named their process that way.
-            foreach (Process adbProcess in Process.GetProcessesByName("adb"))
+            try
             {
-                try
+                // Starting the adb server failed for whatever reason. This can happen if adb.exe
+                // is running but is not accepting requests. In that case, try to kill it & start again.
+                // It kills all processes named "adb", so let's hope nobody else named their process that way.
+                foreach (Process adbProcess in Process.GetProcessesByName("adb"))
                 {
-                    adbProcess.Kill();
+                    try
+                    {
+                        adbProcess.Kill();
+                    }
+                    catch (Win32Exception)
+                    {
+                        // The associated process could not be terminated
+                        // or
+                        // The process is terminating.
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // The process has already exited.
+                        // There is no process associated with this Process object.
+                    }
                 }
-                catch (Win32Exception)
-                {
-                    // The associated process could not be terminated
-                    // or
-                    // The process is terminating.
-                }
-                catch (InvalidOperationException)
-                {
-                    // The process has already exited.
-                    // There is no process associated with this Process object.
-                }
+            }
+            catch (NotSupportedException)
+            {
+                // This platform does not support getting a list of processes.
             }
 #endif
 
@@ -159,23 +166,29 @@ namespace AdvancedSharpAdbClient
 #if NET5_0_OR_GREATER
             using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
             {
-                await process.WaitForExitAsync(completionSource.Token).ConfigureAwait(false);
-                if (!process.HasExited)
+                try
                 {
-                    process.Kill();
+                    await process.WaitForExitAsync(completionSource.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (completionSource.IsCancellationRequested)
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
                 }
             }
 #else
-            // get the return code from the process
             if (!process.WaitForExit(5000))
             {
                 process.Kill();
             }
 #endif
+            // get the return code from the process
             return process.ExitCode;
 #else
             TaskCompletionSource<int> source = new();
-            source.SetException(new PlatformNotSupportedException());
+            source.SetException(new PlatformNotSupportedException("This platform is not support System.Diagnostics.Process. You can start adb server by running `adb start-server` manually."));
             return await source.Task.ConfigureAwait(false);
 #endif
         }
