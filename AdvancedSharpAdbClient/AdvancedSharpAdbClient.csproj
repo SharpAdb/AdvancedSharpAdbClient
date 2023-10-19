@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' == 'True'">
-    <NoWarn>$(NoWarn);NU1603;NU1605</NoWarn>
+    <NoWarn>$(NoWarn);NU1603;NU1605;NU1902;NU1903</NoWarn>
     <TargetFrameworks>net6.0;net8.0;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net6.0-windows10.0.17763.0;net8.0-windows10.0.17763.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.7.2;net4.8.1;netcore50;uap10.0;uap10.0.15138.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.8.1;netcore5.0;uap10.0;uap10.0.15138.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(FullTargets)' != 'True'">
@@ -36,7 +36,8 @@
     <None Include="..\logo.png" Pack="true" PackagePath="\Icon.png" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'
+                     or '$(TargetFramework)' == 'net3.0-client'">
     <PackageReference Include="LinqBridge" Version="1.3.0" />
   </ItemGroup>
 
@@ -48,11 +49,11 @@
     <PackageReference Include="Microsoft.Bcl.Async" Version="1.0.168" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore5.0'">
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore5.0'
                      or '$(TargetFramework)' == 'netcoreapp1.0'
                      or '$(TargetFramework)' == 'netcoreapp1.1'
                      or '$(TargetFramework)' == 'netstandard1.3'
@@ -65,7 +66,8 @@
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client' and
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.0-client' and
                            ('$(ImportAsync)' == 'True'
                         or ('$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'))">
@@ -73,6 +75,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net2.0-client'
+                         or '$(TargetFramework)' == 'net3.0-client'
                          or '$(TargetFramework)' == 'net3.5-client'
                          or '$(TargetFramework)' == 'net4.0-client'
                          or '$(TargetFramework)' == 'net4.5.2'
@@ -95,11 +98,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.0-client'
                         and '$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'
                         and '$(TargetFramework)' != 'net4.5.2'
                         and '$(TargetFramework)' != 'net4.6.2'
-                        and '$(TargetFramework)' != 'netcore50'
+                        and '$(TargetFramework)' != 'net4.7.2'
+                        and '$(TargetFramework)' != 'netcore5.0'
                         and '$(TargetFramework)' != 'uap10.0'">
     <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
   </PropertyGroup>
@@ -113,7 +118,7 @@
     <DefineConstants>$(DefineConstants);HAS_BUFFERS;HAS_INDEXRANGE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore50'
+  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore5.0'
                         and '$(TargetFramework)' != 'netcoreapp1.0'
                         and '$(TargetFramework)' != 'netcoreapp1.1'
                         and '$(TargetFramework)' != 'netstandard1.3'

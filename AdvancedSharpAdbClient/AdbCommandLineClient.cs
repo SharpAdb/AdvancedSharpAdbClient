@@ -251,7 +251,7 @@ namespace AdvancedSharpAdbClient
                 RedirectStandardError = true,
                 RedirectStandardOutput = true
             };
-
+            
             using Process process = Process.Start(psi);
             string standardErrorString = process.StandardError.ReadToEnd();
             string standardOutputString = process.StandardOutput.ReadToEnd();

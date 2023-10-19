@@ -35,7 +35,7 @@
     <IsTestProject Condition="'$(IsTestProject)' == ''">$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore5.0'">
     <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
   </PropertyGroup>
 

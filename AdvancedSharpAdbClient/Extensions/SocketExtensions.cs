@@ -181,7 +181,7 @@ namespace AdvancedSharpAdbClient
 
             return taskCompletionSource.Task;
 #else
-            return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
+            return Extensions.Run(() => socket.Send(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
 #endif

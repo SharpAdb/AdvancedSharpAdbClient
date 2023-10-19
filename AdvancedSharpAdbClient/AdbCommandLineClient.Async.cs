@@ -176,7 +176,7 @@ namespace AdvancedSharpAdbClient
 #else
             TaskCompletionSource<int> source = new();
             source.SetException(new PlatformNotSupportedException());
-            return await source.Task;
+            return await source.Task.ConfigureAwait(false);
 #endif
         }
     }
