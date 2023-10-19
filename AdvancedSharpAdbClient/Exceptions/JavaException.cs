@@ -8,6 +8,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with the Java exception output.
     /// </summary>
+    [Serializable]
     public partial class JavaException : Exception
     {
         private const string UnknownError = "An error occurred in Java";

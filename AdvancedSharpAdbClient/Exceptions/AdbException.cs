@@ -10,6 +10,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with communicating with ADB.
     /// </summary>
+    [Serializable]
     public class AdbException : Exception
     {
         /// <summary>

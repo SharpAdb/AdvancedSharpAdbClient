@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Unable to connect to the device because it was not found in the list of available devices.
     /// </summary>
+    [Serializable]
     public class DeviceNotFoundException : AdbException
     {
         /// <summary>

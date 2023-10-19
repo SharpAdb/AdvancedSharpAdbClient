@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// The exception that is thrown when the permission to a resource was denied.
     /// </summary>
+    [Serializable]
     public class PermissionDeniedException : Exception
     {
         /// <summary>

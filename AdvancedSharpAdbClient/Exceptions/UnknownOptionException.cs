@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Thrown when a command has an unknown option passed.
     /// </summary>
+    [Serializable]
     public class UnknownOptionException : Exception
     {
         /// <summary>

@@ -9,9 +9,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// An exception while installing a package on the device.
     /// </summary>
-#if HAS_SERIALIZATION
     [Serializable]
-#endif
     public class PackageInstallationException : Exception
     {
         /// <summary>

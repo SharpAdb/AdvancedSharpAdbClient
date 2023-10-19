@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// The exception that is thrown when a shell command becomes unresponsive.
     /// </summary>
+    [Serializable]
     public class ShellCommandUnresponsiveException : AdbException
     {
         /// <summary>

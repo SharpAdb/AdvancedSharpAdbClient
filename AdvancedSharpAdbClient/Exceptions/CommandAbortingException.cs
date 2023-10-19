@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Thrown when an executed command identifies that it is being aborted.
     /// </summary>
+    [Serializable]
     public class CommandAbortingException : Exception
     {
         /// <summary>

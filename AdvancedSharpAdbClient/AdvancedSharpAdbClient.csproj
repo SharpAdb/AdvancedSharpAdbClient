@@ -61,6 +61,14 @@
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
+                     or '$(TargetFramework)' == 'net4.7.2'
+                     or '$(TargetFramework)' == 'net4.8.1'
+                     or '$(TargetFramework)' == 'netstandard2.0'
+                     or '$(TargetFramework)' == 'uap10.0.15138.0'">
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                      or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'">
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
