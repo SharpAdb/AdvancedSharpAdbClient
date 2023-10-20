@@ -55,7 +55,8 @@ namespace AdvancedSharpAdbClient
         /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.</remarks>
         StartServerResult RestartServer();
 
-        /// <summary>Restarts the adb server with new adb path if it suddenly became unavailable. Call this class if, for example,
+        /// <summary>
+        /// Restarts the adb server with new adb path if it suddenly became unavailable. Call this class if, for example,
         /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
         /// set to <see langword="true"/> - a clear indicating the ADB server died.
         /// </summary>
@@ -65,6 +66,11 @@ namespace AdvancedSharpAdbClient
         /// <remarks>You can only call this method if you have previously started the adb server via
         /// <see cref="AdbServer.StartServer(string, bool)"/> and passed the full path to the adb server.</remarks>
         StartServerResult RestartServer(string adbPath);
+
+        /// <summary>
+        /// Stop the adb server.
+        /// </summary>
+        void StopServer();
 
         /// <summary>
         /// Gets the status of the adb server.

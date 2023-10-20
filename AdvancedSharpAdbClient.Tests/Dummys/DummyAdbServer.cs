@@ -77,5 +77,15 @@ namespace AdvancedSharpAdbClient.Tests
             tcs.SetResult(result);
             return tcs.Task;
         }
+
+        /// <inheritdoc/>
+        public void StopServer() => Status = Status with { IsRunning = false };
+
+        /// <inheritdoc/>
+        public Task StopServerAsync(CancellationToken cancellationToken)
+        {
+            StopServer();
+            return Task.CompletedTask;
+        }
     }
 }

@@ -79,6 +79,9 @@ namespace AdvancedSharpAdbClient
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
 
         /// <inheritdoc/>
+        public virtual Task StopServerAsync(CancellationToken cancellationToken = default) => adbClient.KillAdbAsync(cancellationToken);
+
+        /// <inheritdoc/>
         public virtual async Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
         {
             // Try to connect to a running instance of the adb server

@@ -220,5 +220,17 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
             Assert.Equal("host:kill", socket.Requests[1]);
         }
+
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StopServerAsync(CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StopServerAsyncTest()
+        {
+            await adbServer.StopServerAsync();
+
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:kill", socket.Requests[0]);
+        }
     }
 }

@@ -73,7 +73,12 @@ namespace AdvancedSharpAdbClient
         Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the status of the adb server.
+        /// Stop the adb server asynchronously.
+        /// </summary>
+        Task StopServerAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets the status of the adb server asynchronously.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>

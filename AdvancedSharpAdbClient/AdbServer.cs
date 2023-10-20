@@ -165,6 +165,9 @@ namespace AdvancedSharpAdbClient
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
 
         /// <inheritdoc/>
+        public virtual void StopServer() => adbClient.KillAdb();
+
+        /// <inheritdoc/>
         public virtual AdbServerStatus GetStatus()
         {
             // Try to connect to a running instance of the adb server

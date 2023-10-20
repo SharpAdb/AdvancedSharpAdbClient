@@ -245,6 +245,18 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbServer.StopServer"/> method.
+        /// </summary>
+        [Fact]
+        public void StopServerTest()
+        {
+            adbServer.StopServer();
+
+            Assert.Single(socket.Requests);
+            Assert.Equal("host:kill", socket.Requests[0]);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbServer(IAdbClient, Func{string, IAdbCommandLineClient})"/> method.
         /// </summary>
         [Fact]
