@@ -26,11 +26,6 @@ namespace AdvancedSharpAdbClient
     public partial class AdbSocket : IAdbSocket
     {
         /// <summary>
-        /// The underlying TCP socket that manages the connection with the ADB server.
-        /// </summary>
-        protected readonly ITcpSocket socket;
-
-        /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<AdbSocket> logger;
@@ -42,9 +37,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(EndPoint endPoint, ILogger<AdbSocket> logger = null)
         {
-            socket = new TcpSocket();
-            socket.Connect(endPoint);
-            socket.ReceiveBufferSize = ReceiveBufferSize;
+            Socket = new TcpSocket();
+            Socket.Connect(endPoint);
+            Socket.ReceiveBufferSize = ReceiveBufferSize;
             this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
@@ -67,9 +62,9 @@ namespace AdvancedSharpAdbClient
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
 
-            socket = new TcpSocket();
-            socket.Connect(endPoint);
-            socket.ReceiveBufferSize = ReceiveBufferSize;
+            Socket = new TcpSocket();
+            Socket.Connect(endPoint);
+            Socket.ReceiveBufferSize = ReceiveBufferSize;
             this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
@@ -80,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(ITcpSocket socket, ILogger<AdbSocket> logger = null)
         {
-            this.socket = socket;
+            this.Socket = socket;
             this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
@@ -95,6 +90,11 @@ namespace AdvancedSharpAdbClient
         public static int WriteBufferSize { get; set; } = 1024;
 
         /// <summary>
+        /// The underlying TCP socket that manages the connection with the ADB server.
+        /// </summary>
+        public ITcpSocket Socket { get; init; }
+
+        /// <summary>
         /// Determines whether the specified reply is okay.
         /// </summary>
         /// <param name="reply">The reply.</param>
@@ -106,17 +106,17 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public bool Connected => socket.Connected;
+        public bool Connected => Socket.Connected;
 
         /// <inheritdoc/>
-        public virtual void Reconnect() => socket.Reconnect();
+        public virtual void Reconnect() => Socket.Reconnect();
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
         {
             try
             {
-                int count = socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
+                int count = Socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
 
                 if (count < 0)
                 {
@@ -135,7 +135,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
+                int count = Socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
 
                 if (count < 0)
                 {
@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
+                    count = Socket.Receive(data, totalRead, bufferLength, SocketFlags.None);
 
                     if (count < 0)
                     {
@@ -305,7 +305,7 @@ namespace AdvancedSharpAdbClient
 
             if (!response.IOSuccess || !response.Okay)
             {
-                socket.Dispose();
+                Socket.Dispose();
                 throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
             }
 
@@ -318,7 +318,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = socket.Send(data, SocketFlags.None);
+                int count = Socket.Send(data, SocketFlags.None);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = socket.Receive(data.Slice(totalRead, bufferLength), SocketFlags.None);
+                    count = Socket.Receive(data.Slice(totalRead, bufferLength), SocketFlags.None);
 
                     if (count < 0)
                     {
@@ -375,7 +375,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = socket.Send(data, SocketFlags.None);
+                int count = Socket.Send(data, SocketFlags.None);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -395,7 +395,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual Stream GetShellStream()
         {
-            Stream stream = socket.GetStream();
+            Stream stream = Socket.GetStream();
             return new ShellStream(stream, closeStream: true);
         }
 
@@ -503,7 +503,7 @@ namespace AdvancedSharpAdbClient
         {
             if (disposing)
             {
-                socket.Dispose();
+                Socket.Dispose();
             }
         }
 
@@ -515,6 +515,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Close() => socket.Dispose();
+        public virtual void Close() => Socket.Dispose();
     }
 }

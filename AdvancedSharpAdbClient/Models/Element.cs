@@ -124,12 +124,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the current ADB client that manages the connection.
         /// </summary>
-        protected IAdbClient Client { get; set; }
+        public IAdbClient Client { get; init; }
 
         /// <summary>
         /// Gets the current device containing the element.
         /// </summary>
-        protected DeviceData Device { get; init; }
+        public DeviceData Device { get; init; }
 
         /// <summary>
         /// Gets the coordinates and size of the element.

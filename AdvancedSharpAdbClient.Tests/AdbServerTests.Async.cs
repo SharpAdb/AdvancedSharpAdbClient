@@ -16,10 +16,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetStatusAsyncNotRunningTest()
         {
-            IAdbClient adbClientMock = Substitute.For<IAdbClient>();
-            adbClientMock.GetAdbVersionAsync(Arg.Any<CancellationToken>()).Throws(new AggregateException(new SocketException(AdbServer.ConnectionRefused)));
+            IAdbSocket adbSocketMock = Substitute.For<IAdbSocket>();
+            adbSocketMock.SendAdbRequestAsync("host:version", Arg.Any<CancellationToken>()).Throws(new AggregateException(new SocketException(AdbServer.ConnectionRefused)));
 
-            AdbServer adbServer = new(adbClientMock, adbCommandLineClientFactory);
+            AdbServer adbServer = new((endPoint) => adbSocketMock, adbCommandLineClientFactory);
 
             AdbServerStatus status = await adbServer.GetStatusAsync();
             Assert.False(status.IsRunning);
@@ -54,8 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<SocketException>(async () => await adbServer.GetStatusAsync());
         }
@@ -68,8 +67,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new Exception();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<Exception>(async () => await adbServer.GetStatusAsync());
         }
@@ -112,8 +110,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<AdbException>(async () => await adbServer.StartServerAsync(null, false));
         }
@@ -147,8 +144,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             commandLineClient.Version = new Version(1, 0, 32);
 

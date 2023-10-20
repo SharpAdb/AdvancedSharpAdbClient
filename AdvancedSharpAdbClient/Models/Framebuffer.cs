@@ -23,8 +23,8 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="client">A <see cref="AdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, AdbClient client) : this(device, client?.EndPoint) { }
+        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
+        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.

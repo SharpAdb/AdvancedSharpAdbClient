@@ -129,13 +129,13 @@ namespace AdvancedSharpAdbClient
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
         /// Android Debug Bridge.
         /// </summary>
-        public IAdbSocket Socket { get; private set; }
+        public IAdbSocket Socket { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
         /// <value><see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.</value>
-        public bool IsRunning { get; private set; }
+        public bool IsRunning { get; protected set; }
 
         /// <inheritdoc/>
         public virtual void Start()

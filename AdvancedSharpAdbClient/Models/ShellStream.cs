@@ -349,7 +349,9 @@ namespace AdvancedSharpAdbClient
 #endif
 
 #if HAS_TASK
+#if NET8_0_OR_GREATER
 #pragma warning disable CA1835
+#endif
         /// <inheritdoc/>
         public
 #if !NETFRAMEWORK || NET45_OR_GREATER
@@ -449,7 +451,9 @@ namespace AdvancedSharpAdbClient
 
             return read;
         }
+#if NET8_0_OR_GREATER
 #pragma warning restore CA1835
+#endif
 #endif
 
         /// <inheritdoc/>

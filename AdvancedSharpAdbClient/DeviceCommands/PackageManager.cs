@@ -38,11 +38,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         protected readonly ILogger<PackageManager> logger;
 
         /// <summary>
-        /// The <see cref="IAdbClient"/> to use when communicating with the device.
-        /// </summary>
-        protected readonly IAdbClient client;
-
-        /// <summary>
         /// A function which returns a new instance of a class
         /// that implements the <see cref="ISyncService"/> interface,
         /// that can be used to transfer files to and from a given device.
@@ -72,7 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = [];
             ThirdPartyOnly = thirdPartyOnly;
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
+            this.AdbClient = client ?? throw new ArgumentNullException(nameof(client));
 
             this.syncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
 
@@ -88,7 +83,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets a value indicating whether this package manager only lists third party applications,
         /// or also includes built-in applications.
         /// </summary>
-        public bool ThirdPartyOnly { get; private init; }
+        public bool ThirdPartyOnly { get; init; }
 
         /// <summary>
         /// Gets the list of packages currently installed on the device. They key is the name of the package;
@@ -99,7 +94,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; private init; }
+        public DeviceData Device { get; init; }
+
+        /// <summary>
+        /// The <see cref="IAdbClient"/> to use when communicating with the device.
+        /// </summary>
+        protected IAdbClient AdbClient { get; init; }
 
         /// <summary>
         /// Refreshes the packages.
@@ -112,11 +112,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             if (ThirdPartyOnly)
             {
-                client.ExecuteShellCommand(Device, ListThirdPartyOnly, pmr);
+                AdbClient.ExecuteShellCommand(Device, ListThirdPartyOnly, pmr);
             }
             else
             {
-                client.ExecuteShellCommand(Device, ListFull, pmr);
+                AdbClient.ExecuteShellCommand(Device, ListFull, pmr);
             }
         }
 
@@ -158,7 +158,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
-            client.ExecuteShellCommand(Device, cmd, receiver);
+            AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -301,7 +301,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
+            AdbClient.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -342,7 +342,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
+            AdbClient.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -359,7 +359,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallOutputReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
+            AdbClient.ExecuteShellCommand(Device, $"pm uninstall {packageName}", receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
@@ -376,7 +376,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             VersionInfoReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"dumpsys package {packageName}", receiver);
+            AdbClient.ExecuteShellCommand(Device, $"dumpsys package {packageName}", receiver);
             return receiver.VersionInfo;
         }
 
@@ -415,7 +415,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
-                using (ISyncService sync = syncServiceFactory(client, Device))
+                using (ISyncService sync = syncServiceFactory(AdbClient, Device))
                 {
                     if (progress != null)
                     {
@@ -453,7 +453,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // now we delete the app we synced
             try
             {
-                client.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"");
+                AdbClient.ExecuteShellCommand(Device, $"rm \"{remoteFilePath}\"");
             }
             catch (IOException e)
             {
@@ -477,7 +477,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string addon = StringExtensions.IsNullOrWhiteSpace(packageName) ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
-            client.ExecuteShellCommand(Device, cmd, receiver);
+            AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))
             {
@@ -502,7 +502,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallOutputReceiver receiver = new();
-            client.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
+            AdbClient.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {

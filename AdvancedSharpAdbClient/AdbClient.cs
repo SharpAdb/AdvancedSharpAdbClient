@@ -95,10 +95,10 @@ namespace AdvancedSharpAdbClient
 
             string[] values = host.Split(':');
 
+            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
             EndPoint = values.Length <= 0
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
-            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
         }
 
         /// <summary>

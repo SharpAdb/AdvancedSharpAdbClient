@@ -21,23 +21,23 @@ namespace AdvancedSharpAdbClient
                 throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
-            await socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
-            socket.Blocking = true;
+            await Socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
+            Socket.Blocking = true;
             this.endPoint = endPoint;
         }
 
         /// <inheritdoc/>
         public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
         {
-            if (socket.Connected)
+            if (Socket.Connected)
             {
                 // Already connected - nothing to do.
                 return ValueTask.CompletedTask;
             }
             else
             {
-                socket.Dispose();
-                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                Socket.Dispose();
+                Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 return ConnectAsync(endPoint, cancellationToken);
             }
         }
@@ -45,36 +45,36 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, size, socketFlags, cancellationToken);
+            Socket.SendAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
+            Socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, size, socketFlags, cancellationToken);
+            Socket.ReceiveAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
+            Socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
 
 #if HAS_BUFFERS
         /// <inheritdoc/>
         public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, socketFlags, cancellationToken);
+            Socket.SendAsync(buffer, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, socketFlags, cancellationToken);
+            Socket.ReceiveAsync(buffer, socketFlags, cancellationToken);
 #else
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.SendAsync(buffer, socketFlags, cancellationToken);
+            Socket.SendAsync(buffer, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-            socket.ReceiveAsync(buffer, socketFlags, cancellationToken);
+            Socket.ReceiveAsync(buffer, socketFlags, cancellationToken);
 #endif
     }
 }

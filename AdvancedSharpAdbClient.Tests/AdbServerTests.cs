@@ -1,6 +1,5 @@
 ﻿using AdvancedSharpAdbClient.Exceptions;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -18,7 +17,6 @@ namespace AdvancedSharpAdbClient.Tests
         private readonly DummyAdbSocket socket;
         private readonly DummyAdbCommandLineClient commandLineClient;
         private Func<EndPoint, IAdbSocket> adbSocketFactory;
-        private AdbClient adbClient;
         private AdbServer adbServer;
 
         public AdbServerTests()
@@ -29,8 +27,7 @@ namespace AdvancedSharpAdbClient.Tests
             commandLineClient = new DummyAdbCommandLineClient();
             adbCommandLineClientFactory = (version) => commandLineClient;
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
         }
 
         /// <summary>
@@ -39,10 +36,10 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetStatusNotRunningTest()
         {
-            IAdbClient adbClientMock = Substitute.For<IAdbClient>();
-            adbClientMock.GetAdbVersion().Throws(new SocketException(AdbServer.ConnectionRefused));
+            IAdbSocket adbSocketMock = Substitute.For<IAdbSocket>();
+            adbSocketMock.When(x => x.SendAdbRequest("host:version")).Do(x => throw new SocketException(AdbServer.ConnectionRefused));
 
-            AdbServer adbServer = new(adbClientMock, adbCommandLineClientFactory);
+            AdbServer adbServer = new((endPoint) => adbSocketMock, adbCommandLineClientFactory);
 
             AdbServerStatus status = adbServer.GetStatus();
             Assert.False(status.IsRunning);
@@ -77,8 +74,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = Assert.Throws<SocketException>(() => adbServer.GetStatus());
         }
@@ -91,8 +87,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new Exception();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = Assert.Throws<Exception>(() => adbServer.GetStatus());
         }
@@ -135,8 +130,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = Assert.Throws<AdbException>(() => adbServer.StartServer(null, false));
         }
@@ -170,8 +164,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             commandLineClient.Version = new Version(1, 0, 32);
 
@@ -257,11 +250,11 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbServer(IAdbClient, Func{string, IAdbCommandLineClient})"/> method.
+        /// Tests the <see cref="AdbServer(EndPoint, Func{EndPoint, IAdbSocket}, Func{string, IAdbCommandLineClient})"/> method.
         /// </summary>
         [Fact]
         public void ConstructorAdbClientNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => new AdbServer(null, adbCommandLineClientFactory));
+            _ = Assert.Throws<ArgumentNullException>(() => new AdbServer((EndPoint)null, adbSocketFactory, adbCommandLineClientFactory));
 
         private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
     }

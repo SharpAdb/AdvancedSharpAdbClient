@@ -26,8 +26,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             PackageManagerReceiver pmr = new(this);
 
             return ThirdPartyOnly
-                ? client.ExecuteShellCommandAsync(Device, ListThirdPartyOnly, pmr, cancellationToken)
-                : client.ExecuteShellCommandAsync(Device, ListFull, pmr, cancellationToken);
+                ? AdbClient.ExecuteShellCommandAsync(Device, ListThirdPartyOnly, pmr, cancellationToken)
+                : AdbClient.ExecuteShellCommandAsync(Device, ListFull, pmr, cancellationToken);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string reinstallSwitch = reinstall ? "-r " : string.Empty;
 
             string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
-            await client.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -213,7 +213,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(Device, $"pm install-commit {session}", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"pm install-commit {session}", receiver, cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(Device, $"pm install-commit {session}", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"pm install-commit {session}", receiver, cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallOutputReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(Device, $"pm uninstall {packageName}", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"pm uninstall {packageName}", receiver, cancellationToken).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {
                 throw new PackageInstallationException(receiver.ErrorMessage);
@@ -293,7 +293,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             VersionInfoReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(Device, $"dumpsys package {packageName}", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"dumpsys package {packageName}", receiver, cancellationToken).ConfigureAwait(false);
             return receiver.VersionInfo;
         }
 
@@ -322,7 +322,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
-                using (ISyncService sync = syncServiceFactory(client, Device))
+                using (ISyncService sync = syncServiceFactory(AdbClient, Device))
                 {
                     if (progress != null)
                     {
@@ -365,7 +365,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // now we delete the app we synced
             try
             {
-                await client.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", cancellationToken).ConfigureAwait(false);
+                await AdbClient.ExecuteShellCommandAsync(Device, $"rm \"{remoteFilePath}\"", cancellationToken).ConfigureAwait(false);
             }
             catch (IOException e)
             {
@@ -390,7 +390,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string addon = StringExtensions.IsNullOrWhiteSpace(packageName) ? string.Empty : $" -p {packageName}";
 
             string cmd = $"pm install-create{reinstallSwitch}{addon}";
-            await client.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))
             {
@@ -417,7 +417,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             ValidateDevice();
 
             InstallOutputReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver, cancellationToken).ConfigureAwait(false);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
             {

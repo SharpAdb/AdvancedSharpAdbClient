@@ -5,6 +5,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -47,7 +48,7 @@ namespace AdvancedSharpAdbClient
                     {
                         ExceptionExtensions.ThrowIfNull(adbPath);
 
-                        await adbClient.KillAdbAsync(cancellationToken);
+                        await StopServerAsync(cancellationToken);
                         await commandLineClient.StartServerAsync(cancellationToken);
                         return StartServerResult.RestartedOutdatedDaemon;
                     }
@@ -79,7 +80,14 @@ namespace AdvancedSharpAdbClient
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task StopServerAsync(CancellationToken cancellationToken = default) => adbClient.KillAdbAsync(cancellationToken);
+        public virtual async Task StopServerAsync(CancellationToken cancellationToken = default)
+        {
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
+
+            // The host will immediately close the connection after the kill
+            // command has been sent; no need to read the response.
+        }
 
         /// <inheritdoc/>
         public virtual async Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
@@ -87,7 +95,12 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = await adbClient.GetAdbVersionAsync(cancellationToken).ConfigureAwait(false);
+                using IAdbSocket socket = adbSocketFactory(EndPoint);
+                await socket.SendAdbRequestAsync("host:version", cancellationToken).ConfigureAwait(false);
+                AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+                string version = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
+
+                int versionCode = int.Parse(version, NumberStyles.HexNumber);
                 return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (AggregateException ex)

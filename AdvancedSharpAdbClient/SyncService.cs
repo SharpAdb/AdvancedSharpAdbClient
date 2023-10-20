@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that enables the connection with the adb server.
         /// </summary>
-        public IAdbSocket Socket { get; private set; }
+        public IAdbSocket Socket { get; protected set; }
 
         /// <inheritdoc/>
         public bool IsOpen => Socket != null && Socket.Connected;

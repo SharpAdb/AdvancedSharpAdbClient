@@ -4,6 +4,8 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Globalization;
+using System.Net;
 using System.Net.Sockets;
 
 namespace AdvancedSharpAdbClient
@@ -17,9 +19,7 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
-    /// <param name="adbClient">The current ADB client that manages the connection.</param>
-    /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
-    public partial class AdbServer(IAdbClient adbClient, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : IAdbServer
+    public partial class AdbServer : IAdbServer
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -44,42 +44,108 @@ namespace AdvancedSharpAdbClient
         public const int ConnectionReset = 10054;
 
         /// <summary>
-        /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
+        /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
-        protected static bool IsStarting = false;
-
-        /// <summary>
-        /// The current ADB client that manages the connection.
-        /// </summary>
-        protected readonly IAdbClient adbClient = adbClient ?? throw new ArgumentNullException(nameof(adbClient));
+        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
         /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
         /// <c>adb.exe</c> command line client.
         /// </summary>
-        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
+        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        public AdbServer() : this(new AdbClient(), Factories.AdbCommandLineClientFactory)
+        public AdbServer() : this(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort), Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
-        /// <param name="adbClient">The current ADB client that manages the connection.</param>
-        public AdbServer(IAdbClient adbClient) : this(adbClient, Factories.AdbCommandLineClientFactory)
+        /// <param name="adbClient">A connection to an adb server.</param>
+        public AdbServer(IAdbClient adbClient) : this(adbClient.EndPoint, Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
+        /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
+        public AdbServer(EndPoint endPoint) : this(endPoint, Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the adb server is listening.</param>
+        /// <param name="port">The port at which the adb server is listening.</param>
+        public AdbServer(string host, int port) : this(host, port, Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="adbClient">A connection to an adb server.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
-        public AdbServer(Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(new AdbClient(), adbCommandLineClientFactory)
+        public AdbServer(IAdbClient adbClient, Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(adbClient.EndPoint, adbSocketFactory, adbCommandLineClientFactory)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the adb server is listening.</param>
+        /// <param name="port">The port at which the adb server is listening.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+        public AdbServer(string host, int port, Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
+            EndPoint = values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+        public AdbServer(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
+        {
+            ExceptionExtensions.ThrowIfNull(endPoint);
+
+            if (endPoint is not (IPEndPoint or DnsEndPoint))
+            {
+                throw new NotSupportedException("Only TCP endpoints are supported");
+            }
+
+            EndPoint = endPoint;
+            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServer"/> class.
+        /// </summary>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
+        public AdbServer(Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory) : this(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort), adbSocketFactory, adbCommandLineClientFactory)
         {
         }
 
@@ -98,6 +164,16 @@ namespace AdvancedSharpAdbClient
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
         protected static Func<string, bool> CheckFileExists { get; set; } = Factories.CheckFileExists;
+
+        /// <summary>
+        /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
+        /// </summary>
+        protected static bool IsStarting { get; set; } = false;
+
+        /// <summary>
+        /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
+        /// </summary>
+        public EndPoint EndPoint { get; protected set; }
 
         /// <inheritdoc/>
         public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
@@ -134,7 +210,7 @@ namespace AdvancedSharpAdbClient
                     {
                         ExceptionExtensions.ThrowIfNull(adbPath);
 
-                        adbClient.KillAdb();
+                        StopServer();
                         commandLineClient.StartServer();
                         return StartServerResult.RestartedOutdatedDaemon;
                     }
@@ -165,7 +241,14 @@ namespace AdvancedSharpAdbClient
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
 
         /// <inheritdoc/>
-        public virtual void StopServer() => adbClient.KillAdb();
+        public virtual void StopServer()
+        {
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SendAdbRequest("host:kill");
+
+            // The host will immediately close the connection after the kill
+            // command has been sent; no need to read the response.
+        }
 
         /// <inheritdoc/>
         public virtual AdbServerStatus GetStatus()
@@ -173,7 +256,12 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = adbClient.GetAdbVersion();
+                using IAdbSocket socket = adbSocketFactory(EndPoint);
+                socket.SendAdbRequest("host:version");
+                AdbResponse response = socket.ReadAdbResponse();
+                string version = socket.ReadString();
+
+                int versionCode = int.Parse(version, NumberStyles.HexNumber);
                 return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (SocketException ex)

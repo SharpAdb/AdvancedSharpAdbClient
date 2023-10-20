@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     {
 #if NET6_0_OR_GREATER
         /// <inheritdoc/>
-        public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default) => socket.ReconnectAsync(cancellationToken);
+        public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default) => Socket.ReconnectAsync(cancellationToken);
 #endif
 
         /// <inheritdoc/>
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count = await Socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                 if (count < 0)
                 {
@@ -43,7 +43,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count = await Socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                 if (count < 0)
                 {
@@ -128,7 +128,7 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = await socket.ReceiveAsync(data, totalRead, bufferLength, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count = await Socket.ReceiveAsync(data, totalRead, bufferLength, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {
@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient
 
             if (!response.IOSuccess || !response.Okay)
             {
-                socket.Dispose();
+                Socket.Dispose();
                 throw new AdbException($"An error occurred while reading a response from ADB: {response.Message}", response);
             }
 
@@ -250,7 +250,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count = await Socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -281,7 +281,7 @@ namespace AdvancedSharpAdbClient
                     int left = length - totalRead;
                     int bufferLength = left < ReceiveBufferSize ? left : ReceiveBufferSize;
 
-                    count = await socket.ReceiveAsync(data.Slice(totalRead, bufferLength), SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                    count = await Socket.ReceiveAsync(data.Slice(totalRead, bufferLength), SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                     if (count < 0)
                     {
@@ -311,7 +311,7 @@ namespace AdvancedSharpAdbClient
         {
             try
             {
-                int count = await socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                int count = await Socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
 
                 if (count < 0)
                 {
