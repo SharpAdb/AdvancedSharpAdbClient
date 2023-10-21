@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace AdvancedSharpAdbClient
@@ -103,7 +104,7 @@ namespace AdvancedSharpAdbClient
         /// <see cref="ForwardProtocol.LocalReserved"/> or <see cref="ForwardProtocol.LocalFilesystem"/>,
         /// the Unix domain socket name of the socket being forwarded.
         /// </summary>
-        public string SocketName { get; init; }
+        public string? SocketName { get; init; }
 
         /// <summary>
         /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.JavaDebugWireProtocol"/>,
@@ -139,10 +140,10 @@ namespace AdvancedSharpAdbClient
         public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as ForwardSpec);
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as ForwardSpec);
 
         /// <inheritdoc/>
-        public bool Equals(ForwardSpec other) =>
+        public bool Equals([NotNullWhen(true)] ForwardSpec? other) =>
             other != null
                 && other.Protocol == Protocol
                 && Protocol switch

@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
                 // -- one of the integration test fetches output 1000 times and found no truncations.
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                    string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
                     if (line == null) { break; }
 
@@ -306,7 +306,7 @@ namespace AdvancedSharpAdbClient
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                LogEntry entry = null;
+                LogEntry? entry = null;
 
                 try
                 {
@@ -552,7 +552,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        public async Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -578,7 +578,8 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)
+                ?? throw new AdbException($"The {nameof(result)} of {nameof(InstallCreateAsync)} is null.");
 
             if (!result.Contains("Success"))
             {
@@ -655,8 +656,8 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
-            if (!result.Contains("Success"))
+            string? result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (result?.Contains("Success") != true)
             {
                 throw new AdbException(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
             }
@@ -698,7 +699,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<XmlDocument?> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(device, cancellationToken).ConfigureAwait(false);
             XmlDocument doc = new();
@@ -712,7 +713,7 @@ namespace AdvancedSharpAdbClient
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
-        public async Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(device, cancellationToken).ConfigureAwait(false);
             Windows.Data.Xml.Dom.XmlDocument doc = new();
@@ -819,7 +820,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync($"shell:pidof {packageName}", cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()).ConfigureAwait(false);
+            string? result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()).ConfigureAwait(false);
             bool intParsed = int.TryParse(result, out int pid);
             return intParsed && pid > 0;
         }
@@ -854,19 +855,19 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<Element> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<Element?> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                    XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
                     if (doc != null)
                     {
-                        XmlNode xmlNode = doc.SelectSingleNode(xpath);
+                        XmlNode? xmlNode = doc.SelectSingleNode(xpath);
                         if (xmlNode != null)
                         {
-                            Element element = Element.FromXmlNode(this, device, xmlNode);
+                            Element? element = Element.FromXmlNode(this, device, xmlNode);
                             if (element != null)
                             {
                                 return element;
@@ -899,17 +900,17 @@ namespace AdvancedSharpAdbClient
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                    XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
                     if (doc != null)
                     {
-                        XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                        XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
                         if (xmlNodes != null)
                         {
                             IEnumerable<Element> FindElements()
                             {
                                 for (int i = 0; i < xmlNodes.Count; i++)
                                 {
-                                    Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                    Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
                                     if (element != null)
                                     {
                                         yield return element;
@@ -932,7 +933,7 @@ namespace AdvancedSharpAdbClient
                     throw new ShellCommandUnresponsiveException(e);
                 }
             }
-            return null;
+            return Enumerable.Empty<Element>();
         }
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -941,7 +942,7 @@ namespace AdvancedSharpAdbClient
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                XmlDocument doc = null;
+                XmlDocument? doc = null;
 
                 try
                 {
@@ -960,12 +961,12 @@ namespace AdvancedSharpAdbClient
 
                 if (doc != null)
                 {
-                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
                         for (int i = 0; i < xmlNodes.Count; i++)
                         {
-                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
                             if (element != null)
                             {
                                 yield return element;

@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken);
+        Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken);
+        Task PullAsync(string remotePath, Stream stream, IProgress<int>? progress, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns information about a file on the device.

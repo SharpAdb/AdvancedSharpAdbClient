@@ -78,8 +78,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -104,8 +104,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default)
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
@@ -239,9 +239,9 @@ fi".Replace("\r\n", "\n"), receiver, cancellationToken).ConfigureAwait(false);
             {
                 while (reader.Peek() > 0)
                 {
-                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                    string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
-                    if (!line.All(char.IsDigit))
+                    if (line?.All(char.IsDigit) != true)
                     {
                         continue;
                     }

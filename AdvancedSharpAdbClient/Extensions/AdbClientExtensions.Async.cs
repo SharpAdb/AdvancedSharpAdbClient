@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
-            client.CreateForwardAsync(device, local?.ToString(), remote?.ToString(), allowRebind, cancellationToken);
+            client.CreateForwardAsync(device, local?.ToString()!, remote?.ToString()!, allowRebind, cancellationToken);
 
         /// <summary>
         /// Creates a port forwarding between a local and a remote port.
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
         /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static Task<int> CreateReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind, CancellationToken cancellationToken = default) =>
-            client.CreateReverseForwardAsync(device, remote?.ToString(), local?.ToString(), allowRebind, cancellationToken);
+            client.CreateReverseForwardAsync(device, remote?.ToString()!, local?.ToString()!, allowRebind, cancellationToken);
 
         /// <summary>
         /// Remove a reverse port forwarding between a remote and a local port.
@@ -90,7 +90,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task RemoveReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, CancellationToken cancellationToken = default) =>
-            client.RemoveReverseForwardAsync(device, remote?.ToString(), cancellationToken);
+            client.RemoveReverseForwardAsync(device, remote?.ToString()!, cancellationToken);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -221,19 +221,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, string host, string code, CancellationToken cancellationToken = default)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.PairAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int port) ? port : AdbClient.DefaultPort), code, cancellationToken);
-        }
+        public static Task<string> PairAsync(this IAdbClient client, string host, string code, CancellationToken cancellationToken = default) =>
+            client.PairAsync(Extensions.CreateDnsEndPoint(host, AdbClient.DefaultPort), code, cancellationToken);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.
@@ -244,19 +233,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, string host, int port, string code, CancellationToken cancellationToken = default)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.PairAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code, cancellationToken);
-        }
+        public static Task<string> PairAsync(this IAdbClient client, string host, int port, string code, CancellationToken cancellationToken = default) =>
+            client.PairAsync(Extensions.CreateDnsEndPoint(host, port), code, cancellationToken);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
@@ -290,19 +268,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="port">The port of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
-        public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.ConnectAsync(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), cancellationToken);
-        }
+        public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default) =>
+            client.ConnectAsync(Extensions.CreateDnsEndPoint(host, port), cancellationToken);
 
         /// <summary>
         /// Asynchronously installs an Android application on an device.
@@ -346,7 +313,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which return the session ID</returns>
-        public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, string packageName = null, params string[] arguments) =>
+        public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, string? packageName = null, params string[] arguments) =>
             client.InstallCreateAsync(device, packageName, default, arguments);
 
         /// <summary>
@@ -360,7 +327,7 @@ namespace AdvancedSharpAdbClient
         public static async Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default)
         {
             await client.SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await client.SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
+            await client.SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

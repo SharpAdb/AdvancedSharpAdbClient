@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient
 {
@@ -44,12 +45,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the serial number of the device for which the port forwarding is configured.
         /// </summary>
-        public string SerialNumber { get; init; }
+        public string SerialNumber { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the local (PC) endpoint.
         /// </summary>
-        public string Local { get; init; }
+        public string Local { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the local (PC) endpoint.
@@ -59,7 +60,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets a <see cref="string"/> that represents the remote (device) endpoint.
         /// </summary>
-        public string Remote { get; init; }
+        public string Remote { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets a <see cref="ForwardSpec"/> that represents the remote (device) endpoint.
@@ -71,13 +72,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="value">The <see cref="string"/> value to parse.</param>
         /// <returns>A <see cref="ForwardData"/> object that represents the port forwarding information contained in <paramref name="value"/>.</returns>
-        public static ForwardData FromString(string value) => value == null ? null : new ForwardData(value);
+        [return: NotNullIfNotNull(nameof(value))]
+        public static ForwardData? FromString(string? value) => value == null ? null : new ForwardData(value);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as ForwardData);
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as ForwardData);
 
         /// <inheritdoc/>
-        public bool Equals(ForwardData other) =>
+        public bool Equals([NotNullWhen(true)] ForwardData? other) =>
             other is not null
                 && SerialNumber == other.SerialNumber
                 && Local == other.Local

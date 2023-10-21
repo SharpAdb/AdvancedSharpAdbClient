@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -14,6 +15,7 @@ namespace AdvancedSharpAdbClient
     {
 #if NET6_0_OR_GREATER
         /// <inheritdoc/>
+        [MemberNotNull(nameof(EndPoint))]
         public virtual async ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
         {
             if (endPoint is not (IPEndPoint or DnsEndPoint))
@@ -21,9 +23,9 @@ namespace AdvancedSharpAdbClient
                 throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
+            EndPoint = endPoint;
             await Socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
             Socket.Blocking = true;
-            this.endPoint = endPoint;
         }
 
         /// <inheritdoc/>
@@ -38,7 +40,7 @@ namespace AdvancedSharpAdbClient
             {
                 Socket.Dispose();
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                return ConnectAsync(endPoint, cancellationToken);
+                return ConnectAsync(EndPoint!, cancellationToken);
             }
         }
 #endif

@@ -9,13 +9,13 @@ namespace AdvancedSharpAdbClient.Logs
     /// </summary>
     public static class LoggerProvider
     {
-        private static ILoggerFactory _loggerFactory = null;
+        private static ILoggerFactory? _loggerFactory = null;
 
         /// <summary>
         /// Sets the current log provider based on logger factory.
         /// </summary>
         /// <param name="loggerFactory">The logger factory.</param>
-        public static void SetLogProvider(ILoggerFactory loggerFactory) => _loggerFactory = loggerFactory;
+        public static void SetLogProvider(ILoggerFactory? loggerFactory) => _loggerFactory = loggerFactory;
 
         /// <summary>
         /// Creates a new <see cref="ILogger"/> instance.

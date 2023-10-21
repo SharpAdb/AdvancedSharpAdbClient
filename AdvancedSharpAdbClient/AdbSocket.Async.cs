@@ -158,7 +158,13 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            int read = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+
+            if (read == 0)
+            {
+                // There is no data to read
+                return string.Empty;
+            }
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);

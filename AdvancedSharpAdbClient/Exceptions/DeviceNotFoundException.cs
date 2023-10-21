@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="DeviceNotFoundException"/> class.
         /// </summary>
         /// <param name="device">The device.</param>
-        public DeviceNotFoundException(string device) : base("The device '" + device + "' was not found.")
+        public DeviceNotFoundException(string? device) : base("The device '" + device + "' was not found.")
         {
         }
 
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public DeviceNotFoundException(string message, Exception innerException) : base(message, innerException)
+        public DeviceNotFoundException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
 

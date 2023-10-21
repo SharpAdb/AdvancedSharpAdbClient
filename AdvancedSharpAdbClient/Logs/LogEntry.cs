@@ -48,6 +48,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Gets or sets the entry's payload.
         /// </summary>
-        public byte[] Data { get; set; }
+        public byte[] Data { get; set; } = [];
     }
 }

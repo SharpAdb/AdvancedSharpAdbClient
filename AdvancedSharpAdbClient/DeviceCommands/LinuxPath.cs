@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -110,7 +111,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="PathTooLongException">The path parameter is longer
         /// than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetDirectoryName(string path)
+        [return: NotNullIfNotNull(nameof(path))]
+        public static string? GetDirectoryName(string? path)
         {
             if (path != null)
             {
@@ -149,7 +151,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="ArgumentException">path contains one or more of the invalid characters
         /// defined in <see cref="InvalidCharacters"/>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetFileName(string path)
+        [return: NotNullIfNotNull(nameof(path))]
+        public static string? GetFileName(string path)
         {
             if (path != null)
             {

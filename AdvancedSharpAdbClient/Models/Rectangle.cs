@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient
 {
@@ -105,7 +106,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>This method returns <see langword="true"/> if <paramref name="obj"/> is a <see cref="Rectangle"/> structure
         /// and its <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties are equal to
         /// the corresponding properties of this <see cref="Rectangle"/> structure; otherwise, <see langword="false"/>.</returns>
-        public override readonly bool Equals(object obj) => obj is Rectangle rectangle && Equals(rectangle);
+        public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is Rectangle rectangle && Equals(rectangle);
 
         /// <inheritdoc/>
         public readonly bool Equals(Rectangle other) => this == other;

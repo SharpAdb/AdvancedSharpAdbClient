@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a new <see cref="LogEntry"/> object.</returns>
-        public async Task<LogEntry> ReadEntryAsync(CancellationToken cancellationToken = default)
+        public async Task<LogEntry?> ReadEntryAsync(CancellationToken cancellationToken = default)
         {
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
@@ -35,11 +35,11 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-            ushort payloadLength = payloadLengthValue.Value;
-            ushort headerSize = headerSizeValue.Value;
-            int pid = pidValue.Value;
-            int tid = tidValue.Value;
-            int sec = secValue.Value;
+            ushort payloadLength = payloadLengthValue!.Value;
+            ushort headerSize = headerSizeValue!.Value;
+            int pid = pidValue!.Value;
+            int tid = tidValue!.Value;
+            int sec = secValue!.Value;
             int nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient.Logs
                 }
             }
 
-            byte[] data = await ReadBytesSafeAsync(payloadLength, cancellationToken).ConfigureAwait(false);
+            byte[]? data = await ReadBytesSafeAsync(payloadLength, cancellationToken).ConfigureAwait(false);
 
             if (data == null)
             {
@@ -181,26 +181,26 @@ namespace AdvancedSharpAdbClient.Logs
         }
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
-            byte[] data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
+            byte[]? data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
         private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
-            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
+            byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
         private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
-            byte[] data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
+            byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
 
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
-        private async Task<byte[]> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
+        private async Task<byte[]?> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;
             int read = 0;

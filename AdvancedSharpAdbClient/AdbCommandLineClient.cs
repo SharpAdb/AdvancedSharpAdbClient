@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Don't check adb file name when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient> logger = null)
+        public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
             if (StringExtensions.IsNullOrWhiteSpace(adbPath))
             {
@@ -172,7 +172,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
-        protected static Version GetVersionFromOutput(IEnumerable<string> output)
+        protected static Version? GetVersionFromOutput(IEnumerable<string> output)
         {
             Regex regex = AdbVersionRegex();
             foreach (string line in output)
@@ -209,7 +209,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual void RunAdbProcess(string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
+        protected virtual void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
 
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual int RunAdbProcessInner(string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
+        protected virtual int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             ExceptionExtensions.ThrowIfNull(command);
 
@@ -247,7 +247,7 @@ namespace AdvancedSharpAdbClient
 #if !HAS_PROCESS
         [DoesNotReturn]
 #endif
-        protected virtual int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
+        protected virtual int RunProcess(string filename, string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
 #if HAS_PROCESS
             ProcessStartInfo psi = new(filename, command)
@@ -259,7 +259,8 @@ namespace AdvancedSharpAdbClient
                 RedirectStandardOutput = true
             };
 
-            using Process process = Process.Start(psi);
+            using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
+
             string standardErrorString = process.StandardError.ReadToEnd();
             string standardOutputString = process.StandardOutput.ReadToEnd();
 

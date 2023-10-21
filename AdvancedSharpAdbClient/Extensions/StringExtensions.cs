@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The string to test.</param>
         /// <returns><see langword="true"/> if the <paramref name="value"/> parameter is <see langword="null"/> or
         /// <see cref="string.Empty"/>, or if <paramref name="value"/> consists exclusively of white-space characters.</returns>
-        public static bool IsNullOrWhiteSpace(string value)
+        public static bool IsNullOrWhiteSpace(string? value)
         {
 #if NETFRAMEWORK && !NET40_OR_GREATER
             if (value == null)
@@ -99,14 +99,14 @@ namespace AdvancedSharpAdbClient
         /// <param name="values">A collection that contains the strings to concatenate.</param>
         /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
         /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
-        public static string Join(string separator, IEnumerable<string> values)
+        public static string Join(string? separator, IEnumerable<string?> values)
         {
 #if NETFRAMEWORK && !NET40_OR_GREATER
             ExceptionExtensions.ThrowIfNull(values);
 
             separator ??= string.Empty;
 
-            using IEnumerator<string> en = values.GetEnumerator();
+            using IEnumerator<string?> en = values.GetEnumerator();
             if (!en.MoveNext())
             {
                 return string.Empty;

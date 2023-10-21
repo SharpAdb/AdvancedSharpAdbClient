@@ -1,5 +1,6 @@
 ﻿#if NETFRAMEWORK && !NET40_OR_GREATER
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
@@ -53,7 +54,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="comparand">A <see cref="DnsEndPoint"/> instance to compare to the current instance.</param>
         /// <returns><see langword="true"/> if the two <see cref="DnsEndPoint"/> instances are equal; otherwise, <see langword="false"/>.</returns>
-        public override bool Equals(object comparand)
+        public override bool Equals([NotNullWhen(true)] object? comparand)
         {
             return comparand is DnsEndPoint dnsComparand
                 && _family == dnsComparand._family &&

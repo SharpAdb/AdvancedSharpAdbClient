@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(EndPoint endPoint, ILogger<AdbSocket> logger = null)
+        public AdbSocket(EndPoint endPoint, ILogger<AdbSocket>? logger = null)
         {
             Socket = new TcpSocket();
             Socket.Connect(endPoint);
@@ -49,23 +49,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="port">The port at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(string host, int port, ILogger<AdbSocket> logger = null)
+        public AdbSocket(string host, int port, ILogger<AdbSocket>? logger = null)
+            : this(Extensions.CreateDnsEndPoint(host, port), logger)
         {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            DnsEndPoint endPoint = values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
-
-            Socket = new TcpSocket();
-            Socket.Connect(endPoint);
-            Socket.ReceiveBufferSize = ReceiveBufferSize;
-            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
         /// <summary>
@@ -73,9 +59,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(ITcpSocket socket, ILogger<AdbSocket> logger = null)
+        public AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null)
         {
-            this.Socket = socket;
+            Socket = socket;
             this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
@@ -252,7 +238,7 @@ namespace AdvancedSharpAdbClient
             if (read == 0)
             {
                 // There is no data to read
-                return null;
+                return string.Empty;
             }
 
             // Convert the bytes to a hex string

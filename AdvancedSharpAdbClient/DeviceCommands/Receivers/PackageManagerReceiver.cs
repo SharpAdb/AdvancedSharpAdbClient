@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     if (separator == -1)
                     {
-                        PackageManager.Packages[package] = null;
+                        PackageManager.Packages[package] = string.Empty;
                     }
                     else
                     {

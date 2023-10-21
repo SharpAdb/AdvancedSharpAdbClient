@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version name.</returns>
-        internal object GetVersionName(string line)
+        internal string? GetVersionName(string line)
         {
             CheckPackagesSection(line);
 
@@ -97,7 +97,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version code.</returns>
-        internal object GetVersionCode(string line)
+        internal object? GetVersionCode(string line)
         {
             CheckPackagesSection(line);
 

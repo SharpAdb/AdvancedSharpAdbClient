@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        public ShellCommandUnresponsiveException(string message) : base(message)
+        public ShellCommandUnresponsiveException(string? message) : base(message)
         {
         }
 
@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// reference to the inner exception that is the cause of this exception.
         /// </summary>
         /// <param name="inner">The exception that is the cause of the current exception, or <see langword="null"/> if no inner exception is specified.</param>
-        public ShellCommandUnresponsiveException(Exception inner) : base("The shell command has become unresponsive", inner)
+        public ShellCommandUnresponsiveException(Exception? inner) : base("The shell command has become unresponsive", inner)
         {
         }
 
@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="inner">The exception that is the cause of the current exception, or <see langword="null"/> if no inner exception is specified.</param>
-        public ShellCommandUnresponsiveException(string message, Exception inner) : base(message, inner)
+        public ShellCommandUnresponsiveException(string? message, Exception? inner) : base(message, inner)
         {
         }
 

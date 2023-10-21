@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Occurs when there is a change in the status of the installing.
         /// </summary>
-        public event EventHandler<InstallProgressEventArgs> InstallProgressChanged;
+        public event EventHandler<InstallProgressEventArgs>? InstallProgressChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="skipInit">A value indicating whether to skip the initial refresh of the package list or not.
         /// Used mainly by unit tests.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager> logger = null)
+        public PackageManager(IAdbClient client, DeviceData device, bool thirdPartyOnly = false, Func<IAdbClient, DeviceData, ISyncService>? syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager>? logger = null)
         {
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = [];
@@ -468,7 +468,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="reinstall">Set to <see langword="true"/> if re-install of app should be performed.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <returns>Session ID.</returns>
-        protected virtual string CreateInstallSession(bool reinstall, string packageName = null)
+        protected virtual string CreateInstallSession(bool reinstall, string? packageName = null)
         {
             ValidateDevice();
 
@@ -484,7 +484,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
 
-            string result = receiver.SuccessMessage;
+            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSession)} is null.");
             int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
             string session = result.Substring(result.IndexOf('[') + 1, arr);
 

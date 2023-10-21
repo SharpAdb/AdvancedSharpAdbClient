@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Logs
         public static NullLogger Instance { get; } = new();
 
         /// <inheritdoc />
-        public void Log(LogLevel logLevel, Exception exception, string message, params object[] args) { }
+        public void Log(LogLevel logLevel, Exception? exception, string? message, params object?[] args) { }
     }
 
     /// <summary>

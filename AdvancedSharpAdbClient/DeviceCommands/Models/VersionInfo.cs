@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -26,7 +27,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public string VersionName { get; init; } = VersionName;
 
         /// <inheritdoc/>
-        public readonly int Compare(object x, object y) =>
+        public readonly int Compare([NotNull] object? x, [NotNull] object? y) =>
             x is VersionInfo left && y is VersionInfo right
                 ? left.VersionCode.CompareTo(right.VersionCode)
                 : throw new NotImplementedException();

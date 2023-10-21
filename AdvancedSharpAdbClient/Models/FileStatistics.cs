@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient
 {
@@ -19,7 +20,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the path of the file.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the <see cref="UnixFileType"/> attributes of the file.
@@ -43,10 +44,10 @@ namespace AdvancedSharpAdbClient
         public override string ToString() => Path;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as FileStatistics);
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as FileStatistics);
 
         /// <inheritdoc/>
-        public bool Equals(FileStatistics other) =>
+        public bool Equals([NotNullWhen(true)] FileStatistics? other) =>
             other is not null
                 && Path == other.Path
                 && FileType == other.FileType

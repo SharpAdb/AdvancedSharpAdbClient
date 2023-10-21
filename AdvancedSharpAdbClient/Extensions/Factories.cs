@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 
@@ -49,6 +50,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Resets all factories to their default values.
         /// </summary>
+        [MemberNotNull(
+            nameof(CheckFileExists),
+            nameof(AdbSocketFactory),
+            nameof(AdbClientFactory),
+            nameof(AdbCommandLineClientFactory),
+            nameof(SyncServiceFactory))]
         public static void Reset()
         {
             CheckFileExists = File.Exists;

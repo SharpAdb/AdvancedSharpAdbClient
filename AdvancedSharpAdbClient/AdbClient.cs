@@ -59,7 +59,8 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        public AdbClient() : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+        public AdbClient()
+            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
         {
         }
 
@@ -67,7 +68,8 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         /// <param name="endPoint">The <see cref="System.Net.EndPoint"/> at which the adb server is listening.</param>
-        public AdbClient(EndPoint endPoint) : this(endPoint, Factories.AdbSocketFactory)
+        public AdbClient(EndPoint endPoint)
+            : this(endPoint, Factories.AdbSocketFactory)
         {
         }
 
@@ -76,29 +78,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="host">The host address at which the adb server is listening.</param>
         /// <param name="port">The port at which the adb server is listening.</param>
-        public AdbClient(string host, int port) : this(host, port, Factories.AdbSocketFactory)
+        public AdbClient(string host, int port)
+            : this(Extensions.CreateDnsEndPoint(host, port), Factories.AdbSocketFactory)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbClient"/> class.
-        /// </summary>
-        /// <param name="host">The host address at which the adb server is listening.</param>
-        /// <param name="port">The port at which the adb server is listening.</param>
-        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
-        public AdbClient(string host, int port, Func<EndPoint, IAdbSocket> adbSocketFactory)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
-            EndPoint = values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
         }
 
         /// <summary>
@@ -117,6 +99,17 @@ namespace AdvancedSharpAdbClient
 
             EndPoint = endPoint;
             this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="host">The host address at which the adb server is listening.</param>
+        /// <param name="port">The port at which the adb server is listening.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public AdbClient(string host, int port, Func<EndPoint, IAdbSocket> adbSocketFactory)
+            : this(Extensions.CreateDnsEndPoint(host, port), adbSocketFactory)
+        {
         }
 
         /// <summary>
@@ -373,7 +366,7 @@ namespace AdvancedSharpAdbClient
                 // -- one of the integration test fetches output 1000 times and found no truncations.
                 while (true)
                 {
-                    string line = reader.ReadLine();
+                    string? line = reader.ReadLine();
 
                     if (line == null) { break; }
 
@@ -448,7 +441,7 @@ namespace AdvancedSharpAdbClient
 
             while (true)
             {
-                LogEntry entry = null;
+                LogEntry? entry = null;
 
                 try
                 {
@@ -696,7 +689,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string InstallCreate(DeviceData device, string packageName = null, params string[] arguments)
+        public string InstallCreate(DeviceData device, string? packageName = null, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -722,7 +715,7 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = reader.ReadLine();
+            string result = reader.ReadLine() ?? throw new AdbException($"The {nameof(result)} of {nameof(InstallCreate)} is null.");
 
             if (!result.Contains("Success"))
             {
@@ -803,8 +796,8 @@ namespace AdvancedSharpAdbClient
             AdbResponse response = socket.ReadAdbResponse();
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = reader.ReadLine();
-            if (!result.Contains("Success"))
+            string? result = reader.ReadLine();
+            if (result?.Contains("Success") != true)
             {
                 throw new AdbException(reader.ReadToEnd());
             }
@@ -847,7 +840,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public XmlDocument DumpScreen(DeviceData device)
+        public XmlDocument? DumpScreen(DeviceData device)
         {
             XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
@@ -861,7 +854,7 @@ namespace AdvancedSharpAdbClient
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
-        public Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device)
+        public Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device)
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = DumpScreenString(device);
@@ -968,7 +961,7 @@ namespace AdvancedSharpAdbClient
             socket.SendAdbRequest($"shell:pidof {packageName}");
             AdbResponse response = socket.ReadAdbResponse();
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = reader.ReadToEnd().TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            string? result = reader.ReadToEnd().TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
             bool intParsed = int.TryParse(result, out int pid);
             return intParsed && pid > 0;
         }
@@ -1005,20 +998,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Element FindElement(DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default)
+        public Element? FindElement(DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default)
         {
             EnsureDevice(device);
             Stopwatch stopwatch = new();
             stopwatch.Start();
             while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
             {
-                XmlDocument doc = DumpScreen(device);
+                XmlDocument? doc = DumpScreen(device);
                 if (doc != null)
                 {
-                    XmlNode xmlNode = doc.SelectSingleNode(xpath);
+                    XmlNode? xmlNode = doc.SelectSingleNode(xpath);
                     if (xmlNode != null)
                     {
-                        Element element = Element.FromXmlNode(this, device, xmlNode);
+                        Element? element = Element.FromXmlNode(this, device, xmlNode);
                         if (element != null)
                         {
                             return element;
@@ -1041,15 +1034,15 @@ namespace AdvancedSharpAdbClient
             stopwatch.Start();
             while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
             {
-                XmlDocument doc = DumpScreen(device);
+                XmlDocument? doc = DumpScreen(device);
                 if (doc != null)
                 {
-                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
                         for (int i = 0; i < xmlNodes.Count; i++)
                         {
-                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
                             if (element != null)
                             {
                                 yield return element;

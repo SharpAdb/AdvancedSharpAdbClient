@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, in bool isCancelled);
+        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress, in bool isCancelled);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        void Pull(string remotePath, Stream stream, IProgress<int> progress, in bool isCancelled);
+        void Pull(string remotePath, Stream stream, IProgress<int>? progress, in bool isCancelled);
 
         /// <summary>
         /// Returns information about a file on the device.
@@ -63,6 +63,6 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Occurs when there is a change in the status of the sync.
         /// </summary>
-        event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
+        event EventHandler<SyncProgressChangedEventArgs>? SyncProgressChanged;
     }
 }

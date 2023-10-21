@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 
@@ -24,7 +25,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
         /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint) { }
+        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint!) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -52,13 +53,14 @@ namespace AdvancedSharpAdbClient
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public byte[] Data { get; private set; }
+        public byte[]? Data { get; private set; }
 
         /// <summary>
         /// Refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
+        [MemberNotNull(nameof(Data))]
         public virtual void Refresh(bool reset = false)
         {
             EnsureNotDisposed();
@@ -164,7 +166,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public virtual Bitmap ToImage()
+        public virtual Bitmap? ToImage()
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(Refresh)} first") : Header.ToImage(Data);
@@ -174,13 +176,13 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public static explicit operator Image(Framebuffer value) => value.ToImage();
+        public static explicit operator Image?(Framebuffer value) => value.ToImage();
 
         /// <inheritdoc/>
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public static explicit operator Bitmap(Framebuffer value) => value.ToImage();
+        public static explicit operator Bitmap?(Framebuffer value) => value.ToImage();
 #endif
 
 #if WINDOWS_UWP
@@ -189,7 +191,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, cancellationToken);
@@ -201,7 +203,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -213,7 +215,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -231,7 +233,7 @@ namespace AdvancedSharpAdbClient
                     ArrayPool<byte>.Shared.Return(Data, clearArray: false);
                 }
 #endif
-                headerData = null;
+                headerData = null!;
                 headerInitialized = false;
                 disposed = true;
             }

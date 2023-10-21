@@ -4,6 +4,7 @@
     <FullTargets>False</FullTargets>
     <ImportAsync>True</ImportAsync>
     <NoWarn>$(NoWarn);CS1685;CA2254</NoWarn>
+    <Nullable>Enable</Nullable>
     <WarningsAsErrors />
   </PropertyGroup>
 
@@ -33,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\logo.png" Pack="true" PackagePath="\Icon.png" />
+    <None Include="..\logo.png" Pack="True" PackagePath="\Icon.png" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'

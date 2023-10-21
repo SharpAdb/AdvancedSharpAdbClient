@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="argument">The reference type argument to validate as non-null.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="argument"/> corresponds.</param>
-        public static void ThrowIfNull(object argument, [CallerArgumentExpression(nameof(argument))] string paramName = null)
+        public static void ThrowIfNull([NotNull] object argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
         {
 #if NET6_0_OR_GREATER
             ArgumentNullException.ThrowIfNull(argument, paramName);
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The argument to validate as less or equal than <paramref name="other"/>.</param>
         /// <param name="other">The value to compare with <paramref name="value"/>.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="value"/> corresponds.</param>
-        public static void ThrowIfGreaterThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string paramName = null)
+        public static void ThrowIfGreaterThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
             where T : IComparable<T>
         {
 #if NET8_0_OR_GREATER
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The argument to validate as greater than or equal than <paramref name="other"/>.</param>
         /// <param name="other">The value to compare with <paramref name="value"/>.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="value"/> corresponds.</param>
-        public static void ThrowIfLessThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string paramName = null)
+        public static void ThrowIfLessThan<T>(T value, T other, [CallerArgumentExpression(nameof(value))] string? paramName = null)
             where T : IComparable<T>
         {
 #if NET8_0_OR_GREATER
@@ -68,12 +68,12 @@ namespace AdvancedSharpAdbClient
         /// <param name="value">The argument to validate as non-negative.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="value"/> corresponds.</param>
 #if NET8_0_OR_GREATER
-        public static void ThrowIfNegative<T>(T value, [CallerArgumentExpression(nameof(value))] string paramName = null)
+        public static void ThrowIfNegative<T>(T value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
             where T : INumberBase<T>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(value, paramName);
 #else
-        public static void ThrowIfNegative(int value, [CallerArgumentExpression(nameof(value))] string paramName = null)
+        public static void ThrowIfNegative(int value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
         {
             if (value < 0)
             {

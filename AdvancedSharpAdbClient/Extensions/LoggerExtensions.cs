@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogDebug(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogDebug(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogDebug(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Debug, exception, message, args);
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogDebug("Processing request from {Address}", address)</example>
-        public static void LogDebug(this ILogger logger, string message, params object[] args) =>
+        public static void LogDebug(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Debug, message, args);
 
         //------------------------------------------TRACE------------------------------------------//
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogTrace(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogTrace(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogTrace(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Trace, exception, message, args);
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogTrace("Processing request from {Address}", address)</example>
-        public static void LogTrace(this ILogger logger, string message, params object[] args) =>
+        public static void LogTrace(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Trace, message, args);
 
         //------------------------------------------INFORMATION------------------------------------------//
@@ -68,7 +68,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogInformation(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogInformation(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogInformation(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Information, exception, message, args);
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogInformation("Processing request from {Address}", address)</example>
-        public static void LogInformation(this ILogger logger, string message, params object[] args) =>
+        public static void LogInformation(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Information, message, args);
 
         //------------------------------------------WARNING------------------------------------------//
@@ -91,7 +91,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogWarning(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogWarning(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogWarning(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Warning, exception, message, args);
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogWarning("Processing request from {Address}", address)</example>
-        public static void LogWarning(this ILogger logger, string message, params object[] args) =>
+        public static void LogWarning(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Warning, message, args);
 
         //------------------------------------------ERROR------------------------------------------//
@@ -114,7 +114,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogError(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogError(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogError(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Error, exception, message, args);
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogError("Processing request from {Address}", address)</example>
-        public static void LogError(this ILogger logger, string message, params object[] args) =>
+        public static void LogError(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Error, message, args);
 
         //------------------------------------------CRITICAL------------------------------------------//
@@ -137,7 +137,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogCritical(exception, "Error while processing request from {Address}", address)</example>
-        public static void LogCritical(this ILogger logger, Exception exception, string message, params object[] args) =>
+        public static void LogCritical(this ILogger logger, Exception? exception, string? message, params object?[] args) =>
             logger.Log(LogLevel.Critical, exception, message, args);
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="message">Format string of the log message in message template format. Example: <c>"User {User} logged in from {Address}"</c></param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         /// <example>logger.LogCritical("Processing request from {Address}", address)</example>
-        public static void LogCritical(this ILogger logger, string message, params object[] args) =>
+        public static void LogCritical(this ILogger logger, string? message, params object?[] args) =>
             logger.Log(LogLevel.Critical, message, args);
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="logLevel">Entry will be written on this level.</param>
         /// <param name="message">Format string of the log message.</param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
-        public static void Log(this ILogger logger, LogLevel logLevel, string message, params object[] args) =>
+        public static void Log(this ILogger logger, LogLevel logLevel, string? message, params object?[] args) =>
             logger.Log(logLevel, null, message, args);
     }
 }

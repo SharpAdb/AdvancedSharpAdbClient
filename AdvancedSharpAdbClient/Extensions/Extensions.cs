@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -47,6 +48,26 @@ namespace AdvancedSharpAdbClient
                     source.Add(item);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DnsEndPoint"/> from the specified host and port information.
+        /// </summary>
+        /// <param name="host">The host address.</param>
+        /// <param name="port">The port.</param>
+        /// <returns>The <see cref="DnsEndPoint"/> created from the specified host and port information.</returns>
+        public static DnsEndPoint CreateDnsEndPoint(string host, int port)
+        {
+            if (string.IsNullOrEmpty(host))
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+
+            string[] values = host.Split(':');
+
+            return values.Length <= 0
+                ? throw new ArgumentNullException(nameof(host))
+                : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
         }
 
         /// <summary>
@@ -216,7 +237,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A value task that represents the asynchronous read operation. The value of the
         /// TResult parameter contains the next line from the text reader, or is null if
         /// all of the characters have been read.</returns>
-        public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken) =>
+        public static Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken) =>
 #if !NET35
             reader.ReadLineAsync();
 #else

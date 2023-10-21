@@ -7,6 +7,7 @@ using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -72,29 +73,29 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The <see cref="Thread"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Thread monitorThread;
+        protected Thread? monitorThread;
 #endif
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
+        public event EventHandler<DeviceDataChangeEventArgs>? DeviceChanged;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
+        public event EventHandler<DeviceDataNotifyEventArgs>? DeviceNotified;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
+        public event EventHandler<DeviceDataConnectEventArgs>? DeviceConnected;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataNotifyEventArgs> DeviceListChanged;
+        public event EventHandler<DeviceDataNotifyEventArgs>? DeviceListChanged;
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
+        public event EventHandler<DeviceDataConnectEventArgs>? DeviceDisconnected;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
         /// <param name="logger">The logger to use when logging.</param>
-        public DeviceMonitor(ILogger<DeviceMonitor> logger = null)
+        public DeviceMonitor(ILogger<DeviceMonitor>? logger = null)
             : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), logger)
         {
         }
@@ -104,7 +105,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public DeviceMonitor(EndPoint endPoint, ILogger<DeviceMonitor> logger = null)
+        public DeviceMonitor(EndPoint endPoint, ILogger<DeviceMonitor>? logger = null)
             : this(Factories.AdbSocketFactory(endPoint), logger)
         {
         }
@@ -114,7 +115,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor> logger = null)
+        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor>? logger = null)
         {
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             devices = [];
@@ -138,6 +139,13 @@ namespace AdvancedSharpAdbClient
         public bool IsRunning { get; protected set; }
 
         /// <inheritdoc/>
+        [MemberNotNull(
+#if HAS_TASK
+            nameof(monitorTask)
+#else
+            nameof(monitorThread)
+#endif
+            )]
         public virtual void Start()
         {
 #if HAS_TASK
@@ -195,7 +203,7 @@ namespace AdvancedSharpAdbClient
             if (Socket != null)
             {
                 Socket.Dispose();
-                Socket = null;
+                Socket = null!;
             }
 
             firstDeviceListParsed.Dispose();
@@ -220,7 +228,7 @@ namespace AdvancedSharpAdbClient
             if (Socket != null)
             {
                 Socket.Dispose();
-                Socket = null;
+                Socket = null!;
             }
 
             firstDeviceListParsed.Close();

@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which return the session ID</returns>
-        Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments);
+        Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
@@ -390,7 +390,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
+        Task<XmlDocument?> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
@@ -399,7 +399,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken);
+        Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken);
 #endif
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task"/> which return the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        Task<Element> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
+        Task<Element?> FindElementAsync(DeviceData device, string xpath, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.

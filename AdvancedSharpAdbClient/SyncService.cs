@@ -6,6 +6,7 @@ using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace AdvancedSharpAdbClient
 {
@@ -47,14 +48,25 @@ namespace AdvancedSharpAdbClient
         protected const int MaxPathLength = 1024;
 
         /// <inheritdoc/>
-        public event EventHandler<SyncProgressChangedEventArgs> SyncProgressChanged;
+        public event EventHandler<SyncProgressChangedEventArgs>? SyncProgressChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
         /// <param name="client">A connection to an adb server.</param>
         /// <param name="device">The device on which to interact with the files.</param>
-        public SyncService(IAdbClient client, DeviceData device) : this(Factories.AdbSocketFactory(client.EndPoint), device)
+        public SyncService(IAdbClient client, DeviceData device)
+            : this(Factories.AdbSocketFactory(client.EndPoint), device)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SyncService"/> class.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="device">The device on which to interact with the files.</param>
+        public SyncService(EndPoint endPoint, DeviceData device)
+            : this(Factories.AdbSocketFactory(endPoint), device)
         {
         }
 
@@ -108,7 +120,7 @@ namespace AdvancedSharpAdbClient
             if (Socket != null)
             {
                 Socket.Dispose();
-                Socket = null;
+                Socket = null!;
             }
             Socket = socket;
             Open();
@@ -121,7 +133,7 @@ namespace AdvancedSharpAdbClient
         public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -218,7 +230,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int> progress = null, in bool isCancelled = false)
+        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
 
@@ -347,7 +359,7 @@ namespace AdvancedSharpAdbClient
                 if (Socket != null)
                 {
                     Socket.Dispose();
-                    Socket = null;
+                    Socket = null!;
                 }
             }
         }

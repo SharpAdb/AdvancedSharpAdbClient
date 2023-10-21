@@ -427,7 +427,7 @@ namespace AdvancedSharpAdbClient
         /// <typeparam name="T">The type of the value to add to the hash code.</typeparam>
         /// <param name="value">The value to add to the hash code.</param>
         /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> to use to calculate the hash code. This value can be a null reference (Nothing in Visual Basic), which will use the default equality comparer for <typeparamref name="T"/>.</param>
-        public void Add<T>(T value, IEqualityComparer<T> comparer)
+        public void Add<T>(T value, IEqualityComparer<T>? comparer)
         {
             Add(value is null ? 0 : (comparer?.GetHashCode(value) ?? value.GetHashCode()));
         }
@@ -561,7 +561,7 @@ namespace AdvancedSharpAdbClient
         [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes.", error: true)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DoesNotReturn]
-        public override readonly bool Equals(object obj) => throw new NotSupportedException("HashCode is a mutable struct and should not be compared with other HashCodes.");
+        public override readonly bool Equals(object? obj) => throw new NotSupportedException("HashCode is a mutable struct and should not be compared with other HashCodes.");
 
         /// <inheritdoc/>
         public static bool operator ==(HashCode left, HashCode right) => left.Equals(right);

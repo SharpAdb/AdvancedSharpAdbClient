@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static int CreateForward(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
-            client.CreateForward(device, local?.ToString(), remote?.ToString(), allowRebind);
+            client.CreateForward(device, local?.ToString()!, remote?.ToString()!, allowRebind);
 
         /// <summary>
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static int CreateReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind) =>
-            client.CreateReverseForward(device, remote?.ToString(), local?.ToString(), allowRebind);
+            client.CreateReverseForward(device, remote?.ToString()!, local?.ToString()!, allowRebind);
 
         /// <summary>
         /// Remove a reverse port forwarding between a remote and a local port.
@@ -50,8 +50,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to remove the reverse port forwarding</param>
         /// <param name="remote">Specification of the remote that was forwarded</param>
-        public static void RemoveReverseForward(this IAdbClient client, DeviceData device, string remote) =>
-            client.RemoveReverseForward(device, remote);
+        public static void RemoveReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote) =>
+            client.RemoveReverseForward(device, remote?.ToString()!);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -181,19 +181,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        public static string Pair(this IAdbClient client, string host, string code)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.Pair(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int port) ? port : AdbClient.DefaultPort), code);
-        }
+        public static string Pair(this IAdbClient client, string host, string code) =>
+            client.Pair(Extensions.CreateDnsEndPoint(host, AdbClient.DefaultPort), code);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.
@@ -203,19 +192,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="port">The port of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        public static string Pair(this IAdbClient client, string host, int port, string code)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.Pair(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port), code);
-        }
+        public static string Pair(this IAdbClient client, string host, int port, string code) =>
+            client.Pair(Extensions.CreateDnsEndPoint(host, port), code);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
@@ -246,19 +224,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="port">The port of the remote device.</param>
         /// <returns>The results from adb.</returns>
-        public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort)
-        {
-            if (string.IsNullOrEmpty(host))
-            {
-                throw new ArgumentNullException(nameof(host));
-            }
-
-            string[] values = host.Split(':');
-
-            return values.Length <= 0
-                ? throw new ArgumentNullException(nameof(host))
-                : client.Connect(new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port));
-        }
+        public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort) =>
+            client.Connect(Extensions.CreateDnsEndPoint(host, port));
 
         /// <summary>
         /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
@@ -269,7 +236,7 @@ namespace AdvancedSharpAdbClient
         public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)
         {
             client.SendKeyEvent(device, "KEYCODE_MOVE_END");
-            client.SendKeyEvent(device, StringExtensions.Join(" ", Enumerable.Repeat("KEYCODE_DEL", charCount)));
+            client.SendKeyEvent(device, StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
         }
 
         /// <summary>

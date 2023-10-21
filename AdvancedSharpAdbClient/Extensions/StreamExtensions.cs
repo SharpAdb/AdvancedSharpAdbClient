@@ -180,13 +180,13 @@ namespace AdvancedSharpAdbClient
             // and convert to a TaskCancelledException - which is the exception we expect.
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(stream.Close);
 
-            TaskCompletionSource<object> taskCompletionSource = new(stream);
+            TaskCompletionSource<object?> taskCompletionSource = new(stream);
 
             IAsyncResult asyncResult = stream.BeginWrite(buffer, offset, count, iar =>
             {
                 // this is the callback
 
-                TaskCompletionSource<object> taskCompletionSource = (TaskCompletionSource<object>)iar.AsyncState;
+                TaskCompletionSource<object?> taskCompletionSource = (TaskCompletionSource<object?>)iar.AsyncState;
                 Stream stream = (Stream)taskCompletionSource.Task.AsyncState;
 
                 try

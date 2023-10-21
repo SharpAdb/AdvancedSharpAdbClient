@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient
@@ -56,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
-        public string Serial { get; init; }
+        public string Serial { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device state.
@@ -66,37 +67,37 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the device model name.
         /// </summary>
-        public string Model { get; init; }
+        public string Model { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device product name.
         /// </summary>
-        public string Product { get; init; }
+        public string Product { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string Name { get; init; }
+        public string Name { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the features available on the device.
         /// </summary>
-        public string Features { get; init; }
+        public string Features { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
         /// </summary>
-        public string Usb { get; init; }
+        public string Usb { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the transport ID for this device.
         /// </summary>
-        public string TransportId { get; init; }
+        public string TransportId { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device info message. Currently only seen for NoPermissions state.
         /// </summary>
-        public string Message { get; init; }
+        public string Message { get; init; } = string.Empty;
 
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
@@ -107,10 +108,10 @@ namespace AdvancedSharpAdbClient
         public static DeviceData CreateFromAdbData(string data) => new(data);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => Equals(obj as DeviceData);
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as DeviceData);
 
         /// <inheritdoc/>
-        public bool Equals(DeviceData other) =>
+        public bool Equals([NotNullWhen(true)] DeviceData? other) =>
             other is not null
                 && Serial == other.Serial
                 && State == other.State

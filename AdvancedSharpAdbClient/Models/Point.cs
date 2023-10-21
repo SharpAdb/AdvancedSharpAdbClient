@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient
 {
@@ -90,7 +91,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to test for equality.</param>
         /// <returns><see langword="true"/> if <paramref name="obj"/> is a <see cref='Point'/> and has the same coordinates as this point instance.</returns>
-        public override readonly bool Equals(object obj) => obj is Point point && Equals(point);
+        public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is Point point && Equals(point);
 
         /// <summary>
         /// Specifies whether this <see cref='Point'/> contains the same coordinates as the specified

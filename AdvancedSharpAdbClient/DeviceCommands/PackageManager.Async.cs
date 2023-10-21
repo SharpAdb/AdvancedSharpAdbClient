@@ -3,6 +3,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -381,7 +382,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the session ID.</returns>
-        protected virtual async Task<string> CreateInstallSessionAsync(bool reinstall, string packageName = null, CancellationToken cancellationToken = default)
+        protected virtual async Task<string> CreateInstallSessionAsync(bool reinstall, string? packageName = null, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -397,7 +398,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 throw new PackageInstallationException(receiver.ErrorMessage);
             }
 
-            string result = receiver.SuccessMessage;
+            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSessionAsync)} is null.");
             int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
             string session = result.Substring(result.IndexOf('[') + 1, arr);
 

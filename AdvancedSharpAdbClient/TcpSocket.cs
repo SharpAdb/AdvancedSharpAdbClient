@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -15,11 +16,6 @@ namespace AdvancedSharpAdbClient
     public partial class TcpSocket : ITcpSocket
     {
         /// <summary>
-        /// The <see cref="EndPoint"/> at which the socket is listening.
-        /// </summary>
-        protected EndPoint endPoint;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
         /// </summary>
         public TcpSocket() => Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -28,6 +24,11 @@ namespace AdvancedSharpAdbClient
         /// The underlying socket that manages the connection.
         /// </summary>
         public Socket Socket { get; protected set; }
+
+        /// <summary>
+        /// The <see cref="System.Net.EndPoint"/> at which the socket is listening.
+        /// </summary>
+        public EndPoint? EndPoint { get; protected set; }
 
         /// <inheritdoc/>
         public bool Connected => Socket.Connected;
@@ -40,6 +41,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        [MemberNotNull(nameof(EndPoint))]
         public virtual void Connect(EndPoint endPoint)
         {
             if (endPoint is not (IPEndPoint or DnsEndPoint))
@@ -47,9 +49,9 @@ namespace AdvancedSharpAdbClient
                 throw new NotSupportedException("Only TCP endpoints are supported");
             }
 
+            EndPoint = endPoint;
             Socket.Connect(endPoint);
             Socket.Blocking = true;
-            this.endPoint = endPoint;
         }
 
         /// <inheritdoc/>
@@ -64,7 +66,7 @@ namespace AdvancedSharpAdbClient
             {
                 Socket.Dispose();
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                Connect(endPoint);
+                Connect(EndPoint!);
             }
         }
 

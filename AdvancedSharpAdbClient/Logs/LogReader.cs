@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
         /// <returns>A new <see cref="LogEntry"/> object.</returns>
-        public virtual LogEntry ReadEntry()
+        public virtual LogEntry? ReadEntry()
         {
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
@@ -42,11 +42,11 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-            ushort payloadLength = payloadLengthValue.Value;
-            ushort headerSize = headerSizeValue.Value;
-            int pid = pidValue.Value;
-            int tid = tidValue.Value;
-            int sec = secValue.Value;
+            ushort payloadLength = payloadLengthValue!.Value;
+            ushort headerSize = headerSizeValue!.Value;
+            int pid = pidValue!.Value;
+            int tid = tidValue!.Value;
+            int sec = secValue!.Value;
             int nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.Logs
                 }
             }
 
-            byte[] data = ReadBytesSafe(payloadLength);
+            byte[]? data = ReadBytesSafe(payloadLength);
 
             if (data == null)
             {
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected ushort? ReadUInt16()
         {
-            byte[] data = ReadBytesSafe(2);
+            byte[]? data = ReadBytesSafe(2);
 
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
@@ -241,7 +241,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected uint? ReadUInt32()
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[]? data = ReadBytesSafe(4);
 
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
@@ -251,7 +251,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected int? ReadInt32()
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[]? data = ReadBytesSafe(4);
 
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
@@ -260,7 +260,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Reads bytes from the stream, making sure that the requested number of bytes
         /// </summary>
         /// <param name="count">The number of bytes to read.</param>
-        protected byte[] ReadBytesSafe(int count)
+        protected byte[]? ReadBytesSafe(int count)
         {
             int totalRead = 0;
             byte[] data = new byte[count];

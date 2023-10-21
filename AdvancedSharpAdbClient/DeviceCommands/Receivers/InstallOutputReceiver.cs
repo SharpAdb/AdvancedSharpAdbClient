@@ -50,12 +50,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
-        public string ErrorMessage { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Gets the success message if the install is successful.
         /// </summary>
-        public string SuccessMessage { get; private set; }
+        public string? SuccessMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.

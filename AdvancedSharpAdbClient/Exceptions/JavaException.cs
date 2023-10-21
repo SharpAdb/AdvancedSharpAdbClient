@@ -21,19 +21,19 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// Gets the name of Java exception.
         /// </summary>
-        public string JavaName { get; init; }
+        public string? JavaName { get; init; }
 
         /// <summary>
         /// Gets a string representation of the immediate frames on the call stack of Java exception.
         /// </summary>
-        public string JavaStackTrace { get; init; }
+        public string? JavaStackTrace { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JavaException"/> class.
         /// </summary>
         /// <param name="name">The name of Java exception.</param>
         /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        public JavaException(string name, string stackTrace) : base(UnknownError)
+        public JavaException(string? name, string? stackTrace) : base(UnknownError)
         {
             JavaName = name;
             JavaStackTrace = stackTrace;
@@ -45,7 +45,20 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="name">The name of Java exception.</param>
         /// <param name="message">The message of Java exception.</param>
         /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        public JavaException(string name, string message, string stackTrace) : base(message)
+        public JavaException(string? name, string? message, string? stackTrace) : base(message)
+        {
+            JavaName = name;
+            JavaStackTrace = stackTrace;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="name">The name of Java exception.</param>
+        /// <param name="message">The message of Java exception.</param>
+        /// <param name="stackTrace">The stackTrace of Java exception.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public JavaException(string? name, string? message, string? stackTrace, Exception? innerException) : base(message, innerException)
         {
             JavaName = name;
             JavaStackTrace = stackTrace;
@@ -64,19 +77,6 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 #endif
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="JavaException"/> class.
-        /// </summary>
-        /// <param name="name">The name of Java exception.</param>
-        /// <param name="message">The message of Java exception.</param>
-        /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public JavaException(string name, string message, string stackTrace, Exception innerException) : base(message, innerException)
-        {
-            JavaName = name;
-            JavaStackTrace = stackTrace;
-        }
 
         /// <summary>
         /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.

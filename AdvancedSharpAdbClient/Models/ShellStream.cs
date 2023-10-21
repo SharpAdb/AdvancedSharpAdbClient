@@ -480,7 +480,7 @@ namespace AdvancedSharpAdbClient
                 if (closeStream && Inner != null)
                 {
                     Inner.Dispose();
-                    Inner = null;
+                    Inner = null!;
                 }
             }
 
@@ -494,7 +494,7 @@ namespace AdvancedSharpAdbClient
             if (closeStream && Inner != null)
             {
                 await Inner.DisposeAsync();
-                Inner = null;
+                Inner = null!;
             }
             await base.DisposeAsync();
             GC.SuppressFinalize(this);

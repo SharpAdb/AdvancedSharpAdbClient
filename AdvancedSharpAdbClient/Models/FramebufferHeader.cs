@@ -142,7 +142,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public readonly Bitmap ToImage(byte[] buffer)
+        public readonly Bitmap? ToImage(byte[] buffer)
         {
             ExceptionExtensions.ThrowIfNull(buffer);
 
@@ -291,7 +291,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public readonly Task<WriteableBitmap?> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             FramebufferHeader self = this;
 
@@ -301,7 +301,7 @@ namespace AdvancedSharpAdbClient
             }
             else
             {
-                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
 
                 _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
@@ -328,7 +328,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public readonly Task<WriteableBitmap?> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             FramebufferHeader self = this;
 
@@ -338,7 +338,7 @@ namespace AdvancedSharpAdbClient
             }
             else
             {
-                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
 
                 if (!dispatcher.TryEnqueue(async () =>
                 {
@@ -366,7 +366,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
+        public readonly async Task<WriteableBitmap?> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
         {
             if (buffer == null)
             {

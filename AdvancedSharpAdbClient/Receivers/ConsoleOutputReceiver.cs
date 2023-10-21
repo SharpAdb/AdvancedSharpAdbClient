@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
     /// <param name="logger">The logger to use when logging.</param>
-    public partial class ConsoleOutputReceiver(ILogger<ConsoleOutputReceiver> logger = null) : MultiLineReceiver
+    public partial class ConsoleOutputReceiver(ILogger<ConsoleOutputReceiver>? logger = null) : MultiLineReceiver
     {
         /// <summary>
         /// The default <see cref="RegexOptions"/> to use when parsing the output.

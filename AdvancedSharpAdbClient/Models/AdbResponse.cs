@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient
 {
@@ -74,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
         /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override readonly bool Equals(object obj) => obj is AdbResponse other && Equals(other);
+        public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is AdbResponse other && Equals(other);
 
         /// <summary>
         /// Determines whether the specified <see cref="AdbResponse"/> is equal to the current <see cref="AdbResponse"/> object.

@@ -73,8 +73,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null,
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -99,8 +99,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null,
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -227,9 +227,9 @@ fi".Replace("\r\n", "\n"), receiver);
             {
                 while (reader.Peek() > 0)
                 {
-                    string line = reader.ReadLine();
+                    string? line = reader.ReadLine();
 
-                    if (!line.All(char.IsDigit))
+                    if (line?.All(char.IsDigit) != true)
                     {
                         continue;
                     }

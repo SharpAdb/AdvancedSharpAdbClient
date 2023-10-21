@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken).ConfigureAwait(false);
-                Version commandLineVersion = null;
+                Version? commandLineVersion = null;
 
                 IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
                 CheckFileExists = commandLineClient.CheckFileExists;
@@ -73,7 +73,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken = default) =>
-            StartServerAsync(CachedAdbPath, true, cancellationToken);
+            StartServerAsync(CachedAdbPath!, true, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default) =>

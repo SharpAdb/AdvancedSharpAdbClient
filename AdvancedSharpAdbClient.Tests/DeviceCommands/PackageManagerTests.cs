@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
         [Theory]
         [InlineData("package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d", "com.android.gallery3d", "/system/app/Gallery2/Gallery2.apk")]
-        [InlineData("package:mwc2015.be", "mwc2015.be", null)]
+        [InlineData("package:mwc2015.be", "mwc2015.be", "")]
         public void PackagesPropertyTest(string command, string packageName, string path)
         {
             DeviceData device = new()

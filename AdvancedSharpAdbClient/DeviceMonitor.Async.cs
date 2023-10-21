@@ -5,6 +5,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -27,9 +28,10 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Task monitorTask;
+        protected Task? monitorTask;
 
         /// <inheritdoc/>
+        [MemberNotNull(nameof(monitorTask))]
         public virtual async Task StartAsync(CancellationToken cancellationToken = default)
         {
             if (monitorTask == null)
@@ -74,7 +76,7 @@ namespace AdvancedSharpAdbClient
             if (Socket != null)
             {
                 Socket.Dispose();
-                Socket = null;
+                Socket = null!;
             }
 
             firstDeviceListParsed.Dispose();

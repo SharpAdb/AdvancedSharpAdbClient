@@ -351,7 +351,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>The session ID of this install session.</returns>
-        string InstallCreate(DeviceData device, string packageName = null, params string[] arguments);
+        string InstallCreate(DeviceData device, string? packageName = null, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
@@ -389,7 +389,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        XmlDocument DumpScreen(DeviceData device);
+        XmlDocument? DumpScreen(DeviceData device);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
@@ -397,7 +397,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device);
+        Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device);
 #endif
 
         /// <summary>
@@ -467,7 +467,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="timeout">The timeout for waiting the element.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
+        Element? FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Get elements by xpath. You can specify the waiting time in timeout.

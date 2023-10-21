@@ -23,7 +23,16 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public UnknownOptionException(string message) : base(message)
+        public UnknownOptionException(string? message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public UnknownOptionException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
 
@@ -40,14 +49,5 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 #endif
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnknownOptionException"/> class.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public UnknownOptionException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }

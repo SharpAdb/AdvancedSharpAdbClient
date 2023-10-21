@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -20,13 +21,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets or sets a dictionary with the extracted properties and their corresponding values.
         /// </summary>
-        private Dictionary<string, object> Properties { get; set; } = [];
+        private Dictionary<string, object?> Properties { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the dictionary with all properties and their corresponding property parsers.
         /// A property parser extracts the property value out of a <see cref="string"/> if possible.
         /// </summary>
-        private Dictionary<string, Func<string, object>> PropertyParsers { get; set; } = [];
+        private Dictionary<string, Func<string, object?>> PropertyParsers { get; set; } = [];
 
         /// <summary>
         /// Gets the value of the property out of the Properties dictionary.
@@ -34,7 +35,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
         /// <returns>The received value</returns>
-        public object GetPropertyValue(string propertyName) => Properties.TryGetValue(propertyName, out object property) ? property : null;
+        public object? GetPropertyValue(string propertyName) => Properties.TryGetValue(propertyName, out object? property) ? property : null;
 
         /// <summary>
         /// Gets the value of the property out of the Properties dictionary.
@@ -43,7 +44,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <typeparam name="T">The type of the property</typeparam>
         /// <param name="propertyName">The name of the property.</param>
         /// <returns>The received value.</returns>
-        public T GetPropertyValue<T>(string propertyName) => Properties.TryGetValue(propertyName, out object property) && property is T value ? value : default;
+        [return: MaybeNull]
+        public T GetPropertyValue<T>(string propertyName) => Properties.TryGetValue(propertyName, out object? property) && property is T value ? value : default;
 
         /// <summary>
         /// Adds a new parser to this receiver.
@@ -52,7 +54,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="property">The property corresponding with the parser.</param>
         /// <param name="parser">Function parsing one string and returning the property value if possible. </param>
-        public void AddPropertyParser(string property, Func<string, object> parser) => PropertyParsers[property] = parser;
+        public void AddPropertyParser(string property, Func<string, object?> parser) => PropertyParsers[property] = parser;
 
         /// <summary>
         /// Processes the new lines, and sets version information if the line represents package information data.
@@ -67,9 +69,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     continue;
                 }
 
-                foreach (KeyValuePair<string, Func<string, object>> parser in PropertyParsers)
+                foreach (KeyValuePair<string, Func<string, object?>> parser in PropertyParsers)
                 {
-                    object propertyValue = parser.Value(line);
+                    object? propertyValue = parser.Value(line);
                     if (propertyValue != null)
                     {
                         Properties[parser.Key] = propertyValue;
