@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient
             {
                 _ = firstDeviceListParsed.Reset();
 
-                monitorTask = Extensions.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token), cancellationToken);
+                monitorTask = DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token);
 
                 // Wait for the worker thread to have read the first list of devices.
                 _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken).ConfigureAwait(false);

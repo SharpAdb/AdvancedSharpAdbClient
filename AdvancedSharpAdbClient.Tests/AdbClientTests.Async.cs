@@ -1039,7 +1039,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
         at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
         at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace);
+        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace, ignoreLineEndingDifferences: true);
         }
 
         /// <summary>

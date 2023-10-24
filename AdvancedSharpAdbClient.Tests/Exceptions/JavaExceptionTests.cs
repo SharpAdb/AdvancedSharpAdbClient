@@ -58,7 +58,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
         at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:4644)
         at com.android.server.pm.PackageManagerService.onTransact(PackageManagerService.java:4513)
         at android.os.Binder.execTransactInternal(Binder.java:1170)
-        at android.os.Binder.execTransact(Binder.java:1134)", javaException.JavaStackTrace);
+        at android.os.Binder.execTransact(Binder.java:1134)", javaException.JavaStackTrace, ignoreLineEndingDifferences: true);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
         at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:4644)
         at com.android.server.pm.PackageManagerService.onTransact(PackageManagerService.java:4513)
         at android.os.Binder.execTransactInternal(Binder.java:1170)
-        at android.os.Binder.execTransact(Binder.java:1134)".Split(Environment.NewLine);
+        at android.os.Binder.execTransact(Binder.java:1134)".Split(Extensions.NewLineSeparator);
 
             JavaException javaException = JavaException.Parse(lines);
 
@@ -97,7 +97,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
         at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:4644)
         at com.android.server.pm.PackageManagerService.onTransact(PackageManagerService.java:4513)
         at android.os.Binder.execTransactInternal(Binder.java:1170)
-        at android.os.Binder.execTransact(Binder.java:1134)", javaException.JavaStackTrace);
+        at android.os.Binder.execTransact(Binder.java:1134)", javaException.JavaStackTrace, ignoreLineEndingDifferences: true);
         }
     }
 }
