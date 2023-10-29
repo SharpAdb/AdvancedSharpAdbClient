@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -46,12 +46,10 @@ jobs:
     name: pack-and-publish
     needs: build-and-test
     runs-on: ubuntu-latest
-    env:
-      NUGET_SOURCE: https://nuget.pkg.github.com/yungd1plomat/index.json
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -69,7 +67,7 @@ jobs:
 
       - name: Publish
         if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        run: dotnet nuget push ./nugets/*nupkg --source "$env:NUGET_SOURCE" --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
+        run: dotnet nuget push ./nugets/*nupkg --source https://nuget.pkg.github.com/yungd1plomat/index.json --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
