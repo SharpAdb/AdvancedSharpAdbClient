@@ -56,26 +56,33 @@ namespace AdvancedSharpAdbClient
             }
 
 #if HAS_PROCESS && !WINDOWS_UWP
-            // Starting the adb server failed for whatever reason. This can happen if adb.exe
-            // is running but is not accepting requests. In that case, try to kill it & start again.
-            // It kills all processes named "adb", so let's hope nobody else named their process that way.
-            foreach (Process adbProcess in Process.GetProcessesByName("adb"))
+            try
             {
-                try
+                // Starting the adb server failed for whatever reason. This can happen if adb.exe
+                // is running but is not accepting requests. In that case, try to kill it & start again.
+                // It kills all processes named "adb", so let's hope nobody else named their process that way.
+                foreach (Process adbProcess in Process.GetProcessesByName("adb"))
                 {
-                    adbProcess.Kill();
+                    try
+                    {
+                        adbProcess.Kill();
+                    }
+                    catch (Win32Exception)
+                    {
+                        // The associated process could not be terminated
+                        // or
+                        // The process is terminating.
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // The process has already exited.
+                        // There is no process associated with this Process object.
+                    }
                 }
-                catch (Win32Exception)
-                {
-                    // The associated process could not be terminated
-                    // or
-                    // The process is terminating.
-                }
-                catch (InvalidOperationException)
-                {
-                    // The process has already exited.
-                    // There is no process associated with this Process object.
-                }
+            }
+            catch (NotSupportedException)
+            {
+                // This platform does not support getting a list of processes.
             }
 #endif
 

@@ -5,6 +5,7 @@
 
 using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -64,7 +65,7 @@ namespace AdvancedSharpAdbClient
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
                 monitorTaskCancellationTokenSource.Cancel();
-                await monitorTask;
+                await monitorTask.ConfigureAwait(false);
 #if HAS_PROCESS
                 monitorTask.Dispose();
 #endif
@@ -75,7 +76,7 @@ namespace AdvancedSharpAdbClient
             if (Socket != null)
             {
                 Socket.Dispose();
-                Socket = null;
+                Socket = null!;
             }
 
             firstDeviceListParsed.Dispose();
@@ -112,7 +113,7 @@ namespace AdvancedSharpAdbClient
             IsRunning = true;
 
             // Set up the connection to track the list of devices.
-            await InitializeSocketAsync(cancellationToken);
+            await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
 
             do
             {
@@ -151,7 +152,29 @@ namespace AdvancedSharpAdbClient
                 catch (ObjectDisposedException)
 #endif
                 {
-                    // ... but an ObjectDisposedException on .NET Core on Linux and macOS.
+                    // ... but an ObjectDisposedException on .NET Core App on Linux and macOS.
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        // The DeviceMonitor is shutting down (disposing) and Dispose()
+                        // has called cancellationToken.Cancel(). This exception is expected,
+                        // so we can safely swallow it.
+                    }
+                    else
+                    {
+                        // The exception was unexpected, so log it & rethrow.
+#if HAS_LOGGER
+                        logger.LogError(ex, ex.Message);
+#endif
+                        throw;
+                    }
+                }
+#if HAS_LOGGER
+                catch (OperationCanceledException ex)
+#else
+                catch (OperationCanceledException)
+#endif
+                {
+                    // ... and an OperationCanceledException on .NET Core App 2.1 or greater.
                     if (cancellationToken.IsCancellationRequested)
                     {
                         // The DeviceMonitor is shutting down (disposing) and Dispose()
@@ -169,15 +192,36 @@ namespace AdvancedSharpAdbClient
                 }
                 catch (AdbException adbException)
                 {
-                    if (adbException.ConnectionReset)
+                    if (adbException.InnerException is SocketException ex)
                     {
-                        // The adb server was killed, for whatever reason. Try to restart it and recover from this.
-                        await AdbServer.Instance.RestartServerAsync(cancellationToken);
-                        Socket.Reconnect();
-                        await InitializeSocketAsync(cancellationToken);
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            // The DeviceMonitor is shutting down (disposing) and Dispose()
+                            // has called Socket.Close(). This exception is expected,
+                            // so we can safely swallow it.
+                        }
+                        else if (adbException.ConnectionReset)
+                        {
+                            // The adb server was killed, for whatever reason. Try to restart it and recover from this.
+                            await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
+                            Socket.Reconnect();
+                            await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            // The exception was unexpected, so log it & rethrow.
+#if HAS_LOGGER
+                            logger.LogError(ex, ex.Message);
+#endif
+                            throw ex;
+                        }
                     }
                     else
                     {
+                        // The exception was unexpected, so log it & rethrow.
+#if HAS_LOGGER
+                        logger.LogError(adbException, adbException.Message);
+#endif
                         throw;
                     }
                 }

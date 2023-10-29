@@ -33,6 +33,9 @@ namespace AdvancedSharpAdbClient
             SocketFlags socketFlags,
             CancellationToken cancellationToken)
         {
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            return socket.ReceiveAsync(buffer.AsMemory(offset, size), socketFlags, cancellationToken).AsTask();
+#elif HAS_PROCESS
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
@@ -69,6 +72,9 @@ namespace AdvancedSharpAdbClient
             }, taskCompletionSource);
 
             return taskCompletionSource.Task;
+#else
+            return Utilities.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
+#endif
         }
     }
 }

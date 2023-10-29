@@ -323,33 +323,5 @@ namespace AdvancedSharpAdbClient
                 is PlatformID.Unix
                 or PlatformID.MacOSX;
 #endif
-
-#if !HAS_PROCESS
-        /// <summary>
-        /// Begins to asynchronously receive data from a connected <see cref="System.Net.Sockets.Socket"/>.
-        /// </summary>
-        /// <param name="socket">The Socket.</param>
-        /// <param name="buffer">An array of type <see cref="byte"/> that is the storage location for the received data.</param>
-        /// <param name="offset">The zero-based position in the <paramref name="buffer"/> parameter at which to store the received data.</param>
-        /// <param name="size">The number of bytes to receive.</param>
-        /// <param name="socketFlags">A bitwise combination of the <see cref="System.Net.Sockets.SocketFlags"/> values.</param>
-        /// <param name="callback">An <see cref="AsyncCallback"/> delegate that references the method to invoke when the operation is complete.</param>
-        /// <param name="state">A user-defined object that contains information about the receive operation. This object is
-        /// passed to the <see cref="EndReceive(System.Net.Sockets.Socket, IAsyncResult)"/> delegate when the operation is complete.</param>
-        /// <returns>An <see cref="IAsyncResult"/> that references the asynchronous read.</returns>
-        public static IAsyncResult BeginReceive(this System.Net.Sockets.Socket socket, byte[] buffer, int offset, int size, System.Net.Sockets.SocketFlags socketFlags, AsyncCallback callback, object state) =>
-            TaskToApm.Begin(socket.ReceiveAsync(buffer, offset, size, socketFlags, default), callback, state);
-#endif
-
-#if !HAS_PROCESS
-        /// <summary>
-        /// Ends a pending asynchronous read.
-        /// </summary>
-        /// <param name="_">The Socket.</param>
-        /// <param name="asyncResult">An <see cref="IAsyncResult"/> that stores state information and any user defined data for this asynchronous operation.</param>
-        /// <returns>The number of bytes received.</returns>
-        public static int EndReceive(this System.Net.Sockets.Socket _, IAsyncResult asyncResult) =>
-            TaskToApm.End<int>(asyncResult);
-#endif
     }
 }
