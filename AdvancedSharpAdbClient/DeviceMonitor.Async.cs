@@ -110,6 +110,8 @@ namespace AdvancedSharpAdbClient
         {
             IsRunning = true;
 
+            await ThreadExtensions.ResumeBackgroundAsync();
+
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
 

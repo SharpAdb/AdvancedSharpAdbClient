@@ -168,6 +168,22 @@ namespace AdvancedSharpAdbClient
             .Delay(dueTime, cancellationToken);
 
         /// <summary>
+        /// Queues the specified work to run on the thread pool and returns a proxy for the task returned by <paramref name="function"/>.
+        /// </summary>
+        /// <param name="function">The work to execute asynchronously.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
+        /// <returns>A task that represents a proxy for the task returned by <paramref name="function"/>.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
+        /// <remarks>For information on handling exceptions thrown by task operations, see <see href="https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library">Exception Handling</see>.</remarks>
+        public static Task Run(Action function, CancellationToken cancellationToken = default) =>
+#if NETFRAMEWORK && !NET45_OR_GREATER
+            TaskEx
+#else
+            Task
+#endif
+            .Run(function, cancellationToken);
+
+        /// <summary>
         /// Queues the specified work to run on the thread pool and returns a proxy for the <see cref="Task{TResult}"/>
         /// returned by function. A cancellation token allows the work to be cancelled if it has not yet started.
         /// </summary>

@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient
         /// Closes the <see cref="Socket"/> connection and releases all associated resources.
         /// </summary>
         /// <param name="socket">The <see cref="Socket"/> to release.</param>
-        public static void Close(this Socket socket) => socket.Dispose();
+        internal static void Close(this Socket socket) => socket.Dispose();
 #endif
 
 #if NETFRAMEWORK && !NET40_OR_GREATER
@@ -199,7 +199,7 @@ namespace AdvancedSharpAdbClient
         /// Releases all resources used by the current instance of the <see cref="Socket"/> class.
         /// </summary>
         /// <param name="socket">The <see cref="Socket"/> to release.</param>
-        public static void Dispose(this Socket socket)
+        internal static void Dispose(this Socket socket)
         {
             socket.Close();
             GC.SuppressFinalize(socket);
