@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// The event arguments that are passed when a device event occurs.

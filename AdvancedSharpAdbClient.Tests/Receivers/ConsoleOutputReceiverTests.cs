@@ -1,9 +1,8 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using System;
+﻿using System;
 using System.IO;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Receivers.Tests
 {
     /// <summary>
     /// Tests the <see cref="ConsoleOutputReceiver"/> class.

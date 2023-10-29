@@ -5,7 +5,7 @@ using System.IO;
 using System.Net;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Models
+namespace AdvancedSharpAdbClient.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="Framebuffer"/> class.

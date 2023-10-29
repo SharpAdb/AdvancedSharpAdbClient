@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Polyfills.Tests
 {
     /// <summary>
     /// Tests the <see cref="ExceptionExtensions"/> class.

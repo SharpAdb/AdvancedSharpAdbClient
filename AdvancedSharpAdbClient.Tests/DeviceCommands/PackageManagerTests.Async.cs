@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using System.IO;
+﻿using System.IO;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Tests

@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using NSubstitute;
+﻿using NSubstitute;
 using System;
 using System.Net;
 using System.Net.Sockets;

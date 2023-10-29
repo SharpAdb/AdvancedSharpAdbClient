@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Stores the location and size of a rectangular region.

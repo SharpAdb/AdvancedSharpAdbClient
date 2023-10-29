@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using Xunit;

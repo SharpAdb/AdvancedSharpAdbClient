@@ -3,9 +3,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
-    internal static class ExceptionExtensions
+    /// <summary>
+    /// Provides extension methods for the <see cref="Exception"/> class.
+    /// </summary>
+    public static class ExceptionExtensions
     {
         /// <summary>
         /// Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.
@@ -73,7 +76,7 @@ namespace AdvancedSharpAdbClient
         {
             ArgumentOutOfRangeException.ThrowIfNegative(value, paramName);
 #else
-        public static void ThrowIfNegative(int value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        public static void ThrowIfNegative(double value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
         {
             if (value < 0)
             {

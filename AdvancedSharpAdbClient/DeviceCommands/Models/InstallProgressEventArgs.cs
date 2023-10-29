@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Models.DeviceCommands
 {
     /// <summary>
     /// Represents the state of the installation for <see cref="PackageManager.InstallProgressChanged"/>.

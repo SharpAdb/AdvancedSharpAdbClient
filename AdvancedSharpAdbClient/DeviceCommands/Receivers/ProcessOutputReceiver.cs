@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.

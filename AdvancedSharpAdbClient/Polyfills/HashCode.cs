@@ -47,7 +47,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     // xxHash32 is used for the hash code.
     // https://github.com/Cyan4973/xxHash

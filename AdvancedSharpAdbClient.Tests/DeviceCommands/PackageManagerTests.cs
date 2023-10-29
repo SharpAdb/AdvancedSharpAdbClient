@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using NSubstitute;
+﻿using NSubstitute;
 using System;
 using System.IO;
 using Xunit;

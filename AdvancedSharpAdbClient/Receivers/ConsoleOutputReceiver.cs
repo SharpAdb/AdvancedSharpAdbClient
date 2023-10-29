@@ -2,14 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Receivers
 {
     /// <summary>
     /// Receives console output, and makes the console output available as a <see cref="string"/>. To

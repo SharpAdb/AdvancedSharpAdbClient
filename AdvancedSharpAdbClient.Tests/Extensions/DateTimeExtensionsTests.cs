@@ -1,12 +1,12 @@
 ﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Polyfills.Tests
 {
     /// <summary>
     /// Tests the <see cref="DateTimeExtensions"/> class.
     /// </summary>
-    public class DateTimeExtensionTests
+    public class DateTimeExtensionsTests
     {
         /// <summary>
         /// Tests the <see cref="DateTimeExtensions.FromUnixTimeSeconds(long)"/> method.

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Implement of screen element, likes Selenium.

@@ -6,7 +6,7 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Socket"/> class.

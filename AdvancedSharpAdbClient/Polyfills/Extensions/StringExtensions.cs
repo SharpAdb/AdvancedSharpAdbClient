@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Provides extension methods for the <see cref="string"/> class.

@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using System;
+﻿using System;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests

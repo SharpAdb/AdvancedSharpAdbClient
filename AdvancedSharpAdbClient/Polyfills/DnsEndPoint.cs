@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Represents a network endpoint as a host name or a string representation of an IP address and a port number.

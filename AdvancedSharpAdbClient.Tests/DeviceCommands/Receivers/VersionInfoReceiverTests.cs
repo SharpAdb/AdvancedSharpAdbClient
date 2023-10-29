@@ -8,7 +8,7 @@ using System;
 using System.IO;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands.Tests
 {
     /// <summary>
     /// Tests the <see cref="VersionInfoReceiver"/> class.
@@ -31,11 +31,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Null(receiver.GetVersionCode(string.Empty));
             Assert.Null(receiver.GetVersionCode(" versionCode=10210targetSdk=18"));
 
-            Assert.Equal("4.7.1", (string)receiver.GetVersionName("    versionName=4.7.1"));
-            Assert.Null((string)receiver.GetVersionName(null));
-            Assert.Null((string)receiver.GetVersionName(" test"));
-            Assert.Null((string)receiver.GetVersionName("    versionName"));
-            Assert.Equal(string.Empty, (string)receiver.GetVersionName("    versionName="));
+            Assert.Equal("4.7.1", receiver.GetVersionName("    versionName=4.7.1"));
+            Assert.Null(receiver.GetVersionName(null));
+            Assert.Null(receiver.GetVersionName(" test"));
+            Assert.Null(receiver.GetVersionName("    versionName"));
+            Assert.Equal(string.Empty, receiver.GetVersionName("    versionName="));
 
             string dumpsys = string.Join(Environment.NewLine, File.ReadAllLines(@"Assets/dumpsys_package.txt"));
             receiver = new VersionInfoReceiver();

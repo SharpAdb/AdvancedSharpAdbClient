@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
 #if WINDOWS_UWP
     /// <summary>
@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="dispatcher">A <see cref="CoreDispatcher"/> whose foreground thread to switch execution to.</param>
     /// <param name="priority">Specifies the priority for event dispatch.</param>
-    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct DispatcherThreadSwitcher(CoreDispatcher dispatcher, CoreDispatcherPriority priority) : INotifyCompletion
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="dispatcher">A <see cref="DispatcherQueue"/> whose foreground thread to switch execution to.</param>
     /// <param name="priority">Specifies the priority for event dispatch.</param>
-    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct DispatcherQueueThreadSwitcher(DispatcherQueue dispatcher, DispatcherQueuePriority priority) : INotifyCompletion
     {
         /// <summary>
@@ -91,7 +91,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// A helper type for switch thread by <see cref="Task"/>. This type is not intended to be used directly from your code.
     /// </summary>
-    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public readonly struct TaskThreadSwitcher : INotifyCompletion
     {
         /// <summary>

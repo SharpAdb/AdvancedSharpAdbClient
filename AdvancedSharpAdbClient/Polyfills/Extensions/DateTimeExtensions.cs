@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Provides helper methods for working with Unix-based date formats.

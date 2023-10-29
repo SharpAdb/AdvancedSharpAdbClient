@@ -1,8 +1,7 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands.Tests
 {
     public class GetPropReceiverTests
     {

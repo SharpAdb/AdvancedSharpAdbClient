@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).

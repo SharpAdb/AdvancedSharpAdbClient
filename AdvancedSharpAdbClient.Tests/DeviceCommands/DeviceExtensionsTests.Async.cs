@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using NSubstitute;
+﻿using NSubstitute;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

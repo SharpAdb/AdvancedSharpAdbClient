@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="AdbResponse"/> class.

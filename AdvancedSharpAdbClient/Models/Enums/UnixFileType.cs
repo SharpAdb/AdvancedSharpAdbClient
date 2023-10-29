@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Describes the properties of a file on an Android device.

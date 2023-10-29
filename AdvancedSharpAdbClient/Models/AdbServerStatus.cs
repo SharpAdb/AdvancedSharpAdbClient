@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Represents the status of the adb server.

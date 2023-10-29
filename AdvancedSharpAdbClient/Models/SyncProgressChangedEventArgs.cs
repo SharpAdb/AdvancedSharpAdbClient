@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Provides data for the <see cref="SyncService.SyncProgressChanged"/> event.

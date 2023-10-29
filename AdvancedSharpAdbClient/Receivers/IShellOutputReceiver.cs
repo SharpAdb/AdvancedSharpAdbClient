@@ -4,7 +4,7 @@
 
 using System.Text;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Receivers
 {
     /// <summary>
     /// This interface contains various receivers that are able to parse Android console output. You can use

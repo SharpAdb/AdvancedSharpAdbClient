@@ -2,7 +2,6 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Logs;
 using System;
 
 namespace AdvancedSharpAdbClient

@@ -2,10 +2,9 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -1152,6 +1151,7 @@ namespace AdvancedSharpAdbClient
     /// See as the <see cref="AdbClient"/> class.
     /// </summary>
     [Obsolete("AdvancedAdbClient is too long to remember. Please use AdbClient instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class AdvancedAdbClient : AdbClient
     {
     }

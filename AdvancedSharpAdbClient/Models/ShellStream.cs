@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>Represents a <see cref="Stream"/> that wraps around an inner <see cref="Stream"/> that contains
     /// output from an Android shell command. In the shell output, the LF character is replaced by a

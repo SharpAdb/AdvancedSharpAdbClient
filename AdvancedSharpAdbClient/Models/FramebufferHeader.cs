@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 #endif
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Whenever the <c>framebuffer:</c> service is invoked, the adb server responds with the contents
