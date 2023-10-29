@@ -45,7 +45,7 @@ jobs:
   pack-and-publish:
     name: pack-and-publish
     needs: build-and-test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
