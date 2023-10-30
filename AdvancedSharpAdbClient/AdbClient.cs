@@ -48,6 +48,7 @@ namespace AdvancedSharpAdbClient
         /// Gets a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static IAdbClient Instance => new AdbClient();
 
         /// <summary>
@@ -1150,7 +1151,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// See as the <see cref="AdbClient"/> class.
     /// </summary>
-    [Obsolete("AdvancedAdbClient is too long to remember. Please use AdbClient instead.")]
+    [Obsolete($"{nameof(AdvancedAdbClient)} is too long to remember. Please use {nameof(AdbClient)} instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class AdvancedAdbClient : AdbClient
     {

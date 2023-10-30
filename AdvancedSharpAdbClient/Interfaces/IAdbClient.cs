@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -509,7 +510,8 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// See as the <see cref="IAdbClient"/> interface.
     /// </summary>
-    [Obsolete("IAdvancedAdbClient is too long to remember. Please use IAdbClient instead.")]
+    [Obsolete($"{nameof(IAdbCommandLineClient)} is too long to remember. Please use {nameof(IAdbClient)} instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IAdvancedAdbClient : IAdbClient
     {
     }

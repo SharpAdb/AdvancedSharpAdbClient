@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient
 
             string commandText = AdbClient.Encoding.GetString(value);
 
-            return Extensions.TryParse(commandText, true, out SyncCommand command) ? command : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
+            return EnumExtensions.TryParse(commandText, true, out SyncCommand command) ? command : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
         }
     }
 }
