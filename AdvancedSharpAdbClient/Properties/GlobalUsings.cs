@@ -30,6 +30,8 @@ global using DateTime = System.DateTime;
 global using TimeSpan = System.TimeSpan;
 #if HAS_DRAWING
 global using Point = System.Drawing.Point;
+#else
+global using Point = AdvancedSharpAdbClient.Polyfills.Point;
 #endif
 #endif
 

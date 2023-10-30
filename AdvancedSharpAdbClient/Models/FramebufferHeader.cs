@@ -291,13 +291,33 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public readonly async Task<WriteableBitmap?> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public readonly Task<WriteableBitmap?> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
-            if (dispatcher?.HasThreadAccess == false)
+            FramebufferHeader self = this;
+
+            if (dispatcher.HasThreadAccess)
             {
-                await dispatcher.ResumeForegroundAsync();
+                return ToBitmap(buffer, cancellationToken);
             }
-            return await ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+            else
+            {
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
+
+                _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    try
+                    {
+                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        taskCompletionSource.SetResult(result);
+                    }
+                    catch (Exception e)
+                    {
+                        taskCompletionSource.SetException(e);
+                    }
+                });
+
+                return taskCompletionSource.Task;
+            }
         }
 
         /// <summary>
@@ -309,13 +329,36 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public readonly async Task<WriteableBitmap?> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public readonly Task<WriteableBitmap?> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
-            if (dispatcher?.HasThreadAccess == false)
+            FramebufferHeader self = this;
+
+            if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
             {
-                await dispatcher.ResumeForegroundAsync();
+                return ToBitmap(buffer, cancellationToken);
             }
-            return await ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+            else
+            {
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
+
+                if (!dispatcher.TryEnqueue(async () =>
+                {
+                    try
+                    {
+                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        taskCompletionSource.SetResult(result);
+                    }
+                    catch (Exception e)
+                    {
+                        taskCompletionSource.SetException(e);
+                    }
+                }))
+                {
+                    taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
+                }
+
+                return taskCompletionSource.Task;
+            }
         }
 
         /// <summary>
@@ -349,7 +392,7 @@ namespace AdvancedSharpAdbClient.Models
                 await WriteableImage.SetSourceAsync(randomAccessStream).AsTask(cancellationToken);
                 return WriteableImage;
             }
-            catch (Exception)
+            catch when (!cancellationToken.IsCancellationRequested)
             {
                 using InMemoryRandomAccessStream random = new();
                 BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);

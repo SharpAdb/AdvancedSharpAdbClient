@@ -7,9 +7,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
+
+#if NET40
+using Microsoft.Runtime.CompilerServices;
+#endif
 
 namespace AdvancedSharpAdbClient
 {
@@ -84,22 +88,6 @@ namespace AdvancedSharpAdbClient
             .Delay(dueTime, cancellationToken);
 
         /// <summary>
-        /// Queues the specified work to run on the thread pool and returns a proxy for the task returned by <paramref name="function"/>.
-        /// </summary>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
-        /// <returns>A task that represents a proxy for the task returned by <paramref name="function"/>.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
-        /// <remarks>For information on handling exceptions thrown by task operations, see <see href="https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library">Exception Handling</see>.</remarks>
-        public static Task Run(Action function, CancellationToken cancellationToken = default) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Run(function, cancellationToken);
-
-        /// <summary>
         /// Queues the specified work to run on the thread pool and returns a proxy for the <see cref="Task{TResult}"/>
         /// returned by function. A cancellation token allows the work to be cancelled if it has not yet started.
         /// </summary>
@@ -143,6 +131,20 @@ namespace AdvancedSharpAdbClient
             Task
 #endif
             .WhenAll(tasks);
+
+        /// <summary>
+        /// Creates an awaitable task that asynchronously yields back to the current context when awaited.
+        /// </summary>
+        /// <returns>A context that, when awaited, will asynchronously transition back into the current context at the time of the await.
+        /// If the current <see cref="SynchronizationContext"/> is non-null, it is treated as the current context. Otherwise, the task scheduler
+        /// that is associated with the currently executing task is treated as the current context.</returns>
+        public static YieldAwaitable Yield() =>
+#if NETFRAMEWORK && !NET45_OR_GREATER
+            TaskEx
+#else
+            Task
+#endif
+            .Yield();
 
 #if !NET7_0_OR_GREATER
         /// <summary>
