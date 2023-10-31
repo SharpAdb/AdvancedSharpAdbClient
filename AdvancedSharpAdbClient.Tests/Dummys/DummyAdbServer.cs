@@ -31,11 +31,10 @@ namespace AdvancedSharpAdbClient.Tests
         public AdbServerStatus GetStatus() => Status;
 
         /// <inheritdoc/>
-        public Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
+        public async Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
         {
-            TaskCompletionSource<AdbServerStatus> tcs = new();
-            tcs.SetResult(Status);
-            return tcs.Task;
+            await Task.Yield();
+            return Status;
         }
 
         /// <inheritdoc/>
@@ -70,22 +69,20 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <inheritdoc/>
-        public Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
+        public async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
         {
-            StartServerResult result = StartServer(adbPath, restartServerIfNewer);
-            TaskCompletionSource<StartServerResult> tcs = new();
-            tcs.SetResult(result);
-            return tcs.Task;
+            await Task.Yield();
+            return StartServer(adbPath, restartServerIfNewer);
         }
 
         /// <inheritdoc/>
         public void StopServer() => Status = Status with { IsRunning = false };
 
         /// <inheritdoc/>
-        public Task StopServerAsync(CancellationToken cancellationToken)
+        public async Task StopServerAsync(CancellationToken cancellationToken)
         {
+            await Task.Yield();
             StopServer();
-            return Task.CompletedTask;
         }
     }
 }

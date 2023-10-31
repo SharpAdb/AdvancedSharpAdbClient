@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -65,7 +66,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Device = device ?? throw new ArgumentNullException(nameof(device));
             Packages = [];
             ThirdPartyOnly = thirdPartyOnly;
-            this.AdbClient = client ?? throw new ArgumentNullException(nameof(client));
+            AdbClient = client ?? throw new ArgumentNullException(nameof(client));
 
             this.syncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
 
@@ -152,10 +153,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             ValidateDevice();
 
-            InstallOutputReceiver receiver = new();
-            string reinstallSwitch = reinstall ? "-r " : string.Empty;
+            StringBuilder requestBuilder = new StringBuilder().Append("pm install");
 
-            string cmd = $"pm install {reinstallSwitch}\"{remoteFilePath}\"";
+            if (reinstall)
+            {
+                _ = requestBuilder.Append(" -r");
+            }
+
+            _ = requestBuilder.AppendFormat(" \"{0}\"", remoteFilePath);
+
+            string cmd = requestBuilder.ToString();
+            InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
@@ -182,17 +190,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSplitSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
-                int count = 1;
-                if (sender is string path)
+                lock (progress)
                 {
-                    progress[path] = args.ProgressPercentage;
+                    int count = 1;
+                    if (sender is string path)
+                    {
+                        progress[path] = args.ProgressPercentage;
+                    }
+                    else if (sender is true)
+                    {
+                        count++;
+                    }
+                    double present = progress.Values.Select(x => x / splitPackageFilePaths.Count / 2).Sum();
+                    InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
                 }
-                else if (sender is true)
-                {
-                    count++;
-                }
-                double present = progress.Values.Select(x => x / splitPackageFilePaths.Count / 2).Sum();
-                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count + 1, present));
             }
 
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Count];
@@ -230,17 +241,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Dictionary<string, double> progress = new(splitPackageFilePaths.Count);
             void OnSyncProgressChanged(object sender, SyncProgressChangedEventArgs args)
             {
-                int count = 1;
-                if (sender is string path)
+                lock (progress)
                 {
-                    progress[path] = args.ProgressPercentage;
+                    int count = 1;
+                    if (sender is string path)
+                    {
+                        progress[path] = args.ProgressPercentage;
+                    }
+                    else if (sender is true)
+                    {
+                        count++;
+                    }
+                    double present = progress.Values.Select(x => x / splitPackageFilePaths.Count).Sum();
+                    InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
                 }
-                else if (sender is true)
-                {
-                    count++;
-                }
-                double present = progress.Values.Select(x => x / splitPackageFilePaths.Count).Sum();
-                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitPackageFilePaths.Count, present));
             }
 
             string[] splitRemoteFilePaths = new string[splitPackageFilePaths.Count];
@@ -282,18 +296,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(1, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.WriteSession));
 
-            int i = 0;
+            int count = 0;
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
-                try
-                {
-                    WriteInstallSession(session, $"splitapp{i++}", splitRemoteFilePath);
-                    InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(i, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.WriteSession));
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
+                WriteInstallSession(session, $"split{count++}", splitRemoteFilePath);
+                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitRemoteFilePaths.Count + 1, PackageInstallProgressState.WriteSession));
             }
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
@@ -323,18 +330,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(0, splitRemoteFilePaths.Count, PackageInstallProgressState.WriteSession));
 
-            int i = 0;
+            int count = 0;
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
-                try
-                {
-                    WriteInstallSession(session, $"splitapp{i++}", splitRemoteFilePath);
-                    InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(i, splitRemoteFilePaths.Count, PackageInstallProgressState.WriteSession));
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
+                WriteInstallSession(session, $"split{count++}", splitRemoteFilePath);
+                InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(count, splitRemoteFilePaths.Count, PackageInstallProgressState.WriteSession));
             }
 
             InstallProgressChanged?.Invoke(this, new InstallProgressEventArgs(PackageInstallProgressState.Installing));
@@ -396,9 +396,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-        protected virtual string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs> progress)
+        protected virtual string SyncPackageToDevice(string localFilePath, Action<object, SyncProgressChangedEventArgs>? progress)
         {
-            progress(localFilePath, new SyncProgressChangedEventArgs(0, 0));
+            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 0));
 
             ValidateDevice();
 
@@ -437,7 +437,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             finally
             {
-                progress(true, new SyncProgressChangedEventArgs(0, 0));
+                progress?.Invoke(true, new SyncProgressChangedEventArgs(0, 0));
             }
         }
 
@@ -470,11 +470,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            InstallOutputReceiver receiver = new();
-            string reinstallSwitch = reinstall ? " -r" : string.Empty;
-            string addon = StringExtensions.IsNullOrWhiteSpace(packageName) ? string.Empty : $" -p {packageName}";
+            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
 
-            string cmd = $"pm install-create{reinstallSwitch}{addon}";
+            if (reinstall)
+            {
+                _ = requestBuilder.Append(" -r");
+            }
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            {
+                requestBuilder.Append($" -p {packageName}");
+            }
+
+            string cmd = requestBuilder.ToString();
+            InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
             if (string.IsNullOrEmpty(receiver.SuccessMessage))

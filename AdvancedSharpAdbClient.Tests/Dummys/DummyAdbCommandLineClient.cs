@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AdvancedSharpAdbClient.Tests
 {
     /// <summary>
-    /// 
+    /// A mock implementation of the <see cref="IAdbCommandLineClient"/> class.
     /// </summary>
     internal class DummyAdbCommandLineClient : AdbCommandLineClient
     {
@@ -50,12 +50,10 @@ namespace AdvancedSharpAdbClient.Tests
             return 0;
         }
 
-        protected override Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
+        protected override async Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
-            int result = RunProcess(filename, command, errorOutput, standardOutput);
-            TaskCompletionSource<int> tcs = new();
-            tcs.SetResult(result);
-            return tcs.Task;
+            await Task.Yield();
+            return RunProcess(filename, command, errorOutput, standardOutput);
         }
 
         private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";

@@ -10,6 +10,9 @@ using System.Xml;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// A mock implementation of the <see cref="IAdbClient"/> class.
+    /// </summary>
     internal class DummyAdbClient : IAdbClient
     {
         public Dictionary<string, string> Commands { get; } = [];
@@ -81,8 +84,10 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding) =>
             ExecuteServerCommand(target, command, receiver, encoding);
 
-        public Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
+
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
@@ -92,7 +97,6 @@ namespace AdvancedSharpAdbClient.Tests
 
             string request = requestBuilder.ToString();
             ReceivedCommands.Add(request);
-            return Task.CompletedTask;
         }
 
         public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
@@ -118,7 +122,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                     while (reader.Peek() != -1)
                     {
-                        receiver.AddOutput(await reader.ReadLineAsync(cancellationToken));
+                        receiver.AddOutput(await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false));
                     }
 
                     receiver.Flush();

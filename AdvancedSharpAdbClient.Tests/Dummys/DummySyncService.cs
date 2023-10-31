@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// A mock implementation of the <see cref="ISyncService"/> class.
+    /// </summary>
     internal class DummySyncService : ISyncService
     {
         public Dictionary<string, Stream> UploadedFiles { get; } = [];
@@ -18,34 +21,54 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Open() => IsOpen = true;
 
-        public Task OpenAsync(CancellationToken cancellationToken)
+        public async Task OpenAsync(CancellationToken cancellationToken)
         {
+            await Task.Yield();
             IsOpen = true;
-            return Task.CompletedTask;
         }
 
-        public void Pull(string remotePath, Stream stream, IProgress<int> progress = null, in bool isCancelled = false) =>
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
-
-        public Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public void Pull(string remotePath, Stream stream, IProgress<int> progress = null, in bool isCancelled = false)
         {
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
-            return Task.CompletedTask;
+            for (int i = 0; i <= 100; i++)
+            {
+                Thread.Yield();
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
+            }
+        }
+
+        public async Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
+        {
+            for (int i = 0; i <= 100; i++)
+            {
+                await Task.Yield();
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
+            }
         }
 
         public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress = null, in bool isCancelled = false)
         {
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles[remotePath] = stream;
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
+            for (int i = 0; i <= 100; i++)
+            {
+                Thread.Yield();
+                if (i == 100)
+                {
+                    UploadedFiles[remotePath] = stream;
+                }
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
+            }
         }
 
-        public Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
+        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(0, 100));
-            UploadedFiles[remotePath] = stream;
-            SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(100, 100));
-            return Task.CompletedTask;
+            for (int i = 0; i <= 100; i++)
+            {
+                await Task.Yield();
+                if (i == 100)
+                {
+                    UploadedFiles[remotePath] = stream;
+                }
+                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
+            }
         }
 
         #region Not Implemented

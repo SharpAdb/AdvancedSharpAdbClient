@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// A mock implementation of the <see cref="ITcpSocket"/> class.
+    /// </summary>
     internal class DummyTcpSocket : ITcpSocket
     {
         /// <summary>
@@ -27,18 +30,18 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Connect(EndPoint endPoint) => Connected = true;
 
-        public ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken)
+        public async ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken)
         {
+            await Task.Yield();
             Connected = true;
-            return ValueTask.CompletedTask;
         }
 
         public void Reconnect() => Connected = true;
 
-        public ValueTask ReconnectAsync(CancellationToken cancellationToken)
+        public async ValueTask ReconnectAsync(CancellationToken cancellationToken)
         {
+            await Task.Yield();
             Connected = true;
-            return ValueTask.CompletedTask;
         }
 
         public void Dispose() => Connected = false;
@@ -77,19 +80,19 @@ namespace AdvancedSharpAdbClient.Tests
 
         public async Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
-            await OutputStream.WriteAsync(buffer.AsMemory(0, size), cancellationToken);
+            await OutputStream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
             return size;
         }
 
         public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
-            await OutputStream.WriteAsync(buffer.AsMemory(offset, size), cancellationToken);
+            await OutputStream.WriteAsync(buffer.AsMemory(offset, size), cancellationToken).ConfigureAwait(false);
             return size;
         }
 
         public async ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
-            await OutputStream.WriteAsync(buffer, cancellationToken);
+            await OutputStream.WriteAsync(buffer, cancellationToken).ConfigureAwait(false);
             return buffer.Length;
         }
 

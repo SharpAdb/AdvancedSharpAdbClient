@@ -8,6 +8,9 @@ using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// A mock implementation of the <see cref="IAdbSocket"/> class.
+    /// </summary>
     internal class DummyAdbSocket : IDummyAdbSocket
     {
         /// <summary>
@@ -98,7 +101,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 while (ResponseMessages.Count == 0)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
             }
 
@@ -165,69 +168,69 @@ namespace AdvancedSharpAdbClient.Tests
 
         public SyncCommand ReadSyncResponse() => SyncResponses.Dequeue();
 
-        public Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
+        public async Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             Send(data, length);
-            return Task.CompletedTask;
         }
 
-        public Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
+        public async Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             Send(data, offset, length);
-            return Task.CompletedTask;
         }
 
-        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        public async ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             Send(data.Span);
-            return ValueTask.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             SendSyncRequest(command, path, permissions);
-            return Task.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             SendSyncRequest(command, path);
-            return Task.CompletedTask;
         }
 
-        public Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             SendSyncRequest(command, length);
-            return Task.CompletedTask;
         }
 
-        public Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
+        public async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             SendAdbRequest(request);
-            return Task.CompletedTask;
         }
 
-        public Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
+        public async Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default)
         {
-            int result = Read(data, length);
-            TaskCompletionSource<int> tcs = new();
-            tcs.SetResult(result);
-            return tcs.Task;
+            await Task.Yield();
+            return Read(data, length);
         }
 
-        public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
+        public async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
         {
-            int result = Read(data.Span);
-            return new ValueTask<int>(result);
+            await Task.Yield();
+            return Read(data.Span);
         }
 
         public async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
+
             if (WaitForNewData)
             {
                 while (ResponseMessages.Count == 0)
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken);
+                    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken).ConfigureAwait(false);
                     cancellationToken.ThrowIfCancellationRequested();
                 }
             }
@@ -245,34 +248,28 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public Task<string> ReadSyncStringAsync(CancellationToken cancellationToken = default)
+        public async Task<string> ReadSyncStringAsync(CancellationToken cancellationToken = default)
         {
-            string response = ReadSyncString();
-            TaskCompletionSource<string> tcs = new();
-            tcs.SetResult(response);
-            return tcs.Task;
+            await Task.Yield();
+            return ReadSyncString();
         }
 
-        public Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
+        public async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
         {
-            SyncCommand response = ReadSyncResponse();
-            TaskCompletionSource<SyncCommand> tcs = new();
-            tcs.SetResult(response);
-            return tcs.Task;
+            await Task.Yield();
+            return ReadSyncResponse();
         }
 
-        public Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
+        public async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
         {
-            AdbResponse response = ReadAdbResponse();
-            TaskCompletionSource<AdbResponse> tcs = new();
-            tcs.SetResult(response);
-            return tcs.Task;
+            await Task.Yield();
+            return ReadAdbResponse();
         }
 
-        public Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             SetDevice(device);
-            return Task.CompletedTask;
         }
 
         public void Dispose() => IsConnected = false;
@@ -281,10 +278,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Reconnect() => DidReconnect = true;
 
-        public ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             DidReconnect = true;
-            return ValueTask.CompletedTask;
         }
     }
 }
