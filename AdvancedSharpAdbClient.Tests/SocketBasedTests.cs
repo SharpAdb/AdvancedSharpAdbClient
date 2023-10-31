@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient
     {
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
-            using FactoriesLocker locker = FactoriesLocker.Wait();
+            Func<EndPoint, IAdbSocket> AdbSocketFactory;
 
             // this.EndPoint = AdbClient.Instance.EndPoint;
 #if DEBUG
@@ -21,13 +21,12 @@ namespace AdvancedSharpAdbClient
             if (integrationTest)
             {
                 TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
-
-                Factories.AdbSocketFactory = (endPoint) => tracingSocket;
+                AdbSocketFactory = (endPoint) => tracingSocket;
             }
             else
             {
                 DummyAdbSocket socket = new();
-                Factories.AdbSocketFactory = (endPoint) => socket;
+                AdbSocketFactory = (endPoint) => socket;
             }
 
             IntegrationTest = integrationTest;
@@ -35,14 +34,12 @@ namespace AdvancedSharpAdbClient
             // In release mode (e.g. on the build server),
             // never run integration tests.
             DummyAdbSocket socket = new();
-            Factories.AdbSocketFactory = (endPoint) => socket;
+            AdbSocketFactory = (endPoint) => socket;
             IntegrationTest = false;
 #endif
-            Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(EndPoint);
+            Socket = (IDummyAdbSocket)AdbSocketFactory(EndPoint);
 
-            TestClient = new AdbClient();
-
-            Factories.Reset();
+            TestClient = new AdbClient(AdbSocketFactory);
         }
 
         protected static AdbResponse[] NoResponses { get; } = [];

@@ -439,25 +439,24 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetFrameBufferTest()
         {
-            DummyAdbSocket socket = new();
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "framebuffer:"
+            ];
 
-            socket.Responses.Enqueue(AdbResponse.OK);
-            socket.Responses.Enqueue(AdbResponse.OK);
-
-            socket.Requests.Add("host:transport:169.254.109.177:5555");
-            socket.Requests.Add("framebuffer:");
-
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
-
-            Framebuffer framebuffer = null;
-
-            using (FactoriesLocker locker = FactoriesLocker.Wait())
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer = TestClient.GetFrameBuffer(Device);
-                Factories.Reset();
-            }
+            Framebuffer framebuffer = RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                [
+                    File.ReadAllBytes("Assets/framebufferheader.bin"),
+                    File.ReadAllBytes("Assets/framebuffer.bin")
+                ],
+                null,
+                () => TestClient.GetFrameBuffer(Device));
 
             Assert.NotNull(framebuffer);
             Assert.Equal(Device, framebuffer.Device);

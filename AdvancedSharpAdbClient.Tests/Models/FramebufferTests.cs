@@ -43,14 +43,9 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device);
+            using Framebuffer framebuffer = new(device, (endPoint) => socket);
 
-            using (FactoriesLocker locker = FactoriesLocker.Wait())
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                framebuffer.Refresh();
-                Factories.Reset();
-            }
+            framebuffer.Refresh();
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
@@ -106,17 +101,12 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.Requests.Add("host:transport:169.254.109.177:5555");
             socket.Requests.Add("framebuffer:");
 
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/framebufferheader.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device);
+            using Framebuffer framebuffer = new(device, (endPoint) => socket);
 
-            using (FactoriesLocker locker = await FactoriesLocker.WaitAsync())
-            {
-                Factories.AdbSocketFactory = (endPoint) => socket;
-                await framebuffer.RefreshAsync();
-                Factories.Reset();
-            }
+            await framebuffer.RefreshAsync();
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);

@@ -19,14 +19,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.StatAsync("/test", Arg.Any<CancellationToken>()).Returns(tcs.Task);
 
-            using FactoriesLocker locker = await FactoriesLocker.WaitAsync();
-
-            Factories.SyncServiceFactory = (c, d) => mock;
-
             DeviceData device = new();
-            Assert.Equal(await tcs.Task, await client.StatAsync(device, "/test"));
 
-            Factories.Reset();
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Factories.Reset();
+                return mock;
+            };
+
+            Assert.Equal(await tcs.Task, await client.StatAsync(device, "/test"));
         }
 
         [Fact]

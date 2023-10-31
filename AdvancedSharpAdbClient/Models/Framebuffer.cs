@@ -14,24 +14,52 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="device">The device for which to fetch the frame buffer.</param>
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
-    public class Framebuffer(DeviceData device, EndPoint endPoint) : IDisposable
+    /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+    public class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
         private byte[] headerData = new byte[56];
         private bool headerInitialized;
         private bool disposed = false;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
-        /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint!) { }
+        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory = adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        public Framebuffer(DeviceData device) : this(device, AdbClient.DefaultEndPoint) { }
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        public Framebuffer(DeviceData device, EndPoint endPoint) : this(device, endPoint, Factories.AdbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public Framebuffer(DeviceData device, IAdbClient client, Func<EndPoint, IAdbSocket> adbSocketFactory) : this(device, client?.EndPoint!, adbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
+        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint!, Factories.AdbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public Framebuffer(DeviceData device, Func<EndPoint, IAdbSocket> adbSocketFactory) : this(device, AdbClient.DefaultEndPoint, adbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        public Framebuffer(DeviceData device) : this(device, AdbClient.DefaultEndPoint, Factories.AdbSocketFactory) { }
 
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
@@ -65,7 +93,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
             // Select the target device
             socket.SetDevice(Device);
 
@@ -117,7 +145,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
             // Select the target device
             await socket.SetDeviceAsync(Device, cancellationToken).ConfigureAwait(false);
 

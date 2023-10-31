@@ -65,10 +65,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummySyncService syncService = new();
 
-            using FactoriesLocker locker = FactoriesLocker.Wait();
-
-            Factories.SyncServiceFactory = (c, d) => syncService;
-
             DummyAdbClient adbClient = new();
 
             adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
@@ -80,7 +76,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 State = DeviceState.Online
             };
 
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, device, (c, d) => syncService);
             manager.InstallPackage("Assets/test.txt");
 
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
@@ -89,8 +85,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             Assert.Single(syncService.UploadedFiles);
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/test.txt"));
-
-            Factories.Reset();
         }
 
         [Fact]
@@ -157,10 +151,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummySyncService syncService = new();
 
-            using FactoriesLocker locker = FactoriesLocker.Wait();
-
-            Factories.SyncServiceFactory = (c, d) => syncService;
-
             DummyAdbClient adbClient = new();
 
             adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
@@ -179,7 +169,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 State = DeviceState.Online
             };
 
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, device, (c, d) => syncService);
             manager.InstallMultiplePackage("Assets/test.txt", ["Assets/gapps.txt", "Assets/logcat.bin"]);
 
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
@@ -212,8 +202,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal(2, syncService.UploadedFiles.Count);
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/gapps.txt"));
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/logcat.bin"));
-
-            Factories.Reset();
         }
 
         [Fact]

@@ -113,6 +113,15 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public AdbClient(Func<EndPoint, IAdbSocket> adbSocketFactory)
+            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), adbSocketFactory)
+        {
+        }
+
+        /// <summary>
         /// Get or set default encoding.
         /// </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
@@ -399,7 +408,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            return new Framebuffer(device, this);
+            return new Framebuffer(device, this, adbSocketFactory);
         }
 
         /// <inheritdoc/>
