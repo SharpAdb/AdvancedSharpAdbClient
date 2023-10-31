@@ -108,7 +108,6 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
-
             await Extensions.Yield();
 
             // Set up the connection to track the list of devices.

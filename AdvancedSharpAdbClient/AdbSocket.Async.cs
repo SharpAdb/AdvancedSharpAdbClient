@@ -13,10 +13,14 @@ namespace AdvancedSharpAdbClient
 {
     public partial class AdbSocket
     {
-#if NET6_0_OR_GREATER
         /// <inheritdoc/>
-        public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default) => Socket.ReconnectAsync(cancellationToken);
+        public virtual
+#if NET6_0_OR_GREATER
+            ValueTask
+#else
+            Task
 #endif
+            ReconnectAsync(CancellationToken cancellationToken = default) => Socket.ReconnectAsync(cancellationToken);
 
         /// <inheritdoc/>
         public virtual async Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)

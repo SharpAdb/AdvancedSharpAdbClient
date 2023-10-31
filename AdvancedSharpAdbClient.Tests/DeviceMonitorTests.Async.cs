@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -39,11 +40,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            RunTest(
+            _ = await RunTestAsync(
                 NoResponses,
                 [string.Empty],
                 NoRequests,
-                () => _ = eventWaiter.WaitOne(1000));
+                () => Task.Run(() => eventWaiter.WaitOne(1000)));
 
             Assert.Empty(monitor.Devices);
             Assert.Empty(sink.ConnectedEvents);
@@ -87,11 +88,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            _ = RunTest(
+            _ = await RunTestAsync(
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => eventWaiter.WaitOne(1000));
+                () => Task.Run(() => eventWaiter.WaitOne(1000)));
 
             Assert.Single(monitor.Devices);
             Assert.Single(sink.ConnectedEvents);
@@ -165,11 +166,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Device disconnects
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            _ = RunTest(
+            _ = await RunTestAsync(
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => eventWaiter.WaitOne(1000));
+                () => Task.Run(() => eventWaiter.WaitOne(1000)));
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Online, monitor.Devices[0].State);
@@ -215,11 +216,11 @@ namespace AdvancedSharpAdbClient.Tests
             // Something happens but device does not change
             ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-            _ = RunTest(
+            _ = await RunTestAsync(
                 NoResponses,
                 ["169.254.109.177:5555\toffline\n"],
                 NoRequests,
-                () => eventWaiter.WaitOne(1000));
+                () => Task.Run(() => eventWaiter.WaitOne(1000)));
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);

@@ -43,6 +43,40 @@ namespace AdvancedSharpAdbClient
                 return ConnectAsync(EndPoint!, cancellationToken);
             }
         }
+#else
+        /// <inheritdoc/>
+        [MemberNotNull(nameof(EndPoint))]
+        public virtual async Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
+        {
+            if (endPoint is not (IPEndPoint or DnsEndPoint))
+            {
+                throw new NotSupportedException("Only TCP endpoints are supported");
+            }
+
+            using (CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(Socket.Close))
+            {
+                EndPoint = endPoint;
+                await Extensions.Yield();
+                Socket.Connect(endPoint);
+            }
+            Socket.Blocking = true;
+        }
+
+        /// <inheritdoc/>
+        public virtual Task ReconnectAsync(CancellationToken cancellationToken = default)
+        {
+            if (Socket.Connected)
+            {
+                // Already connected - nothing to do.
+                return Extensions.CompletedTask;
+            }
+            else
+            {
+                Socket.Dispose();
+                Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                return ConnectAsync(EndPoint!, cancellationToken);
+            }
+        }
 #endif
 
         /// <inheritdoc/>

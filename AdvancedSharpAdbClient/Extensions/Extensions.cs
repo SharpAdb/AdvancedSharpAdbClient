@@ -41,37 +41,27 @@ namespace AdvancedSharpAdbClient
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
         }
 
-#if !HAS_PROCESS
-        /// <summary>
-        /// Closes the <see cref="Socket"/> connection and releases all associated resources.
-        /// </summary>
-        /// <param name="socket">The <see cref="Socket"/> to release.</param>
-        public static void Close(this Socket socket) => socket.Dispose();
-#endif
-
-#if NETFRAMEWORK && !NET40_OR_GREATER
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="Socket"/> class.
-        /// </summary>
-        /// <param name="socket">The <see cref="Socket"/> to release.</param>
-        public static void Dispose(this Socket socket)
-        {
-            socket.Close();
-            GC.SuppressFinalize(socket);
-        }
-
-        /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="WaitHandle"/> class.
-        /// </summary>
-        /// <param name="waitHandle">The <see cref="WaitHandle"/> to release.</param>
-        public static void Dispose(this WaitHandle waitHandle)
-        {
-            waitHandle.Close();
-            GC.SuppressFinalize(waitHandle);
-        }
-#endif
-
 #if HAS_TASK
+#if NETFRAMEWORK && !NET46_OR_GREATER
+        /// <summary>
+        /// Singleton cached task that's been completed successfully.
+        /// </summary>
+        internal static readonly Task s_cachedCompleted =
+#if NET45_OR_GREATER
+            Task.
+#else
+            TaskEx.
+#endif
+            FromResult<object?>(null);
+
+        /// <summary>
+        /// Gets a task that's already been completed successfully.
+        /// </summary>
+        public static Task CompletedTask => s_cachedCompleted;
+#else
+        public static Task CompletedTask => Task.CompletedTask;
+#endif
+
         /// <summary>
         /// Creates a task that completes after a specified number of milliseconds.
         /// </summary>
@@ -155,12 +145,16 @@ namespace AdvancedSharpAdbClient
         /// <returns>A value task that represents the asynchronous read operation. The value of the
         /// TResult parameter contains the next line from the text reader, or is null if
         /// all of the characters have been read.</returns>
-        public static Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken) =>
+        public static async Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
+        {
+            using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            Run(reader.ReadLine, cancellationToken);
+            await Yield();
+            return reader.ReadLine();
 #else
-            reader.ReadLineAsync();
+            return await reader.ReadLineAsync();
 #endif
+        }
 
         /// <summary>
         /// Reads all characters from the current position to the end of the stream asynchronously and returns them as one string.
@@ -170,13 +164,53 @@ namespace AdvancedSharpAdbClient
         /// <returns>A task that represents the asynchronous read operation. The value of the TResult
         /// parameter contains a string with the characters from the current position to
         /// the end of the stream.</returns>
-        public static Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken) =>
+        public static async Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken)
+        {
+            using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            Run(reader.ReadToEnd, cancellationToken);
+            await Yield();
+            return reader.ReadToEnd();
 #else
-            reader.ReadToEndAsync();
+            return await reader.ReadToEndAsync();
+#endif
+        }
 #endif
 #endif
+
+#if !HAS_PROCESS
+        /// <summary>
+        /// Closes the <see cref="Socket"/> connection and releases all associated resources.
+        /// </summary>
+        /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        public static void Close(this Socket socket) => socket.Dispose();
+
+        /// <summary>
+        /// Closes the <see cref="TextReader"/> and releases any system resources associated with the <see cref="TextReader"/>.
+        /// </summary>
+        /// <param name="reader">The <see cref="TextReader"/> to release.</param>
+        public static void Close(this TextReader reader) => reader.Dispose();
+#endif
+
+#if NETFRAMEWORK && !NET40_OR_GREATER
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="Socket"/> class.
+        /// </summary>
+        /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        public static void Dispose(this Socket socket)
+        {
+            socket.Close();
+            GC.SuppressFinalize(socket);
+        }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="WaitHandle"/> class.
+        /// </summary>
+        /// <param name="waitHandle">The <see cref="WaitHandle"/> to release.</param>
+        public static void Dispose(this WaitHandle waitHandle)
+        {
+            waitHandle.Close();
+            GC.SuppressFinalize(waitHandle);
+        }
 #endif
 
         public static bool IsWindowsPlatform() =>

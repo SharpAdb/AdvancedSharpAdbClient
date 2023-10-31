@@ -28,6 +28,22 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
         ValueTask ReconnectAsync(CancellationToken cancellationToken);
+#else
+        /// <summary>
+        /// Begins an asynchronous request for a connection to a remote host.
+        /// </summary>
+        /// <param name="endPoint">An <see cref="EndPoint"/> that represents the remote device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
+        /// socket to disconnect.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        Task ReconnectAsync(CancellationToken cancellationToken);
 #endif
 
         /// <summary>
