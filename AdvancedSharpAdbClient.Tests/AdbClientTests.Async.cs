@@ -786,6 +786,29 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.UninstallAsync(IAdbClient, DeviceData, string, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public async void UninstallAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'uninstall' com.android.gallery3d"
+            ];
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.UninstallAsync(Device, "com.android.gallery3d"));
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.GetFeatureSetAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]

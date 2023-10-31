@@ -40,7 +40,7 @@ jobs:
       run: dotnet build --no-restore -p:FullTargets=false
 
     - name: Test
-      run: dotnet test --no-restore -p:FullTargets=false
+      run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
 
   pack-and-publish:
     name: pack-and-publish

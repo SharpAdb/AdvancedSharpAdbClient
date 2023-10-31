@@ -369,6 +369,14 @@ namespace AdvancedSharpAdbClient
         void InstallCommit(DeviceData device, string session);
 
         /// <summary>
+        /// Uninstalls an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb uninstall</c>.</param>
+        void Uninstall(DeviceData device, string packageName, params string[] arguments);
+
+        /// <summary>
         /// Lists all features supported by the current device.
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>

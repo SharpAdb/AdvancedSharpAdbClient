@@ -309,6 +309,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task IAdbClient.SwipeAsync(DeviceData device, int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken) => throw new NotImplementedException();
 
+        void IAdbClient.Uninstall(DeviceData device, string packageName, params string[] arguments) => throw new NotImplementedException();
+
+        Task IAdbClient.UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+
         void IAdbClient.Unroot(DeviceData device) => throw new NotImplementedException();
 
         Task IAdbClient.UnrootAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();

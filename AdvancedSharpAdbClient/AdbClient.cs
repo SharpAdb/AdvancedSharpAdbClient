@@ -430,7 +430,7 @@ namespace AdvancedSharpAdbClient
 
             foreach (LogId logName in logNames)
             {
-                _ = request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
             }
 
             socket.SendAdbRequest(request.ToString());
@@ -579,13 +579,13 @@ namespace AdvancedSharpAdbClient
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
-            _ = requestBuilder.Append($" -S {apk.Length}");
+            _ = requestBuilder.AppendFormat(" -S {0}", apk.Length);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -697,14 +697,14 @@ namespace AdvancedSharpAdbClient
 
             if (!StringExtensions.IsNullOrWhiteSpace(packageName))
             {
-                requestBuilder.Append($" -p {packageName}");
+                requestBuilder.AppendFormat(" -p {0}", packageName);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
@@ -743,14 +743,12 @@ namespace AdvancedSharpAdbClient
 
             ExceptionExtensions.ThrowIfNull(apkName);
 
-            StringBuilder requestBuilder = new();
-            requestBuilder.Append($"exec:cmd package 'install-write'");
-
-            // add size parameter [required for streaming installs]
-            // do last to override any user specified value
-            requestBuilder.Append($" -S {apk.Length}");
-
-            requestBuilder.Append($" {session} {apkName}.apk");
+            StringBuilder requestBuilder =
+                new StringBuilder().Append($"exec:cmd package 'install-write'")
+                                   // add size parameter [required for streaming installs]
+                                   // do last to override any user specified value
+                                   .AppendFormat(" -S {0}", apk.Length)
+                                   .AppendFormat(" {0} {1}.apk", session, apkName);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             socket.SetDevice(device);
@@ -793,6 +791,37 @@ namespace AdvancedSharpAdbClient
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"exec:cmd package 'install-commit' {session}");
+            AdbResponse response = socket.ReadAdbResponse();
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string? result = reader.ReadLine();
+            if (result?.Contains("Success") != true)
+            {
+                throw new AdbException(reader.ReadToEnd());
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Uninstall(DeviceData device, string packageName, params string[] arguments)
+        {
+            EnsureDevice(device);
+
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'uninstall'");
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            _ = requestBuilder.AppendFormat(" {0}", packageName);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            socket.SendAdbRequest(requestBuilder.ToString());
             AdbResponse response = socket.ReadAdbResponse();
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);

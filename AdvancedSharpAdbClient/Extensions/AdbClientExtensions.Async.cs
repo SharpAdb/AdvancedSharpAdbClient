@@ -315,6 +315,17 @@ namespace AdvancedSharpAdbClient
             client.InstallCreateAsync(device, packageName, default, arguments);
 
         /// <summary>
+        /// Uninstalls an Android application on an device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb uninstall</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task UninstallAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
+            client.UninstallAsync(device, packageName, default, arguments);
+
+        /// <summary>
         /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>

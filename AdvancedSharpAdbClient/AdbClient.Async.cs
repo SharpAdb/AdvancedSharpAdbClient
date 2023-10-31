@@ -290,7 +290,7 @@ namespace AdvancedSharpAdbClient
 
             foreach (LogId logName in logNames)
             {
-                _ = request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
             }
 
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
@@ -440,7 +440,7 @@ namespace AdvancedSharpAdbClient
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
@@ -558,14 +558,14 @@ namespace AdvancedSharpAdbClient
 
             if (!StringExtensions.IsNullOrWhiteSpace(packageName))
             {
-                requestBuilder.Append($" -p {packageName}");
+                requestBuilder.AppendFormat(" -p {0}", packageName);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
@@ -609,8 +609,8 @@ namespace AdvancedSharpAdbClient
                 new StringBuilder().Append($"exec:cmd package 'install-write'")
                                    // add size parameter [required for streaming installs]
                                    // do last to override any user specified value
-                                   .Append($" -S {apk.Length}")
-                                   .Append($" {session} {apkName}.apk");
+                                   .AppendFormat(" -S {0}", apk.Length)
+                                   .AppendFormat(" {0} {1}.apk", session, apkName);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
@@ -651,6 +651,37 @@ namespace AdvancedSharpAdbClient
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
             await socket.SendAdbRequestAsync($"exec:cmd package 'install-commit' {session}", cancellationToken).ConfigureAwait(false);
+            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string? result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (result?.Contains("Success") != true)
+            {
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        {
+            EnsureDevice(device);
+
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'uninstall'");
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            _ = requestBuilder.AppendFormat(" {0}", packageName);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
             AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);

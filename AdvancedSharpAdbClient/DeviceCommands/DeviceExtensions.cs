@@ -248,16 +248,16 @@ fi".Replace("\r\n", "\n"), receiver);
             StringBuilder catBuilder = new();
             ProcessOutputReceiver processOutputReceiver = new();
 
-            _ = catBuilder.Append("cat ");
+            _ = catBuilder.Append("cat");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
+                _ = catBuilder.AppendFormat(" /proc/{0}/cmdline /proc/{1}/stat", pids[i], pids[i]);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
                     client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-                    _ = catBuilder.Clear().Append("cat ");
+                    _ = catBuilder.Clear().Append("cat");
                 }
             }
 

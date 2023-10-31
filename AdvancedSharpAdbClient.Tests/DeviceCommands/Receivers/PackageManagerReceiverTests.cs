@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands.Tests
 
             DummyAdbClient client = new();
 
-            PackageManager manager = new(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
+            PackageManager manager = new(client, device, syncServiceFactory: null, skipInit: true);
             PackageManagerReceiver receiver = new(manager);
 
             // Act

@@ -313,7 +313,7 @@ static void Main(string[] args)
 {
     ...
     PackageManager manager = new PackageManager(client, device);
-    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk", reinstall: false);
+    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk");
     manager.UninstallPackage("com.android.app");
     ...
 }
@@ -328,6 +328,7 @@ static void Main(string[] args)
     using (FileStream stream = File.OpenRead("Application.apk"))
     {
         client.Install(device, stream);
+        client.Uninstall(device, "com.android.app");
     }
     ...
 }
@@ -339,8 +340,8 @@ static void Main(string[] args)
 {
     ...
     PackageManager manager = new PackageManager(client, device);
-    manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }, reinstall: false); // Install split app whith base app
-    manager.InstallMultiplePackage(new[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app", reinstall: false); // Add split app to base app which packagename is 'com.android.app'
+    manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }); // Install split app whith base app
+    manager.InstallMultiplePackage(new[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
 }
 ```

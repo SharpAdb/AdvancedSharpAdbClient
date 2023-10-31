@@ -31,16 +31,15 @@ namespace AdvancedSharpAdbClient.Tests
         {
             for (int i = 0; i <= 100; i++)
             {
-                Thread.Yield();
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
             }
         }
 
         public async Task PullAsync(string remotePath, Stream stream, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             for (int i = 0; i <= 100; i++)
             {
-                await Task.Yield();
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
             }
         }
@@ -49,7 +48,6 @@ namespace AdvancedSharpAdbClient.Tests
         {
             for (int i = 0; i <= 100; i++)
             {
-                Thread.Yield();
                 if (i == 100)
                 {
                     UploadedFiles[remotePath] = stream;
@@ -60,9 +58,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int> progress, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             for (int i = 0; i <= 100; i++)
             {
-                await Task.Yield();
                 if (i == 100)
                 {
                     UploadedFiles[remotePath] = stream;

@@ -366,6 +366,16 @@ namespace AdvancedSharpAdbClient
         Task InstallCommitAsync(DeviceData device, string session, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Uninstalls an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb uninstall</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments);
+
+        /// <summary>
         /// Lists all features supported by the current device.
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>

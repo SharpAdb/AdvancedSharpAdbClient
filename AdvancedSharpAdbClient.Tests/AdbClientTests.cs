@@ -894,6 +894,29 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.Uninstall(DeviceData, string, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public void UninstallTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'uninstall' com.android.gallery3d"
+            ];
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.Uninstall(Device, "com.android.gallery3d"));
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.GetFeatureSet(DeviceData)"/> method.
         /// </summary>
         [Fact]
