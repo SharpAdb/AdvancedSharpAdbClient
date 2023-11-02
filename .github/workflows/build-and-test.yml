@@ -69,7 +69,7 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
         run: dotnet nuget push nugets/**.nupkg --source $env:NUGET_SOURCE --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
         env:
-          NUGET_SOURCE: https://nuget.pkg.github.com/yungd1plomat/index.json
+          NUGET_SOURCE: https://nuget.pkg.github.com/SharpAdb/index.json
 
       - name: Upload
         uses: actions/upload-artifact@v3
