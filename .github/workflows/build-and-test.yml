@@ -66,8 +66,8 @@ jobs:
         run: dotnet pack --no-restore --version-suffix build.${{ github.run_number }}.${{ github.run_attempt }} -o "nugets" -p:FullTargets=true
 
       - name: Publish
-        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        run: dotnet nuget push ./nugets/*nupkg --source https://nuget.pkg.github.com/yungd1plomat/index.json --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
+        #if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+        run: dotnet nuget push ./nugets/*nupkg --source https://nuget.pkg.github.com/SharpAdb/index.json --skip-duplicate --api-key ${{ secrets.NUGET_KEY }}
 
       - name: Upload
         uses: actions/upload-artifact@v3
