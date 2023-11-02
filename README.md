@@ -1,6 +1,6 @@
 | Issues | License | NuGet |
 |--------|---------|-------|
-[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![License](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
+[![Github Issues](https://img.shields.io/github/issues/SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/issues)|[![License](https://img.shields.io/github/license/SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
 
 # A .NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)
 
@@ -442,10 +442,10 @@ AdbClient.SetEncoding(Encoding.ASCII);
 ```
 
 ## Contributors
-[![Contributors](https://contrib.rocks/image?repo=yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/graphs/contributors)
 
 ## Consulting and Support
-Please open an [**issue**](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues) on if you have suggestions or problems.
+Please open an [**issue**](https://github.com/SharpAdb/AdvancedSharpAdbClient/issues) on if you have suggestions or problems.
 
 ## History
 AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).
