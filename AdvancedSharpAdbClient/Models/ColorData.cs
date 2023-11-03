@@ -41,16 +41,10 @@ namespace AdvancedSharpAdbClient.Models
         public readonly int Count => 8;
 
         /// <inheritdoc/>
-        public readonly byte this[int index]
-        {
-            get
-            {
-                if (index < 0 || index >= Count)
-                {
-                    throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.");
-                }
-
-                return index switch
+        public readonly byte this[int index] =>
+            index < 0 || index >= Count
+                ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
+                : index switch
                 {
                     0 => (byte)Offset,
                     1 => (byte)(Offset >> 8),
@@ -64,8 +58,6 @@ namespace AdvancedSharpAdbClient.Models
 
                     _ => throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
                 };
-            }
-        }
 
         /// <summary>
         /// Deconstruct the <see cref="ColorData"/> struct.

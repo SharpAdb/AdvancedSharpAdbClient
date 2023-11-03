@@ -80,9 +80,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
             service.Pull(remotePath, stream, progress, in isCancelled);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>
@@ -106,9 +108,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
             service.Push(stream, remotePath, permissions, timestamp, progress, in isCancelled);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>

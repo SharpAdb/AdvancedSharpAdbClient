@@ -78,13 +78,13 @@ namespace AdvancedSharpAdbClient.Models
                 Offset = ReadUInt32(ref data),
                 Length = ReadUInt32(ref data)
             };
-            
+
             Blue = new ColorData
             {
                 Offset = ReadUInt32(ref data),
                 Length = ReadUInt32(ref data)
             };
-            
+
             Green = new ColorData
             {
                 Offset = ReadUInt32(ref data),

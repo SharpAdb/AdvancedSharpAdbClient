@@ -20,13 +20,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device);
-            await manager.InstallRemotePackageAsync("/data/test.apk");
+
+            using (EventTestHost eventTestHost = new(manager, PackageInstallProgressState.Installing))
+            {
+                await manager.InstallRemotePackageAsync("/data/test.apk");
+            }
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install \"/data/test.apk\"", adbClient.ReceivedCommands[1]);
 
             adbClient.ReceivedCommands.Clear();
-            await manager.InstallRemotePackageAsync("/data/test.apk", "-r", "-t");
+
+            using (EventTestHost eventTestHost = new(manager, PackageInstallProgressState.Installing))
+            {
+                await manager.InstallRemotePackageAsync("/data/test.apk", "-r", "-t");
+            }
 
             Assert.Single(adbClient.ReceivedCommands);
             Assert.Equal("shell:pm install -r -t \"/data/test.apk\"", adbClient.ReceivedCommands[0]);
@@ -49,7 +57,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device, (c, d) => syncService);
-            await manager.InstallPackageAsync("Assets/test.txt");
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.Uploading,
+                PackageInstallProgressState.Installing,
+                PackageInstallProgressState.PostInstall,
+                PackageInstallProgressState.Finished))
+            {
+                await manager.InstallPackageAsync("Assets/test.txt");
+            }
 
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install \"/data/local/tmp/test.txt\"", adbClient.ReceivedCommands[1]);
@@ -82,7 +99,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device);
-            await manager.InstallMultipleRemotePackageAsync("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"]);
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing))
+            {
+                await manager.InstallMultipleRemotePackageAsync("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"]);
+            }
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create", adbClient.ReceivedCommands[1]);
@@ -92,7 +117,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[5]);
 
             adbClient.ReceivedCommands.Clear();
-            await manager.InstallMultipleRemotePackageAsync("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"], "-r", "-t");
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing))
+            {
+                await manager.InstallMultipleRemotePackageAsync("/data/base.apk", ["/data/split-dpi.apk", "/data/split-abi.apk"], "-r", "-t");
+            }
 
             Assert.Equal(5, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -r -t", adbClient.ReceivedCommands[0]);
@@ -102,7 +135,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[4]);
 
             adbClient.ReceivedCommands.Clear();
-            await manager.InstallMultipleRemotePackageAsync(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms");
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing))
+            {
+                await manager.InstallMultipleRemotePackageAsync(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms");
+            }
 
             Assert.Equal(4, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[0]);
@@ -111,7 +152,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[3]);
 
             adbClient.ReceivedCommands.Clear();
-            await manager.InstallMultipleRemotePackageAsync(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms", "-r", "-t");
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing))
+            {
+                await manager.InstallMultipleRemotePackageAsync(["/data/split-dpi.apk", "/data/split-abi.apk"], "com.google.android.gms", "-r", "-t");
+            }
 
             Assert.Equal(4, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms -r -t", adbClient.ReceivedCommands[0]);
@@ -144,7 +193,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
 
             PackageManager manager = new(adbClient, device, (c, d) => syncService);
-            await manager.InstallMultiplePackageAsync("Assets/test.txt", ["Assets/gapps.txt", "Assets/logcat.bin"]);
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.Uploading,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing,
+                PackageInstallProgressState.PostInstall,
+                PackageInstallProgressState.Finished))
+            {
+                await manager.InstallMultiplePackageAsync("Assets/test.txt", ["Assets/gapps.txt", "Assets/logcat.bin"]);
+            }
 
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create", adbClient.ReceivedCommands[1]);
@@ -163,7 +223,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             syncService.UploadedFiles.Clear();
             adbClient.ReceivedCommands.Clear();
-            await manager.InstallMultiplePackageAsync(["Assets/gapps.txt", "Assets/logcat.bin"], "com.google.android.gms");
+
+            using (EventTestHost eventTestHost = new(
+                manager,
+                PackageInstallProgressState.Uploading,
+                PackageInstallProgressState.CreateSession,
+                PackageInstallProgressState.WriteSession,
+                PackageInstallProgressState.Installing,
+                PackageInstallProgressState.PostInstall,
+                PackageInstallProgressState.Finished))
+            {
+                await manager.InstallMultiplePackageAsync(["Assets/gapps.txt", "Assets/logcat.bin"], "com.google.android.gms");
+            }
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[0]);
