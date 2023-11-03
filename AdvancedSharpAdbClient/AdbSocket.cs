@@ -263,7 +263,11 @@ namespace AdvancedSharpAdbClient
                 Array.Reverse(reply);
             }
 
+#if HAS_BUFFERS
+            int len = BitConverter.ToInt32(reply);
+#else
             int len = BitConverter.ToInt32(reply, 0);
+#endif
 
             // And get the string
             reply = new byte[len];

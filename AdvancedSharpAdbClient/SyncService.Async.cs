@@ -193,7 +193,12 @@ namespace AdvancedSharpAdbClient
                     Array.Reverse(reply);
                 }
 
-                int size = BitConverter.ToInt32(reply, 0);
+                int size =
+#if HAS_BUFFERS
+                    BitConverter.ToInt32(reply);
+#else
+                    BitConverter.ToInt32(reply, 0);
+#endif
 
                 if (size > MaxBufferSize)
                 {
@@ -315,9 +320,15 @@ namespace AdvancedSharpAdbClient
                 Array.Reverse(statResult, 8, 4);
             }
 
+#if HAS_BUFFERS
+            value.FileType = (UnixFileType)BitConverter.ToInt32(statResult);
+            value.Size = BitConverter.ToInt32(statResult.AsSpan(4));
+            value.Time = DateTimeExtensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult.AsSpan(8)));
+#else
             value.FileType = (UnixFileType)BitConverter.ToInt32(statResult, 0);
             value.Size = BitConverter.ToInt32(statResult, 4);
             value.Time = DateTimeExtensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
+#endif
         }
     }
 }

@@ -232,7 +232,12 @@ namespace AdvancedSharpAdbClient.Logs
         {
             byte[]? data = ReadBytesSafe(2);
 
-            return data == null ? null : BitConverter.ToUInt16(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToUInt16(data);
+#else
+                : BitConverter.ToUInt16(data, 0);
+#endif
         }
 
         /// <summary>
@@ -242,7 +247,12 @@ namespace AdvancedSharpAdbClient.Logs
         {
             byte[]? data = ReadBytesSafe(4);
 
-            return data == null ? null : BitConverter.ToUInt32(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToUInt32(data);
+#else
+                : BitConverter.ToUInt32(data, 0);
+#endif
         }
 
         /// <summary>
@@ -252,7 +262,12 @@ namespace AdvancedSharpAdbClient.Logs
         {
             byte[]? data = ReadBytesSafe(4);
 
-            return data == null ? null : BitConverter.ToInt32(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToInt32(data);
+#else
+                : BitConverter.ToInt32(data, 0);
+#endif
         }
 
         /// <summary>

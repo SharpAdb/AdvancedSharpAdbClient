@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         {
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-v1.bin");
 
-            FramebufferHeader header = FramebufferHeader.Read(data);
+            FramebufferHeader header = [.. data];
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -32,6 +32,13 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(1440u, header.Width);
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
+
+            for (int i = 0; i < header.Count; i++)
+            {
+                Assert.Equal(data[i], header[i]);
+            }
+
+            Assert.Equal(data, [.. header]);
         }
 
         [Fact]
@@ -39,7 +46,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         {
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
 
-            FramebufferHeader header = FramebufferHeader.Read(data);
+            FramebufferHeader header = [.. data];
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -55,6 +62,13 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(1080u, header.Width);
             Assert.Equal(2u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
+
+            for (int i = 0; i < header.Count; i++)
+            {
+                Assert.Equal(data[i], header[i]);
+            }
+
+            Assert.Equal(data, [.. header]);
         }
 
 #if WINDOWS

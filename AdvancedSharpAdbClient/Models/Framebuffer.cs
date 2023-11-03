@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
     public class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
-        private byte[] headerData = new byte[56];
+        private byte[] headerData = new byte[FramebufferHeader.MaxLength];
         private bool headerInitialized;
         private bool disposed = false;
 

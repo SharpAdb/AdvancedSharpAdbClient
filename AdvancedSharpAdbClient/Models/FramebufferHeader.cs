@@ -3,11 +3,13 @@
 // </copyright>
 
 using System;
-using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 #if WINDOWS_UWP
+using System.IO;
 using System.Threading;
 #endif
 
@@ -18,19 +20,40 @@ namespace AdvancedSharpAdbClient.Models
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
     /// information about the framebuffer.
     /// </summary>
-    public readonly struct FramebufferHeader
+#if HAS_BUFFERS
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreate))]
+#endif
+    public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
+        /// <summary>
+        /// The length of the head when <see cref="Version"/> is <see langword="2"/>.
+        /// </summary>
+        public const int MaxLength = 56;
+
+        /// <summary>
+        /// The length of the head when <see cref="Version"/> is <see langword="1"/>.
+        /// </summary>
+        public const int MiniLength = 52;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
+#if HAS_BUFFERS
+        public FramebufferHeader(ReadOnlySpan<byte> data)
+#else
         public FramebufferHeader(byte[] data)
+#endif
         {
-            // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
-            using MemoryStream stream = new(data);
-            using BinaryReader reader = new(stream, Encoding.ASCII);
-            Version = reader.ReadUInt32();
+            if (data.Length is < MiniLength or > MaxLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must between {MiniLength} and {MaxLength}.");
+            }
+
+            int index = 0;
+
+            Version = ReadUInt32(ref data);
 
             if (Version > 2)
             {
@@ -39,40 +62,49 @@ namespace AdvancedSharpAdbClient.Models
                 throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
             }
 
-            Bpp = reader.ReadUInt32();
+            Bpp = ReadUInt32(ref data);
 
-            if (Version == 2)
+            if (Version >= 2)
             {
-                ColorSpace = reader.ReadUInt32();
+                ColorSpace = ReadUInt32(ref data);
             }
 
-            Size = reader.ReadUInt32();
-            Width = reader.ReadUInt32();
-            Height = reader.ReadUInt32();
+            Size = ReadUInt32(ref data);
+            Width = ReadUInt32(ref data);
+            Height = ReadUInt32(ref data);
 
             Red = new ColorData
             {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
+                Offset = ReadUInt32(ref data),
+                Length = ReadUInt32(ref data)
             };
-
+            
             Blue = new ColorData
             {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
+                Offset = ReadUInt32(ref data),
+                Length = ReadUInt32(ref data)
             };
-
+            
             Green = new ColorData
             {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
+                Offset = ReadUInt32(ref data),
+                Length = ReadUInt32(ref data)
             };
 
             Alpha = new ColorData
             {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
+                Offset = ReadUInt32(ref data),
+                Length = ReadUInt32(ref data)
             };
+
+#if HAS_BUFFERS
+            uint ReadUInt32(ref ReadOnlySpan<byte> data)
+#else
+            uint ReadUInt32(ref byte[] data)
+#endif
+            {
+                return (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
+            }
         }
 
         /// <summary>
@@ -126,11 +158,68 @@ namespace AdvancedSharpAdbClient.Models
         public ColorData Alpha { get; init; }
 
         /// <summary>
+        /// The length of the head in bytes.
+        /// </summary>
+        public int Count => Version < 2 ? MiniLength : MaxLength;
+
+        /// <inheritdoc/>
+        public byte this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= Count)
+                {
+                    throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.");
+                }
+
+                if (index > 7 && Version < 2)
+                {
+                    index += 4;
+                }
+
+                return index switch
+                {
+                    < 4 => GetByte(Version),
+                    < 8 => GetByte(Bpp),
+                    < 12 => GetByte(ColorSpace),
+                    < 16 => GetByte(Size),
+                    < 20 => GetByte(Width),
+                    < 24 => GetByte(Height),
+                    < 28 => GetByte(Red.Offset),
+                    < 32 => GetByte(Red.Length),
+                    < 36 => GetByte(Blue.Offset),
+                    < 40 => GetByte(Blue.Length),
+                    < 44 => GetByte(Green.Offset),
+                    < 48 => GetByte(Green.Length),
+                    < 52 => GetByte(Alpha.Offset),
+                    < 56 => GetByte(Alpha.Length),
+                    _ => throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
+                };
+
+                byte GetByte(uint value)
+                {
+                    return (index % 4) switch
+                    {
+                        0 => (byte)value,
+                        1 => (byte)(value >> 8),
+                        2 => (byte)(value >> 16),
+                        3 => (byte)(value >> 24),
+                        _ => throw new InvalidOperationException()
+                    };
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
+#if HAS_BUFFERS
+        public static FramebufferHeader Read(ReadOnlySpan<byte> data) => new(data);
+#else
         public static FramebufferHeader Read(byte[] data) => new(data);
+#endif
 
 #if HAS_IMAGING
         /// <summary>
@@ -404,5 +493,48 @@ namespace AdvancedSharpAdbClient.Models
             }
         }
 #endif
+
+        /// <inheritdoc/>
+        public IEnumerator<byte> GetEnumerator()
+        {
+            foreach (uint value in GetEnumerable())
+            {
+                yield return (byte)value;
+                yield return (byte)(value >> 8);
+                yield return (byte)(value >> 16);
+                yield return (byte)(value >> 24);
+            }
+        }
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private IEnumerable<uint> GetEnumerable()
+        {
+            yield return Version;
+
+            yield return Bpp;
+
+            if (Version >= 2)
+            {
+                yield return ColorSpace;
+            }
+
+            yield return Size;
+            yield return Width;
+            yield return Height;
+
+            yield return Red.Offset;
+            yield return Red.Length;
+
+            yield return Blue.Offset;
+            yield return Blue.Length;
+
+            yield return Green.Offset;
+            yield return Green.Length;
+
+            yield return Alpha.Offset;
+            yield return Alpha.Length;
+        }
     }
 }

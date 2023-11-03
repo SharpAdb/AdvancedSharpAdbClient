@@ -17,6 +17,9 @@ using Microsoft.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
 {
+    /// <summary>
+    /// Extension methods for the <see cref="AdvancedSharpAdbClient"/> namespace.
+    /// </summary>
     internal static class Extensions
     {
         public static char[] NewLineSeparator { get; } = ['\r', '\n'];
