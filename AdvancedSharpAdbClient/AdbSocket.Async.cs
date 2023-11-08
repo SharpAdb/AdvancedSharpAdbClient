@@ -352,7 +352,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
 #if HAS_BUFFERS
-        protected virtual async Task<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
+        protected virtual async ValueTask<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
 #else
         protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
 #endif

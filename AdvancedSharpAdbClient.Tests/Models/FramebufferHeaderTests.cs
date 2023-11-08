@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.Versioning;
@@ -38,7 +39,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
                 Assert.Equal(data[i], header[i]);
             }
 
-            Assert.Equal(data, [.. header]);
+            Assert.Equal(data.AsSpan(), [.. header]);
         }
 
         [Fact]
@@ -68,7 +69,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
                 Assert.Equal(data[i], header[i]);
             }
 
-            Assert.Equal(data, [.. header]);
+            Assert.Equal(data.AsSpan(), [.. header]);
         }
 
 #if WINDOWS
