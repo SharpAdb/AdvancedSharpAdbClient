@@ -276,9 +276,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Close() => IsConnected = false;
 
-        public void Reconnect() => DidReconnect = true;
+        public void Reconnect(bool isForce = false) => DidReconnect = true;
 
-        public async ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
+        public async ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
         {
             await Task.Yield();
             DidReconnect = true;

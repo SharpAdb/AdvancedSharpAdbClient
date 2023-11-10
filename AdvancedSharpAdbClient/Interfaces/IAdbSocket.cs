@@ -24,7 +24,8 @@ namespace AdvancedSharpAdbClient
         /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
         /// Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
-        void Reconnect();
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
+        void Reconnect(bool isForce);
 
         /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,

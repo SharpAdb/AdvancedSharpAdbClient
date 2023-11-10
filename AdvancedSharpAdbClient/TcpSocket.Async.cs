@@ -29,18 +29,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual ValueTask ReconnectAsync(CancellationToken cancellationToken = default)
+        public virtual ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
         {
-            if (Socket.Connected)
-            {
-                // Already connected - nothing to do.
-                return ValueTask.CompletedTask;
-            }
-            else
+            if (isForce || !Socket.Connected)
             {
                 Socket.Dispose();
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 return ConnectAsync(EndPoint!, cancellationToken);
+            }
+            else
+            {
+                // Already connected - nothing to do.
+                return ValueTask.CompletedTask;
             }
         }
 #else
@@ -63,21 +63,30 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task ReconnectAsync(CancellationToken cancellationToken = default)
+        public virtual Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
         {
-            if (Socket.Connected)
-            {
-                // Already connected - nothing to do.
-                return Extensions.CompletedTask;
-            }
-            else
+            if (isForce || !Socket.Connected)
             {
                 Socket.Dispose();
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 return ConnectAsync(EndPoint!, cancellationToken);
             }
+            else
+            {
+                // Already connected - nothing to do.
+                return Extensions.CompletedTask;
+            }
         }
 #endif
+
+        /// <inheritdoc/>
+        public
+#if NET6_0_OR_GREATER
+            ValueTask
+#else
+            Task
+#endif
+            ReconnectAsync(CancellationToken cancellationToken = default) => ReconnectAsync(false, cancellationToken);
 
         /// <inheritdoc/>
         public virtual Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>

@@ -18,6 +18,11 @@ namespace AdvancedSharpAdbClient
         /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
         public static byte[] GetBytes(SyncCommand command)
         {
+            if (command == 0)
+            {
+                return [0, 0, 0, 0];
+            }
+
             if (command is not (SyncCommand.LIST
                 or SyncCommand.RECV
                 or SyncCommand.SEND
@@ -58,8 +63,7 @@ namespace AdvancedSharpAdbClient
             }
 
             string commandText = AdbClient.Encoding.GetString(value);
-
-            return EnumExtensions.TryParse(commandText, true, out SyncCommand command) ? command : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
+            return commandText == "\0\0\0\0" ? 0 : EnumExtensions.TryParse(commandText, true, out SyncCommand command) ? command : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
         }
     }
 }

@@ -37,7 +37,8 @@ namespace AdvancedSharpAdbClient
         /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
         /// socket to disconnect.
         /// </summary>
-        void Reconnect();
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
+        void Reconnect(bool isForce = false);
 
         /// <summary>
         /// Sends the specified number of bytes of data to a connected

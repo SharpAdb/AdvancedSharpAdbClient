@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void Open() => IsOpen = true;
 
-        public async Task OpenAsync(CancellationToken cancellationToken)
+        public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             await Task.Yield();
             IsOpen = true;
@@ -67,6 +67,14 @@ namespace AdvancedSharpAdbClient.Tests
                 }
                 SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(i, 100));
             }
+        }
+
+        public void Reopen() => IsOpen = true;
+
+        public async Task ReopenAsync(CancellationToken cancellationToken = default)
+        {
+            await Task.Yield();
+            IsOpen = true;
         }
 
         #region Not Implemented

@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient.Tests
             return value;
         }
 
-        public override async Task<string> ReadStringAsync(CancellationToken cancellationToken)
+        public override async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
             string value = await base.ReadStringAsync(cancellationToken);
             ResponseMessages.Enqueue(value);
@@ -168,10 +168,9 @@ namespace AdvancedSharpAdbClient.Tests
             return response;
         }
 
-        public override void Reconnect()
+        public override void Reconnect(bool isForce = false)
         {
             base.Reconnect();
-
             DidReconnect = true;
         }
     }

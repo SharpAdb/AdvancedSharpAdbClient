@@ -58,6 +58,17 @@ namespace AdvancedSharpAdbClient.Models
         public string Message { get; init; }
 
         /// <summary>
+        /// Throw <see cref="AdbException"/> if <see cref="IOSuccess"/> or <see cref="Okay"/> is <see langword="false"/>.
+        /// </summary>
+        public void Throw()
+        {
+            if (!IOSuccess || !Okay)
+            {
+                new AdbException($"An error occurred while reading a response from ADB: {Message}", this);
+            }
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="AdbResponse"/> class, based on an
         /// error message returned by adb.
         /// </summary>

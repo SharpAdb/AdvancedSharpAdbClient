@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient
         public bool Connected => Socket.Connected;
 
         /// <inheritdoc/>
-        public virtual void Reconnect() => Socket.Reconnect();
+        public virtual void Reconnect(bool isForce = false) => Socket.Reconnect(isForce);
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
@@ -282,7 +282,6 @@ namespace AdvancedSharpAdbClient
         {
             byte[] data = new byte[4];
             _ = Read(data);
-
             return SyncCommandConverter.GetCommand(data);
         }
 

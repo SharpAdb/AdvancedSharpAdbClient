@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.Models
 
             int index = 0;
 
-            Version = ReadUInt32(ref data);
+            Version = ReadUInt32(in data);
 
             if (Version > 2)
             {
@@ -62,45 +62,45 @@ namespace AdvancedSharpAdbClient.Models
                 throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
             }
 
-            Bpp = ReadUInt32(ref data);
+            Bpp = ReadUInt32(in data);
 
             if (Version >= 2)
             {
-                ColorSpace = ReadUInt32(ref data);
+                ColorSpace = ReadUInt32(in data);
             }
 
-            Size = ReadUInt32(ref data);
-            Width = ReadUInt32(ref data);
-            Height = ReadUInt32(ref data);
+            Size = ReadUInt32(in data);
+            Width = ReadUInt32(in data);
+            Height = ReadUInt32(in data);
 
             Red = new ColorData
             {
-                Offset = ReadUInt32(ref data),
-                Length = ReadUInt32(ref data)
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
             };
 
             Blue = new ColorData
             {
-                Offset = ReadUInt32(ref data),
-                Length = ReadUInt32(ref data)
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
             };
 
             Green = new ColorData
             {
-                Offset = ReadUInt32(ref data),
-                Length = ReadUInt32(ref data)
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
             };
 
             Alpha = new ColorData
             {
-                Offset = ReadUInt32(ref data),
-                Length = ReadUInt32(ref data)
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
             };
 
 #if HAS_BUFFERS
-            uint ReadUInt32(ref ReadOnlySpan<byte> data)
+            uint ReadUInt32(in ReadOnlySpan<byte> data)
 #else
-            uint ReadUInt32(ref byte[] data)
+            uint ReadUInt32(in byte[] data)
 #endif
             {
                 return (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));

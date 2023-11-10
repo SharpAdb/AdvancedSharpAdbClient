@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// List the files in a folder.
         /// </summary>
-        LIST,
+        LIST = 1,
 
         /// <summary>
         /// Retrieve a file from device.

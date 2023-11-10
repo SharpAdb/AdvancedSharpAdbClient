@@ -52,6 +52,15 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
+        /// <param name="device">The device on which to interact with the files.</param>
+        public SyncService(DeviceData device)
+            : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SyncService"/> class.
+        /// </summary>
         /// <param name="client">A connection to an adb server.</param>
         /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(IAdbClient client, DeviceData device)
@@ -110,32 +119,17 @@ namespace AdvancedSharpAdbClient
             _ = Socket.ReadAdbResponse();
         }
 
-        /// <summary>
-        /// Reopen this connection.
-        /// </summary>
-        /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
-        public virtual void Reopen(IAdbSocket socket)
+        /// <inheritdoc/>
+        public virtual void Reopen()
         {
-            if (Socket != null)
-            {
-                Socket.Dispose();
-                Socket = null!;
-            }
-            Socket = socket;
+            Socket.Reconnect(true);
             Open();
         }
-
-        /// <summary>
-        /// Reopen this connection.
-        /// </summary>
-        /// <param name="client">A connection to an adb server.</param>
-        public void Reopen(IAdbClient client) => Reopen(Factories.AdbSocketFactory(client.EndPoint));
 
         /// <inheritdoc/>
         public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
-
             ExceptionExtensions.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
@@ -232,7 +226,6 @@ namespace AdvancedSharpAdbClient
         public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
-
             ExceptionExtensions.ThrowIfNull(stream);
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
@@ -309,9 +302,10 @@ namespace AdvancedSharpAdbClient
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
 
-            if (Socket.ReadSyncResponse() != SyncCommand.STAT)
+            SyncCommand response = Socket.ReadSyncResponse();
+            if (response != SyncCommand.STAT)
             {
-                throw new AdbException($"The server returned an invalid sync response.");
+                throw new AdbException($"The server returned an invalid sync response {response}.");
             }
 
             // read the result, in a byte array containing 3 int
@@ -329,6 +323,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
+            bool isLocked = false;
+
+            start:
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
 
@@ -336,13 +333,26 @@ namespace AdvancedSharpAdbClient
             {
                 SyncCommand response = Socket.ReadSyncResponse();
 
-                if (response == SyncCommand.DONE)
+                if (response == 0)
+                {
+                    if (isLocked)
+                    {
+                        throw new AdbException("The server returned an empty sync response.");
+                    }
+                    else
+                    {
+                        Reopen();
+                        isLocked = true;
+                        goto start;
+                    }
+                }
+                else if (response == SyncCommand.DONE)
                 {
                     break;
                 }
                 else if (response != SyncCommand.DENT)
                 {
-                    throw new AdbException($"The server returned an invalid sync response.");
+                    throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
                 FileStatistics entry = new();
@@ -350,6 +360,7 @@ namespace AdvancedSharpAdbClient
                 entry.Path = Socket.ReadSyncString();
 
                 yield return entry;
+                isLocked = true;
             }
         }
 

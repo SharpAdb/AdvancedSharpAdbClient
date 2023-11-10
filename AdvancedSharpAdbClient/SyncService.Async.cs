@@ -23,36 +23,17 @@ namespace AdvancedSharpAdbClient
             _ = await Socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Reopen this connection.
-        /// </summary>
-        /// <param name="socket">A <see cref="IAdbSocket"/> that enables to connection with the adb server.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual Task ReopenAsync(IAdbSocket socket, CancellationToken cancellationToken = default)
+        /// <inheritdoc/>
+        public virtual async Task ReopenAsync(CancellationToken cancellationToken = default)
         {
-            if (Socket != null)
-            {
-                Socket.Dispose();
-                Socket = null!;
-            }
-            Socket = socket;
-            return OpenAsync(cancellationToken);
+            await Socket.ReconnectAsync(true, cancellationToken).ConfigureAwait(false);
+            await OpenAsync(cancellationToken).ConfigureAwait(false);
         }
-
-        /// <summary>
-        /// Reopen this connection.
-        /// </summary>
-        /// <param name="client">A connection to an adb server.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public Task ReopenAsync(IAdbClient client, CancellationToken cancellationToken = default) => ReopenAsync(Factories.AdbSocketFactory(client.EndPoint), cancellationToken);
 
         /// <inheritdoc/>
         public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
-
             ExceptionExtensions.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
@@ -153,7 +134,6 @@ namespace AdvancedSharpAdbClient
         public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
-
             ExceptionExtensions.ThrowIfNull(stream);
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
@@ -231,9 +211,10 @@ namespace AdvancedSharpAdbClient
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.STAT, remotePath, cancellationToken).ConfigureAwait(false);
 
-            if (await Socket.ReadSyncResponseAsync(cancellationToken).ContinueWith(x => x.Result != SyncCommand.STAT).ConfigureAwait(false))
+            SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+            if (response != SyncCommand.STAT)
             {
-                throw new AdbException($"The server returned an invalid sync response.");
+                throw new AdbException($"The server returned an invalid sync response {response}.");
             }
 
             // read the result, in a byte array containing 3 int
@@ -251,6 +232,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
+            bool isLocked = false;
+
+            start:
             List<FileStatistics> value = [];
 
             // create the stat request message.
@@ -260,13 +244,26 @@ namespace AdvancedSharpAdbClient
             {
                 SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
 
-                if (response == SyncCommand.DONE)
+                if (response == 0)
+                {
+                    if (isLocked)
+                    {
+                        throw new AdbException("The server returned an empty sync response.");
+                    }
+                    else
+                    {
+                        Reopen();
+                        isLocked = true;
+                        goto start;
+                    }
+                }
+                else if (response == SyncCommand.DONE)
                 {
                     break;
                 }
                 else if (response != SyncCommand.DENT)
                 {
-                    throw new AdbException($"The server returned an invalid sync response.");
+                    throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
                 FileStatistics entry = new();
@@ -283,6 +280,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
+            bool isLocked = false;
+
+            start:
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken).ConfigureAwait(false);
 
@@ -290,13 +290,26 @@ namespace AdvancedSharpAdbClient
             {
                 SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
 
-                if (response == SyncCommand.DONE)
+                if (response == 0)
+                {
+                    if (isLocked)
+                    {
+                        throw new AdbException("The server returned an empty sync response.");
+                    }
+                    else
+                    {
+                        Reopen();
+                        isLocked = true;
+                        goto start;
+                    }
+                }
+                else if (response == SyncCommand.DONE)
                 {
                     break;
                 }
                 else if (response != SyncCommand.DENT)
                 {
-                    throw new AdbException($"The server returned an invalid sync response.");
+                    throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
                 FileStatistics entry = new();
@@ -304,6 +317,7 @@ namespace AdvancedSharpAdbClient
                 entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
 
                 yield return entry;
+                isLocked = true;
             }
         }
 #endif

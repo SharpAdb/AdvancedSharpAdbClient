@@ -13,8 +13,8 @@ namespace AdvancedSharpAdbClient
     public partial class DeviceMonitor
     {
         /// <summary>
-        /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
-        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
+        /// When the <see cref="StartAsync(CancellationToken)"/> method is called, this <see cref="ManualResetEvent"/>
+        /// is used to block the <see cref="StartAsync(CancellationToken)"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
         protected readonly ManualResetEvent firstDeviceListParsed = new(false);
@@ -184,7 +184,7 @@ namespace AdvancedSharpAdbClient
                         {
                             // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                             await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
-                            Socket.Reconnect();
+                            Socket.Reconnect(false);
                             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
                         }
                         else

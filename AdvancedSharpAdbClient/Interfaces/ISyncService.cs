@@ -61,6 +61,11 @@ namespace AdvancedSharpAdbClient
         void Open();
 
         /// <summary>
+        /// Reopen this connection. Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        void Reopen();
+
+        /// <summary>
         /// Occurs when there is a change in the status of the sync.
         /// </summary>
         event EventHandler<SyncProgressChangedEventArgs>? SyncProgressChanged;

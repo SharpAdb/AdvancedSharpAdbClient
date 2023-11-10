@@ -55,18 +55,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Reconnect()
+        public virtual void Reconnect(bool isForce = false)
         {
-            if (Socket.Connected)
-            {
-                // Already connected - nothing to do.
-                return;
-            }
-            else
+            if (isForce || !Socket.Connected)
             {
                 Socket.Dispose();
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 Connect(EndPoint!);
+            }
+            else
+            {
+                // Already connected - nothing to do.
+                return;
             }
         }
 

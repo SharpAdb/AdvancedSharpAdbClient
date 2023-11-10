@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void StopServer() => Status = Status with { IsRunning = false };
 
         /// <inheritdoc/>
-        public async Task StopServerAsync(CancellationToken cancellationToken)
+        public async Task StopServerAsync(CancellationToken cancellationToken = default)
         {
             await Task.Yield();
             StopServer();

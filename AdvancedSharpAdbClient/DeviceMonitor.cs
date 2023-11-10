@@ -278,7 +278,7 @@ namespace AdvancedSharpAdbClient
                             {
                                 // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                                 AdbServer.Instance.RestartServer();
-                                Socket.Reconnect();
+                                Socket.Reconnect(false);
                                 InitializeSocket();
                             }
                             else

@@ -66,6 +66,13 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task OpenAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reopen this connection. Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task ReopenAsync(CancellationToken cancellationToken = default);
     }
 }
 #endif

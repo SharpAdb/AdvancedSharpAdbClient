@@ -69,12 +69,10 @@ namespace AdvancedSharpAdbClient
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
-
             RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
             Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
@@ -91,12 +89,7 @@ namespace AdvancedSharpAdbClient
         public virtual void StartServer()
         {
             int status = RunAdbProcessInner("start-server", null, null);
-
-            if (status == 0)
-            {
-                return;
-            }
-
+            if (status == 0) { return; }
 #if HAS_PROCESS && !WINDOWS_UWP
             try
             {
@@ -127,7 +120,6 @@ namespace AdvancedSharpAdbClient
                 // This platform does not support getting a list of processes.
             }
 #endif
-
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
             RunAdbProcess("start-server", null, null);
@@ -191,7 +183,6 @@ namespace AdvancedSharpAdbClient
                     return new Version(majorVersion, minorVersion, microVersion);
                 }
             }
-
             return null;
         }
 
@@ -210,11 +201,7 @@ namespace AdvancedSharpAdbClient
         protected virtual void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
-
-            if (status != 0)
-            {
-                throw new AdbException($"The adb process returned error code {status} when running command {command}");
-            }
+            if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
         }
 
         /// <summary>
@@ -232,10 +219,7 @@ namespace AdvancedSharpAdbClient
         protected virtual int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             ExceptionExtensions.ThrowIfNull(command);
-
-            int status = RunProcess(AdbPath, command, errorOutput, standardOutput);
-
-            return status;
+            return RunProcess(AdbPath, command, errorOutput, standardOutput);
         }
 
         /// <summary>
@@ -263,7 +247,6 @@ namespace AdvancedSharpAdbClient
             string standardOutputString = process.StandardOutput.ReadToEnd();
 
             errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-
             standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
             // get the return code from the process

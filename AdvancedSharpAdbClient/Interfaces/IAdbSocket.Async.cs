@@ -17,17 +17,19 @@ namespace AdvancedSharpAdbClient
         /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
         /// Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-        ValueTask ReconnectAsync(CancellationToken cancellationToken);
+        ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken);
 #else
         /// <summary>
         /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
         /// Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        Task ReconnectAsync(CancellationToken cancellationToken);
+        Task ReconnectAsync(bool isForce, CancellationToken cancellationToken);
 #endif
 
         /// <summary>
