@@ -914,23 +914,27 @@ namespace AdvancedSharpAdbClient
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
-                    if (doc != null)
+                    try
                     {
-                        XmlNode? xmlNode = doc.SelectSingleNode(xpath);
-                        if (xmlNode != null)
+                        XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                        if (doc != null)
                         {
-                            Element? element = Element.FromXmlNode(this, device, xmlNode);
-                            if (element != null)
+                            XmlNode? xmlNode = doc.SelectSingleNode(xpath);
+                            if (xmlNode != null)
                             {
-                                return element;
+                                Element? element = Element.FromXmlNode(this, device, xmlNode);
+                                if (element != null)
+                                {
+                                    return element;
+                                }
                             }
                         }
                     }
-                    if (cancellationToken == default)
+                    catch (XmlException)
                     {
-                        break;
+                        // Ignore XmlException and try again
                     }
+                    if (cancellationToken == default) { break; }
                 }
             }
             catch (Exception e)
@@ -953,25 +957,32 @@ namespace AdvancedSharpAdbClient
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
-                    if (doc != null)
+                    try
                     {
-                        XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
-                        if (xmlNodes != null)
+                        XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                        if (doc != null)
                         {
-                            IEnumerable<Element> FindElements()
+                            XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
+                            if (xmlNodes != null)
                             {
-                                for (int i = 0; i < xmlNodes.Count; i++)
+                                IEnumerable<Element> FindElements()
                                 {
-                                    Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
-                                    if (element != null)
+                                    for (int i = 0; i < xmlNodes.Count; i++)
                                     {
-                                        yield return element;
+                                        Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                        if (element != null)
+                                        {
+                                            yield return element;
+                                        }
                                     }
                                 }
+                                return FindElements();
                             }
-                            return FindElements();
                         }
+                    }
+                    catch (XmlException)
+                    {
+                        // Ignore XmlException and try again
                     }
                     if (cancellationToken == default) { break; }
                 }
@@ -1001,6 +1012,10 @@ namespace AdvancedSharpAdbClient
                 {
                     doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
                 }
+                catch (XmlException)
+                {
+                    // Ignore XmlException and try again
+                }
                 catch (Exception e)
                 {
                     // If a cancellation was requested, this main loop is interrupted with an exception
@@ -1028,10 +1043,8 @@ namespace AdvancedSharpAdbClient
                         break;
                     }
                 }
-                if (cancellationToken == default)
-                {
-                    break;
-                }
+
+                if (cancellationToken == default) { break; }
             }
         }
 #endif

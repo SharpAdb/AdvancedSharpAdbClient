@@ -1059,26 +1059,31 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
             Stopwatch stopwatch = new();
             stopwatch.Start();
-            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
+            do
             {
-                XmlDocument? doc = DumpScreen(device);
-                if (doc != null)
+                try
                 {
-                    XmlNode? xmlNode = doc.SelectSingleNode(xpath);
-                    if (xmlNode != null)
+                    XmlDocument? doc = DumpScreen(device);
+                    if (doc != null)
                     {
-                        Element? element = Element.FromXmlNode(this, device, xmlNode);
-                        if (element != null)
+                        XmlNode? xmlNode = doc.SelectSingleNode(xpath);
+                        if (xmlNode != null)
                         {
-                            return element;
+                            Element? element = Element.FromXmlNode(this, device, xmlNode);
+                            if (element != null)
+                            {
+                                return element;
+                            }
                         }
                     }
                 }
-                if (timeout == TimeSpan.Zero)
+                catch (XmlException)
                 {
-                    break;
+                    // Ignore XmlException and try again
                 }
+                if (timeout == default) { break; }
             }
+            while (stopwatch.Elapsed < timeout);
             return null;
         }
 
@@ -1088,9 +1093,19 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
             Stopwatch stopwatch = new();
             stopwatch.Start();
-            while (timeout == TimeSpan.Zero || stopwatch.Elapsed < timeout)
+            do
             {
-                XmlDocument? doc = DumpScreen(device);
+                XmlDocument? doc = null;
+
+                try
+                {
+                    doc = DumpScreen(device);
+                }
+                catch (XmlException)
+                {
+                    // Ignore XmlException and try again
+                }
+
                 if (doc != null)
                 {
                     XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
@@ -1107,8 +1122,10 @@ namespace AdvancedSharpAdbClient
                         break;
                     }
                 }
-                if (timeout == TimeSpan.Zero) { break; }
+
+                if (timeout == default) { break; }
             }
+            while (stopwatch.Elapsed < timeout);
         }
 
         /// <inheritdoc/>
