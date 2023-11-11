@@ -95,6 +95,52 @@ namespace AdvancedSharpAdbClient.Polyfills
 #endif
 
         /// <summary>
+        /// Concatenates the elements of an object array, using the specified separator between each element.
+        /// </summary>
+        /// <param name="separator">The string to use as a separator. <paramref name="separator"/> is included
+        /// in the returned string only if <paramref name="values"/> has more than one element.</param>
+        /// <param name="values">An array that contains the elements to concatenate.</param>
+        /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
+        /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
+        public static string Join(string? separator, params object?[] values)
+        {
+#if NETFRAMEWORK && !NET40_OR_GREATER
+            ExceptionExtensions.ThrowIfNull(values);
+
+            if (values.Length == 0 || values[0] == null)
+            {
+                return string.Empty;
+            }
+
+            separator ??= string.Empty;
+
+            StringBuilder stringBuilder = new();
+            string? text = values[0]?.ToString();
+            if (text != null)
+            {
+                _ = stringBuilder.Append(text);
+            }
+
+            for (int i = 1; i < values.Length; i++)
+            {
+                _ = stringBuilder.Append(separator);
+                if (values[i] != null)
+                {
+                    text = values[i]?.ToString();
+                    if (text != null)
+                    {
+                        _ = stringBuilder.Append(text);
+                    }
+                }
+            }
+
+            return stringBuilder.ToString();
+#else
+            return string.Join(separator, values);
+#endif
+        }
+
+        /// <summary>
         /// Concatenates the members of a constructed <see cref="IEnumerable{T}"/> collection of type <see cref="string"/>,
         /// using the specified separator between each member.
         /// </summary>
@@ -110,24 +156,24 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             separator ??= string.Empty;
 
-            using IEnumerator<string?> en = values.GetEnumerator();
-            if (!en.MoveNext())
+            using IEnumerator<string?> enumerator = values.GetEnumerator();
+            if (!enumerator.MoveNext())
             {
                 return string.Empty;
             }
 
             StringBuilder result = new();
-            if (en.Current != null)
+            if (enumerator.Current != null)
             {
-                _ = result.Append(en.Current);
+                _ = result.Append(enumerator.Current);
             }
 
-            while (en.MoveNext())
+            while (enumerator.MoveNext())
             {
                 _ = result.Append(separator);
-                if (en.Current != null)
+                if (enumerator.Current != null)
                 {
-                    _ = result.Append(en.Current);
+                    _ = result.Append(enumerator.Current);
                 }
             }
             return result.ToString();

@@ -965,18 +965,18 @@ namespace AdvancedSharpAdbClient
                             XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
                             if (xmlNodes != null)
                             {
-                                IEnumerable<Element> FindElements()
+                                static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, XmlNodeList xmlNodes)
                                 {
                                     for (int i = 0; i < xmlNodes.Count; i++)
                                     {
-                                        Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                                        Element? element = Element.FromXmlNode(client, device, xmlNodes[i]);
                                         if (element != null)
                                         {
                                             yield return element;
                                         }
                                     }
                                 }
-                                return FindElements();
+                                return FindElements(this, device, xmlNodes);
                             }
                         }
                     }

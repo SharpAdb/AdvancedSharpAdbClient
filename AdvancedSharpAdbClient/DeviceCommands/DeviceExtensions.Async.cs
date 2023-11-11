@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static async Task<IEnumerable<FileStatistics>> List(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
+        public static async Task<List<FileStatistics>> ListAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);

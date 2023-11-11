@@ -37,11 +37,8 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         public DateTimeOffset Time { get; set; }
 
-        /// <summary>
-        /// Gets a <see cref="string"/> that represents the current <see cref="FileStatistics"/> object.
-        /// </summary>
-        /// <returns>The <see cref="Path"/> of the current <see cref="FileStatistics"/> object.</returns>
-        public override string ToString() => Path;
+        /// <inheritdoc/>
+        public override string ToString() => StringExtensions.Join("\t", FileType, Time, FileType, Path);
 
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as FileStatistics);

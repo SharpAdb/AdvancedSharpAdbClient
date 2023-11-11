@@ -102,9 +102,7 @@ namespace AdvancedSharpAdbClient.Models
 #else
             uint ReadUInt32(in byte[] data)
 #endif
-            {
-                return (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
-            }
+                => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
 
         /// <summary>
@@ -196,17 +194,14 @@ namespace AdvancedSharpAdbClient.Models
                     _ => throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
                 };
 
-                byte GetByte(uint value)
+                byte GetByte(uint value) => (index % 4) switch
                 {
-                    return (index % 4) switch
-                    {
-                        0 => (byte)value,
-                        1 => (byte)(value >> 8),
-                        2 => (byte)(value >> 16),
-                        3 => (byte)(value >> 24),
-                        _ => throw new InvalidOperationException()
-                    };
-                }
+                    0 => (byte)value,
+                    1 => (byte)(value >> 8),
+                    2 => (byte)(value >> 16),
+                    3 => (byte)(value >> 24),
+                    _ => throw new InvalidOperationException()
+                };
             }
         }
 

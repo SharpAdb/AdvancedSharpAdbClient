@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient.Models
                 }
             }
 
-            IEnumerable<Element> FindElements()
+            static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, XmlNode? xmlNode)
             {
                 XmlNodeList? childNodes = xmlNode?.ChildNodes;
                 if (childNodes != null)
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient.Models
                     }
                 }
             }
-            Children = FindElements();
+            Children = FindElements(client, device, xmlNode);
         }
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
@@ -110,7 +110,7 @@ namespace AdvancedSharpAdbClient.Models
                 }
             }
 
-            IEnumerable<Element> FindElements()
+            static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
             {
                 Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
                 if (childNodes != null)
@@ -125,7 +125,7 @@ namespace AdvancedSharpAdbClient.Models
                     }
                 }
             }
-            Children = FindElements();
+            Children = FindElements(client, device, xmlNode);
         }
 #endif
 

@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             if (!IOSuccess || !Okay)
             {
-                new AdbException($"An error occurred while reading a response from ADB: {Message}", this);
+                throw new AdbException($"An error occurred while reading a response from ADB: {Message}", this);
             }
         }
 

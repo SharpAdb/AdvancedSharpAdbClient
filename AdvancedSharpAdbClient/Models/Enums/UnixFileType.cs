@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Describes the properties of a file on an Android device.
     /// </summary>
     [Flags]
-    public enum UnixFileType : ushort
+    public enum UnixFileType
     {
         /// <summary>
         /// The mask that can be used to retrieve the file type from a <see cref="UnixFileType"/>.

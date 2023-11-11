@@ -1,4 +1,4 @@
-﻿// <copyright file="SyncProgressChangedEventArgs.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+﻿// <copyright file="SyncService.EventArgs.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
-    /// Provides data for the <see cref="SyncService.SyncProgressChanged"/> event.
+    /// Provides data for the <see cref="ISyncService.SyncProgressChanged"/> event.
     /// </summary>
     public class SyncProgressChangedEventArgs(long current, long total) : EventArgs
     {
