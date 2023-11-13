@@ -81,35 +81,24 @@ namespace AdvancedSharpAdbClient.Models
             Timeout = false
         };
 
-        /// <summary>
-        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="AdbResponse"/> object.
-        /// </summary>
-        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="AdbResponse"/> object.</param>
-        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is AdbResponse other && Equals(other);
+        /// <inheritdoc/>
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is AdbResponse other && Equals(other);
 
-        /// <summary>
-        /// Determines whether the specified <see cref="AdbResponse"/> is equal to the current <see cref="AdbResponse"/> object.
-        /// </summary>
-        /// <param name="other">The <see cref="AdbResponse"/> to compare with the current <see cref="AdbResponse"/> object.</param>
-        /// <returns><see langword="true"/> if the specified object is equal to the current object; otherwise, <see langword="false"/>.</returns>
-        public readonly bool Equals(AdbResponse other) =>
+        /// <inheritdoc/>
+        public bool Equals(AdbResponse other) =>
             other.IOSuccess == IOSuccess
             && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
             && other.Okay == Okay
             && other.Timeout == Timeout;
 
-        /// <summary>
-        /// Gets the hash code for the current <see cref="AdbResponse"/>.
-        /// </summary>
-        /// <returns>A hash code for the current <see cref="AdbResponse"/>.</returns>
-        public override readonly int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);
 
         /// <summary>
         /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
         /// </summary>
         /// <returns><c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the response indicates an error.</returns>
-        public override readonly string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
+        public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
 
         /// <summary>
         /// Tests whether two <see cref='AdbResponse'/> objects are equally.

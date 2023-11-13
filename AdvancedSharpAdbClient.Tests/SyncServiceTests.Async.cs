@@ -28,7 +28,6 @@ namespace AdvancedSharpAdbClient.Tests
                     return await service.StatAsync("/fstab.donatello");
                 });
 
-            Assert.NotNull(value);
             Assert.Equal(UnixFileType.Regular, value.FileType & UnixFileType.TypeMask);
             Assert.Equal(597, value.Size);
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);

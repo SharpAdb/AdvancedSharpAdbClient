@@ -10,10 +10,10 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Contains information about a file on the remote device.
     /// </summary>
-    public class FileStatistics : IEquatable<FileStatistics>
+    public struct FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileStatistics"/> class.
+        /// Initializes a new instance of the <see cref="FileStatistics"/> struct.
         /// </summary>
         public FileStatistics() { }
 
@@ -25,33 +25,48 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the <see cref="UnixFileType"/> attributes of the file.
         /// </summary>
-        public UnixFileType FileType { get; set; }
+        public UnixFileType FileType { get; init; }
 
         /// <summary>
         /// Gets or sets the total file size, in bytes.
         /// </summary>
-        public int Size { get; set; }
+        public int Size { get; init; }
 
         /// <summary>
         /// Gets or sets the time of last modification.
         /// </summary>
-        public DateTimeOffset Time { get; set; }
+        public DateTimeOffset Time { get; init; }
 
         /// <inheritdoc/>
-        public override string ToString() => StringExtensions.Join("\t", FileType, Time, FileType, Path);
+        public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is FileStatistics other && Equals(other);
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as FileStatistics);
+        public readonly bool Equals(FileStatistics other) =>
+            Path == other.Path
+            && FileType == other.FileType
+            && Size == other.Size
+            && Time == other.Time;
 
         /// <inheritdoc/>
-        public bool Equals([NotNullWhen(true)] FileStatistics? other) =>
-            other is not null
-                && Path == other.Path
-                && FileType == other.FileType
-                && Size == other.Size
-                && Time == other.Time;
+        public override readonly int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
+        public override readonly string ToString() => StringExtensions.Join("\t", FileType, Time, FileType, Path);
+
+        /// <summary>
+        /// Tests whether two <see cref='FileStatistics'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='FileStatistics'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='FileStatistics'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="FileStatistics"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(FileStatistics left, FileStatistics right) => left.Equals(right);
+
+        /// <summary>
+        /// Tests whether two <see cref='FileStatistics'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='FileStatistics'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='FileStatistics'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="FileStatistics"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(FileStatistics left, FileStatistics right) => !left.Equals(right);
     }
 }

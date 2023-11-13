@@ -310,12 +310,8 @@ namespace AdvancedSharpAdbClient
 
             // read the result, in a byte array containing 3 int
             // (mode, size, time)
-            FileStatistics value = new()
-            {
-                Path = remotePath
-            };
-
-            ReadStatistics(value);
+            FileStatistics value = ReadStatistics();
+            value.Path = remotePath;
 
             return value;
         }
@@ -355,8 +351,7 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
-                FileStatistics entry = new();
-                ReadStatistics(entry);
+                FileStatistics entry = ReadStatistics();
                 entry.Path = Socket.ReadSyncString();
 
                 yield return entry;
@@ -389,17 +384,20 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reads the statistics of a file from the socket.
         /// </summary>
-        /// <param name="value">The <see cref="FileStatistics"/> to store the statistics.</param>
-        protected void ReadStatistics(FileStatistics value)
+        /// <returns>A <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        protected FileStatistics ReadStatistics()
         {
             byte[] statResult = new byte[12];
             _ = Socket.Read(statResult);
 
             int index = 0;
 
-            value.FileType = (UnixFileType)ReadInt32(in statResult);
-            value.Size = ReadInt32(in statResult);
-            value.Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult));
+            return new FileStatistics
+            {
+                FileType = (UnixFileType)ReadInt32(in statResult),
+                Size = ReadInt32(in statResult),
+                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult))
+            };
 
             int ReadInt32(in byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
         }

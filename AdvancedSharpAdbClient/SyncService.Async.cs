@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -219,12 +220,8 @@ namespace AdvancedSharpAdbClient
 
             // read the result, in a byte array containing 3 int
             // (mode, size, time)
-            FileStatistics value = new()
-            {
-                Path = remotePath
-            };
-
-            await ReadStatisticsAsync(value, cancellationToken).ConfigureAwait(false);
+            FileStatistics value = await ReadStatisticsAsync(cancellationToken).ConfigureAwait(false);
+            value.Path = remotePath;
 
             return value;
         }
@@ -266,8 +263,7 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
-                FileStatistics entry = new();
-                await ReadStatisticsAsync(entry, cancellationToken).ConfigureAwait(false);
+                FileStatistics entry = await ReadStatisticsAsync(cancellationToken).ConfigureAwait(false);
                 entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
 
                 value.Add(entry);
@@ -312,8 +308,7 @@ namespace AdvancedSharpAdbClient
                     throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
-                FileStatistics entry = new();
-                await ReadStatisticsAsync(entry, cancellationToken).ConfigureAwait(false);
+                FileStatistics entry = await ReadStatisticsAsync(cancellationToken).ConfigureAwait(false);
                 entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
 
                 yield return entry;
@@ -322,27 +317,26 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-        private async Task ReadStatisticsAsync(FileStatistics value, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Reads the statistics of a file from the socket.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        protected async Task<FileStatistics> ReadStatisticsAsync(CancellationToken cancellationToken = default)
         {
             byte[] statResult = new byte[12];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
 
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(statResult, 0, 4);
-                Array.Reverse(statResult, 4, 4);
-                Array.Reverse(statResult, 8, 4);
-            }
+            int index = 0;
 
-#if HAS_BUFFERS
-            value.FileType = (UnixFileType)BitConverter.ToInt32(statResult);
-            value.Size = BitConverter.ToInt32(statResult.AsSpan(4));
-            value.Time = DateTimeExtensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult.AsSpan(8)));
-#else
-            value.FileType = (UnixFileType)BitConverter.ToInt32(statResult, 0);
-            value.Size = BitConverter.ToInt32(statResult, 4);
-            value.Time = DateTimeExtensions.FromUnixTimeSeconds(BitConverter.ToInt32(statResult, 8));
-#endif
+            return new FileStatistics
+            {
+                FileType = (UnixFileType)ReadInt32(in statResult),
+                Size = ReadInt32(in statResult),
+                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult))
+            };
+
+            int ReadInt32(in byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
         }
     }
 }

@@ -9,15 +9,15 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
     /// <summary>
     /// Represents a process running on an Android device.
     /// </summary>
-    public class AndroidProcess
+    public readonly struct AndroidProcess
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AndroidProcess"/> class.
+        /// Initializes a new instance of the <see cref="AndroidProcess"/> struct.
         /// </summary>
         public AndroidProcess() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AndroidProcess"/> class from it <see cref="string"/> representation.
+        /// Initializes a new instance of the <see cref="AndroidProcess"/> struct from it <see cref="string"/> representation.
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
         /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.

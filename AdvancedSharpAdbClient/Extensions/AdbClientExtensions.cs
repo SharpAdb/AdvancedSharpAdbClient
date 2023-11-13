@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static int CreateForward(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
-            client.CreateForward(device, local?.ToString()!, remote?.ToString()!, allowRebind);
+            client.CreateForward(device, local.ToString(), remote.ToString(), allowRebind);
 
         /// <summary>
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static int CreateReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind) =>
-            client.CreateReverseForward(device, remote?.ToString()!, local?.ToString()!, allowRebind);
+            client.CreateReverseForward(device, remote.ToString(), local.ToString(), allowRebind);
 
         /// <summary>
         /// Remove a reverse port forwarding between a remote and a local port.
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to remove the reverse port forwarding</param>
         /// <param name="remote">Specification of the remote that was forwarded</param>
         public static void RemoveReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote) =>
-            client.RemoveReverseForward(device, remote?.ToString()!);
+            client.RemoveReverseForward(device, remote.ToString());
 
         /// <summary>
         /// Executes a command on the adb server.

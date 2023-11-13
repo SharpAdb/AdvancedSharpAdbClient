@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
-    public class ForwardSpec : IEquatable<ForwardSpec>
+    public readonly struct ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>
         /// Provides a mapping between a <see cref="string"/> and a <see cref="ForwardProtocol"/>
@@ -30,12 +30,12 @@ namespace AdvancedSharpAdbClient.Models
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardSpec"/> class.
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> struct.
         /// </summary>
         public ForwardSpec() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardSpec"/> class from its <see cref="string"/> representation.
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> struct from its <see cref="string"/> representation.
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
         public ForwardSpec(string spec)
@@ -66,7 +66,6 @@ namespace AdvancedSharpAdbClient.Models
                     {
                         throw new ArgumentOutOfRangeException(nameof(spec));
                     }
-
                     ProcessId = intValue;
                     break;
 
@@ -75,7 +74,6 @@ namespace AdvancedSharpAdbClient.Models
                     {
                         throw new ArgumentOutOfRangeException(nameof(spec));
                     }
-
                     Port = intValue;
                     break;
 
@@ -122,9 +120,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            string protocolString = Mappings.FirstOrDefault(v => v.Value == Protocol).Key;
-
-            return Protocol switch
+            ForwardProtocol protocol = Protocol;
+            string protocolString = Mappings.FirstOrDefault(v => v.Value == protocol).Key;
+            return protocol switch
             {
                 ForwardProtocol.JavaDebugWireProtocol => $"{protocolString}:{ProcessId}",
                 ForwardProtocol.Tcp => $"{protocolString}:{Port}",
@@ -140,21 +138,20 @@ namespace AdvancedSharpAdbClient.Models
         public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as ForwardSpec);
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is ForwardSpec other && Equals(other);
 
         /// <inheritdoc/>
-        public bool Equals([NotNullWhen(true)] ForwardSpec? other) =>
-            other != null
-                && other.Protocol == Protocol
-                && Protocol switch
-                {
-                    ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
-                    ForwardProtocol.Tcp => Port == other.Port,
-                    ForwardProtocol.LocalAbstract
-                    or ForwardProtocol.LocalFilesystem
-                    or ForwardProtocol.LocalReserved
-                    or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
-                    _ => false,
-                };
+        public bool Equals(ForwardSpec other) =>
+            other.Protocol == Protocol
+            && Protocol switch
+            {
+                ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
+                ForwardProtocol.Tcp => Port == other.Port,
+                ForwardProtocol.LocalAbstract
+                or ForwardProtocol.LocalFilesystem
+                or ForwardProtocol.LocalReserved
+                or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
+                _ => false,
+            };
     }
 }

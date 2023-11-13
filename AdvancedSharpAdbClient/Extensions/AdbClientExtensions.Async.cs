@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
-            client.CreateForwardAsync(device, local?.ToString()!, remote?.ToString()!, allowRebind, cancellationToken);
+            client.CreateForwardAsync(device, local.ToString(), remote.ToString(), allowRebind, cancellationToken);
 
         /// <summary>
         /// Creates a port forwarding between a local and a remote port.
@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient
         /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static Task<int> CreateReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind, CancellationToken cancellationToken = default) =>
-            client.CreateReverseForwardAsync(device, remote?.ToString()!, local?.ToString()!, allowRebind, cancellationToken);
+            client.CreateReverseForwardAsync(device, remote.ToString(), local.ToString(), allowRebind, cancellationToken);
 
         /// <summary>
         /// Remove a reverse port forwarding between a remote and a local port.
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task RemoveReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, CancellationToken cancellationToken = default) =>
-            client.RemoveReverseForwardAsync(device, remote?.ToString()!, cancellationToken);
+            client.RemoveReverseForwardAsync(device, remote.ToString(), cancellationToken);
 
         /// <summary>
         /// Executes a command on the adb server.

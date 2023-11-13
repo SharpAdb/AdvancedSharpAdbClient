@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the device state.
         /// </summary>
-        public DeviceState State { get; init; }
+        public DeviceState State { get; set; }
 
         /// <summary>
         /// Gets or sets the device model name.
@@ -147,7 +147,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="state">The device state string.</param>
         /// <returns>The device state.</returns>
-        internal static DeviceState GetStateFromString(string state)
+        public static DeviceState GetStateFromString(string state)
         {
             // Default to the unknown state
             DeviceState value;

@@ -293,7 +293,7 @@ namespace AdvancedSharpAdbClient
             string data = socket.ReadString();
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => new ForwardData(x));
+            return parts.Select(x => ForwardData.FromString(x));
         }
 
         /// <inheritdoc/>
@@ -309,7 +309,7 @@ namespace AdvancedSharpAdbClient
             string data = socket.ReadString();
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => new ForwardData(x));
+            return parts.Select(x => ForwardData.FromString(x));
         }
 
         /// <inheritdoc/>
