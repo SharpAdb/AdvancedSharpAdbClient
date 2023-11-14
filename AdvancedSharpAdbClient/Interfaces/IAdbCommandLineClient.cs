@@ -22,9 +22,9 @@ namespace AdvancedSharpAdbClient
         void StartServer();
 
         /// <summary>
-        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
+        /// Determines whether the <c>adb.exe</c> file exists.
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
-        bool IsValidAdbFile(string adbPath);
+        bool CheckFileExists(string adbPath);
     }
 }

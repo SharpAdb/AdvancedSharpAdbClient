@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using NSubstitute;
+﻿using NSubstitute;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -20,12 +19,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.Stat("/test").Returns(stats);
 
-            Factories.SyncServiceFactory = (c, d) => mock;
-
             DeviceData device = new();
-            Assert.Equal(stats, client.Stat(device, "/test"));
 
-            Factories.Reset();
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Factories.Reset();
+                return mock;
+            };
+
+            Assert.Equal(stats, client.Stat(device, "/test"));
         }
 
         [Fact]
@@ -33,7 +35,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands[EnvironmentVariablesReceiver.PrintEnvCommand] = "a=b";
+            adbClient.Commands[$"shell:{EnvironmentVariablesReceiver.PrintEnvCommand}"] = "a=b";
 
             DeviceData device = new();
 
@@ -49,8 +51,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-            adbClient.Commands["pm uninstall com.example"] = "Success";
+            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["shell:pm uninstall com.example"] = "Success";
 
             DeviceData device = new()
             {
@@ -59,8 +61,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.UninstallPackage(device, "com.example");
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("pm uninstall com.example", adbClient.ReceivedCommands[1]);
+            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[1]);
         }
 
         [Theory]
@@ -294,8 +296,8 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
-            adbClient.Commands[$"dumpsys package {packageName}"] = command;
+            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
             DeviceData device = new()
             {
@@ -307,8 +309,8 @@ Compiler stats:
             Assert.Equal(versionName, version.VersionName);
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal($"dumpsys package {packageName}", adbClient.ReceivedCommands[1]);
+            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
+            Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[1]);
         }
 
         [Fact]
@@ -316,7 +318,7 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands[@"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
+            adbClient.Commands[@"shell:SDK=""$(/system/bin/getprop ro.build.version.sdk)""
 if [ $SDK -lt 24 ]
 then
     /system/bin/ls /proc/
@@ -328,11 +330,11 @@ fi".Replace("\r\n", "\n")] =
 3
 acpi
 asound";
-            adbClient.Commands["cat /proc/1/stat /proc/2/stat /proc/3/stat "] =
+            adbClient.Commands["shell:cat /proc/1/stat /proc/2/stat /proc/3/stat"] =
 @"1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 4288071392 4288070744 134658736 0 0 0 65536 18446744071580117077 0 0 17 1 0 0 0 0 0 135152736 135165080 142131200 4288073690 4288073696 4288073696 4288073714 0
 2 (kthreadd) S 0 0 0 0 -1 2129984 0 0 0 0 0 0 0 0 20 0 1 0 2 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579254310 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
-            adbClient.Commands["cat /proc/1/cmdline /proc/1/stat /proc/2/cmdline /proc/2/stat /proc/3/cmdline /proc/3/stat "] =
+            adbClient.Commands["shell:cat /proc/1/cmdline /proc/1/stat /proc/2/cmdline /proc/2/stat /proc/3/cmdline /proc/3/stat"] =
 @"
 1 (init) S 0 0 0 0 -1 1077944576 2680 83280 0 179 0 67 16 39 20 0 1 0 2 17735680 143 18446744073709551615 134512640 135145076 4288071392 4288070744 134658736 0 0 0 65536 18446744071580117077 0 0 17 1 0 0 0 0 0 135152736 135165080 142131200 4288073690 4288073696 4288073696 4288073714 0
 

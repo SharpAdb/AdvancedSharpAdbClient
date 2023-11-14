@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// The exception that is thrown when the permission to a resource was denied.
     /// </summary>
+    [Serializable]
     public class PermissionDeniedException : Exception
     {
         /// <summary>
@@ -22,7 +23,16 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public PermissionDeniedException(string message) : base(message)
+        public PermissionDeniedException(string? message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public PermissionDeniedException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
 
@@ -39,14 +49,5 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 #endif
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PermissionDeniedException"/> class.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public PermissionDeniedException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }

@@ -2,7 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Gives information about a <see cref="AdbServer.StartServer(string, bool)"/> operation.
@@ -23,6 +23,11 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The adb server was not running, and a new instance of the adb server was started.
         /// </summary>
-        Started
+        Started,
+
+        /// <summary>
+        /// An <see cref="IAdbServer.StartServer(string, bool)"/> operation is already in progress.
+        /// </summary>
+        Starting
     }
 }

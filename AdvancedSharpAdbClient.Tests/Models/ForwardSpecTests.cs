@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="ForwardSpec"/> class.
@@ -13,7 +13,6 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ForwardSpec value = ForwardSpec.Parse("tcp:1234");
 
-            Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.Tcp, value.Protocol);
             Assert.Equal(1234, value.Port);
             Assert.Equal(0, value.ProcessId);
@@ -27,7 +26,6 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ForwardSpec value = ForwardSpec.Parse("localabstract:/tmp/1234");
 
-            Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.LocalAbstract, value.Protocol);
             Assert.Equal(0, value.Port);
             Assert.Equal(0, value.ProcessId);
@@ -41,7 +39,6 @@ namespace AdvancedSharpAdbClient.Tests
         {
             ForwardSpec value = ForwardSpec.Parse("jdwp:1234");
 
-            Assert.NotNull(value);
             Assert.Equal(ForwardProtocol.JavaDebugWireProtocol, value.Protocol);
             Assert.Equal(0, value.Port);
             Assert.Equal(1234, value.ProcessId);

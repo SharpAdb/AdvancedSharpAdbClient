@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.Models.DeviceCommands.Tests
 {
     /// <summary>
     /// Tests the <see cref="VersionInfo"/> class.
@@ -26,8 +26,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void ToStringTest()
         {
-            VersionInfo v = new(1234, "1.2.3.4");
-            Assert.Equal("1.2.3.4 (1234)", v.ToString());
+            VersionInfo version = new(1234, "1.2.3.4");
+            Assert.Equal("1.2.3.4 (1234)", version.ToString());
         }
     }
 }

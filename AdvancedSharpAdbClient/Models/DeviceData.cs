@@ -3,19 +3,20 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
-    public partial class DeviceData
+    public partial class DeviceData : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
-        internal const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
+        private const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
 
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -23,9 +24,40 @@ namespace AdvancedSharpAdbClient
         private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceData"/> class.
+        /// </summary>
+        public DeviceData() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceData"/> class based on
+        /// data retrieved from the Android Debug Bridge.
+        /// </summary>
+        /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
+        public DeviceData(string data)
+        {
+            Match match = Regex.Match(data);
+            if (match.Success)
+            {
+                Serial = match.Groups["serial"].Value;
+                State = GetStateFromString(match.Groups["state"].Value);
+                Model = match.Groups["model"].Value;
+                Product = match.Groups["product"].Value;
+                Name = match.Groups["device"].Value;
+                Features = match.Groups["features"].Value;
+                Usb = match.Groups["usb"].Value;
+                TransportId = match.Groups["transport_id"].Value;
+                Message = match.Groups["message"].Value;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid device list data '{data}'");
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the device serial number.
         /// </summary>
-        public string Serial { get; set; }
+        public string Serial { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device state.
@@ -35,37 +67,37 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the device model name.
         /// </summary>
-        public string Model { get; set; }
+        public string Model { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device product name.
         /// </summary>
-        public string Product { get; set; }
+        public string Product { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the features available on the device.
         /// </summary>
-        public string Features { get; set; }
+        public string Features { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
         /// </summary>
-        public string Usb { get; set; }
+        public string Usb { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the transport ID for this device.
         /// </summary>
-        public string TransportId { get; set; }
+        public string TransportId { get; init; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the device info message. Currently only seen for NoPermissions state.
         /// </summary>
-        public string Message { get; set; }
+        public string Message { get; init; } = string.Empty;
 
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
@@ -73,23 +105,38 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
         /// <returns>A <see cref="DeviceData"/> object that represents the device.</returns>
-        public static DeviceData CreateFromAdbData(string data)
+        public static DeviceData CreateFromAdbData(string data) => new(data);
+
+        /// <inheritdoc/>
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as DeviceData);
+
+        /// <inheritdoc/>
+        public bool Equals([NotNullWhen(true)] DeviceData? other) =>
+            other is not null
+                && Serial == other.Serial
+                && State == other.State
+                && Model == other.Model
+                && Product == other.Product
+                && Name == other.Name
+                && Features == other.Features
+                && Usb == other.Usb
+                && TransportId == other.TransportId
+                && Message == other.Message;
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
         {
-            Match m = Regex.Match(data);
-            return m.Success
-                ? new DeviceData()
-                {
-                    Serial = m.Groups["serial"].Value,
-                    State = GetStateFromString(m.Groups["state"].Value),
-                    Model = m.Groups["model"].Value,
-                    Product = m.Groups["product"].Value,
-                    Name = m.Groups["device"].Value,
-                    Features = m.Groups["features"].Value,
-                    Usb = m.Groups["usb"].Value,
-                    TransportId = m.Groups["transport_id"].Value,
-                    Message = m.Groups["message"].Value
-                }
-                : throw new ArgumentException($"Invalid device list data '{data}'");
+            HashCode hash = new();
+            hash.Add(Serial);
+            hash.Add(State);
+            hash.Add(Model);
+            hash.Add(Product);
+            hash.Add(Name);
+            hash.Add(Features);
+            hash.Add(Usb);
+            hash.Add(TransportId);
+            hash.Add(Message);
+            return hash.ToHashCode();
         }
 
         /// <inheritdoc/>
@@ -100,7 +147,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="state">The device state string.</param>
         /// <returns>The device state.</returns>
-        internal static DeviceState GetStateFromString(string state)
+        public static DeviceState GetStateFromString(string state)
         {
             // Default to the unknown state
             DeviceState value;
@@ -118,7 +165,7 @@ namespace AdvancedSharpAdbClient
             else
             {
                 // Else, we try to match a value of the DeviceState enumeration.
-                if (!Utilities.TryParse(state, true, out value))
+                if (!EnumExtensions.TryParse(state, true, out value))
                 {
                     value = DeviceState.Unknown;
                 }

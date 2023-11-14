@@ -6,7 +6,7 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcore50'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore5.0'">
     <PackageReference Include="Microsoft.NETCore" Version="5.0.2" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.2" PrivateAssets="all" IsImplicitlyDefined="true" />
   </ItemGroup>

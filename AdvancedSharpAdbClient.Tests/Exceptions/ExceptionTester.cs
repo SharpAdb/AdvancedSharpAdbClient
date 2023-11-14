@@ -30,6 +30,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             Assert.Equal(inner, ex.InnerException);
         }
 
+        [Obsolete]
         public static void SerializationConstructorTest(Func<SerializationInfo, StreamingContext, T> constructor)
         {
             SerializationInfo info = new(typeof(T), new FormatterConverter());

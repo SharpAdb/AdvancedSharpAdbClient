@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Logs
@@ -11,5 +12,6 @@ namespace AdvancedSharpAdbClient.Logs
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
-    internal class NamespaceDoc { }
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc { }
 }

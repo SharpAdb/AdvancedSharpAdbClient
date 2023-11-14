@@ -2,72 +2,34 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Xml;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Implement of screen element, likes Selenium.
     /// </summary>
-    public class Element
+    public class Element : IEquatable<Element>
     {
-        /// <summary>
-        /// Gets or sets the current ADB client that manages the connection.
-        /// </summary>
-        protected IAdbClient Client { get; set; }
-
-        /// <summary>
-        /// Gets the current device containing the element.
-        /// </summary>
-        protected DeviceData Device { get; }
-
-        /// <summary>
-        /// Gets the coordinates and size of the element.
-        /// </summary>
-        public Area Area { get; }
-
-        /// <summary>
-        /// Gets or sets the coordinates of the element to click. Default is the center of area.
-        /// </summary>
-        public Cords Cords { get; set; }
-
-        /// <summary>
-        /// Gets the children of this element.
-        /// </summary>
-        public List<Element> Children { get; }
-
-        /// <summary>
-        /// Gets the element attributes.
-        /// </summary>
-        public Dictionary<string, string> Attributes { get; }
-
-        /// <summary>
-        /// Gets the <see cref="XmlNode"/> of this element.
-        /// </summary>
-        public XmlNode Node { get; }
-
-        /// <summary>
-        /// Gets or sets the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to get or set.</param>
-        /// <returns>The element at the specified index.</returns>
-        public Element this[int index] => Children[index];
+        private static readonly char[] separator = ['[', ']', ',', ' '];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Element"/> class.
         /// </summary>
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
-        /// <param name="cords">The coordinates of the element to click.</param>
+        /// <param name="rectangle">The coordinates and size of the element.</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Cords cords, Dictionary<string, string> attributes)
+        public Element(IAdbClient client, DeviceData device, Rectangle rectangle, Dictionary<string, string?>? attributes = null)
         {
             Client = client;
             Device = device;
-            Cords = cords;
+            Bounds = rectangle;
             Attributes = attributes;
         }
 
@@ -76,35 +38,44 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Area area, Dictionary<string, string> attributes)
+        /// <param name="xmlNode">The <see cref="XmlNode"/> of the element.</param>
+        public Element(IAdbClient client, DeviceData device, XmlNode? xmlNode)
         {
             Client = client;
             Device = device;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
-        }
+            Node = xmlNode;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Element"/> class.
-        /// </summary>
-        /// <param name="client">The current ADB client that manages the connection.</param>
-        /// <param name="device">The current device containing the element.</param>
-        /// <param name="node">The <see cref="XmlNode"/> of the element.</param>
-        /// <param name="children">The children of the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, XmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
-        {
-            Client = client;
-            Device = device;
-            Node = node;
-            Children = children;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
+            if (xmlNode?.Attributes != null)
+            {
+                if (xmlNode.Attributes["bounds"]?.Value is string bounds)
+                {
+                    string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
+                    Bounds = Rectangle.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                }
+
+                Attributes = new(xmlNode.Attributes.Count);
+                foreach (XmlAttribute at in xmlNode.Attributes.OfType<XmlAttribute>())
+                {
+                    Attributes[at.Name] = at.Value;
+                }
+            }
+
+            static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, XmlNode? xmlNode)
+            {
+                XmlNodeList? childNodes = xmlNode?.ChildNodes;
+                if (childNodes != null)
+                {
+                    for (int i = 0; i < childNodes!.Count; i++)
+                    {
+                        Element? element = FromXmlNode(client, device, childNodes?[i]);
+                        if (element != null)
+                        {
+                            yield return element;
+                        }
+                    }
+                }
+            }
+            Children = FindElements(client, device, xmlNode);
         }
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
@@ -113,24 +84,113 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
-        /// <param name="node">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
-        /// <param name="children">The children of the element.</param>
-        /// <param name="area">The coordinates and size of the element.</param>
-        /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode node, List<Element> children, Area area, Dictionary<string, string> attributes)
+        /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
+        public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
         {
-            XmlDocument doc = new();
-            doc.LoadXml(node.GetXml());
-
             Client = client;
             Device = device;
+
+            ExceptionExtensions.ThrowIfNull(xmlNode);
+            XmlDocument doc = new();
+            doc.LoadXml(xmlNode.GetXml());
             Node = doc.FirstChild;
-            Children = children;
-            Area = area;
-            Attributes = attributes;
-            Cords = area.Center; // Average x1, y1, x2, y2
+
+            if (xmlNode.Attributes != null)
+            {
+                if (xmlNode.Attributes.GetNamedItem("bounds")?.NodeValue?.ToString() is string bounds)
+                {
+                    string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
+                    Bounds = Rectangle.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                }
+
+                Attributes = new(xmlNode.Attributes.Count);
+                foreach (Windows.Data.Xml.Dom.IXmlNode at in xmlNode.Attributes)
+                {
+                    Attributes[at.NodeName] = at.NodeValue.ToString();
+                }
+            }
+
+            static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
+            {
+                Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
+                if (childNodes != null)
+                {
+                    foreach (Windows.Data.Xml.Dom.IXmlNode childNode in childNodes)
+                    {
+                        Element? element = FromIXmlNode(client, device, childNode);
+                        if (element != null)
+                        {
+                            yield return element;
+                        }
+                    }
+                }
+            }
+            Children = FindElements(client, device, xmlNode);
         }
 #endif
+
+        /// <summary>
+        /// Gets or sets the current ADB client that manages the connection.
+        /// </summary>
+        public IAdbClient Client { get; init; }
+
+        /// <summary>
+        /// Gets the current device containing the element.
+        /// </summary>
+        public DeviceData Device { get; init; }
+
+        /// <summary>
+        /// Gets the coordinates and size of the element.
+        /// </summary>
+        public Rectangle Bounds { get; init; }
+
+        /// <summary>
+        /// Gets the children of this element.
+        /// </summary>
+        public IEnumerable<Element>? Children { get; init; }
+
+        /// <summary>
+        /// Gets the element attributes.
+        /// </summary>
+        public Dictionary<string, string?>? Attributes { get; init; }
+
+        /// <summary>
+        /// Gets the <see cref="XmlNode"/> of this element.
+        /// </summary>
+        public XmlNode? Node { get; init; }
+
+        /// <summary>
+        /// Gets the coordinates of the the center of the element.
+        /// </summary>
+        public Point Center => unchecked(new(Bounds.X + (Bounds.Width / 2), Bounds.Y + (Bounds.Height / 2)));
+
+        /// <summary>
+        /// Gets the text of the element.
+        /// </summary>
+        public string? Text => Attributes?.TryGetValue("text", out string? text) == true ? text : string.Empty;
+
+        /// <summary>
+        /// Gets the class name of the element.
+        /// </summary>
+        public string? Class => Attributes?.TryGetValue("class", out string? @class) == true ? @class : string.Empty;
+
+        /// <summary>
+        /// Gets the package name of the element.
+        /// </summary>
+        public string? Package => Attributes?.TryGetValue("package", out string? package) == true ? package : string.Empty;
+
+        /// <summary>
+        /// Gets the resource ID of the element.
+        /// </summary>
+        public string? ResourceID => Attributes?.TryGetValue("resource-id", out string? resource_id) == true ? resource_id : string.Empty;
+
+        /// <summary>
+        /// Gets the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to get or set.</param>
+        /// <returns>The element at the specified index.</returns>
+        /// <remarks>The index method is index by <see cref="Enumerable.ElementAt{TSource}(IEnumerable{TSource}, int)"/>.</remarks>
+        public Element? this[int index] => Children?.ElementAt(index);
 
         /// <summary>
         /// Creates a new <see cref='Element'/> with the specified <see cref="XmlNode"/>.
@@ -139,35 +199,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The current device containing the element.</param>
         /// <param name="xmlNode">The <see cref="XmlNode"/> of the element.</param>
         /// <returns>The new <see cref="Element"/> that this method creates.</returns>
-        public static Element FromXmlNode(IAdbClient client, DeviceData device, XmlNode xmlNode)
-        {
-            string bounds = xmlNode.Attributes["bounds"].Value;
-            if (bounds != null)
-            {
-                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                Dictionary<string, string> attributes = new(xmlNode.Attributes.Count);
-                foreach (XmlAttribute at in xmlNode.Attributes)
-                {
-                    attributes[at.Name] = at.Value;
-                }
-                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                XmlNodeList childNodes = xmlNode.ChildNodes;
-                List<Element> elements = new(childNodes?.Count ?? 0);
-                if (childNodes != null)
-                {
-                    for (int i = 0; i < childNodes.Count; i++)
-                    {
-                        Element element = FromXmlNode(client, device, childNodes[i]);
-                        if (element != null)
-                        {
-                            elements.Add(element);
-                        }
-                    }
-                }
-                return new Element(client, device, xmlNode, elements, area, attributes);
-            }
-            return null;
-        }
+        public static Element? FromXmlNode(IAdbClient client, DeviceData device, XmlNode? xmlNode) =>
+            xmlNode?.Attributes?["bounds"] != null ? new Element(client, device, xmlNode) : null;
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
@@ -177,60 +210,19 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The current device containing the element.</param>
         /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
         /// <returns>The new <see cref="Element"/> that this method creates.</returns>
-        public static Element FromIXmlNode(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
-        {
-            string bounds = xmlNode.Attributes?.GetNamedItem("bounds")?.NodeValue?.ToString();
-            if (bounds != null)
-            {
-                int[] cords = bounds.Replace("][", ",").Replace("[", "").Replace("]", "").Split(',').Select(int.Parse).ToArray(); // x1, y1, x2, y2
-                Dictionary<string, string> attributes = new(xmlNode.Attributes.Count);
-                foreach (Windows.Data.Xml.Dom.IXmlNode at in xmlNode.Attributes)
-                {
-                    attributes[at.NodeName] = at.NodeValue.ToString();
-                }
-                Area area = Area.FromLTRB(cords[0], cords[1], cords[2], cords[3]);
-                Windows.Data.Xml.Dom.XmlNodeList childNodes = xmlNode.ChildNodes;
-                List<Element> elements = new(childNodes?.Count ?? 0);
-                if (childNodes != null)
-                {
-                    foreach (Windows.Data.Xml.Dom.IXmlNode childNode in childNodes)
-                    {
-                        Element element = FromIXmlNode(client, device, childNode);
-                        if (element != null)
-                        {
-                            elements.Add(element);
-                        }
-                    }
-                }
-                return new Element(client, device, xmlNode, elements, area, attributes);
-            }
-            return null;
-        }
+        public static Element? FromIXmlNode(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode) =>
+            xmlNode.Attributes?.GetNamedItem("bounds") != null ? new Element(client, device, xmlNode) : null;
 #endif
 
         /// <summary>
         /// Gets the count of <see cref="Children"/> in this element.
         /// </summary>
-        public virtual int GetChildCount()
-        {
-            int count = Children.Count;
-            Children.ForEach(x => count += x.GetChildCount());
-            return count;
-        }
+        public virtual int GetChildCount() => Children == null ? 0 : Children.Count() + Children.Select(x => x.GetChildCount()).Sum();
 
         /// <summary>
         /// Clicks on this coordinates.
         /// </summary>
-        public void Click() => Client.Click(Device, Cords);
-
-#if HAS_TASK
-        /// <summary>
-        /// Clicks on this coordinates.
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        public async Task ClickAsync(CancellationToken cancellationToken = default) =>
-            await Client.ClickAsync(Device, Cords, cancellationToken);
-#endif
+        public void Click() => Client.Click(Device, Center);
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
@@ -242,7 +234,30 @@ namespace AdvancedSharpAdbClient
             Client.SendText(Device, text);
         }
 
+        /// <summary>
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// </summary>
+        [MemberNotNull(nameof(Text))]
+        public void ClearInput() => ClearInput(Text!.Length);
+
+        /// <summary>
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// </summary>
+        /// <param name="charCount">The length of text to clear.</param>
+        public void ClearInput(int charCount)
+        {
+            Click(); // focuses
+            Client.ClearInput(Device, charCount);
+        }
+
 #if HAS_TASK
+        /// <summary>
+        /// Clicks on this coordinates.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        public Task ClickAsync(CancellationToken cancellationToken = default) =>
+            Client.ClickAsync(Device, Center, cancellationToken);
+
         /// <summary>
         /// Send text to device. Doesn't support Russian.
         /// </summary>
@@ -251,47 +266,113 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
         {
-            await ClickAsync(cancellationToken);
-            await Client.SendTextAsync(Device, text, cancellationToken);
+            await ClickAsync(cancellationToken).ConfigureAwait(false);
+            await Client.SendTextAsync(Device, text, cancellationToken).ConfigureAwait(false);
         }
-#endif
 
         /// <summary>
-        /// Clear the input text. Use <see cref="IAdbClient.ClearInput(DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
-        /// <param name="charCount">The length of text to clear.</param>
-        public void ClearInput(int charCount = 0)
-        {
-            Click(); // focuses
-            if (charCount == 0)
-            {
-                Client.ClearInput(Device, Attributes["text"].Length);
-            }
-            else
-            {
-                Client.ClearInput(Device, charCount);
-            }
-        }
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MemberNotNull(nameof(Text))]
+        public Task ClearInputAsync(CancellationToken cancellationToken = default) =>
+            ClearInputAsync(Text!.Length, cancellationToken);
 
-#if HAS_TASK
         /// <summary>
-        /// Clear the input text. Use <see cref="IAdbClient.ClearInputAsync(DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task ClearInputAsync(int charCount = 0, CancellationToken cancellationToken = default)
+        public async Task ClearInputAsync(int charCount, CancellationToken cancellationToken = default)
         {
-            await ClickAsync(cancellationToken); // focuses
-            if (charCount == 0)
-            {
-                await Client.ClearInputAsync(Device, Attributes["text"].Length, cancellationToken);
-            }
-            else
-            {
-                await Client.ClearInputAsync(Device, charCount, cancellationToken);
-            }
+            await ClickAsync(cancellationToken).ConfigureAwait(false); // focuses
+            await Client.ClearInputAsync(Device, charCount, cancellationToken).ConfigureAwait(false);
         }
 #endif
+
+        /// <summary>
+        /// Find the first descendant element matching a given predicate, using a depth-first search.
+        /// </summary>
+        /// <param name="predicate">The predicate to use to match the descendant nodes.</param>
+        /// <returns>The descendant that was found, or <see langword="null"/>.</returns>
+        public Element? FindDescendant(Func<Element, bool> predicate)
+        {
+            if (Children == null) { return null; }
+
+            foreach (Element child in Children)
+            {
+                if (predicate(child))
+                {
+                    return child;
+                }
+
+                Element? descendant = child.FindDescendant(predicate);
+
+                if (descendant != null)
+                {
+                    return descendant;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Find the first descendant (or self) element matching a given predicate, using a depth-first search.
+        /// </summary>
+        /// <param name="predicate">The predicate to use to match the descendant nodes.</param>
+        /// <returns>The descendant (or self) that was found, or <see langword="null"/>.</returns>
+        public Element? FindDescendantOrSelf(Func<Element, bool> predicate) =>
+            predicate(this) ? this : FindDescendant(predicate);
+
+        /// <summary>
+        /// Find all descendant elements of the specified element. This method can be chained with
+        /// LINQ calls to add additional filters or projections on top of the returned results.
+        /// <para>
+        /// This method is meant to provide extra flexibility in specific scenarios and it should not
+        /// be used when only the first item is being looked for. In those cases, use one of the
+        /// available <see cref="FindDescendant(Func{Element, bool})"/> overloads instead, which will
+        /// offer a more compact syntax as well as better performance in those cases.
+        /// </para>
+        /// </summary>
+        /// <returns>All the descendant <see cref="Element"/> instance from <see cref="Children"/>.</returns>
+        public IEnumerable<Element> FindDescendants()
+        {
+            if (Children == null) { yield break; }
+            foreach (Element child in Children)
+            {
+                yield return child;
+
+                foreach (Element childOfChild in child.FindDescendants())
+                {
+                    yield return childOfChild;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as Element);
+
+        /// <inheritdoc/>
+        public bool Equals([NotNullWhen(true)] Element? other) =>
+            other is not null
+                && Client == other.Client
+                && Device == other.Device
+                && (Node == null
+                    ? Bounds == other.Bounds
+                        && Attributes == other.Attributes
+                    : Node == other.Node);
+
+        /// <inheritdoc/>
+        public override int GetHashCode() =>
+            Node == null
+                ? HashCode.Combine(Client, Device, Bounds, Attributes)
+                : HashCode.Combine(Client, Device, Node);
+
+        /// <inheritdoc/>
+        public override string? ToString() =>
+            string.IsNullOrEmpty(Text) ? string.IsNullOrEmpty(Class) ? base.ToString() : Class : Text;
     }
 }

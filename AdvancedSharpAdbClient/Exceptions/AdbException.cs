@@ -10,6 +10,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with communicating with ADB.
     /// </summary>
+    [Serializable]
     public class AdbException : Exception
     {
         /// <summary>
@@ -23,7 +24,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="AdbException"/> class with the specified error message.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
-        public AdbException(string message) : base(message)
+        public AdbException(string? message) : base(message)
         {
         }
 
@@ -32,17 +33,26 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="message">The message that describes the error on the client side.</param>
         /// <param name="adbError">The raw error message that was sent by adb.</param>
-        public AdbException(string message, string adbError) : base(message) => AdbError = adbError;
+        public AdbException(string? message, string? adbError) : base(message) => AdbError = adbError;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbException"/> class with the specified client error message and <see cref="AdbResponse"/>
         /// </summary>
         /// <param name="message">The message that describes the error on the client side.</param>
         /// <param name="response">The <see cref="AdbResponse"/> that was sent by adb.</param>
-        public AdbException(string message, AdbResponse response) : base(message)
+        public AdbException(string? message, AdbResponse response) : base(message)
         {
             AdbError = response.Message;
             Response = response;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public AdbException(string? message, Exception? innerException) : base(message, innerException)
+        {
         }
 
 #if HAS_SERIALIZATION
@@ -60,23 +70,14 @@ namespace AdvancedSharpAdbClient.Exceptions
 #endif
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdbException"/> class.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public AdbException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        /// <summary>
         /// Gets the error message that was sent by adb.
         /// </summary>
-        public string AdbError { get; private set; }
+        public string? AdbError { get; init; }
 
         /// <summary>
         /// Gets the response that was sent by adb.
         /// </summary>
-        public AdbResponse Response { get; private set; }
+        public AdbResponse Response { get; init; }
 
         /// <summary>
         /// Gets a value indicating whether the underlying error was a <see cref="SocketException"/> where the
@@ -84,6 +85,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// that the connection was reset by the remote server. This happens when the adb server was killed.
         /// </summary>
         public bool ConnectionReset =>
-            InnerException is SocketException socketException && socketException.SocketErrorCode == SocketError.ConnectionReset;
+            InnerException is SocketException socketException
+            && socketException.SocketErrorCode == SocketError.ConnectionReset;
     }
 }

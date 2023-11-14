@@ -18,282 +18,270 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
-        //[Fact]
-        //public void ConstructorTest()
-        //{
-        //    using DeviceMonitor monitor = new(Socket);
-        //    Assert.NotNull(monitor.Devices);
-        //    Assert.Empty(monitor.Devices);
-        //    Assert.Equal(Socket, monitor.Socket);
-        //    Assert.False(monitor.IsRunning);
-        //}
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor(IAdbSocket, ILogger{DeviceMonitor})"/> method.
+        /// </summary>
+        [Fact]
+        public void ConstructorTest()
+        {
+            using DeviceMonitor monitor = new(Socket);
+            Assert.NotNull(monitor.Devices);
+            Assert.Empty(monitor.Devices);
+            Assert.Equal(Socket, monitor.Socket);
+            Assert.False(monitor.IsRunning);
+        }
 
-        //[Fact]
-        //public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor(null));
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor(IAdbSocket, ILogger{DeviceMonitor})"/> method.
+        /// </summary>
+        [Fact]
+        public void ConstructorNullTest() => _ = Assert.Throws<ArgumentNullException>(() => new DeviceMonitor((IAdbSocket)null));
 
-        //[Fact]
-        //public void DeviceDisconnectedTest()
-        //{
-        //    Socket.WaitForNewData = true;
+        [Fact]
+        public void DeviceDisconnectedTest()
+        {
+            Socket.WaitForNewData = true;
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    DeviceMonitorSink sink = new(monitor);
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
 
-        //    Assert.Empty(monitor.Devices);
+            Assert.Empty(monitor.Devices);
 
-        //    // Start the monitor, detect the initial device.
-        //    RunTest(
-        //        OkResponse,
-        //        ResponseMessages("169.254.109.177:5555\tdevice\n"),
-        //        Requests("host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+            // Start the monitor, detect the initial device.
+            RunTest(
+                OkResponse,
+                ["169.254.109.177:5555\tdevice\n"],
+                ["host:track-devices"],
+                monitor.Start);
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
+            Assert.Single(monitor.Devices);
+            Assert.Single(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
 
-        //    Socket.ResponseMessages.Clear();
-        //    Socket.Responses.Clear();
-        //    Socket.Requests.Clear();
+            sink.ResetSignals();
 
-        //    // Device disconnects
-        //    ManualResetEvent eventWaiter = sink.CreateEventSignal();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-        //    RunTest(
-        //        NoResponses,
-        //        ResponseMessages(""),
-        //        Requests(),
-        //        () =>
-        //        {
-        //            eventWaiter.WaitOne(1000);
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-        //            Assert.Empty(monitor.Devices);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Single(sink.DisconnectedEvents);
-        //            Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
-        //        });
-        //}
+            _ = RunTest(
+                NoResponses,
+                [string.Empty],
+                NoRequests,
+                () => eventWaiter.WaitOne(1000));
 
-        //[Fact]
-        //public void DeviceConnectedTest()
-        //{
-        //    Socket.WaitForNewData = true;
+            Assert.Empty(monitor.Devices);
+            Assert.Empty(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Single(sink.DisconnectedEvents);
+            Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
+        }
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    DeviceMonitorSink sink = new(monitor);
+        [Fact]
+        public void DeviceConnectedTest()
+        {
+            Socket.WaitForNewData = true;
 
-        //    Assert.Empty(monitor.Devices);
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
 
-        //    // Start the monitor, detect the initial device.
-        //    RunTest(
-        //        OkResponse,
-        //        ResponseMessages(""),
-        //        Requests("host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+            Assert.Empty(monitor.Devices);
 
-        //            Assert.Empty(monitor.Devices);
-        //            Assert.Empty(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Empty(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
+            // Start the monitor, detect the initial device.
+            RunTest(
+                OkResponse,
+                [string.Empty],
+                ["host:track-devices"],
+                monitor.Start);
 
-        //    Socket.ResponseMessages.Clear();
-        //    Socket.Responses.Clear();
-        //    Socket.Requests.Clear();
+            Assert.Empty(monitor.Devices);
+            Assert.Empty(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Empty(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
 
-        //    // Device disconnects
-        //    ManualResetEvent eventWaiter = sink.CreateEventSignal();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-        //    RunTest(
-        //        NoResponses,
-        //        ResponseMessages("169.254.109.177:5555\tdevice\n"),
-        //        Requests(),
-        //        () =>
-        //        {
-        //            eventWaiter.WaitOne(1000);
+            sink.ResetSignals();
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //            Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-        //        });
-        //}
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-        //[Fact]
-        //public void StartInitialDeviceListTest()
-        //{
-        //    Socket.WaitForNewData = true;
+            _ = RunTest(
+                NoResponses,
+                ["169.254.109.177:5555\tdevice\n"],
+                NoRequests,
+                () => eventWaiter.WaitOne(1000));
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    DeviceMonitorSink sink = new(monitor);
+            Assert.Single(monitor.Devices);
+            Assert.Single(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
+            Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+        }
 
-        //    Assert.Empty(monitor.Devices);
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor.Start"/> method.
+        /// </summary>
+        [Fact]
+        public void StartInitialDeviceListTest()
+        {
+            Socket.WaitForNewData = true;
 
-        //    RunTest(
-        //        OkResponse,
-        //        ResponseMessages("169.254.109.177:5555\tdevice\n"),
-        //        Requests("host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Equal("169.254.109.177:5555", monitor.Devices.ElementAt(0).Serial);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
-        //}
+            Assert.Empty(monitor.Devices);
 
-        //[Fact]
-        //public void DeviceChanged_TriggeredWhenStatusChangedTest()
-        //{
-        //    Socket.WaitForNewData = true;
+            RunTest(
+                OkResponse,
+                ["169.254.109.177:5555\tdevice\n"],
+                ["host:track-devices"],
+                monitor.Start);
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    DeviceMonitorSink sink = new(monitor);
+            Assert.Single(monitor.Devices);
+            Assert.Equal("169.254.109.177:5555", monitor.Devices[0].Serial);
+            Assert.Single(sink.ConnectedEvents);
+            Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
+        }
 
-        //    Assert.Empty(monitor.Devices);
+        [Fact]
+        public void TriggeredWhenStatusChangedTest()
+        {
+            Socket.WaitForNewData = true;
 
-        //    // Start the monitor, detect the initial device.
-        //    RunTest(
-        //        OkResponse,
-        //        ResponseMessages("169.254.109.177:5555\toffline\n"),
-        //        Requests("host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
+            Assert.Empty(monitor.Devices);
 
-        //    Socket.ResponseMessages.Clear();
-        //    Socket.Responses.Clear();
-        //    Socket.Requests.Clear();
+            // Start the monitor, detect the initial device.
+            RunTest(
+                OkResponse,
+                ["169.254.109.177:5555\toffline\n"],
+                ["host:track-devices"],
+                monitor.Start);
 
-        //    sink.ResetSignals();
+            Assert.Single(monitor.Devices);
+            Assert.Equal(DeviceState.Offline, monitor.Devices[0].State);
+            Assert.Single(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
 
-        //    // Device disconnects
-        //    ManualResetEvent eventWaiter = sink.CreateEventSignal();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-        //    RunTest(
-        //        NoResponses,
-        //        ResponseMessages("169.254.109.177:5555\tdevice\n"),
-        //        Requests(),
-        //        () =>
-        //        {
-        //            eventWaiter.WaitOne(1000);
+            sink.ResetSignals();
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Equal(DeviceState.Online, monitor.Devices.ElementAt(0).State);
-        //            Assert.Empty(sink.ConnectedEvents);
-        //            Assert.Single(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //            Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
-        //        });
-        //}
+            // Device disconnects
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-        //[Fact]
-        //public void DeviceChanged_NoTriggerIfStatusIsSameTest()
-        //{
-        //    Socket.WaitForNewData = true;
+            _ = RunTest(
+                NoResponses,
+                ["169.254.109.177:5555\tdevice\n"],
+                NoRequests,
+                () => eventWaiter.WaitOne(1000));
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    DeviceMonitorSink sink = new(monitor);
+            Assert.Single(monitor.Devices);
+            Assert.Equal(DeviceState.Online, monitor.Devices[0].State);
+            Assert.Empty(sink.ConnectedEvents);
+            Assert.Single(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
+            Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+        }
 
-        //    Assert.Empty(monitor.Devices);
+        [Fact]
+        public void NoTriggerIfStatusIsSameTest()
+        {
+            Socket.WaitForNewData = true;
 
-        //    // Start the monitor, detect the initial device.
-        //    RunTest(
-        //        OkResponse,
-        //        ResponseMessages("169.254.109.177:5555\toffline\n"),
-        //        Requests("host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+            using DeviceMonitor monitor = new(Socket);
+            DeviceMonitorSink sink = new(monitor);
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-        //            Assert.Single(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
+            Assert.Empty(monitor.Devices);
 
-        //    Socket.ResponseMessages.Clear();
-        //    Socket.Responses.Clear();
-        //    Socket.Requests.Clear();
+            // Start the monitor, detect the initial device.
+            RunTest(
+                OkResponse,
+                ["169.254.109.177:5555\toffline\n"],
+                ["host:track-devices"],
+                monitor.Start);
 
-        //    sink.ResetSignals();
+            Assert.Single(monitor.Devices);
+            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+            Assert.Single(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Single(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
 
-        //    // Something happens but device does not change
-        //    ManualResetEvent eventWaiter = sink.CreateEventSignal();
+            Socket.ResponseMessages.Clear();
+            Socket.Responses.Clear();
+            Socket.Requests.Clear();
 
-        //    RunTest(
-        //        NoResponses,
-        //        ResponseMessages("169.254.109.177:5555\toffline\n"),
-        //        Requests(),
-        //        () =>
-        //        {
-        //            eventWaiter.WaitOne(1000);
+            sink.ResetSignals();
 
-        //            Assert.Single(monitor.Devices);
-        //            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
-        //            Assert.Empty(sink.ConnectedEvents);
-        //            Assert.Empty(sink.ChangedEvents);
-        //            Assert.Single(sink.NotifiedEvents);
-        //            Assert.Empty(sink.DisconnectedEvents);
-        //        });
-        //}
+            // Something happens but device does not change
+            ManualResetEvent eventWaiter = sink.CreateEventSignal();
 
-        ///// <summary>
-        ///// Tests the <see cref="DeviceMonitor"/> in a case where the adb server dies in the middle of the monitor
-        ///// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
-        ///// </summary>
-        //[Fact]
-        //public void AdbKilledTest()
-        //{
-        //    DummyAdbServer dummyAdbServer = new();
-        //    AdbServer.Instance = dummyAdbServer;
+            _ = RunTest(
+                NoResponses,
+                ["169.254.109.177:5555\toffline\n"],
+                NoRequests,
+                () => eventWaiter.WaitOne(1000));
 
-        //    Socket.WaitForNewData = true;
+            Assert.Single(monitor.Devices);
+            Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
+            Assert.Empty(sink.ConnectedEvents);
+            Assert.Empty(sink.ChangedEvents);
+            Assert.Single(sink.NotifiedEvents);
+            Assert.Empty(sink.ListChangedEvents);
+            Assert.Empty(sink.DisconnectedEvents);
+        }
 
-        //    using DeviceMonitor monitor = new(Socket);
-        //    RunTest(
-        //        new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
-        //        ResponseMessages(
-        //            DummyAdbSocket.ServerDisconnected,
-        //            string.Empty),
-        //        Requests(
-        //            "host:track-devices",
-        //            "host:track-devices"),
-        //        () =>
-        //        {
-        //            monitor.Start();
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor"/> in a case where the adb server dies in the middle of the monitor
+        /// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
+        /// </summary>
+        [Fact]
+        public void AdbKilledTest()
+        {
+            DummyAdbServer dummyAdbServer = new();
+            AdbServer.Instance = dummyAdbServer;
 
-        //            Assert.True(Socket.DidReconnect);
-        //            Assert.True(dummyAdbServer.WasRestarted);
-        //        });
-        //}
+            Socket.WaitForNewData = true;
+
+            using DeviceMonitor monitor = new(Socket);
+            RunTest(
+                OkResponses(2),
+                [DummyAdbSocket.ServerDisconnected, string.Empty],
+                ["host:track-devices", "host:track-devices"],
+                monitor.Start);
+
+            Assert.True(Socket.DidReconnect);
+            Assert.True(dummyAdbServer.WasRestarted);
+        }
     }
 }

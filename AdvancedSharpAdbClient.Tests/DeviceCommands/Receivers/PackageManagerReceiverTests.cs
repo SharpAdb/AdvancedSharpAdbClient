@@ -1,7 +1,6 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using Xunit;
+﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands.Tests
 {
     public class PackageManagerReceiverTests
     {
@@ -16,8 +15,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             DummyAdbClient client = new();
 
-            PackageManager manager = new(client, device, thirdPartyOnly: false, syncServiceFactory: null, skipInit: true);
-            PackageManagerReceiver receiver = new(device, manager);
+            PackageManager manager = new(client, device, syncServiceFactory: null, skipInit: true);
+            PackageManagerReceiver receiver = new(manager);
 
             // Act
             receiver.AddOutput("package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus");

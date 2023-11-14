@@ -1,20 +1,16 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing.Imaging;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Xunit;
-using System.Data.Common;
 
 namespace AdvancedSharpAdbClient.Tests
 {
@@ -26,23 +22,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetAdbVersionAsyncTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "0020"
-            };
+            string[] responseMessages = ["0020"];
+            string[] requests = ["host:version"];
 
-            string[] requests = new string[]
-            {
-                "host:version"
-            };
-
-            int version = 0;
-
-            await RunTestAsync(
+            int version = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => version = await TestClient.GetAdbVersionAsync());
+                () => TestClient.GetAdbVersionAsync());
 
             // Make sure and the correct value is returned.
             Assert.Equal(32, version);
@@ -54,10 +41,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void KillAdbAsyncTest()
         {
-            string[] requests = new string[]
-            {
-                "host:kill"
-            };
+            string[] requests = ["host:kill"];
 
             await RunTestAsync(
                 NoResponses,
@@ -72,29 +56,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetDevicesAsyncTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"
-            };
+            string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
+            string[] requests = ["host:devices-l"];
 
-            string[] requests = new string[]
-            {
-                "host:devices-l"
-            };
-
-            IEnumerable<DeviceData> devices = null;
-
-            await RunTestAsync(
+            DeviceData[] devices = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => devices = await TestClient.GetDevicesAsync());
+                async () => await TestClient.GetDevicesAsync().ToArrayAsync());
 
             // Make sure and the correct value is returned.
             Assert.NotNull(devices);
             Assert.Single(devices);
 
-            DeviceData device = devices.Single();
+            DeviceData device = devices.SingleOrDefault();
 
             Assert.Equal("169.254.109.177:5555", device.Serial);
             Assert.Equal(DeviceState.Online, device.State);
@@ -144,15 +119,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void CreateDuplicateForwardAsyncTest()
         {
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.FromError("cannot rebind existing socket")
-            };
-
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"
-            };
+            AdbResponse[] responses = [AdbResponse.FromError("cannot rebind existing socket")];
+            string[] requests = ["host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"];
 
             _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
@@ -168,10 +136,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RemoveForwardAsyncTest()
         {
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:killforward:tcp:1"
-            };
+            string[] requests = ["host-serial:169.254.109.177:5555:killforward:tcp:1"];
 
             await RunTestAsync(
                 OkResponse,
@@ -186,20 +151,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RemoveReverseForwardAsyncTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward:localabstract:test"
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK,
-            };
+            ];
 
             await RunTestAsync(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.RemoveReverseForwardAsync(Device, "localabstract:test"));
@@ -211,10 +170,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RemoveAllForwardsAsyncTest()
         {
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:killforward-all"
-            };
+            string[] requests = ["host-serial:169.254.109.177:5555:killforward-all"];
 
             await RunTestAsync(
                 OkResponse,
@@ -229,20 +185,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RemoveAllReversesAsyncTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:killforward-all"
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK,
-            };
+            ];
 
             await RunTestAsync(
-                responses,
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.RemoveAllReverseForwardsAsync(Device));
@@ -254,23 +204,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ListForwardAsyncTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"
-            };
+            string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
+            string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
 
-            string[] requests = new string[]
-            {
-                "host-serial:169.254.109.177:5555:list-forward"
-            };
-
-            ForwardData[] forwards = null;
-
-            await RunTestAsync(
+            ForwardData[] forwards = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                async () => forwards = (await TestClient.ListForwardAsync(Device)).ToArray());
+                async () => await TestClient.ListForwardAsync(Device).ToArrayAsync());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -285,29 +226,19 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void ListReverseForwardAsyncTest()
         {
-            string[] responseMessages = new string[]
-            {
-                "(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"
-            };
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK,
-            };
+            string[] responseMessages = ["(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"];
 
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reverse:list-forward"
-            };
+            ];
 
-            ForwardData[] forwards = null;
-
-            await RunTestAsync(
-                responses,
+            ForwardData[] forwards = await RunTestAsync(
+                OkResponses(2),
                 responseMessages,
                 requests,
-                async () => forwards = (await TestClient.ListReverseForwardAsync(Device)).ToArray());
+                async () => await TestClient.ListReverseForwardAsync(Device).ToArrayAsync());
 
             Assert.NotNull(forwards);
             Assert.Equal(3, forwards.Length);
@@ -317,30 +248,41 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ExecuteServerCommandAsync(IAdbClient, string, string, IShellOutputReceiver, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ExecuteServerCommandAsyncTest()
+        {
+            string[] requests = ["host:version"];
+
+            byte[] streamData = Encoding.ASCII.GetBytes("0020");
+            await using MemoryStream shellStream = new(streamData);
+
+            ConsoleOutputReceiver receiver = new();
+
+            await RunTestAsync(
+                OkResponse,
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.ExecuteServerCommandAsync("host", "version", receiver));
+
+            string version = receiver.ToString();
+            Assert.Equal("0020\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
+            Assert.Equal(32, int.Parse(version, NumberStyles.HexNumber));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommandAsync(IAdbClient, string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK
-            };
-
-            string[] responseMessages = Array.Empty<string>();
-
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
             await using MemoryStream shellStream = new(streamData);
@@ -348,50 +290,36 @@ namespace AdvancedSharpAdbClient.Tests
             ConsoleOutputReceiver receiver = new();
 
             await RunTestAsync(
-                responses,
-                responseMessages,
+                OkResponses(2),
+                NoResponseMessages,
                 requests,
-                shellStream,
-                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver));
+                [shellStream],
+                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", Device, receiver));
 
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommandAsync(IAdbClient, string, DeviceData, IShellOutputReceiver, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncUnresponsiveTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK
-            };
-
-            string[] responseMessages = Array.Empty<string>();
-
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:echo Hello, World"
-            };
+            ];
 
             ConsoleOutputReceiver receiver = new();
 
             _ = await Assert.ThrowsAsync<ShellCommandUnresponsiveException>(() =>
             RunTestAsync(
-                responses,
-                responseMessages,
+                OkResponses(2),
+                NoResponseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None)));
+                () => TestClient.ExecuteRemoteCommandAsync("echo Hello, World", Device, receiver)));
         }
 
         /// <summary>
@@ -400,30 +328,27 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetFrameBufferAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "framebuffer:"
+            ];
 
-            DummyAdbSocket socket = new();
+            Framebuffer framebuffer = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                [
+                    await File.ReadAllBytesAsync("Assets/framebufferheader.bin"),
+                    await File.ReadAllBytesAsync("Assets/framebuffer.bin")
+                ],
+                null,
+                () => TestClient.GetFrameBufferAsync(Device));
 
-            socket.Responses.Enqueue(AdbResponse.OK);
-            socket.Responses.Enqueue(AdbResponse.OK);
-
-            socket.Requests.Add("host:transport:169.254.109.177:5555");
-            socket.Requests.Add("framebuffer:");
-
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
-
-            Framebuffer framebuffer = null;
-
-            Factories.AdbSocketFactory = (endPoint) => socket;
-            framebuffer = await TestClient.GetFrameBufferAsync(device);
-            
             Assert.NotNull(framebuffer);
-            Assert.Equal(device, framebuffer.Device);
+            Assert.Equal(Device, framebuffer.Device);
             Assert.Equal(16, framebuffer.Data.Length);
 
             FramebufferHeader header = framebuffer.Header;
@@ -443,64 +368,49 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                using Bitmap image = framebuffer.ToImage();
-                Assert.NotNull(image);
-                Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
+#if WINDOWS
+            using Bitmap image = framebuffer.ToImage();
+            Assert.NotNull(image);
+            Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+            Assert.Equal(1, image.Width);
+            Assert.Equal(1, image.Height);
 
-                Color pixel = image.GetPixel(0, 0);
-                Assert.Equal(0x35, pixel.R);
-                Assert.Equal(0x4a, pixel.G);
-                Assert.Equal(0x4c, pixel.B);
-                Assert.Equal(0xff, pixel.A);
-            }
+            Color pixel = image.GetPixel(0, 0);
+            Assert.Equal(0x35, pixel.R);
+            Assert.Equal(0x4a, pixel.G);
+            Assert.Equal(0x4c, pixel.B);
+            Assert.Equal(0xff, pixel.A);
+#endif
 
             framebuffer.Dispose();
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, CancellationToken, LogId[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.RunLogServiceAsync(IAdbClient, DeviceData, Action{LogEntry}, LogId[])"/> method.
         /// </summary>
         [Fact]
         public async void RunLogServiceAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "169.254.109.177:5555",
-                State = DeviceState.Online
-            };
-
-            AdbResponse[] responses = new AdbResponse[]
-            {
-                AdbResponse.OK,
-                AdbResponse.OK
-            };
-
-            string[] responseMessages = Array.Empty<string>();
-
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "shell:logcat -B -b system"
-            };
+            ];
 
             ConsoleOutputReceiver receiver = new();
 
-            await using Stream stream = File.OpenRead("Assets/logcat.bin");
+            await using FileStream stream = File.OpenRead("Assets/logcat.bin");
             await using ShellStream shellStream = new(stream, false);
-            Collection<LogEntry> logs = new();
+            List<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
 
             await RunTestAsync(
-                responses,
-                responseMessages,
+                OkResponses(2),
+                NoResponseMessages,
                 requests,
-                shellStream,
-                () => TestClient.RunLogServiceAsync(device, sink, CancellationToken.None, LogId.System));
+                [shellStream],
+                () => TestClient.RunLogServiceAsync(Device, sink, LogId.System));
 
             Assert.Equal(3, logs.Count);
         }
@@ -511,14 +421,14 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RebootAsyncTest()
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 "reboot:"
-            };
+            ];
 
             await RunTestAsync(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
                 () => TestClient.RebootAsync(Device));
@@ -662,8 +572,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DisconnectAsyncTest()
         {
-            string[] requests = new string[] { "host:disconnect:localhost:5555" };
-            string[] responseMessages = new string[] { "disconnected 127.0.0.1:5555" };
+            string[] requests = ["host:disconnect:localhost:5555"];
+            string[] responseMessages = ["disconnected 127.0.0.1:5555"];
 
             await RunTestAsync(
                 OkResponse,
@@ -678,32 +588,25 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RootAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "root:"
-            };
+            ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd cannot run as root in production builds\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd cannot run as root in production builds\n"u8.CopyTo(expectedData);
 
             _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                Array.Empty<(SyncCommand, string)>(),
-                Array.Empty<SyncCommand>(),
-                new byte[][] { expectedData },
-                Array.Empty<byte[]>(),
-                () => TestClient.RootAsync(device)));
+                NoSyncRequests,
+                NoSyncResponses,
+                [expectedData],
+                null,
+                () => TestClient.RootAsync(Device)));
         }
 
         /// <summary>
@@ -712,56 +615,43 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void UnrootAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "unroot:"
-            };
+            ];
 
             byte[] expectedData = new byte[1024];
-            byte[] expectedString = Encoding.UTF8.GetBytes("adbd not running as root\n");
-            Buffer.BlockCopy(expectedString, 0, expectedData, 0, expectedString.Length);
+            "adbd not running as root\n"u8.CopyTo(expectedData);
 
             _ = await Assert.ThrowsAsync<AdbException>(() =>
             RunTestAsync(
-                new AdbResponse[] { AdbResponse.OK, AdbResponse.OK },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                Array.Empty<(SyncCommand, string)>(),
-                Array.Empty<SyncCommand>(),
-                new byte[][] { expectedData },
-                Array.Empty<byte[]>(),
-                () => TestClient.UnrootAsync(device)));
+                NoSyncRequests,
+                NoSyncResponses,
+                [expectedData],
+                null,
+                () => TestClient.UnrootAsync(Device)));
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, string[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.InstallAsync(IAdbClient, DeviceData, Stream, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install' -S 205774"
-            };
+            ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChuncks = new();
+            List<byte[]> applicationDataChunks = [];
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -775,64 +665,48 @@ namespace AdvancedSharpAdbClient.Tests
                     else
                     {
                         buffer = buffer.Take(read).ToArray();
-                        applicationDataChuncks.Add(buffer);
+                        applicationDataChunks.Add(buffer);
                     }
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success\n");
+            byte[] response = "Success\n"u8.ToArray();
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
-                    new AdbResponse[]
-                    {
-                        AdbResponse.OK,
-                        AdbResponse.OK,
-                    },
+                    OkResponses(2),
                     NoResponseMessages,
                     requests,
-                    Array.Empty<(SyncCommand, string)>(),
-                    Array.Empty<SyncCommand>(),
-                    new byte[][] { response },
-                    applicationDataChuncks.ToArray(),
-                    () => TestClient.InstallAsync(device, stream));
+                    NoSyncRequests,
+                    NoSyncResponses,
+                    [response],
+                    applicationDataChunks.ToArray(),
+                    () => TestClient.InstallAsync(Device, stream));
             }
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallCreateAsync(DeviceData, string, string[])"/> method.
+        /// Tests the <see cref="AdbClientExtensions.InstallCreateAsync(IAdbClient, DeviceData, string, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallCreateAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-create' -p com.google.android.gms"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
             await using MemoryStream shellStream = new(streamData);
 
-            string session = string.Empty;
-
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            string session = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                async () => session = await TestClient.InstallCreateAsync(device, "com.google.android.gms"));
+                [shellStream],
+                () => TestClient.InstallCreateAsync(Device, "com.google.android.gms"));
 
             Assert.Equal("936013062", session);
         }
@@ -843,22 +717,16 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void InstallWriteAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
-            };
+            ];
 
             // The app data is sent in chunks of 32 kb
-            Collection<byte[]> applicationDataChuncks = new();
+            List<byte[]> applicationDataChunks = [];
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 while (true)
                 {
@@ -872,28 +740,24 @@ namespace AdvancedSharpAdbClient.Tests
                     else
                     {
                         buffer = buffer.Take(read).ToArray();
-                        applicationDataChuncks.Add(buffer);
+                        applicationDataChunks.Add(buffer);
                     }
                 }
             }
 
-            byte[] response = Encoding.UTF8.GetBytes("Success: streamed 205774 bytes\n");
+            byte[] response = "Success: streamed 205774 bytes\n"u8.ToArray();
 
-            await using (Stream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
             {
                 await RunTestAsync(
-                    new AdbResponse[]
-                    {
-                        AdbResponse.OK,
-                        AdbResponse.OK,
-                    },
+                    OkResponses(2),
                     NoResponseMessages,
                     requests,
-                    Array.Empty<(SyncCommand, string)>(),
-                    Array.Empty<SyncCommand>(),
-                    new byte[][] { response },
-                    applicationDataChuncks.ToArray(),
-                    () => TestClient.InstallWriteAsync(device, stream, "base", "936013062"));
+                    NoSyncRequests,
+                    NoSyncResponses,
+                    [response],
+                    applicationDataChunks.ToArray(),
+                    () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062"));
             }
         }
 
@@ -903,31 +767,44 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void InstallCommitAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "exec:cmd package 'install-commit' 936013062"
-            };
+            ];
 
             byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
             await using MemoryStream shellStream = new(streamData);
 
             await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                () => TestClient.InstallCommitAsync(device, "936013062"));
+                [shellStream],
+                () => TestClient.InstallCommitAsync(Device, "936013062"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.UninstallAsync(IAdbClient, DeviceData, string, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public async void UninstallAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'uninstall' com.android.gallery3d"
+            ];
+
+            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            using MemoryStream shellStream = new(streamData);
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.UninstallAsync(Device, "com.android.gallery3d"));
         }
 
         /// <summary>
@@ -936,36 +813,18 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void GetFeatureSetAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
+            string[] requests = ["host-serial:169.254.109.177:5555:features"];
+            string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
-            string[] requests = new string[]
-            {
-                "host-serial:009d1cd696d5194a:features"
-            };
-
-            string[] responses = new string[]
-            {
-                "sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"
-            };
-
-            IEnumerable<string> features = null;
-
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                },
+            string[] features = await RunTestAsync(
+                OkResponse,
                 responses,
                 requests,
-                async () => features = await TestClient.GetFeatureSetAsync(device));
+                async () => await TestClient.GetFeatureSetAsync(Device).ToArrayAsync());
 
-            Assert.Equal(12, features.Count());
-            Assert.Equal("sendrecv_v2_brotli", features.First());
-            Assert.Equal("stat_v2", features.Last());
+            Assert.Equal(12, features.Length);
+            Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
+            Assert.Equal("stat_v2", features.LastOrDefault());
         }
 
         /// <summary>
@@ -974,35 +833,23 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DumpScreenStringAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            string xml = string.Empty;
-
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            string xml = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                async () => xml = await TestClient.DumpScreenStringAsync(device));
+                [shellStream],
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanDump, xml);
         }
@@ -1013,35 +860,23 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DumpScreenStringAsyncMIUITest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string miuiDump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
             string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
             byte[] miuiStreamData = Encoding.UTF8.GetBytes(miuiDump);
             await using MemoryStream miuiStream = new(miuiStreamData);
 
-            string miuiXml = string.Empty;
-
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            string miuiXml = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                miuiStream,
-                async () => miuiXml = await TestClient.DumpScreenStringAsync(device));
+                [miuiStream],
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.Equal(cleanMIUIDump, miuiXml);
         }
@@ -1052,32 +887,20 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DumpScreenStringAsyncEmptyTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
-            byte[] emptyStreamData = Encoding.UTF8.GetBytes(string.Empty);
-            await using MemoryStream emptyStream = new(emptyStreamData);
-            string emptyXml = string.Empty;
+            await using MemoryStream emptyStream = new();
 
-            await RunTestAsync(
-               new AdbResponse[]
-               {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-               },
-               NoResponseMessages,
-               requests,
-               emptyStream,
-               async () => emptyXml = await TestClient.DumpScreenStringAsync(device));
+            string emptyXml = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [emptyStream],
+                () => TestClient.DumpScreenStringAsync(Device));
 
             Assert.True(string.IsNullOrEmpty(emptyXml));
         }
@@ -1088,17 +911,11 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DumpScreenStringAsyncErrorTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string errorXml = File.ReadAllText(@"Assets/dumpscreen_error.txt");
             byte[] errorStreamData = Encoding.UTF8.GetBytes(errorXml);
@@ -1106,15 +923,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             await Assert.ThrowsAsync<XmlException>(() =>
             RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                errorStream,
-                () => TestClient.DumpScreenStringAsync(device)));
+                [errorStream],
+                () => TestClient.DumpScreenStringAsync(Device)));
         }
 
         /// <summary>
@@ -1123,34 +936,22 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void DumpScreenAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            XmlDocument xml = null;
-
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            XmlDocument xml = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                async () => xml = await TestClient.DumpScreenAsync(device));
+                [shellStream],
+                () => TestClient.DumpScreenAsync(Device));
 
             string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
             XmlDocument doc = new();
@@ -1159,25 +960,52 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(doc, xml);
         }
 
+#if WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Tests the <see cref="AdbClient.DumpScreenWinRTAsync(DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void DumpScreenWinRTAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:uiautomator dump /dev/tty"
+            ];
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            await using MemoryStream shellStream = new(streamData);
+
+            Windows.Data.Xml.Dom.XmlDocument xml = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.DumpScreenWinRTAsync(Device));
+
+            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
+            Windows.Data.Xml.Dom.XmlDocument doc = new();
+            doc.LoadXml(cleanDump);
+
+            Assert.Equal(doc.InnerText, xml.InnerText);
+        }
+
+#endif
+
         /// <summary>
         /// Tests the <see cref="AdbClient.ClickAsync(DeviceData, int, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ClickAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:input tap 100 100"
-            };
+            ];
 
-            byte[] streamData = Encoding.UTF8.GetBytes(@"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+            byte[] streamData = @"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
         at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
         at android.os.Parcel.createException(Parcel.java:2357)
         at android.os.Parcel.readException(Parcel.java:2340)
@@ -1198,20 +1026,16 @@ Caused by: android.os.RemoteException: Remote stack trace:
         at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
         at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
         at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)");
+        at android.os.Binder.execTransact(Binder.java:1134)"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
             JavaException exception = await Assert.ThrowsAsync<JavaException>(() =>
             RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                () => TestClient.ClickAsync(device, 100, 100)));
+                [shellStream],
+                () => TestClient.ClickAsync(Device, 100, 100)));
 
             Assert.Equal("SecurityException", exception.JavaName);
             Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
@@ -1239,37 +1063,191 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ClickAsync(DeviceData, Cords, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ClickAsync(DeviceData, Point, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ClickCordsAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:input tap 100 100"
-            };
-            
-            byte[] streamData = Encoding.UTF8.GetBytes(@"Error: Injecting to another application requires INJECT_EVENTS permission");
+            ];
+
+            byte[] streamData = "Error: Injecting to another application requires INJECT_EVENTS permission\r\n"u8.ToArray();
             await using MemoryStream shellStream = new(streamData);
 
             _ = await Assert.ThrowsAsync<ElementNotFoundException>(() =>
             RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                () => TestClient.ClickAsync(device, new Cords(100, 100))));
+                [shellStream],
+                () => TestClient.ClickAsync(Device, new Point(100, 100))));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SwipeAsync(DeviceData, int, int, int, int, long, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SwipeAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input swipe 100 200 300 400 500"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.SwipeAsync(Device, 100, 200, 300, 400, 500));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SwipeAsync(DeviceData, Element, Element, long, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SwipeAsyncElementTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input swipe 100 200 300 400 500"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.SwipeAsync(Device, new Element(TestClient, Device, new Rectangle(0, 0, 200, 400)), new Element(TestClient, Device, new Rectangle(0, 0, 600, 800)), 500));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppRunningAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("21216 27761\r\n", true)]
+        [InlineData(" 21216 27761\r\n", true)]
+        [InlineData(" \r\n", false)]
+        [InlineData("\r\n", false)]
+        [InlineData(" ", false)]
+        [InlineData("", false)]
+        public async void IsAppRunningAsyncTest(string response, bool expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:pidof com.google.android.gms"
+            ];
+
+            byte[] streamData = Encoding.UTF8.GetBytes(response);
+            await using MemoryStream shellStream = new(streamData);
+
+            bool result = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.IsAppRunningAsync(Device, "com.google.android.gms"));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.IsAppInForegroundAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", true)]
+        [InlineData("com.android.settings", true)]
+        [InlineData("com.google.android.gms", false)]
+        public async void IsAppInForegroundAsyncTest(string packageName, bool expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream shellStream = new(streamData);
+
+            bool result = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.IsAppInForegroundAsync(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatusAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("com.google.android.gms", "21216 27761\r\n", AppStatus.Background)]
+        [InlineData("com.android.gallery3d", "\r\n", AppStatus.Stopped)]
+        public async void GetAppStatusAsyncTest(string packageName, string response, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity",
+                "host:transport:169.254.109.177:5555",
+                $"shell:pidof {packageName}"
+            ];
+
+            byte[] activityData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream activityStream = new(activityData);
+            byte[] pidData = Encoding.UTF8.GetBytes(response);
+            await using MemoryStream pidStream = new(pidData);
+
+            AppStatus result = await RunTestAsync(
+                OkResponses(4),
+                NoResponseMessages,
+                requests,
+                [activityStream, pidStream],
+                () => TestClient.GetAppStatusAsync(Device, packageName));
+
+            Assert.Equal(expected, result);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetAppStatusAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData("app.lawnchair", AppStatus.Foreground)]
+        [InlineData("com.android.settings", AppStatus.Foreground)]
+        public async void GetAppStatusAsyncForegroundTest(string packageName, AppStatus expected)
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:dumpsys activity activities | grep mResumedActivity"
+            ];
+
+            byte[] streamData = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}"u8.ToArray();
+            await using MemoryStream shellStream = new(streamData);
+
+            AppStatus result = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.GetAppStatusAsync(Device, packageName));
+
+            Assert.Equal(expected, result);
         }
 
         /// <summary>
@@ -1278,39 +1256,29 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public async void FindElementAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            Element element = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
-                async () =>
-                {
-                    Element element = await TestClient.FindElementAsync(device);
-                    Assert.Equal(144, element.GetChildCount());
-                    element = element[0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
-                });
+                [shellStream],
+                () => TestClient.FindElementAsync(Device));
+
+            Assert.Equal(144, element.GetChildCount());
+            Element child = element[0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", child.Text);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), child.Bounds);
+            Assert.Equal(child, element.FindDescendantOrSelf(x => x.Text == "where-where"));
+            Assert.Equal(2, element.FindDescendants().Where(x => x.Text == "where-where").Count());
         }
 
         /// <summary>
@@ -1319,54 +1287,225 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Fact]
         public async void FindElementsAsyncTest()
         {
-            DeviceData device = new()
-            {
-                Serial = "009d1cd696d5194a",
-                State = DeviceState.Online
-            };
-
-            string[] requests = new string[]
-            {
-                "host:transport:009d1cd696d5194a",
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
                 "shell:uiautomator dump /dev/tty"
-            };
+            ];
 
             string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
             byte[] streamData = Encoding.UTF8.GetBytes(dump);
             await using MemoryStream shellStream = new(streamData);
 
-            await RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                },
+            Element[] elements = await RunTestAsync(
+                OkResponses(2),
                 NoResponseMessages,
                 requests,
-                shellStream,
+                [shellStream],
+                async () => await TestClient.FindElementsAsync(Device).ToArrayAsync());
+
+            int childCount = elements.Length;
+            Array.ForEach(elements, x => childCount += x.GetChildCount());
+            Assert.Equal(145, childCount);
+            Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.FindAsyncElements(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void FindAsyncElementsTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:uiautomator dump /dev/tty"
+            ];
+
+            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
+            byte[] streamData = Encoding.UTF8.GetBytes(dump);
+            await using MemoryStream shellStream = new(streamData);
+
+            List<Element> elements = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
                 async () =>
                 {
-                    List<Element> elements = await TestClient.FindElementsAsync(device);
-                    int childCount = elements.Count;
-                    elements.ForEach(x => childCount += x.GetChildCount());
-                    Assert.Equal(145, childCount);
-                    Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
-                    Assert.Equal("where-where", element.Attributes["text"]);
-                    Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Area);
+                    List<Element> elements = [];
+                    await foreach (Element element in TestClient.FindAsyncElements(Device))
+                    {
+                        elements.Add(element);
+                    }
+                    return elements;
                 });
+
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
+            Assert.Equal(145, childCount);
+            Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
+            Assert.Equal("where-where", element.Attributes["text"]);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendKeyEventAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SendKeyEventAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_MOVE_END"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.SendKeyEventAsync(Device, "KEYCODE_MOVE_END"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.SendTextAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SendTextAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input text Hello, World",
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.SendTextAsync(Device, "Hello, World"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClearInputAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_MOVE_END",
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"
+            ];
+
+            await using MemoryStream firstShellStream = new();
+            await using MemoryStream secondShellStream = new();
+
+            await RunTestAsync(
+                OkResponses(4),
+                NoResponseMessages,
+                requests,
+                [firstShellStream, secondShellStream],
+                () => TestClient.ClearInputAsync(Device, 3));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StartAppAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StartAppAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:monkey -p com.android.settings 1",
+            ];
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                () => TestClient.StartAppAsync(Device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.StopAppAsync(DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StopAppAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:am force-stop com.android.settings",
+            ];
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                () => TestClient.StopAppAsync(Device, "com.android.settings"));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ClickBackButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickBackButtonAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_BACK"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.ClickBackButtonAsync(Device));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClientExtensions.ClickHomeButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickHomeButtonAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:input keyevent KEYCODE_HOME"
+            ];
+
+            await using MemoryStream shellStream = new();
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.ClickHomeButtonAsync(Device));
         }
 
         private Task RunConnectAsyncTest(Func<Task> test, string connectString)
         {
-            string[] requests = new string[]
-            {
-                $"host:connect:{connectString}"
-            };
-
-            string[] responseMessages = new string[]
-            {
-                $"connected to {connectString}"
-            };
+            string[] requests = [$"host:connect:{connectString}"];
+            string[] responseMessages = [$"connected to {connectString}"];
 
             return RunTestAsync(
                 OkResponse,
@@ -1377,15 +1516,8 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private Task RunPairAsyncTest(Func<Task> test, string connectString, string code)
         {
-            string[] requests = new string[]
-            {
-                $"host:pair:{code}:{connectString}"
-            };
-
-            string[] responseMessages = new string[]
-            {
-                $"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"
-            };
+            string[] requests = [$"host:pair:{code}:{connectString}"];
+            string[] responseMessages = [$"Successfully paired to {connectString} [guid=adb-996198a3-xPRwsQ]"];
 
             return RunTestAsync(
                 OkResponse,
@@ -1396,44 +1528,26 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
         private Task RunCreateReverseAsyncTest(Func<DeviceData, Task> test, string reverseString)
         {
-            string[] requests = new string[]
-            {
+            string[] requests =
+            [
                 "host:transport:169.254.109.177:5555",
                 $"reverse:forward:{reverseString}",
-            };
+            ];
 
             return RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK,
-                    AdbResponse.OK
-                },
-                new string[]
-                {
-                    null
-                },
+                OkResponses(3),
+                [null],
                 requests,
                 () => test(Device));
         }
 
         private Task RunCreateForwardAsyncTest(Func<DeviceData, Task> test, string forwardString)
         {
-            string[] requests = new string[]
-            {
-                $"host-serial:169.254.109.177:5555:forward:{forwardString}"
-            };
+            string[] requests = [$"host-serial:169.254.109.177:5555:forward:{forwardString}"];
 
             return RunTestAsync(
-                new AdbResponse[]
-                {
-                    AdbResponse.OK,
-                    AdbResponse.OK
-                },
-                new string[]
-                {
-                    null
-                },
+                OkResponses(2),
+                [null],
                 requests,
                 () => test(Device));
         }

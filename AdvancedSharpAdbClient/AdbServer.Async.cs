@@ -3,8 +3,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -13,89 +13,79 @@ namespace AdvancedSharpAdbClient
     public partial class AdbServer
     {
         /// <inheritdoc/>
-        public virtual async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken = default)
+        public virtual async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer = false, CancellationToken cancellationToken = default)
         {
-            AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken);
-            Version commandLineVersion = null;
-
-            IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-
-            if (commandLineClient.IsValidAdbFile(adbPath))
+            if (IsStarting) { return StartServerResult.Starting; }
+            try
             {
-                cachedAdbPath = adbPath;
-                commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken);
+                AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken).ConfigureAwait(false);
+                Version? commandLineVersion = null;
+
+                IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+                CheckFileExists = commandLineClient.CheckFileExists;
+
+                if (commandLineClient.CheckFileExists(adbPath))
+                {
+                    CachedAdbPath = adbPath;
+                    commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ConfigureAwait(false);
+                }
+
+                // If the server is running, and no adb path is provided, check if we have the minimum version
+                if (adbPath == null)
+                {
+                    return !serverStatus.IsRunning
+                        ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
+                        : serverStatus.Version >= RequiredAdbVersion
+                        ? StartServerResult.AlreadyRunning
+                        : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                }
+
+                if (serverStatus.IsRunning)
+                {
+                    if (serverStatus.Version < RequiredAdbVersion
+                        || (restartServerIfNewer && serverStatus.Version < commandLineVersion))
+                    {
+                        ExceptionExtensions.ThrowIfNull(adbPath);
+
+                        await StopServerAsync(cancellationToken);
+                        await commandLineClient.StartServerAsync(cancellationToken);
+                        return StartServerResult.RestartedOutdatedDaemon;
+                    }
+                    else
+                    {
+                        return StartServerResult.AlreadyRunning;
+                    }
+                }
+                else
+                {
+                    ExceptionExtensions.ThrowIfNull(adbPath);
+
+                    await commandLineClient.StartServerAsync(cancellationToken);
+                    return StartServerResult.Started;
+                }
             }
-
-            // If the server is running, and no adb path is provided, check if we have the minimum version
-            if (adbPath == null)
+            finally
             {
-                return !serverStatus.IsRunning
-                    ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
-                    : serverStatus.Version >= RequiredAdbVersion
-                    ? StartServerResult.AlreadyRunning
-                    : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
-            }
-
-            if (serverStatus.IsRunning
-                && ((serverStatus.Version < RequiredAdbVersion)
-                    || ((serverStatus.Version < commandLineVersion) && restartServerIfNewer)))
-            {
-                ExceptionExtensions.ThrowIfNull(adbPath);
-
-                await adbClient.KillAdbAsync(cancellationToken);
-                serverStatus.IsRunning = false;
-                serverStatus.Version = null;
-
-                await commandLineClient.StartServerAsync(cancellationToken);
-                return StartServerResult.RestartedOutdatedDaemon;
-            }
-            else if (!serverStatus.IsRunning)
-            {
-                ExceptionExtensions.ThrowIfNull(adbPath);
-
-                await commandLineClient.StartServerAsync(cancellationToken);
-                return StartServerResult.Started;
-            }
-            else
-            {
-                return StartServerResult.AlreadyRunning;
+                IsStarting = false;
             }
         }
 
         /// <inheritdoc/>
-        public Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken = default) => RestartServerAsync(null, cancellationToken);
+        public Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken = default) =>
+            StartServerAsync(CachedAdbPath!, true, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual async Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default)
+        public virtual Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default) =>
+            StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
+
+        /// <inheritdoc/>
+        public virtual async Task StopServerAsync(CancellationToken cancellationToken = default)
         {
-            adbPath ??= cachedAdbPath;
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
 
-            if (!IsValidAdbFile(adbPath))
-            {
-                throw new InvalidOperationException($"The adb server was not started via {nameof(AdbServer)}.{nameof(this.StartServer)} or no path to adb was specified. The adb server cannot be restarted.");
-            }
-
-            ManualResetEvent manualResetEvent = null;
-            await Utilities.Run(() =>
-            {
-                lock (RestartLock)
-                {
-                    manualResetEvent = new(false);
-                }
-            }, cancellationToken);
-
-            _ = Utilities.Run(() =>
-            {
-                lock (RestartLock)
-                {
-                    manualResetEvent.WaitOne();
-                }
-            }, cancellationToken);
-
-            StartServerResult result = await StartServerAsync(adbPath, false, cancellationToken);
-            manualResetEvent.Set();
-            manualResetEvent.Dispose();
-            return result;
+            // The host will immediately close the connection after the kill
+            // command has been sent; no need to read the response.
         }
 
         /// <inheritdoc/>
@@ -104,7 +94,12 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                int versionCode = await adbClient.GetAdbVersionAsync(cancellationToken);
+                using IAdbSocket socket = adbSocketFactory(EndPoint);
+                await socket.SendAdbRequestAsync("host:version", cancellationToken).ConfigureAwait(false);
+                AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+                string version = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
+
+                int versionCode = int.Parse(version, NumberStyles.HexNumber);
                 return new AdbServerStatus(true, new Version(1, 0, versionCode));
             }
             catch (AggregateException ex)

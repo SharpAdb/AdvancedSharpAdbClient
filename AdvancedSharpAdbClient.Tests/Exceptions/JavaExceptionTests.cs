@@ -18,6 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<JavaException>.MessageAndInnerConstructorTest((message, inner) => new JavaException(string.Empty, message, string.Empty, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<JavaException>.SerializationConstructorTest((info, context) => new JavaException(info, context));
 
@@ -77,7 +78,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
         at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:4644)
         at com.android.server.pm.PackageManagerService.onTransact(PackageManagerService.java:4513)
         at android.os.Binder.execTransactInternal(Binder.java:1170)
-        at android.os.Binder.execTransact(Binder.java:1134)".Split('\r', '\n');
+        at android.os.Binder.execTransact(Binder.java:1134)".Split(Extensions.NewLineSeparator);
 
             JavaException javaException = JavaException.Parse(lines);
 

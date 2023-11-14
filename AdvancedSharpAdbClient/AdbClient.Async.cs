@@ -3,8 +3,6 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,9 +24,10 @@ namespace AdvancedSharpAdbClient
         public async Task<int> GetAdbVersionAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync("host:version", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
-            string version = await socket.ReadStringAsync(cancellationToken);
+
+            await socket.SendAdbRequestAsync("host:version", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            string version = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
             return int.Parse(version, NumberStyles.HexNumber);
         }
@@ -37,7 +36,7 @@ namespace AdvancedSharpAdbClient
         public async Task KillAdbAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync("host:kill", cancellationToken);
+            await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
 
             // The host will immediately close the connection after the kill
             // command has been sent; no need to read the response.
@@ -47,13 +46,13 @@ namespace AdvancedSharpAdbClient
         public async Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync("host:devices-l", cancellationToken);
-            await socket.ReadAdbResponseAsync(cancellationToken);
-            string reply = await socket.ReadStringAsync(cancellationToken);
 
-            string[] data = reply.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            await socket.SendAdbRequestAsync("host:devices-l", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            string reply = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
-            return data.Select(DeviceData.CreateFromAdbData);
+            string[] data = reply.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            return data.Select(x => new DeviceData(x));
         }
 
         /// <inheritdoc/>
@@ -64,17 +63,13 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = adbSocketFactory(EndPoint);
             string rebind = allowRebind ? string.Empty : "norebind:";
 
-            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}", cancellationToken);
-            _ = await socket.ReadAdbResponseAsync(cancellationToken);
-            _ = await socket.ReadAdbResponseAsync(cancellationToken);
-            string portString = await socket.ReadStringAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
+            string portString = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
             return portString != null && int.TryParse(portString, out int port) ? port : 0;
         }
-
-        /// <inheritdoc/>
-        public Task<int> CreateForwardAsync(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
-            CreateForwardAsync(device, local?.ToString(), remote?.ToString(), allowRebind, cancellationToken);
 
         /// <inheritdoc/>
         public async Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken = default)
@@ -82,15 +77,15 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
 
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
             string rebind = allowRebind ? string.Empty : "norebind:";
 
-            await socket.SendAdbRequestAsync($"reverse:forward:{rebind}{remote};{local}", cancellationToken);
-            _ = await socket.ReadAdbResponseAsync(cancellationToken);
-            _ = await socket.ReadAdbResponseAsync(cancellationToken);
-            string portString = await socket.ReadStringAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"reverse:forward:{rebind}{remote};{local}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
+            string portString = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
             return portString != null && int.TryParse(portString, out int port) ? port : 0;
         }
 
@@ -100,10 +95,10 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync($"reverse:killforward:{remote}", cancellationToken);
-            AdbResponse response = socket.ReadAdbResponse();
+            await socket.SendAdbRequestAsync($"reverse:killforward:{remote}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -112,10 +107,10 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync($"reverse:killforward-all", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"reverse:killforward-all", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -124,8 +119,8 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:killforward:tcp:{localPort}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:killforward:tcp:{localPort}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -134,8 +129,8 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:killforward-all", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:killforward-all", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -144,14 +139,12 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:list-forward", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:list-forward", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            string data = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
-            string data = await socket.ReadStringAsync(cancellationToken);
-
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-            return parts.Select(ForwardData.FromString);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Select(x => ForwardData.FromString(x));
         }
 
         /// <inheritdoc/>
@@ -160,36 +153,78 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync($"reverse:list-forward", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"reverse:list-forward", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            string data = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
-            string data = await socket.ReadStringAsync(cancellationToken);
-
-            string[] parts = data.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-            return parts.Select(ForwardData.FromString);
+            string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Select(x => ForwardData.FromString(x));
         }
 
         /// <inheritdoc/>
-        public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            ExecuteRemoteCommandAsync(command, device, receiver, Encoding, cancellationToken);
+        public async Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken);
+        }
 
         /// <inheritdoc/>
-        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(encoding);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            cancellationToken.Register(socket.Dispose);
-
             await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:{command}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+
+            await ExecuteServerCommandAsync("shell", command, socket, encoding, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await ExecuteServerCommandAsync(target, command, socket, receiver, encoding, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             try
             {
+                cancellationToken.Register(socket.Dispose);
                 using StreamReader reader = new(socket.GetShellStream(), encoding);
                 // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
                 // break too soon in certain cases (about every 10 loops, so it appears to be a timing
@@ -197,7 +232,7 @@ namespace AdvancedSharpAdbClient
                 // -- one of the integration test fetches output 1000 times and found no truncations.
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                    string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
                     if (line == null) { break; }
 
@@ -221,6 +256,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken);
+
+            await ExecuteServerCommandAsync("shell", command, socket, receiver, encoding, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -233,41 +280,35 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
-            RunLogServiceAsync(device, messageSink, default, logNames);
-        
-        /// <inheritdoc/>
         public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
         {
-            ExceptionExtensions.ThrowIfNull(messageSink);
-
             EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(messageSink);
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            StringBuilder request = new();
-            request.Append("shell:logcat -B");
+            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                request.Append($" -b {logName.ToString().ToLowerInvariant()}");
+                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
             }
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
 #if NETCOREAPP3_0_OR_GREATER
             await
 #endif
-                using Stream stream = socket.GetShellStream();
+            using Stream stream = socket.GetShellStream();
             LogReader reader = new(stream);
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                LogEntry entry = null;
+                LogEntry? entry = null;
 
                 try
                 {
@@ -294,12 +335,11 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            string request = $"reboot:{into}";
-
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync(request, cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"reboot:{into}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -308,10 +348,10 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
-            string results = await socket.ReadStringAsync(cancellationToken);
-            return results;
+            await socket.SendAdbRequestAsync($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -320,10 +360,10 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:connect:{endpoint.Host}:{endpoint.Port}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
-            string results = await socket.ReadStringAsync(cancellationToken);
-            return results;
+            await socket.SendAdbRequestAsync($"host:connect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -332,10 +372,10 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(endpoint);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:disconnect:{endpoint.Host}:{endpoint.Port}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
-            string results = await socket.ReadStringAsync(cancellationToken);
-            return results;
+            await socket.SendAdbRequestAsync($"host:disconnect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -356,23 +396,25 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync(request, cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(request, cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             // ADB will send some additional data
             byte[] buffer = new byte[1024];
-            int read = socket.Read(buffer);
+            int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
 
-            string responseMessage = Encoding.UTF8.GetString(buffer, 0, read);
+            string responseMessage =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
             // for possible return strings
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
-#else
-            if (responseMessage.IndexOf("restarting", StringComparison.OrdinalIgnoreCase) == -1)
-#endif
             {
                 throw new AdbException(responseMessage);
             }
@@ -380,18 +422,14 @@ namespace AdvancedSharpAdbClient
             {
                 // Give adbd some time to kill itself and come back up.
                 // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
-                Utilities.Delay(3000, cancellationToken).GetAwaiter().GetResult();
+                await Extensions.Delay(3000, cancellationToken).ConfigureAwait(false);
             }
         }
-
-        /// <inheritdoc/>
-        public Task InstallAsync(DeviceData device, Stream apk, params string[] arguments) => InstallAsync(device, apk, default, arguments);
 
         /// <inheritdoc/>
         public async Task InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
-
             ExceptionExtensions.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
@@ -399,14 +437,13 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install'");
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
@@ -415,27 +452,30 @@ namespace AdvancedSharpAdbClient
             _ = requestBuilder.Append($" -S {apk.Length}");
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
-#elif !NET35
-            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
-#else
-            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
-#endif
+            while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-                await socket.SendAsync(buffer, read, cancellationToken);
+#if HAS_BUFFERS
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+#else
+                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
+#endif
             }
 
-            read = await socket.ReadAsync(buffer, cancellationToken);
-            string value = Encoding.UTF8.GetString(buffer, 0, read);
+            read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             if (!value.Contains("Success"))
             {
@@ -444,20 +484,16 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) =>
-            InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
-
-        /// <inheritdoc/>
         public async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
-
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
             ExceptionExtensions.ThrowIfNull(packageName);
 
-            string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments);
+            string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
 
             int i = 0;
-            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
+            await Extensions.WhenAll(splitAPKs.Select(async splitAPK =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
@@ -467,43 +503,35 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    await InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, cancellationToken);
+                    await InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
                 }
-            });
-            foreach (Task task in tasks)
-            {
-                await task;
-            }
+            })).ConfigureAwait(false);
 
-            await InstallCommitAsync(device, session, cancellationToken);
+            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
         }
-
-        /// <inheritdoc/>
-        public Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) =>
-            InstallMultipleAsync(device, baseAPK, splitAPKs, default, arguments);
 
         /// <inheritdoc/>
         public async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
-
             ExceptionExtensions.ThrowIfNull(baseAPK);
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
 
             if (!baseAPK.CanRead || !baseAPK.CanSeek)
             {
                 throw new ArgumentOutOfRangeException(nameof(baseAPK), "The apk stream must be a readable and seekable stream");
             }
 
-            string session = await InstallCreateAsync(device, null, cancellationToken, arguments);
+            string session = await InstallCreateAsync(device, null, cancellationToken, arguments).ConfigureAwait(false);
 
-            await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, cancellationToken);
+            await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, cancellationToken).ConfigureAwait(false);
 
             int i = 0;
-            IEnumerable<Task> tasks = splitAPKs.Select(async (splitAPK) =>
+            await Extensions.WhenAll(splitAPKs.Select(async splitAPK =>
             {
                 if (splitAPK == null || !splitAPK.CanRead || !splitAPK.CanSeek)
                 {
@@ -513,59 +541,54 @@ namespace AdvancedSharpAdbClient
 
                 try
                 {
-                    await InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, cancellationToken);
+                    await InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, cancellationToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
                 }
-            });
-            foreach (Task task in tasks)
-            {
-                await task;
-            }
+            })).ConfigureAwait(false);
 
-            await InstallCommitAsync(device, session, cancellationToken);
+            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public Task<string> InstallCreateAsync(DeviceData device, string packageName = null, params string[] arguments) =>
-            InstallCreateAsync(device, packageName, default, arguments);
-
-
-        /// <inheritdoc/>
-        public async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        public async Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new();
-            _ = requestBuilder.Append("exec:cmd package 'install-create'");
-            _ = requestBuilder.Append(packageName.IsNullOrWhiteSpace() ? string.Empty : $" -p {packageName}");
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install-create'");
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            {
+                requestBuilder.AppendFormat(" -p {0}", packageName);
+            }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append($" {argument}");
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
                 }
             }
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)
+                ?? throw new AdbException($"The {nameof(result)} of {nameof(InstallCreateAsync)} is null.");
 
             if (!result.Contains("Success"))
             {
-                throw new AdbException(await reader.ReadToEndAsync(cancellationToken));
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
             }
 
-            int arr = result.IndexOf("]") - 1 - result.IndexOf("[");
-            string session = result.Substring(result.IndexOf("[") + 1, arr);
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
             return session;
         }
 
@@ -573,49 +596,47 @@ namespace AdvancedSharpAdbClient
         public async Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
-
             ExceptionExtensions.ThrowIfNull(apk);
+            ExceptionExtensions.ThrowIfNull(apkName);
+            ExceptionExtensions.ThrowIfNull(session);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            ExceptionExtensions.ThrowIfNull(session);
-
-            ExceptionExtensions.ThrowIfNull(apkName);
-
-            StringBuilder requestBuilder = new();
-            requestBuilder.Append($"exec:cmd package 'install-write'");
-
-            // add size parameter [required for streaming installs]
-            // do last to override any user specified value
-            requestBuilder.Append($" -S {apk.Length}");
-
-            requestBuilder.Append($" {session} {apkName}.apk");
+            StringBuilder requestBuilder =
+                new StringBuilder().Append($"exec:cmd package 'install-write'")
+                                   // add size parameter [required for streaming installs]
+                                   // do last to override any user specified value
+                                   .AppendFormat(" -S {0}", apk.Length)
+                                   .AppendFormat(" {0} {1}.apk", session, apkName);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            while ((read = await apk.ReadAsync(buffer, cancellationToken)) > 0)
-#elif !NET35
-            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
-#else
-            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
-#endif
+            while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-                await socket.SendAsync(buffer, read, cancellationToken);
+#if HAS_BUFFERS
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+#else
+                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
+#endif
             }
 
-            read = await socket.ReadAsync(buffer, cancellationToken);
-            string value = Encoding.UTF8.GetString(buffer, 0, read);
+            read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
 
             if (!value.Contains("Success"))
             {
@@ -627,29 +648,61 @@ namespace AdvancedSharpAdbClient
         public async Task InstallCommitAsync(DeviceData device, string session, CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync($"exec:cmd package 'install-commit' {session}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SendAdbRequestAsync($"exec:cmd package 'install-commit' {session}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
-            if (!result.Contains("Success"))
+            string? result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (result?.Contains("Success") != true)
             {
-                throw new AdbException(await reader.ReadToEndAsync(cancellationToken));
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        {
+            EnsureDevice(device);
+
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'uninstall'");
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            _ = requestBuilder.AppendFormat(" {0}", packageName);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string? result = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (result?.Contains("Success") != true)
+            {
+                throw new AdbException(await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false));
             }
         }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
+            EnsureDevice(device);
+
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:features", cancellationToken);
+            await socket.SendAdbRequestAsync($"host-serial:{device.Serial}:features", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+            string features = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
-            string features = await socket.ReadStringAsync(cancellationToken);
-
-            IEnumerable<string> featureList = features.Trim().Split(new char[] { '\n', ',' });
+            IEnumerable<string> featureList = features.Trim().Split('\n', ',');
             return featureList;
         }
 
@@ -657,32 +710,35 @@ namespace AdvancedSharpAdbClient
         public async Task<string> DumpScreenStringAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
+
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync("shell:uiautomator dump /dev/tty", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync("shell:uiautomator dump /dev/tty", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string xmlString = reader.ReadToEnd()
-                .Replace("Events injected: 1\r\n", string.Empty)
-                .Replace("UI hierchary dumped to: /dev/tty", string.Empty)
-                .Trim();
+            string xmlString =
+                reader.ReadToEnd()
+                      .Replace("Events injected: 1\r\n", string.Empty)
+                      .Replace("UI hierchary dumped to: /dev/tty", string.Empty)
+                      .Trim();
+
             if (string.IsNullOrEmpty(xmlString) || xmlString.StartsWith("<?xml"))
             {
                 return xmlString;
             }
-            Match xmlMatch = GetXMLRegex().Match(xmlString);
-            if (!xmlMatch.Success)
-            {
-                throw new XmlException("An error occurred while receiving xml: " + xmlString);
-            }
-            return xmlMatch.Value;
+
+            Match xmlMatch = GetXmlRegex().Match(xmlString);
+            return !xmlMatch.Success ? throw new XmlException("An error occurred while receiving xml: " + xmlString) : xmlMatch.Value;
         }
 
         /// <inheritdoc/>
-        public async Task<XmlDocument> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<XmlDocument?> DumpScreenAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
+            EnsureDevice(device);
+            string xmlString = await DumpScreenStringAsync(device, cancellationToken).ConfigureAwait(false);
             XmlDocument doc = new();
-            string xmlString = await DumpScreenStringAsync(device, cancellationToken);
             if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
@@ -693,10 +749,11 @@ namespace AdvancedSharpAdbClient
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
-        public async Task<Windows.Data.Xml.Dom.XmlDocument> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
+            EnsureDevice(device);
+            string xmlString = await DumpScreenStringAsync(device, cancellationToken).ConfigureAwait(false);
             Windows.Data.Xml.Dom.XmlDocument doc = new();
-            string xmlString = await DumpScreenStringAsync(device, cancellationToken);
             if (!string.IsNullOrEmpty(xmlString))
             {
                 doc.LoadXml(xmlString);
@@ -707,21 +764,24 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public async Task ClickAsync(DeviceData device, Cords cords, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(DeviceData device, Point cords, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input tap {cords.X} {cords.Y}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input tap {cords.X} {cords.Y}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -733,16 +793,19 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input tap {x} {y}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input tap {x} {y}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -754,16 +817,19 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input swipe {first.Cords.X} {first.Cords.Y} {second.Cords.X} {second.Cords.Y} {speed}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input swipe {first.Center.X} {first.Center.Y} {second.Center.X} {second.Center.Y} {speed}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
@@ -775,79 +841,100 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input swipe {x1} {y1} {x2} {y2} {speed}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input swipe {x1} {y1} {x2} {y2} {speed}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new ElementNotFoundException("Coordinates of element is invalid");
             }
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsCurrentAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"dumpsys activity activities | grep mResumedActivity", device, receiver, cancellationToken);
-            string response = receiver.ToString().Trim();
-            return response.ToString().Contains(packageName);
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:pidof {packageName}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string? result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart().Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()).ConfigureAwait(false);
+            bool intParsed = int.TryParse(result, out int pid);
+            return intParsed && pid > 0;
         }
 
         /// <inheritdoc/>
-        public async Task<bool> IsAppRunningAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        public async Task<bool> IsAppInForegroundAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            ConsoleOutputReceiver receiver = new();
-            await ExecuteRemoteCommandAsync($"pidof {packageName}", device, receiver, cancellationToken);
-            string response = receiver.ToString().Trim();
-            bool intParsed = int.TryParse(response, out int pid);
-            return intParsed && pid > 0;
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:dumpsys activity activities | grep mResumedActivity", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string result = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            return result.Contains(packageName);
         }
 
         /// <inheritdoc/>
         public async Task<AppStatus> GetAppStatusAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             // Check if the app is in foreground
-            bool currentApp = await IsCurrentAppAsync(device, packageName, cancellationToken);
+            bool currentApp = await IsAppInForegroundAsync(device, packageName, cancellationToken).ConfigureAwait(false);
             if (currentApp)
             {
                 return AppStatus.Foreground;
             }
 
             // Check if the app is running in background
-            bool isAppRunning = await IsAppRunningAsync(device, packageName, cancellationToken);
+            bool isAppRunning = await IsAppRunningAsync(device, packageName, cancellationToken).ConfigureAwait(false);
             return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
         /// <inheritdoc/>
-        public async Task<Element> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<Element?> FindElementAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument doc = await DumpScreenAsync(device, cancellationToken);
-                    if (doc != null)
+                    try
                     {
-                        XmlNode xmlNode = doc.SelectSingleNode(xpath);
-                        if (xmlNode != null)
+                        XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                        if (doc != null)
                         {
-                            Element element = Element.FromXmlNode(this, device, xmlNode);
-                            if (element != null)
+                            XmlNode? xmlNode = doc.SelectSingleNode(xpath);
+                            if (xmlNode != null)
                             {
-                                return element;
+                                Element? element = Element.FromXmlNode(this, device, xmlNode);
+                                if (element != null)
+                                {
+                                    return element;
+                                }
                             }
                         }
                     }
-                    if (cancellationToken == default)
+                    catch (XmlException)
                     {
-                        break;
+                        // Ignore XmlException and try again
                     }
+                    if (cancellationToken == default) { break; }
                 }
             }
             catch (Exception e)
@@ -864,34 +951,40 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task<List<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Element>> FindElementsAsync(DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    XmlDocument doc = await DumpScreenAsync(device, cancellationToken);
-                    if (doc != null)
+                    try
                     {
-                        XmlNodeList xmlNodes = doc.SelectNodes(xpath);
-                        if (xmlNodes != null)
+                        XmlDocument? doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                        if (doc != null)
                         {
-                            List<Element> elements = new(xmlNodes.Count);
-                            for (int i = 0; i < xmlNodes.Count; i++)
+                            XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
+                            if (xmlNodes != null)
                             {
-                                Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
-                                if (element != null)
+                                static IEnumerable<Element> FindElements(IAdbClient client, DeviceData device, XmlNodeList xmlNodes)
                                 {
-                                    elements.Add(element);
+                                    for (int i = 0; i < xmlNodes.Count; i++)
+                                    {
+                                        Element? element = Element.FromXmlNode(client, device, xmlNodes[i]);
+                                        if (element != null)
+                                        {
+                                            yield return element;
+                                        }
+                                    }
                                 }
+                                return FindElements(this, device, xmlNodes);
                             }
-                            return elements.Count == 0 ? null : elements;
                         }
                     }
-                    if (cancellationToken == default)
+                    catch (XmlException)
                     {
-                        break;
+                        // Ignore XmlException and try again
                     }
+                    if (cancellationToken == default) { break; }
                 }
             }
             catch (Exception e)
@@ -904,7 +997,7 @@ namespace AdvancedSharpAdbClient
                     throw new ShellCommandUnresponsiveException(e);
                 }
             }
-            return null;
+            return Enumerable.Empty<Element>();
         }
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -913,32 +1006,45 @@ namespace AdvancedSharpAdbClient
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                XmlDocument doc = await DumpScreenAsync(device, cancellationToken);
+                XmlDocument? doc = null;
+
+                try
+                {
+                    doc = await DumpScreenAsync(device, cancellationToken).ConfigureAwait(false);
+                }
+                catch (XmlException)
+                {
+                    // Ignore XmlException and try again
+                }
+                catch (Exception e)
+                {
+                    // If a cancellation was requested, this main loop is interrupted with an exception
+                    // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                    // In all other cases, something went wrong, and we want to report it to the user.
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        throw new ShellCommandUnresponsiveException(e);
+                    }
+                }
+
                 if (doc != null)
                 {
-                    XmlNodeList xmlNodes = doc.SelectNodes(xpath);
+                    XmlNodeList? xmlNodes = doc.SelectNodes(xpath);
                     if (xmlNodes != null)
                     {
-                        bool isBreak = false;
                         for (int i = 0; i < xmlNodes.Count; i++)
                         {
-                            Element element = Element.FromXmlNode(this, device, xmlNodes[i]);
+                            Element? element = Element.FromXmlNode(this, device, xmlNodes[i]);
                             if (element != null)
                             {
-                                isBreak = true;
                                 yield return element;
                             }
                         }
-                        if (isBreak)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-                if (cancellationToken == default)
-                {
-                    break;
-                }
+
+                if (cancellationToken == default) { break; }
             }
         }
 #endif
@@ -949,16 +1055,19 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input keyevent {key}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input keyevent {key}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidKeyEventException("KeyEvent is invalid");
             }
@@ -970,41 +1079,47 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
 
             using IAdbSocket socket = adbSocketFactory(EndPoint);
-            await socket.SetDeviceAsync(device, cancellationToken);
-            await socket.SendAdbRequestAsync($"shell:input text {text}", cancellationToken);
-            AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:input text {text}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
-            string result = (await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false)).TrimStart();
+            string result = await reader.ReadToEndAsync(cancellationToken).ContinueWith(x => x.Result.TrimStart()).ConfigureAwait(false);
+
             if (result.StartsWith("java.lang."))
             {
                 throw JavaException.Parse(result);
             }
-            else if (result.IndexOf("ERROR", StringComparison.OrdinalIgnoreCase) != -1) // error or ERROR
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
             {
                 throw new InvalidTextException();
             }
         }
 
         /// <inheritdoc/>
-        public async Task ClearInputAsync(DeviceData device, int charCount, CancellationToken cancellationToken = default)
+        public async Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            await SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken);
-            await ExecuteRemoteCommandAsync("input keyevent " + Utilities.Join(" ", Enumerable.Repeat("KEYCODE_DEL ", charCount)), device, null, cancellationToken);
+            EnsureDevice(device);
+
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync($"shell:monkey -p {packageName} 1", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public async Task StartAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
-            await ExecuteRemoteCommandAsync($"monkey -p {packageName} 1", device, null, cancellationToken);
+        public async Task StopAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
 
-        /// <inheritdoc/>
-        public async Task StopAppAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
-            await ExecuteRemoteCommandAsync($"am force-stop {packageName}", device, null, cancellationToken);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-        /// <inheritdoc/>
-        public Task BackBtnAsync(DeviceData device) => SendKeyEventAsync(device, "KEYCODE_BACK");
-
-        /// <inheritdoc/>
-        public Task HomeBtnAsync(DeviceData device) => SendKeyEventAsync(device, "KEYCODE_HOME");
+            await socket.SendAdbRequestAsync($"shell:am force-stop {packageName}", cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+        }
     }
 }
 #endif

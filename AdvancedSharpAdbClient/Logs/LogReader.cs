@@ -2,9 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -13,24 +12,19 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Processes Android log files in binary format. You usually get the binary format by running <c>logcat -B</c>.
     /// </summary>
-    public partial class LogReader
+    /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
+    public partial class LogReader(Stream stream)
     {
         /// <summary>
         /// The <see cref="Stream"/> that contains the logcat data.
         /// </summary>
-        private readonly Stream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogReader"/> class.
-        /// </summary>
-        /// <param name="stream">A <see cref="Stream"/> that contains the logcat data.</param>
-        public LogReader(Stream stream) => this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        private readonly Stream stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         /// <summary>
         /// Reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
         /// <returns>A new <see cref="LogEntry"/> object.</returns>
-        public virtual LogEntry ReadEntry()
+        public virtual LogEntry? ReadEntry()
         {
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
@@ -47,11 +41,11 @@ namespace AdvancedSharpAdbClient.Logs
                 return null;
             }
 
-            ushort payloadLength = payloadLengthValue.Value;
-            ushort headerSize = headerSizeValue.Value;
-            int pid = pidValue.Value;
-            int tid = tidValue.Value;
-            int sec = secValue.Value;
+            ushort payloadLength = payloadLengthValue!.Value;
+            ushort headerSize = headerSizeValue!.Value;
+            int pid = pidValue!.Value;
+            int tid = tidValue!.Value;
+            int sec = secValue!.Value;
             int nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
@@ -59,7 +53,6 @@ namespace AdvancedSharpAdbClient.Logs
             // header size and payload length.
             // For both objects, the size should be 0x18
             uint id = 0;
-            uint uid = 0;
 
             if (headerSize != 0)
             {
@@ -84,7 +77,7 @@ namespace AdvancedSharpAdbClient.Logs
                         return null;
                     }
 
-                    uid = uidValue.Value;
+                    _ = uidValue.Value;
                 }
 
                 if (headerSize >= 0x20)
@@ -99,14 +92,14 @@ namespace AdvancedSharpAdbClient.Logs
                 }
             }
 
-            byte[] data = ReadBytesSafe(payloadLength);
+            byte[]? data = ReadBytesSafe(payloadLength);
 
             if (data == null)
             {
                 return null;
             }
 
-            DateTimeOffset timestamp = Utilities.FromUnixTimeSeconds(sec);
+            DateTimeOffset timestamp = DateTimeExtensions.FromUnixTimeSeconds(sec);
 
             switch ((LogId)id)
             {
@@ -192,7 +185,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a single log entry from the stream.
         /// </summary>
-        protected void ReadLogEntry(BinaryReader reader, Collection<object> parent)
+        protected void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
         {
             EventLogType type = (EventLogType)reader.ReadByte();
 
@@ -213,7 +206,7 @@ namespace AdvancedSharpAdbClient.Logs
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
 
-                    Collection<object> list = new();
+                    List<object> list = [];
 
                     for (int i = 0; i < listLength; i++)
                     {
@@ -237,9 +230,14 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected ushort? ReadUInt16()
         {
-            byte[] data = ReadBytesSafe(2);
+            byte[]? data = ReadBytesSafe(2);
 
-            return data == null ? null : BitConverter.ToUInt16(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToUInt16(data);
+#else
+                : BitConverter.ToUInt16(data, 0);
+#endif
         }
 
         /// <summary>
@@ -247,9 +245,14 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected uint? ReadUInt32()
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[]? data = ReadBytesSafe(4);
 
-            return data == null ? null : BitConverter.ToUInt32(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToUInt32(data);
+#else
+                : BitConverter.ToUInt32(data, 0);
+#endif
         }
 
         /// <summary>
@@ -257,22 +260,31 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         protected int? ReadInt32()
         {
-            byte[] data = ReadBytesSafe(4);
+            byte[]? data = ReadBytesSafe(4);
 
-            return data == null ? null : BitConverter.ToInt32(data, 0);
+            return data == null ? null
+#if HAS_BUFFERS
+                : BitConverter.ToInt32(data);
+#else
+                : BitConverter.ToInt32(data, 0);
+#endif
         }
 
         /// <summary>
         /// Reads bytes from the stream, making sure that the requested number of bytes
         /// </summary>
         /// <param name="count">The number of bytes to read.</param>
-        protected byte[] ReadBytesSafe(int count)
+        protected byte[]? ReadBytesSafe(int count)
         {
             int totalRead = 0;
             byte[] data = new byte[count];
 
             int read;
+#if HAS_BUFFERS
+            while ((read = stream.Read(data.AsSpan(totalRead, count - totalRead))) > 0)
+#else
             while ((read = stream.Read(data, totalRead, count - totalRead)) > 0)
+#endif
             {
                 totalRead += read;
             }

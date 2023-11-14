@@ -2,137 +2,221 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
-using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 
-namespace AdvancedSharpAdbClient
+#if WINDOWS_UWP
+using System.IO;
+using System.Threading;
+#endif
+
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Whenever the <c>framebuffer:</c> service is invoked, the adb server responds with the contents
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
     /// information about the framebuffer.
     /// </summary>
-    public struct FramebufferHeader
+#if HAS_BUFFERS
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreate))]
+#endif
+    public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
+        /// <summary>
+        /// The length of the head when <see cref="Version"/> is <see langword="2"/>.
+        /// </summary>
+        public const int MaxLength = 56;
+
+        /// <summary>
+        /// The length of the head when <see cref="Version"/> is <see langword="1"/>.
+        /// </summary>
+        public const int MiniLength = 52;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
+        /// </summary>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
+        /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
+#if HAS_BUFFERS
+        public FramebufferHeader(ReadOnlySpan<byte> data)
+#else
+        public FramebufferHeader(byte[] data)
+#endif
+        {
+            if (data.Length is < MiniLength or > MaxLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must between {MiniLength} and {MaxLength}.");
+            }
+
+            int index = 0;
+
+            Version = ReadUInt32(in data);
+
+            if (Version > 2)
+            {
+                // Technically, 0 is not a supported version either; we assume version 0 indicates
+                // an empty framebuffer.
+                throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
+            }
+
+            Bpp = ReadUInt32(in data);
+
+            if (Version >= 2)
+            {
+                ColorSpace = ReadUInt32(in data);
+            }
+
+            Size = ReadUInt32(in data);
+            Width = ReadUInt32(in data);
+            Height = ReadUInt32(in data);
+
+            Red = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Blue = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Green = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Alpha = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+#if HAS_BUFFERS
+            uint ReadUInt32(in ReadOnlySpan<byte> data)
+#else
+            uint ReadUInt32(in byte[] data)
+#endif
+                => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
+        }
+
         /// <summary>
         /// Gets or sets the version of the framebuffer struct.
         /// </summary>
-        public uint Version { get; set; }
+        public uint Version { get; init; }
 
         /// <summary>
         /// Gets or sets the number of bytes per pixel. Usual values include 32 or 24.
         /// </summary>
-        public uint Bpp { get; set; }
+        public uint Bpp { get; init; }
 
         /// <summary>
         /// Gets or sets the color space. Only available starting with <see cref="Version"/> 2.
         /// </summary>
-        public uint ColorSpace { get; set; }
+        public uint ColorSpace { get; init; }
 
         /// <summary>
         /// Gets or sets the total size, in bits, of the framebuffer.
         /// </summary>
-        public uint Size { get; set; }
+        public uint Size { get; init; }
 
         /// <summary>
         /// Gets or sets the width, in pixels, of the framebuffer.
         /// </summary>
-        public uint Width { get; set; }
+        public uint Width { get; init; }
 
         /// <summary>
         /// Gets or sets the height, in pixels, of the framebuffer.
         /// </summary>
-        public uint Height { get; set; }
+        public uint Height { get; init; }
 
         /// <summary>
         /// Gets or sets information about the red color channel.
         /// </summary>
-        public ColorData Red { get; set; }
+        public ColorData Red { get; init; }
 
         /// <summary>
         /// Gets or sets information about the blue color channel.
         /// </summary>
-        public ColorData Blue { get; set; }
+        public ColorData Blue { get; init; }
 
         /// <summary>
         /// Gets or sets information about the green color channel.
         /// </summary>
-        public ColorData Green { get; set; }
+        public ColorData Green { get; init; }
 
         /// <summary>
         /// Gets or sets information about the alpha channel.
         /// </summary>
-        public ColorData Alpha { get; set; }
+        public ColorData Alpha { get; init; }
+
+        /// <summary>
+        /// The length of the head in bytes.
+        /// </summary>
+        public int Count => Version < 2 ? MiniLength : MaxLength;
+
+        /// <inheritdoc/>
+        public byte this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= Count)
+                {
+                    throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.");
+                }
+
+                if (index > 7 && Version < 2)
+                {
+                    index += 4;
+                }
+
+                return index switch
+                {
+                    < 4 => GetByte(Version),
+                    < 8 => GetByte(Bpp),
+                    < 12 => GetByte(ColorSpace),
+                    < 16 => GetByte(Size),
+                    < 20 => GetByte(Width),
+                    < 24 => GetByte(Height),
+                    < 28 => GetByte(Red.Offset),
+                    < 32 => GetByte(Red.Length),
+                    < 36 => GetByte(Blue.Offset),
+                    < 40 => GetByte(Blue.Length),
+                    < 44 => GetByte(Green.Offset),
+                    < 48 => GetByte(Green.Length),
+                    < 52 => GetByte(Alpha.Offset),
+                    < 56 => GetByte(Alpha.Length),
+                    _ => throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
+                };
+
+                byte GetByte(uint value) => (index % 4) switch
+                {
+                    0 => (byte)value,
+                    1 => (byte)(value >> 8),
+                    2 => (byte)(value >> 16),
+                    3 => (byte)(value >> 24),
+                    _ => throw new InvalidOperationException()
+                };
+            }
+        }
 
         /// <summary>
         /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
-        public static FramebufferHeader Read(byte[] data)
-        {
-            // as defined in https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp
-            FramebufferHeader header = default;
-
-            // Read the data from a MemoryStream so we can use the BinaryReader to process the data.
-            using MemoryStream stream = new(data);
-            using BinaryReader reader = new(stream, Encoding.ASCII
-#if !NETFRAMEWORK || NET45_OR_GREATER
-                , leaveOpen: true
+#if HAS_BUFFERS
+        public static FramebufferHeader Read(ReadOnlySpan<byte> data) => new(data);
+#else
+        public static FramebufferHeader Read(byte[] data) => new(data);
 #endif
-                );
-            header.Version = reader.ReadUInt32();
 
-            if (header.Version > 2)
-            {
-                // Technically, 0 is not a supported version either; we assume version 0 indicates
-                // an empty framebuffer.
-                throw new InvalidOperationException($"Framebuffer version {header.Version} is not supported");
-            }
-
-            header.Bpp = reader.ReadUInt32();
-
-            if (header.Version >= 2)
-            {
-                header.ColorSpace = reader.ReadUInt32();
-            }
-
-            header.Size = reader.ReadUInt32();
-            header.Width = reader.ReadUInt32();
-            header.Height = reader.ReadUInt32();
-
-            header.Red = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Blue = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Green = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            header.Alpha = new ColorData
-            {
-                Offset = reader.ReadUInt32(),
-                Length = reader.ReadUInt32()
-            };
-
-            return header;
-        }
-
-#if HAS_DRAWING
+#if HAS_IMAGING
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="Bitmap"/>.
         /// </summary>
@@ -142,7 +226,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public readonly Bitmap ToImage(byte[] buffer)
+        public Bitmap? ToImage(byte[] buffer)
         {
             ExceptionExtensions.ThrowIfNull(buffer);
 
@@ -172,13 +256,19 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <returns>A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
+#if HAS_BUFFERS
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        private readonly PixelFormat StandardizePixelFormat(byte[] buffer)
+        private PixelFormat StandardizePixelFormat(Span<byte> buffer)
+#else
+        private PixelFormat StandardizePixelFormat(byte[] buffer)
+#endif
         {
             // Initial parameter validation.
+#if !HAS_BUFFERS
             ExceptionExtensions.ThrowIfNull(buffer);
+#endif
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -208,10 +298,10 @@ namespace AdvancedSharpAdbClient
                 }
 
                 // Get the index at which the red, bue, green and alpha values are stored.
-                uint redIndex = Red.Offset / 8;
-                uint blueIndex = Blue.Offset / 8;
-                uint greenIndex = Green.Offset / 8;
-                uint alphaIndex = Alpha.Offset / 8;
+                int redIndex = (int)Red.Offset / 8;
+                int blueIndex = (int)Blue.Offset / 8;
+                int greenIndex = (int)Green.Offset / 8;
+                int alphaIndex = (int)Alpha.Offset / 8;
 
                 // Loop over the array and re-order as required
                 for (int i = 0; i < (int)Size; i += 4)
@@ -285,23 +375,24 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
-            FramebufferHeader self = this;
-
             if (dispatcher.HasThreadAccess)
             {
                 return ToBitmap(buffer, cancellationToken);
             }
             else
             {
-                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+                FramebufferHeader self = this;
+
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
 
                 _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await self.ToBitmap(buffer, cancellationToken));
+                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        taskCompletionSource.SetResult(result);
                     }
                     catch (Exception e)
                     {
@@ -322,23 +413,24 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public readonly Task<WriteableBitmap> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
-            FramebufferHeader self = this;
-
             if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
             {
                 return ToBitmap(buffer, cancellationToken);
             }
             else
             {
-                TaskCompletionSource<WriteableBitmap> taskCompletionSource = new();
+                FramebufferHeader self = this;
+
+                TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
 
                 if (!dispatcher.TryEnqueue(async () =>
                 {
                     try
                     {
-                        taskCompletionSource.SetResult(await self.ToBitmap(buffer, cancellationToken));
+                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        taskCompletionSource.SetResult(result);
                     }
                     catch (Exception e)
                     {
@@ -360,7 +452,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public readonly async Task<WriteableBitmap> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
+        public async Task<WriteableBitmap?> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
         {
             if (buffer == null)
             {
@@ -384,7 +476,7 @@ namespace AdvancedSharpAdbClient
                 await WriteableImage.SetSourceAsync(randomAccessStream).AsTask(cancellationToken);
                 return WriteableImage;
             }
-            catch (Exception)
+            catch when (!cancellationToken.IsCancellationRequested)
             {
                 using InMemoryRandomAccessStream random = new();
                 BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);
@@ -396,5 +488,48 @@ namespace AdvancedSharpAdbClient
             }
         }
 #endif
+
+        /// <inheritdoc/>
+        public IEnumerator<byte> GetEnumerator()
+        {
+            foreach (uint value in GetEnumerable())
+            {
+                yield return (byte)value;
+                yield return (byte)(value >> 8);
+                yield return (byte)(value >> 16);
+                yield return (byte)(value >> 24);
+            }
+        }
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private IEnumerable<uint> GetEnumerable()
+        {
+            yield return Version;
+
+            yield return Bpp;
+
+            if (Version >= 2)
+            {
+                yield return ColorSpace;
+            }
+
+            yield return Size;
+            yield return Width;
+            yield return Height;
+
+            yield return Red.Offset;
+            yield return Red.Length;
+
+            yield return Blue.Offset;
+            yield return Blue.Length;
+
+            yield return Green.Offset;
+            yield return Green.Length;
+
+            yield return Alpha.Offset;
+            yield return Alpha.Length;
+        }
     }
 }

@@ -1,6 +1,6 @@
 | Issues | License | NuGet |
 |--------|---------|-------|
-[![Github Issues](https://img.shields.io/github/issues/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues)|[![License](https://img.shields.io/github/license/yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
+[![Github Issues](https://img.shields.io/github/issues/SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/issues)|[![License](https://img.shields.io/github/license/SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/blob/main/LICENSE)|[![NuGet Status](https://img.shields.io/nuget/dt/AdvancedSharpAdbClient.svg?style=flat)](https://www.nuget.org/packages/AdvancedSharpAdbClient/)
 
 # A .NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)
 
@@ -17,7 +17,6 @@ Added important features.
 - .NET Framework 4.0 (Need [Microsoft.Bcl.Async](https://www.nuget.org/packages/Microsoft.Bcl.Async))
 - .NET Framework 4.5.2
 - .NET Framework 4.6.2
-- .NET Framework 4.7.2
 - .NET Framework 4.8.1
 - .NET Standard 1.3
 - .NET Standard 2.0
@@ -88,20 +87,20 @@ static void Main(string[] args)
     client = new AdbClient();
     client.Connect("127.0.0.1:62001");
     device = client.GetDevices().FirstOrDefault();
-    Element el = client.FindElement(device, "//node[@text='Login']");
+    Element element = client.FindElement(device, "//node[@text='Login']");
 }
 ```
 
 You can also specify the waiting time for the element
 
 ```cs
-Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(5));
+Element element = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(5));
 ```
 
 And you can find several elements
 
 ```cs
-Element[] els = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
+Element[] element = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
 
 ### Getting element attributes
@@ -111,9 +110,9 @@ You can get all element attributes
 static void Main(string[] args)
 {
     ...
-    Element el = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
-    string eltext = el.attributes["text"];
-    string bounds = el.attributes["bounds"];
+    Element element = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
+    string eltext = element.Attributes["text"];
+    string bounds = element.Attributes["bounds"];
     ...
 }
 ```
@@ -137,8 +136,8 @@ Or on the element(need xpath)
 static void Main(string[] args)
 {
     ...
-    Element el = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(3));
-    el.Click();// Click on element by xpath //node[@text='Login']
+    Element element = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(3));
+    element.Click(); // Click on element by xpath //node[@text='Login']
     ...
 }
 ```
@@ -148,7 +147,7 @@ The Click() method throw ElementNotFoundException if the element is not found
 ```cs
 try
 {
-    el.Click();
+    element.Click();
 }
 catch (Exception ex)
 {
@@ -188,7 +187,7 @@ The Swipe() method throw ElementNotFoundException if the element is not found
 ```cs
 try
 {
-    client.Swipe(device, 0x2232323, 0x954,0x9128,0x11111, 200);
+    client.Swipe(device, 0x2232323, 0x954, 0x9128, 0x11111, 200);
     ...
     client.Swipe(device, first, second, 200);
 }
@@ -298,9 +297,9 @@ catch (Exception ex)
 static void Main(string[] args)
 {
     ...
-    client.BackBtn(device); // Click Back button
+    client.ClickBackButton(device); // Click Back button
     ...
-    client.HomeBtn(device); // Click Home button
+    client.ClickHomeButton(device); // Click Home button
     ...
 }
 ```
@@ -314,7 +313,7 @@ static void Main(string[] args)
 {
     ...
     PackageManager manager = new PackageManager(client, device);
-    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk", reinstall: false);
+    manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk");
     manager.UninstallPackage("com.android.app");
     ...
 }
@@ -326,7 +325,11 @@ Or you can use AdbClient.Install
 static void Main(string[] args)
 {
     ...
-    client.Install(device, File.OpenRead("Application.apk"));
+    using (FileStream stream = File.OpenRead("Application.apk"))
+    {
+        client.Install(device, stream);
+        client.Uninstall(device, "com.android.app");
+    }
     ...
 }
 ```
@@ -337,8 +340,8 @@ static void Main(string[] args)
 {
     ...
     PackageManager manager = new PackageManager(client, device);
-    manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new string[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }, reinstall: false); // Install split app whith base app
-    manager.InstallMultiplePackage(new string[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app", reinstall: false); // Add split app to base app which packagename is 'com.android.app'
+    manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }); // Install split app whith base app
+    manager.InstallMultiplePackage(new[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
 }
 ```
@@ -349,8 +352,8 @@ Or you can use AdbClient.InstallMultiple
 static void Main(string[] args)
 {
     ...
-    client.InstallMultiple(device, File.OpenRead("base.apk"), new Stream[] { File.OpenRead("split_1.apk"), File.OpenRead("split_2.apk") }); // Install split app whith base app
-    client.InstallMultiple(device, new Stream[] { File.OpenRead("split_3.apk"), File.OpenRead("split_4.apk") }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
+    client.InstallMultiple(device, File.OpenRead("base.apk"), new[] { File.OpenRead("split_1.apk"), File.OpenRead("split_2.apk") }); // Install split app whith base app
+    client.InstallMultiple(device, new[] { File.OpenRead("split_3.apk"), File.OpenRead("split_4.apk") }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
 }
 ```
@@ -373,9 +376,9 @@ static void Main(string[] args)
 static async void Main(string[] args)
 {
     ...
-    System.Drawing.Image img = client.GetFrameBuffer(device, CancellationToken.None); // synchronously
+    Image img = client.GetFrameBuffer(device, CancellationToken.None); // synchronously
     ...
-    System.Drawing.Image img = await client.GetFrameBufferAsync(device, CancellationToken.None); // asynchronously
+    Image img = await client.GetFrameBufferAsync(device, CancellationToken.None); // asynchronously
     ...
 }
 ```
@@ -398,9 +401,9 @@ void DownloadFile()
 {
     using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
     {
-        using (Stream stream = File.OpenWrite(@"C:\MyFile.txt"))
+        using (FileStream stream = File.OpenWrite(@"C:\MyFile.txt"))
         {
-            service.Pull("/data/local/tmp/MyFile.txt", stream, null, CancellationToken.None);
+            service.Pull("/data/local/tmp/MyFile.txt", stream, null);
         }
     }
 }
@@ -409,9 +412,9 @@ void UploadFile()
 {
     using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
     {
-        using (Stream stream = File.OpenRead(@"C:\MyFile.txt"))
+        using (FileStream stream = File.OpenRead(@"C:\MyFile.txt"))
         {
-            service.Push(stream, "/data/local/tmp/MyFile.txt", 777 ,DateTimeOffset.Now, null ,CancellationToken.None);
+            service.Push(stream, "/data/local/tmp/MyFile.txt", 777, DateTimeOffset.Now, null);
         }
     }
 }
@@ -439,10 +442,10 @@ AdbClient.SetEncoding(Encoding.ASCII);
 ```
 
 ## Contributors
-[![Contributors](https://contrib.rocks/image?repo=yungd1plomat/AdvancedSharpAdbClient)](https://github.com/yungd1plomat/AdvancedSharpAdbClient/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=SharpAdb/AdvancedSharpAdbClient)](https://github.com/SharpAdb/AdvancedSharpAdbClient/graphs/contributors)
 
 ## Consulting and Support
-Please open an [**issue**](https://github.com/yungd1plomat/AdvancedSharpAdbClient/issues) on if you have suggestions or problems.
+Please open an [**issue**](https://github.com/SharpAdb/AdvancedSharpAdbClient/issues) on if you have suggestions or problems.
 
 ## History
 AdvancedSharpAdbClient is a fork of [SharpAdbClient](https://github.com/quamotion/madb) and [madb](https://github.com/camalot/madb) which in itself is a .NET port of the [ddmlib Java Library](https://android.googlesource.com/platform/tools/base/+/master/ddmlib/).

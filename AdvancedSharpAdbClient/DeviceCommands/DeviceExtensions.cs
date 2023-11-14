@@ -4,11 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -24,9 +22,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command) =>
+            client.ExecuteRemoteCommand(command, device, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
-            client.ExecuteRemoteCommand(command, device, receiver);
+            client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -51,13 +58,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device, string remotePath)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return service.GetDirectoryListing(remotePath);
+            foreach (FileStatistics fileStatistics in service.GetDirectoryListing(remotePath))
+            {
+                yield return fileStatistics;
+            }
         }
 
-#if !HAS_TASK
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#pragma warning disable CS1574 // XML 注释中有未能解析的 cref 特性
-#endif
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
@@ -67,27 +73,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null,
+            in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            service.Pull(remotePath, stream, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            service.Pull(remotePath, stream, progress, in isCancelled);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>
@@ -101,32 +101,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null
-#if HAS_TASK
-            , CancellationToken cancellationToken = default
-#endif
-            )
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null,
+            in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            service.Push(stream, remotePath, permissions, timestamp, progress
-#if HAS_TASK
-                , cancellationToken
-#endif
-                );
+            service.Push(stream, remotePath, permissions, timestamp, progress, in isCancelled);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
-#if !HAS_TASK
-#pragma warning restore CS1574 // XML 注释中有未能解析的 cref 特性
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <summary>
         /// Gets the property of a device.
@@ -138,7 +128,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static string GetProperty(this IAdbClient client, DeviceData device, string property)
         {
             ConsoleOutputReceiver receiver = new();
-            client.ExecuteRemoteCommand($"{GetPropReceiver.GetPropCommand} {property}", device, receiver);
+            client.ExecuteShellCommand(device, $"{GetPropReceiver.GetPropCommand} {property}", receiver);
             return receiver.ToString();
         }
 
@@ -151,7 +141,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Dictionary<string, string> GetProperties(this IAdbClient client, DeviceData device)
         {
             GetPropReceiver receiver = new();
-            client.ExecuteRemoteCommand(GetPropReceiver.GetPropCommand, device, receiver);
+            client.ExecuteShellCommand(device, GetPropReceiver.GetPropCommand, receiver);
             return receiver.Properties;
         }
 
@@ -164,7 +154,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Dictionary<string, string> GetEnvironmentVariables(this IAdbClient client, DeviceData device)
         {
             EnvironmentVariablesReceiver receiver = new();
-            client.ExecuteRemoteCommand(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver);
+            client.ExecuteShellCommand(device, EnvironmentVariablesReceiver.PrintEnvCommand, receiver);
             return receiver.EnvironmentVariables;
         }
 
@@ -213,7 +203,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = new();
+            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
@@ -237,16 +227,16 @@ else
     /system/bin/ls -1 /proc/
 fi".Replace("\r\n", "\n"), receiver);
 
-            Collection<int> pids = new();
+            List<int> pids = [];
 
             string output = receiver.ToString();
             using (StringReader reader = new(output))
             {
                 while (reader.Peek() > 0)
                 {
-                    string line = reader.ReadLine();
+                    string? line = reader.ReadLine();
 
-                    if (!line.All(char.IsDigit))
+                    if (line?.All(char.IsDigit) != true)
                     {
                         continue;
                     }
@@ -265,17 +255,16 @@ fi".Replace("\r\n", "\n"), receiver);
             StringBuilder catBuilder = new();
             ProcessOutputReceiver processOutputReceiver = new();
 
-            _ = catBuilder.Append("cat ");
+            _ = catBuilder.Append("cat");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
+                _ = catBuilder.AppendFormat(" /proc/{0}/cmdline /proc/{1}/stat", pids[i], pids[i]);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
                     client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-                    catBuilder.Clear();
-                    _ = catBuilder.Append("cat ");
+                    _ = catBuilder.Clear().Append("cat");
                 }
             }
 

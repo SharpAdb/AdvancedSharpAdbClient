@@ -5,7 +5,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
@@ -45,9 +45,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the version code of the specified package.
         /// </summary>
         public VersionInfo VersionInfo =>
-            GetPropertyValue(versionCode) != null && GetPropertyValue(versionName) != null
-                ? new VersionInfo((int)GetPropertyValue(versionCode), (string)GetPropertyValue(versionName))
-                : null;
+            GetPropertyValue<string>(versionName) is string name
+                ? new VersionInfo(GetPropertyValue<int>(versionCode), name)
+                : default;
 
         private void CheckPackagesSection(string line)
         {
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             // We check whether the line is indented. If it's not, and it's not an empty line, we take it is
             // a section header line and update the data accordingly.
-            if (line.IsNullOrWhiteSpace())
+            if (StringExtensions.IsNullOrWhiteSpace(line))
             {
                 return;
             }
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version name.</returns>
-        internal object GetVersionName(string line)
+        internal string? GetVersionName(string line)
         {
             CheckPackagesSection(line);
 
@@ -97,7 +97,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="line">The line to be parsed.</param>
         /// <returns>The extracted version code.</returns>
-        internal object GetVersionCode(string line)
+        internal object? GetVersionCode(string line)
         {
             CheckPackagesSection(line);
 

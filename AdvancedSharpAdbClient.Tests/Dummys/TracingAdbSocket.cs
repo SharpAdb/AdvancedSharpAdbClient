@@ -1,23 +1,15 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    internal class TracingAdbSocket : AdbSocket, IDummyAdbSocket
+    internal class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
     {
-        public TracingAdbSocket(EndPoint endPoint) : base(endPoint)
-        {
-        }
-
-        public Stream ShellStream { get; set; }
-
         public bool DoDispose { get; set; }
 
         public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
@@ -30,9 +22,11 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Queue<byte[]> SyncDataSent { get; } = new Queue<byte[]>();
 
-        public List<string> Requests { get; } = new List<string>();
+        public List<string> Requests { get; } = [];
 
-        public List<(SyncCommand, string)> SyncRequests { get; } = new List<(SyncCommand, string)>();
+        public List<(SyncCommand, string)> SyncRequests { get; } = [];
+
+        public Queue<Stream> ShellStreams { get; } = new Queue<Stream>();
 
         public bool DidReconnect { get; private set; }
 
@@ -54,7 +48,35 @@ namespace AdvancedSharpAdbClient.Tests
 
             if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
             {
-                SyncDataReceived.Enqueue(data.Take(length).ToArray());
+                SyncDataReceived.Enqueue(data[..length]);
+            }
+
+            return read;
+        }
+
+        public override int Read(byte[] data, int offset, int length)
+        {
+            StackTrace trace = new();
+
+            int read = base.Read(data, offset, length);
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                SyncDataReceived.Enqueue(data.AsSpan(offset, length).ToArray());
+            }
+
+            return read;
+        }
+
+        public override int Read(Span<byte> data)
+        {
+            StackTrace trace = new();
+
+            int read = base.Read(data);
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                SyncDataReceived.Enqueue(data.ToArray());
             }
 
             return read;
@@ -80,6 +102,20 @@ namespace AdvancedSharpAdbClient.Tests
             return exception != null ? throw exception : response;
         }
 
+        public override Stream GetShellStream()
+        {
+            StackTrace trace = new();
+
+            Stream stream = base.GetShellStream();
+
+            if (trace != null && trace.GetFrames()[1].GetMethod().DeclaringType != typeof(AdbSocket))
+            {
+                ShellStreams.Enqueue(stream);
+            }
+
+            return stream;
+        }
+
         public override string ReadString()
         {
             string value = base.ReadString();
@@ -94,7 +130,7 @@ namespace AdvancedSharpAdbClient.Tests
             return value;
         }
 
-        public override async Task<string> ReadStringAsync(CancellationToken cancellationToken)
+        public override async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
             string value = await base.ReadStringAsync(cancellationToken);
             ResponseMessages.Enqueue(value);
@@ -132,10 +168,9 @@ namespace AdvancedSharpAdbClient.Tests
             return response;
         }
 
-        public override void Reconnect()
+        public override void Reconnect(bool isForce = false)
         {
             base.Reconnect();
-
             DidReconnect = true;
         }
     }

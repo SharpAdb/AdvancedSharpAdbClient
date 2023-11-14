@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.
@@ -25,12 +25,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Initializes a new instance of the <see cref="EnvironmentVariablesReceiver"/> class.
         /// </summary>
-        public EnvironmentVariablesReceiver() => EnvironmentVariables = new Dictionary<string, string>();
+        public EnvironmentVariablesReceiver() { }
 
         /// <summary>
         /// Gets the environment variables that are currently defined on the device.
         /// </summary>
-        public Dictionary<string, string> EnvironmentVariables { get; private set; }
+        public Dictionary<string, string> EnvironmentVariables { get; } = [];
 
         /// <summary>
         /// Processes the new lines.
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             Regex regex = EnvRegex();
             foreach (string line in lines)
             {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                if (string.IsNullOrEmpty(line) || line.StartsWith('#'))
                 {
                     continue;
                 }

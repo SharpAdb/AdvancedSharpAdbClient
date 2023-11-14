@@ -5,8 +5,6 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public interface IDummyAdbSocket : IAdbSocket
     {
-        Stream ShellStream { get; set; }
-
         Queue<AdbResponse> Responses { get; }
 
         Queue<string> ResponseMessages { get; }
@@ -20,6 +18,8 @@ namespace AdvancedSharpAdbClient.Tests
         Queue<byte[]> SyncDataSent { get; }
 
         List<(SyncCommand, string)> SyncRequests { get; }
+
+        Queue<Stream> ShellStreams { get; }
 
         /// <summary>
         /// Gets a value indicating whether the socket reconnected.

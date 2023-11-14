@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using System;
+﻿using System;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -9,6 +8,9 @@ namespace AdvancedSharpAdbClient.Tests
     /// </summary>
     public partial class AdbCommandLineClientTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersion"/> method.
+        /// </summary>
         [Fact]
         public void GetVersionTest()
         {
@@ -16,10 +18,12 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = new Version(1, 0, 32)
             };
-
             Assert.Equal(new Version(1, 0, 32), commandLine.GetVersion());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersion"/> method.
+        /// </summary>
         [Fact]
         public void GetVersionNullTest()
         {
@@ -30,6 +34,9 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.GetVersion"/> method.
+        /// </summary>
         [Fact]
         public void GetOutdatedVersionTest()
         {
@@ -37,10 +44,12 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = new Version(1, 0, 1)
             };
-
             _ = Assert.Throws<AdbException>(commandLine.GetVersion);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.StartServer"/> method.
+        /// </summary>
         [Fact]
         public void StartServerTest()
         {

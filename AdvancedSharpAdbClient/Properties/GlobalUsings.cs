@@ -1,4 +1,15 @@
-﻿#if NET
+﻿#region AdvancedSharpAdbClient
+global using AdvancedSharpAdbClient.DeviceCommands;
+global using AdvancedSharpAdbClient.Exceptions;
+global using AdvancedSharpAdbClient.Logs;
+global using AdvancedSharpAdbClient.Models;
+global using AdvancedSharpAdbClient.Models.DeviceCommands;
+global using AdvancedSharpAdbClient.Polyfills;
+global using AdvancedSharpAdbClient.Receivers;
+global using AdvancedSharpAdbClient.Receivers.DeviceCommands;
+#endregion
+
+#if NET
 global using System.Runtime.Versioning;
 #endif
 
@@ -17,22 +28,22 @@ global using Windows.UI.Xaml.Media.Imaging;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
 global using TimeSpan = System.TimeSpan;
+#if HAS_DRAWING
+global using Point = System.Drawing.Point;
+#else
+global using Point = AdvancedSharpAdbClient.Polyfills.Point;
+#endif
 #endif
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-global using Windows.Foundation;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
+global using Point = System.Drawing.Point;
 global using TimeSpan = System.TimeSpan;
 #endif
 
 #if HAS_TASK
 global using System.Threading.Tasks;
-#endif
-
-#if HAS_LOGGER
-global using Microsoft.Extensions.Logging;
-global using Microsoft.Extensions.Logging.Abstractions;
 #endif
 
 #if HAS_BUFFERS
@@ -41,6 +52,9 @@ global using System.Buffers;
 
 #if HAS_DRAWING
 global using System.Drawing;
+#endif
+
+#if HAS_IMAGING
 global using System.Drawing.Imaging;
 #endif
 

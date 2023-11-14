@@ -2,10 +2,9 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
-using AdvancedSharpAdbClient.Logs;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -106,42 +105,6 @@ namespace AdvancedSharpAdbClient
         int CreateForward(DeviceData device, string local, string remote, bool allowRebind);
 
         /// <summary>
-        /// Asks the ADB server to forward local connections from <paramref name="local"/>
-        /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
-        /// </summary>
-        /// <param name="device">The device on which to forward the connections.</param>
-        /// <param name="local">
-        /// <para>The local address to forward. This value can be in one of:</para>
-        /// <list type="ordered">
-        ///   <item>
-        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt;
-        ///   </item>
-        ///   <item>
-        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt;
-        ///   </item>
-        /// </list>
-        /// </param>
-        /// <param name="remote">
-        /// <para>The remote address to forward. This value can be in one of:</para>
-        /// <list type="ordered">
-        ///   <item>
-        ///     <c>tcp:&lt;port&gt;</c>: TCP connection on localhost:&lt;port&gt; on device
-        ///   </item>
-        ///   <item>
-        ///     <c>local:&lt;path&gt;</c>: Unix local domain socket on &lt;path&gt; on device
-        ///   </item>
-        ///   <item>
-        ///     <c>jdwp:&lt;pid&gt;</c>: JDWP thread on VM process &lt;pid&gt; on device.
-        ///   </item>
-        /// </list>
-        /// </param>
-        /// <param name="allowRebind">If set to <see langword="true"/>, the request will fail if there is already a forward
-        /// connection from <paramref name="local"/>.</param>
-        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.</returns>
-        int CreateForward(DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind);
-
-        /// <summary>
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
@@ -218,19 +181,59 @@ namespace AdvancedSharpAdbClient
         IEnumerable<ForwardData> ListReverseForward(DeviceData device);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Executes a command on the adb server.
         /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
-        /// <param name="device">The device on which to run the command.</param>
-        /// <param name="receiver">The receiver which will get the command output.</param>
-        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver);
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, Encoding encoding);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="receiver">The receiver which will get the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 
@@ -347,7 +350,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>The session ID of this install session.</returns>
-        string InstallCreate(DeviceData device, string packageName = null, params string[] arguments);
+        string InstallCreate(DeviceData device, string? packageName = null, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
@@ -364,6 +367,14 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="session">The session ID of the install session.</param>
         void InstallCommit(DeviceData device, string session);
+
+        /// <summary>
+        /// Uninstalls an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb uninstall</c>.</param>
+        void Uninstall(DeviceData device, string packageName, params string[] arguments);
 
         /// <summary>
         /// Lists all features supported by the current device.
@@ -385,7 +396,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        XmlDocument DumpScreen(DeviceData device);
+        XmlDocument? DumpScreen(DeviceData device);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
@@ -393,15 +404,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Windows.Data.Xml.Dom.XmlDocument DumpScreenWinRT(DeviceData device);
+        Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device);
 #endif
 
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
         /// <param name="device">The device on which to click.</param>
-        /// <param name="cords">The <see cref="Cords"/> to click.</param>
-        void Click(DeviceData device, Cords cords);
+        /// <param name="cords">The <see cref="Point"/> to click.</param>
+        void Click(DeviceData device, Point cords);
 
         /// <summary>
         /// Clicks on the specified coordinates.
@@ -437,7 +448,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to check.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns><see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        bool IsCurrentApp(DeviceData device, string packageName);
+        bool IsAppInForeground(DeviceData device, string packageName);
 
         /// <summary>
         /// Check if the app is running in background.
@@ -463,7 +474,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="timeout">The timeout for waiting the element.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        Element FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
+        Element? FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
 
         /// <summary>
         /// Get elements by xpath. You can specify the waiting time in timeout.
@@ -490,13 +501,6 @@ namespace AdvancedSharpAdbClient
         void SendText(DeviceData device, string text);
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
-        /// </summary>
-        /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="charCount">The length of text to clear.</param>
-        void ClearInput(DeviceData device, int charCount);
-
-        /// <summary>
         /// Start an Android application on device.
         /// </summary>
         /// <param name="device">The device on which to start an application.</param>
@@ -509,24 +513,13 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to stop an application.</param>
         /// <param name="packageName">The package name of the application to stop.</param>
         void StopApp(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Click BACK button.
-        /// </summary>
-        /// <param name="device">The device on which to click BACK button.</param>
-        void BackBtn(DeviceData device);
-
-        /// <summary>
-        /// Click HOME button.
-        /// </summary>
-        /// <param name="device">The device on which to click HOME button.</param>
-        void HomeBtn(DeviceData device);
     }
 
     /// <summary>
     /// See as the <see cref="IAdbClient"/> interface.
     /// </summary>
-    [Obsolete("IAdvancedAdbClient is too long to remember. Please use IAdbClient instead.")]
+    [Obsolete($"{nameof(IAdbCommandLineClient)} is too long to remember. Please use {nameof(IAdbClient)} instead.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IAdvancedAdbClient : IAdbClient
     {
     }

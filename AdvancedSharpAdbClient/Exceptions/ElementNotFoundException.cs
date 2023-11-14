@@ -9,13 +9,8 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with Element.
     /// </summary>
-    public class ElementNotFoundException : Exception
+    [Serializable]
+    public class ElementNotFoundException(string? message) : Exception(message)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementNotFoundException"/> class.
-        /// </summary>
-        public ElementNotFoundException(string message) : base(message)
-        {
-        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -12,12 +12,14 @@ namespace AdvancedSharpAdbClient.Tests
             Monitor.DeviceChanged += OnDeviceChanged;
             Monitor.DeviceNotified += OnDeviceNotified;
             Monitor.DeviceConnected += OnDeviceConnected;
+            Monitor.DeviceListChanged += OnDeviceListChanged;
             Monitor.DeviceDisconnected += OnDeviceDisconnected;
 
-            ChangedEvents = new Collection<DeviceDataChangeEventArgs>();
-            NotifiedEvents = new Collection<DeviceDataNotifyEventArgs>();
-            ConnectedEvents = new Collection<DeviceDataConnectEventArgs>();
-            DisconnectedEvents = new Collection<DeviceDataConnectEventArgs>();
+            ChangedEvents = [];
+            NotifiedEvents = [];
+            ConnectedEvents = [];
+            ListChangedEvents = [];
+            DisconnectedEvents = [];
         }
 
         public void ResetSignals()
@@ -25,28 +27,32 @@ namespace AdvancedSharpAdbClient.Tests
             ChangedEvents.Clear();
             NotifiedEvents.Clear();
             ConnectedEvents.Clear();
+            ListChangedEvents.Clear();
             DisconnectedEvents.Clear();
         }
 
-        public Collection<DeviceDataConnectEventArgs> DisconnectedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> DisconnectedEvents { get; init; }
 
-        public Collection<DeviceDataConnectEventArgs> ConnectedEvents { get; private set; }
+        public List<DeviceDataNotifyEventArgs> ListChangedEvents { get; init; }
 
-        public Collection<DeviceDataNotifyEventArgs> NotifiedEvents { get; private set; }
+        public List<DeviceDataConnectEventArgs> ConnectedEvents { get; init; }
 
-        public Collection<DeviceDataChangeEventArgs> ChangedEvents { get; private set; }
+        public List<DeviceDataNotifyEventArgs> NotifiedEvents { get; init; }
 
-        public DeviceMonitor Monitor { get; private set; }
+        public List<DeviceDataChangeEventArgs> ChangedEvents { get; init; }
+
+        public DeviceMonitor Monitor { get; init; }
 
         public ManualResetEvent CreateEventSignal()
         {
             ManualResetEvent signal = new(false);
             Monitor.DeviceNotified += (sender, e) => signal.Set();
-            Monitor.DeviceDisconnected += (sender, e) => signal.Set();
             return signal;
         }
 
         protected virtual void OnDeviceDisconnected(object sender, DeviceDataConnectEventArgs e) => DisconnectedEvents.Add(e);
+
+        protected virtual void OnDeviceListChanged(object sender, DeviceDataNotifyEventArgs e) => ListChangedEvents.Add(e);
 
         protected virtual void OnDeviceConnected(object sender, DeviceDataConnectEventArgs e) => ConnectedEvents.Add(e);
 

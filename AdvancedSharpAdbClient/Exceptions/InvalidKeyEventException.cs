@@ -9,13 +9,8 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with key event.
     /// </summary>
-    public class InvalidKeyEventException : Exception
+    [Serializable]
+    public class InvalidKeyEventException(string? message) : Exception(message)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidKeyEventException"/> class.
-        /// </summary>
-        public InvalidKeyEventException(string message) : base(message)
-        {
-        }
     }
 }

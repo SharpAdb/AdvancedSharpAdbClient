@@ -2,7 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// The status of an application if it is stopped or running in foreground or background.

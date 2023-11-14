@@ -2,24 +2,24 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
-    public class ForwardSpec
+    public readonly struct ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>
         /// Provides a mapping between a <see cref="string"/> and a <see cref="ForwardProtocol"/>
         /// value, used for the <see cref="string"/> representation of the <see cref="ForwardSpec"/>
         /// class.
         /// </summary>
-        private static readonly Dictionary<string, ForwardProtocol> Mappings = new(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, ForwardProtocol> Mappings = new(6, StringComparer.OrdinalIgnoreCase)
         {
             { "tcp", ForwardProtocol.Tcp },
             { "localabstract", ForwardProtocol.LocalAbstract },
@@ -30,57 +30,32 @@ namespace AdvancedSharpAdbClient
         };
 
         /// <summary>
-        /// Gets or sets the protocol which is being forwarded.
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> struct.
         /// </summary>
-        public ForwardProtocol Protocol { get; set; }
+        public ForwardSpec() { }
 
         /// <summary>
-        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.Tcp"/>, the port
-        /// number of the port being forwarded.
-        /// </summary>
-        public int Port { get; set; }
-
-        /// <summary>
-        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.LocalAbstract"/>,
-        /// <see cref="ForwardProtocol.LocalReserved"/> or <see cref="ForwardProtocol.LocalFilesystem"/>,
-        /// the Unix domain socket name of the socket being forwarded.
-        /// </summary>
-        public string SocketName { get; set; }
-
-        /// <summary>
-        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.JavaDebugWireProtocol"/>,
-        /// the process id of the process to which the debugger is attached.
-        /// </summary>
-        public int ProcessId { get; set; }
-
-        /// <summary>
-        /// Creates a <see cref="ForwardSpec"/> from its <see cref="string"/> representation.
+        /// Initializes a new instance of the <see cref="ForwardSpec"/> struct from its <see cref="string"/> representation.
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
-        /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
-        public static ForwardSpec Parse(string spec)
+        public ForwardSpec(string spec)
         {
             ExceptionExtensions.ThrowIfNull(spec);
 
-            string[] parts = spec.Split(new char[] { ':' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = spec.Split(':', 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(spec));
             }
 
-            if (!Mappings.ContainsKey(parts[0]))
+            if (!Mappings.TryGetValue(parts[0], out ForwardProtocol value))
             {
                 throw new ArgumentOutOfRangeException(nameof(spec));
             }
 
-            ForwardProtocol protocol = Mappings[parts[0]];
-
-            ForwardSpec value = new()
-            {
-                Protocol = protocol
-            };
-
+            ForwardProtocol protocol = value;
+            Protocol = protocol;
 
             bool isInt = int.TryParse(parts[1], out int intValue);
 
@@ -91,8 +66,7 @@ namespace AdvancedSharpAdbClient
                     {
                         throw new ArgumentOutOfRangeException(nameof(spec));
                     }
-
-                    value.ProcessId = intValue;
+                    ProcessId = intValue;
                     break;
 
                 case ForwardProtocol.Tcp:
@@ -100,27 +74,55 @@ namespace AdvancedSharpAdbClient
                     {
                         throw new ArgumentOutOfRangeException(nameof(spec));
                     }
-
-                    value.Port = intValue;
+                    Port = intValue;
                     break;
 
                 case ForwardProtocol.LocalAbstract
                     or ForwardProtocol.LocalFilesystem
                     or ForwardProtocol.LocalReserved
                     or ForwardProtocol.Device:
-                    value.SocketName = parts[1];
+                    SocketName = parts[1];
                     break;
             }
-
-            return value;
         }
+
+        /// <summary>
+        /// Gets or sets the protocol which is being forwarded.
+        /// </summary>
+        public ForwardProtocol Protocol { get; init; }
+
+        /// <summary>
+        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.Tcp"/>, the port
+        /// number of the port being forwarded.
+        /// </summary>
+        public int Port { get; init; }
+
+        /// <summary>
+        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.LocalAbstract"/>,
+        /// <see cref="ForwardProtocol.LocalReserved"/> or <see cref="ForwardProtocol.LocalFilesystem"/>,
+        /// the Unix domain socket name of the socket being forwarded.
+        /// </summary>
+        public string? SocketName { get; init; }
+
+        /// <summary>
+        /// Gets or sets, when the <see cref="Protocol"/> is <see cref="ForwardProtocol.JavaDebugWireProtocol"/>,
+        /// the process id of the process to which the debugger is attached.
+        /// </summary>
+        public int ProcessId { get; init; }
+
+        /// <summary>
+        /// Creates a <see cref="ForwardSpec"/> from its <see cref="string"/> representation.
+        /// </summary>
+        /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
+        /// <returns>A <see cref="ForwardSpec"/> which represents <paramref name="spec"/>.</returns>
+        public static ForwardSpec Parse(string spec) => new(spec);
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            string protocolString = Mappings.FirstOrDefault(v => v.Value == Protocol).Key;
-
-            return Protocol switch
+            ForwardProtocol protocol = Protocol;
+            string protocolString = Mappings.FirstOrDefault(v => v.Value == protocol).Key;
+            return protocol switch
             {
                 ForwardProtocol.JavaDebugWireProtocol => $"{protocolString}:{ProcessId}",
                 ForwardProtocol.Tcp => $"{protocolString}:{Port}",
@@ -133,27 +135,23 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() =>
-            (int)Protocol
-                ^ Port
-                ^ ProcessId
-                ^ (SocketName == null ? 1 : SocketName.GetHashCode());
+        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
-        {
-            return obj is ForwardSpec other
-                && other.Protocol == Protocol
-                && Protocol switch
-                {
-                    ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
-                    ForwardProtocol.Tcp => Port == other.Port,
-                    ForwardProtocol.LocalAbstract
-                    or ForwardProtocol.LocalFilesystem
-                    or ForwardProtocol.LocalReserved
-                    or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
-                    _ => false,
-                };
-        }
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is ForwardSpec other && Equals(other);
+
+        /// <inheritdoc/>
+        public bool Equals(ForwardSpec other) =>
+            other.Protocol == Protocol
+            && Protocol switch
+            {
+                ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
+                ForwardProtocol.Tcp => Port == other.Port,
+                ForwardProtocol.LocalAbstract
+                or ForwardProtocol.LocalFilesystem
+                or ForwardProtocol.LocalReserved
+                or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
+                _ => false,
+            };
     }
 }

@@ -2,11 +2,9 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
@@ -14,9 +12,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public class ProcessOutputReceiver : MultiLineReceiver
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessOutputReceiver"/> class.
+        /// </summary>
+        public ProcessOutputReceiver() { }
+
+        /// <summary>
         /// Gets a list of all processes that have been received.
         /// </summary>
-        public Collection<AndroidProcess> Processes { get; private set; } = new Collection<AndroidProcess>();
+        public List<AndroidProcess> Processes { get; } = [];
 
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)
@@ -31,9 +34,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 try
                 {
-                    Processes.Add(AndroidProcess.Parse(line, cmdLinePrefix: true));
+                    Processes.Add(new AndroidProcess(line, cmdLinePrefix: true));
                 }
-                catch (Exception)
+                catch
                 {
                     // Swallow
                 }

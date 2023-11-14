@@ -12,19 +12,19 @@
     <IncludeSymbols>True</IncludeSymbols>
     <LangVersion>latest</LangVersion>
     <PackageIcon>Icon.png</PackageIcon>
-    <PackageIconUrl>https://raw.githubusercontent.com/yungd1plomat/AdvancedSharpAdbClient/main/logo.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/SharpAdb/AdvancedSharpAdbClient/main/logo.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>https://github.com/yungd1plomat/AdvancedSharpAdbClient/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/SharpAdb/AdvancedSharpAdbClient/releases</PackageReleaseNotes>
     <PackageTags>Android;ADB;Communicate;UWP;Xamarin;MAUI;WinUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
-    <RepositoryUrl>https://github.com/yungd1plomat/AdvancedSharpAdbClient</RepositoryUrl>
+    <RepositoryUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>2.5.8</VersionPrefix>
+    <VersionPrefix>3.0.9</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,20 +35,24 @@
     <IsTestProject Condition="'$(IsTestProject)' == ''">$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore50'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcore5.0'">
     <NugetTargetMoniker>.NETCore,Version=v5.0</NugetTargetMoniker>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'
-                         or '$(TargetFramework)' == 'netcoreapp3.1'">
-    <SuppressTfmSupportBuildWarnings>True</SuppressTfmSupportBuildWarnings>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+    <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.15138.0'">
+    <DefineConstants>$(DefineConstants);UAP10_0_15138_0</DefineConstants>
+    <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'
                          or '$(TargetFramework)' == 'uap10.0.15138.0'">
     <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP;UAP10_0</DefineConstants>
     <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
     <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>

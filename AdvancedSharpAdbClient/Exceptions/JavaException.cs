@@ -8,6 +8,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Represents an exception with the Java exception output.
     /// </summary>
+    [Serializable]
     public partial class JavaException : Exception
     {
         private const string UnknownError = "An error occurred in Java";
@@ -15,22 +16,24 @@ namespace AdvancedSharpAdbClient.Exceptions
         private const string ExceptionOutput = "java.lang.";
         private const string ExceptionPattern = @"java.lang.(\w+Exception):\s+(.*)?";
 
+        private static readonly char[] separator = Extensions.NewLineSeparator;
+
         /// <summary>
         /// Gets the name of Java exception.
         /// </summary>
-        public string JavaName { get; }
+        public string? JavaName { get; init; }
 
         /// <summary>
         /// Gets a string representation of the immediate frames on the call stack of Java exception.
         /// </summary>
-        public string JavaStackTrace { get; }
+        public string? JavaStackTrace { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JavaException"/> class.
         /// </summary>
         /// <param name="name">The name of Java exception.</param>
         /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        public JavaException(string name, string stackTrace) : base(UnknownError)
+        public JavaException(string? name, string? stackTrace) : base(UnknownError)
         {
             JavaName = name;
             JavaStackTrace = stackTrace;
@@ -42,7 +45,20 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <param name="name">The name of Java exception.</param>
         /// <param name="message">The message of Java exception.</param>
         /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        public JavaException(string name, string message, string stackTrace) : base(message)
+        public JavaException(string? name, string? message, string? stackTrace) : base(message)
+        {
+            JavaName = name;
+            JavaStackTrace = stackTrace;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JavaException"/> class.
+        /// </summary>
+        /// <param name="name">The name of Java exception.</param>
+        /// <param name="message">The message of Java exception.</param>
+        /// <param name="stackTrace">The stackTrace of Java exception.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public JavaException(string? name, string? message, string? stackTrace, Exception? innerException) : base(message, innerException)
         {
             JavaName = name;
             JavaStackTrace = stackTrace;
@@ -63,24 +79,11 @@ namespace AdvancedSharpAdbClient.Exceptions
 #endif
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="JavaException"/> class.
-        /// </summary>
-        /// <param name="name">The name of Java exception.</param>
-        /// <param name="message">The message of Java exception.</param>
-        /// <param name="stackTrace">The stackTrace of Java exception.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public JavaException(string name, string message, string stackTrace, Exception innerException) : base(message, innerException)
-        {
-            JavaName = name;
-            JavaStackTrace = stackTrace;
-        }
-
-        /// <summary>
         /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.
         /// </summary>
         /// <param name="line">A <see cref="string"/> which represents a <see cref="JavaException"/>.</param>
         /// <returns>The equivalent <see cref="JavaException"/>.</returns>
-        public static JavaException Parse(string line) => Parse(line.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries));
+        public static JavaException Parse(string line) => Parse(line.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
 
         /// <summary>
@@ -106,10 +109,10 @@ namespace AdvancedSharpAdbClient.Exceptions
                             exception = m.Groups[1].Value;
 
                             message = m.Groups[2].Value;
-                            message = message.IsNullOrWhiteSpace() ? UnknownError : message;
+                            message = StringExtensions.IsNullOrWhiteSpace(message) ? UnknownError : message;
                         }
                     }
-                    else if (!line.IsNullOrWhiteSpace())
+                    else if (!StringExtensions.IsNullOrWhiteSpace(line))
                     {
                         stackTrace.AppendLine(line.TrimEnd());
                     }

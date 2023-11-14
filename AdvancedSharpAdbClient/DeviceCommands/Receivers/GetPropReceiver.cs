@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Parses the output of the <c>getprop</c> command, which lists all properties of an Android device.
@@ -23,9 +23,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string GetPropPattern = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="GetPropReceiver"/> class.
+        /// </summary>
+        public GetPropReceiver() { }
+
+        /// <summary>
         /// Gets the list of properties which have been retrieved.
         /// </summary>
-        public Dictionary<string, string> Properties { get; private set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> Properties { get; } = [];
 
         /// <summary>
         /// Processes the new lines.
@@ -41,7 +46,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // after all that.
             foreach (string line in lines)
             {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#") || line.StartsWith("$"))
+                if (string.IsNullOrEmpty(line) || line.StartsWith('#') || line.StartsWith('$'))
                 {
                     continue;
                 }

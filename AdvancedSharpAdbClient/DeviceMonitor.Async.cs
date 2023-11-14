@@ -3,8 +3,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -13,8 +13,8 @@ namespace AdvancedSharpAdbClient
     public partial class DeviceMonitor
     {
         /// <summary>
-        /// When the <see cref="Start"/> method is called, this <see cref="ManualResetEvent"/>
-        /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoopAsync"/>
+        /// When the <see cref="StartAsync(CancellationToken)"/> method is called, this <see cref="ManualResetEvent"/>
+        /// is used to block the <see cref="StartAsync(CancellationToken)"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
         protected readonly ManualResetEvent firstDeviceListParsed = new(false);
@@ -27,32 +27,31 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Task monitorTask;
+        protected Task? monitorTask;
 
         /// <inheritdoc/>
+        [MemberNotNull(nameof(monitorTask))]
         public virtual async Task StartAsync(CancellationToken cancellationToken = default)
         {
             if (monitorTask == null)
             {
                 _ = firstDeviceListParsed.Reset();
 
-                monitorTask = Utilities.Run(() => DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token), cancellationToken);
+                monitorTask = DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token);
 
                 // Wait for the worker thread to have read the first list of devices.
-                _ = await Utilities.Run(firstDeviceListParsed.WaitOne, cancellationToken);
+                _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken).ConfigureAwait(false);
             }
         }
 
         /// <summary>
         /// Stops the monitoring
         /// </summary>
-        protected virtual async
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            ValueTask
+        protected virtual async ValueTask DisposeAsyncCore()
 #else
-            Task
+        protected virtual async Task DisposeAsyncCore()
 #endif
-            DisposeAsyncCore()
         {
             if (disposed) { return; }
 
@@ -86,13 +85,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-            ValueTask
+        public async ValueTask DisposeAsync()
 #else
-            Task
+        public async Task DisposeAsync()
 #endif
-            DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
@@ -111,6 +108,7 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
+            await Extensions.Yield();
 
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -124,11 +122,7 @@ namespace AdvancedSharpAdbClient
 
                     firstDeviceListParsed.Set();
                 }
-#if HAS_LOGGER
                 catch (TaskCanceledException ex)
-#else
-                catch (TaskCanceledException)
-#endif
                 {
                     // We get a TaskCanceledException on Windows
                     if (cancellationToken.IsCancellationRequested)
@@ -140,17 +134,11 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
-#endif
                         throw;
                     }
                 }
-#if HAS_LOGGER
                 catch (ObjectDisposedException ex)
-#else
-                catch (ObjectDisposedException)
-#endif
                 {
                     // ... but an ObjectDisposedException on .NET Core App on Linux and macOS.
                     if (cancellationToken.IsCancellationRequested)
@@ -162,17 +150,11 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
-#endif
                         throw;
                     }
                 }
-#if HAS_LOGGER
                 catch (OperationCanceledException ex)
-#else
-                catch (OperationCanceledException)
-#endif
                 {
                     // ... and an OperationCanceledException on .NET Core App 2.1 or greater.
                     if (cancellationToken.IsCancellationRequested)
@@ -184,9 +166,7 @@ namespace AdvancedSharpAdbClient
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(ex, ex.Message);
-#endif
                         throw;
                     }
                 }
@@ -204,36 +184,27 @@ namespace AdvancedSharpAdbClient
                         {
                             // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                             await AdbServer.Instance.RestartServerAsync(cancellationToken).ConfigureAwait(false);
-                            Socket.Reconnect();
+                            Socket.Reconnect(false);
                             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
                         }
                         else
                         {
                             // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                             logger.LogError(ex, ex.Message);
-#endif
                             throw ex;
                         }
                     }
                     else
                     {
                         // The exception was unexpected, so log it & rethrow.
-#if HAS_LOGGER
                         logger.LogError(adbException, adbException.Message);
-#endif
                         throw;
                     }
                 }
-#if HAS_LOGGER
                 catch (Exception ex)
                 {
                     // The exception was unexpected, so log it & rethrow.
                     logger.LogError(ex, ex.Message);
-#else
-                catch (Exception)
-                {
-#endif
                     throw;
                 }
             }
@@ -243,8 +214,8 @@ namespace AdvancedSharpAdbClient
         private async Task InitializeSocketAsync(CancellationToken cancellationToken)
         {
             // Set up the connection to track the list of devices.
-            await Socket.SendAdbRequestAsync("host:track-devices", cancellationToken);
-            _ = await Socket.ReadAdbResponseAsync(cancellationToken);
+            await Socket.SendAdbRequestAsync("host:track-devices", cancellationToken).ConfigureAwait(false);
+            _ = await Socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }

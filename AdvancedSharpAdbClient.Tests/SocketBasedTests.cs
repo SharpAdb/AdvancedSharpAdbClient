@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Tests;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,10 +10,10 @@ namespace AdvancedSharpAdbClient
 {
     public class SocketBasedTests
     {
-        protected AdbClient TestClient { get; private set; }
-
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
+            Func<EndPoint, IAdbSocket> AdbSocketFactory;
+
             // this.EndPoint = AdbClient.Instance.EndPoint;
 #if DEBUG
             // Use the tracing adb socket factory to run the tests on an actual device.
@@ -22,44 +21,48 @@ namespace AdvancedSharpAdbClient
             if (integrationTest)
             {
                 TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
-
-                Factories.AdbSocketFactory = (endPoint) => tracingSocket;
+                AdbSocketFactory = (endPoint) => tracingSocket;
             }
             else
             {
                 DummyAdbSocket socket = new();
-                Factories.AdbSocketFactory = (endPoint) => socket;
+                AdbSocketFactory = (endPoint) => socket;
             }
 
             IntegrationTest = integrationTest;
 #else
             // In release mode (e.g. on the build server),
             // never run integration tests.
-            DummyAdbSocket socket = new DummyAdbSocket();
-            Factories.AdbSocketFactory = (endPoint) => socket;
+            DummyAdbSocket socket = new();
+            AdbSocketFactory = (endPoint) => socket;
             IntegrationTest = false;
 #endif
-            Socket = (IDummyAdbSocket)Factories.AdbSocketFactory(EndPoint);
+            Socket = (IDummyAdbSocket)AdbSocketFactory(EndPoint);
 
-            TestClient = new AdbClient();
-
-            Factories.Reset();
+            TestClient = new AdbClient(AdbSocketFactory);
         }
 
-        protected static AdbResponse[] NoResponses { get; } = Array.Empty<AdbResponse>();
-        protected static AdbResponse[] OkResponse { get; } = new AdbResponse[] { AdbResponse.OK };
-        protected static string[] NoResponseMessages { get; } = Array.Empty<string>();
+        protected static AdbResponse[] NoResponses { get; } = [];
+        protected static AdbResponse[] OkResponse { get; } = [AdbResponse.OK];
+        protected static string[] NoResponseMessages { get; } = [];
+        protected static string[] NoRequests { get; } = [];
+        protected static (SyncCommand, string)[] NoSyncRequests { get; } = [];
+        protected static SyncCommand[] NoSyncResponses { get; } = [];
         protected static DeviceData Device { get; } = new()
         {
             Serial = "169.254.109.177:5555",
             State = DeviceState.Online
         };
 
+        protected AdbClient TestClient { get; init; }
+
         protected IDummyAdbSocket Socket { get; set; }
 
         public EndPoint EndPoint { get; set; }
 
         public bool IntegrationTest { get; set; }
+
+        #region Action
 
         /// <summary>
         /// <para>
@@ -109,15 +112,15 @@ namespace AdvancedSharpAdbClient
         /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Action test) =>
-            RunTest(responses, responseMessages, requests, null, null, null, null, shellStream, test);
+            RunTest(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
 
         /// <summary>
         /// <para>
@@ -188,7 +191,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         protected void RunTest(
             IEnumerable<AdbResponse> responses,
@@ -198,15 +201,13 @@ namespace AdvancedSharpAdbClient
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Action test)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!IntegrationTest)
             {
-                Socket.ShellStream = shellStream;
-
                 foreach (AdbResponse response in responses)
                 {
                     Socket.Responses.Enqueue(response);
@@ -232,6 +233,14 @@ namespace AdvancedSharpAdbClient
                         Socket.SyncDataReceived.Enqueue(syncDatum);
                     }
                 }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
+                    }
+                }
             }
 
             Exception exception = null;
@@ -255,13 +264,14 @@ namespace AdvancedSharpAdbClient
                 Assert.Empty(Socket.Responses);
                 Assert.Empty(Socket.SyncResponses);
                 Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToList(), Socket.Requests);
+                Assert.Equal(requests.ToArray(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
                 }
                 else
                 {
@@ -270,7 +280,7 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
                 }
                 else
                 {
@@ -281,23 +291,23 @@ namespace AdvancedSharpAdbClient
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToList(), Socket.Requests);
+                Assert.Equal(requests.ToArray(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToList(), Socket.Responses);
-                Assert.Equal(responseMessages.ToList(), Socket.ResponseMessages);
+                Assert.Equal(responses.ToArray(), Socket.Responses);
+                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToList(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
                 }
                 else
                 {
@@ -306,7 +316,7 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToList(), Socket.SyncDataReceived.ToList());
+                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
                 }
                 else
                 {
@@ -315,11 +325,20 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncDataSent);
+                }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
                 }
             }
 
@@ -328,6 +347,300 @@ namespace AdvancedSharpAdbClient
                 throw exception;
             }
         }
+
+        #endregion
+
+        #region Function
+
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>The result of <paramref name="test"/>.</returns>
+        protected TResult RunTest<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            Func<TResult> test) =>
+            RunTest(responses, responseMessages, requests, null, null, null, null, null, test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>The result of <paramref name="test"/>.</returns>
+        protected TResult RunTest<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<Stream> shellStreams,
+            Func<TResult> test) =>
+            RunTest(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>The result of <paramref name="test"/>.</returns>
+        protected TResult RunTest<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            Func<TResult> test) =>
+            RunTest(
+                responses,
+                responseMessages,
+                requests,
+                syncRequests,
+                syncResponses,
+                syncDataReceived,
+                syncDataSent,
+                null,
+                test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>The result of <paramref name="test"/>.</returns>
+        protected TResult RunTest<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            IEnumerable<Stream> shellStreams,
+            Func<TResult> test)
+        {
+            // If we are running unit tests, we need to mock all the responses
+            // that are sent by the device. Do that now.
+            if (!IntegrationTest)
+            {
+                foreach (AdbResponse response in responses)
+                {
+                    Socket.Responses.Enqueue(response);
+                }
+
+                foreach (string responseMessage in responseMessages)
+                {
+                    Socket.ResponseMessages.Enqueue(responseMessage);
+                }
+
+                if (syncResponses != null)
+                {
+                    foreach (SyncCommand syncResponse in syncResponses)
+                    {
+                        Socket.SyncResponses.Enqueue(syncResponse);
+                    }
+                }
+
+                if (syncDataReceived != null)
+                {
+                    foreach (byte[] syncDatum in syncDataReceived)
+                    {
+                        Socket.SyncDataReceived.Enqueue(syncDatum);
+                    }
+                }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
+                    }
+                }
+            }
+
+            TResult result = default;
+            Exception exception = null;
+
+            try
+            {
+                result = test();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (!IntegrationTest)
+            {
+                // If we are running unit tests, we need to make sure all messages
+                // were read, and the correct request was sent.
+
+                // Make sure the messages were read
+                Assert.Empty(Socket.ResponseMessages);
+                Assert.Empty(Socket.Responses);
+                Assert.Empty(Socket.SyncResponses);
+                Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
+
+                // Make sure a request was sent
+                Assert.Equal(requests.ToArray(), Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncRequests);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataSent);
+                }
+            }
+            else
+            {
+                // Make sure the traffic sent on the wire matches the traffic
+                // we have defined in our unit test.
+                Assert.Equal(requests.ToArray(), Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncRequests);
+                }
+
+                Assert.Equal(responses.ToArray(), Socket.Responses);
+                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+
+                if (syncResponses != null)
+                {
+                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncResponses);
+                }
+
+                if (syncDataReceived != null)
+                {
+                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataReceived);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataSent);
+                }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
+                }
+            }
+
+            return exception != null ? throw exception : result;
+        }
+
+        #endregion
+
+        #region Task
 
         /// <summary>
         /// <para>
@@ -378,16 +691,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Func<Task> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStream, test);
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
 
         /// <summary>
         /// <para>
@@ -459,7 +772,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
-        /// <param name="shellStream">The <see cref="Stream"/> of <see cref="IDummyAdbSocket.ShellStream"/>.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected async Task RunTestAsync(
@@ -470,15 +783,13 @@ namespace AdvancedSharpAdbClient
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Stream shellStream,
+            IEnumerable<Stream> shellStreams,
             Func<Task> test)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
             if (!IntegrationTest)
             {
-                Socket.ShellStream = shellStream;
-
                 foreach (AdbResponse response in responses)
                 {
                     Socket.Responses.Enqueue(response);
@@ -502,6 +813,14 @@ namespace AdvancedSharpAdbClient
                     foreach (byte[] syncDatum in syncDataReceived)
                     {
                         Socket.SyncDataReceived.Enqueue(syncDatum);
+                    }
+                }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
                     }
                 }
             }
@@ -531,13 +850,14 @@ namespace AdvancedSharpAdbClient
                 Assert.Empty(Socket.Responses);
                 Assert.Empty(Socket.SyncResponses);
                 Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToList(), Socket.Requests);
+                Assert.Equal(requests.ToArray(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
                 }
                 else
                 {
@@ -546,7 +866,7 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
                 }
                 else
                 {
@@ -557,23 +877,23 @@ namespace AdvancedSharpAdbClient
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToList(), Socket.Requests);
+                Assert.Equal(requests.ToArray(), Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToList(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToList(), Socket.Responses);
-                Assert.Equal(responseMessages.ToList(), Socket.ResponseMessages);
+                Assert.Equal(responses.ToArray(), Socket.Responses);
+                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToList(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
                 }
                 else
                 {
@@ -582,7 +902,7 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToList(), Socket.SyncDataReceived.ToList());
+                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
                 }
                 else
                 {
@@ -591,11 +911,20 @@ namespace AdvancedSharpAdbClient
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToList(), Socket.SyncDataSent.ToList());
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncDataSent);
+                }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
                 }
             }
 
@@ -605,35 +934,303 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        protected static IEnumerable<string> Requests(params string[] requests) => requests;
+        #endregion
 
-        protected static IEnumerable<string> ResponseMessages(params string[] requests) => requests;
+        #region Task<TResult>
 
-        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path)
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
+        protected Task<TResult> RunTestAsync<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            Func<Task<TResult>> test) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
+        protected Task<TResult> RunTestAsync<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<Stream> shellStreams,
+            Func<Task<TResult>> test) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
+        protected Task<TResult> RunTestAsync<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            Func<Task<TResult>> test) =>
+            RunTestAsync(
+                responses,
+                responseMessages,
+                requests,
+                syncRequests,
+                syncResponses,
+                syncDataReceived,
+                syncDataSent,
+                null,
+                test);
+
+        /// <summary>
+        /// <para>
+        /// Runs an async ADB helper test, either as a unit test or as an integration test.
+        /// </para>
+        /// <para>
+        /// When running as a unit test, the <paramref name="responses"/> and <paramref name="responseMessages"/>
+        /// are used by the <see cref="DummyAdbSocket"/> to mock the responses an actual device
+        /// would send; and the <paramref name="requests"/> parameter is used to ensure the code
+        /// did send the correct requests to the device.
+        /// </para>
+        /// <para>
+        /// When running as an integration test, all three parameters, <paramref name="responses"/>,
+        /// <paramref name="responseMessages"/> and <paramref name="requests"/> are used to validate
+        /// that the traffic we simulate in the unit tests matches the traffic that is actually sent
+        /// over the wire.
+        /// </para>
+        /// </summary>
+        /// <param name="responses">The <see cref="AdbResponse"/> messages that the ADB sever should send.</param>
+        /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
+        /// <param name="requests">The requests the client should send.</param>
+        /// <param name="syncRequests">The <see cref="SyncCommand"/> requests the client should send.</param>
+        /// <param name="syncResponses">The <see cref="SyncCommand"/> messages that the ADB sever should send.</param>
+        /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
+        /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
+        /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
+        /// <param name="test">The test to run.</param>
+        /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
+        protected async Task<TResult> RunTestAsync<TResult>(
+            IEnumerable<AdbResponse> responses,
+            IEnumerable<string> responseMessages,
+            IEnumerable<string> requests,
+            IEnumerable<(SyncCommand, string)> syncRequests,
+            IEnumerable<SyncCommand> syncResponses,
+            IEnumerable<byte[]> syncDataReceived,
+            IEnumerable<byte[]> syncDataSent,
+            IEnumerable<Stream> shellStreams,
+            Func<Task<TResult>> test)
         {
-            yield return (command, path);
-        }
-
-        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2)
-        {
-            yield return (command, path);
-            yield return (command2, path2);
-        }
-
-        protected static IEnumerable<(SyncCommand, string)> SyncRequests(SyncCommand command, string path, SyncCommand command2, string path2, SyncCommand command3, string path3)
-        {
-            yield return (command, path);
-            yield return (command2, path2);
-            yield return (command3, path3);
-        }
-
-        protected static IEnumerable<AdbResponse> OkResponses(int count)
-        {
-            for (int i = 0; i < count; i++)
+            // If we are running unit tests, we need to mock all the responses
+            // that are sent by the device. Do that now.
+            if (!IntegrationTest)
             {
-                yield return AdbResponse.OK;
+                foreach (AdbResponse response in responses)
+                {
+                    Socket.Responses.Enqueue(response);
+                }
+
+                foreach (string responseMessage in responseMessages)
+                {
+                    Socket.ResponseMessages.Enqueue(responseMessage);
+                }
+
+                if (syncResponses != null)
+                {
+                    foreach (SyncCommand syncResponse in syncResponses)
+                    {
+                        Socket.SyncResponses.Enqueue(syncResponse);
+                    }
+                }
+
+                if (syncDataReceived != null)
+                {
+                    foreach (byte[] syncDatum in syncDataReceived)
+                    {
+                        Socket.SyncDataReceived.Enqueue(syncDatum);
+                    }
+                }
+
+                if (shellStreams != null)
+                {
+                    foreach (Stream shellStream in shellStreams)
+                    {
+                        Socket.ShellStreams.Enqueue(shellStream);
+                    }
+                }
             }
+
+            TResult result = default;
+            Exception exception = null;
+
+            try
+            {
+                result = await test();
+            }
+            catch (AggregateException ex)
+            {
+                exception = ex.InnerExceptions.Count == 1 ? ex.InnerException : ex;
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (!IntegrationTest)
+            {
+                // If we are running unit tests, we need to make sure all messages
+                // were read, and the correct request was sent.
+
+                // Make sure the messages were read
+                Assert.Empty(Socket.ResponseMessages);
+                Assert.Empty(Socket.Responses);
+                Assert.Empty(Socket.SyncResponses);
+                Assert.Empty(Socket.SyncDataReceived);
+                Assert.Empty(Socket.ShellStreams);
+
+                // Make sure a request was sent
+                Assert.Equal(requests.ToArray(), Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncRequests);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataSent);
+                }
+            }
+            else
+            {
+                // Make sure the traffic sent on the wire matches the traffic
+                // we have defined in our unit test.
+                Assert.Equal(requests.ToArray(), Socket.Requests);
+
+                if (syncRequests != null)
+                {
+                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncRequests);
+                }
+
+                Assert.Equal(responses.ToArray(), Socket.Responses);
+                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+
+                if (syncResponses != null)
+                {
+                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncResponses);
+                }
+
+                if (syncDataReceived != null)
+                {
+                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataReceived);
+                }
+
+                if (syncDataSent != null)
+                {
+                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                }
+                else
+                {
+                    Assert.Empty(Socket.SyncDataSent);
+                }
+
+                if (shellStreams != null)
+                {
+                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                }
+                else
+                {
+                    Assert.Empty(Socket.ShellStreams);
+                }
+            }
+
+            return exception != null ? throw exception : result;
         }
+
+        #endregion
+
+        protected static IEnumerable<AdbResponse> OkResponses(int count) => Enumerable.Repeat(AdbResponse.OK, count);
 
         private static void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
         {

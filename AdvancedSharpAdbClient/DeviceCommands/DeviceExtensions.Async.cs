@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,11 +20,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
-            client.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken);
+            client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -38,7 +48,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<FileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return await service.StatAsync(path, cancellationToken);
+            return await service.StatAsync(path, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -49,10 +59,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static async Task<IEnumerable<FileStatistics>> List(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
+        public static async Task<List<FileStatistics>> ListAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return await service.GetDirectoryListingAsync(remotePath, cancellationToken);
+            return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -68,16 +78,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            await service.PullAsync(remotePath, stream, progress, cancellationToken);
+            await service.PullAsync(remotePath, stream, progress, cancellationToken).ConfigureAwait(false);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>
@@ -95,16 +106,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            EventHandler<SyncProgressChangedEventArgs> syncProgressEventHandler = null,
-            IProgress<int> progress = null, CancellationToken cancellationToken = default            )
+            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
+            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             if (syncProgressEventHandler != null)
             {
+                service.SyncProgressChanged -= syncProgressEventHandler;
                 service.SyncProgressChanged += syncProgressEventHandler;
             }
-
-            await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken);
+            await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken).ConfigureAwait(false);
+            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>
@@ -118,7 +130,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<string> GetPropertyAsync(this IAdbClient client, DeviceData device, string property, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync($"{GetPropReceiver.GetPropCommand} {property}", device, receiver, cancellationToken);
+            await client.ExecuteShellCommandAsync(device, $"{GetPropReceiver.GetPropCommand} {property}", receiver, cancellationToken).ConfigureAwait(false);
             return receiver.ToString();
         }
 
@@ -132,7 +144,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<Dictionary<string, string>> GetPropertiesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             GetPropReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync(GetPropReceiver.GetPropCommand, device, receiver, cancellationToken);
+            await client.ExecuteShellCommandAsync(device, GetPropReceiver.GetPropCommand, receiver, cancellationToken).ConfigureAwait(false);
             return receiver.Properties;
         }
 
@@ -146,7 +158,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnvironmentVariablesReceiver receiver = new();
-            await client.ExecuteRemoteCommandAsync(EnvironmentVariablesReceiver.PrintEnvCommand, device, receiver, cancellationToken);
+            await client.ExecuteShellCommandAsync(device, EnvironmentVariablesReceiver.PrintEnvCommand, receiver, cancellationToken).ConfigureAwait(false);
             return receiver.EnvironmentVariables;
         }
 
@@ -200,7 +212,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = new();
+            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs
@@ -222,18 +234,18 @@ then
     /system/bin/ls /proc/
 else
     /system/bin/ls -1 /proc/
-fi".Replace("\r\n", "\n"), receiver, cancellationToken);
+fi".Replace("\r\n", "\n"), receiver, cancellationToken).ConfigureAwait(false);
 
-            Collection<int> pids = new();
+            List<int> pids = [];
 
             string output = receiver.ToString();
             using (StringReader reader = new(output))
             {
                 while (reader.Peek() > 0)
                 {
-                    string line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                    string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
-                    if (!line.All(char.IsDigit))
+                    if (line?.All(char.IsDigit) != true)
                     {
                         continue;
                     }
@@ -252,17 +264,16 @@ fi".Replace("\r\n", "\n"), receiver, cancellationToken);
             StringBuilder catBuilder = new();
             ProcessOutputReceiver processOutputReceiver = new();
 
-            _ = catBuilder.Append("cat ");
+            _ = catBuilder.Append("cat");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.Append($"/proc/{pids[i]}/cmdline /proc/{pids[i]}/stat ");
+                _ = catBuilder.AppendFormat(" /proc/{0}/cmdline /proc/{1}/stat", pids[i], pids[i]);
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    await client.ExecuteShellCommandAsync(device, catBuilder.ToString(), processOutputReceiver, cancellationToken);
-                    _ = catBuilder.Clear();
-                    _ = catBuilder.Append("cat ");
+                    await client.ExecuteShellCommandAsync(device, catBuilder.ToString(), processOutputReceiver, cancellationToken).ConfigureAwait(false);
+                    _ = catBuilder.Clear().Append("cat");
                 }
             }
 

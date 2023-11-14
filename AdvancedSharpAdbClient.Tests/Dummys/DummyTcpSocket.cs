@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
+    /// <summary>
+    /// A mock implementation of the <see cref="ITcpSocket"/> class.
+    /// </summary>
     internal class DummyTcpSocket : ITcpSocket
     {
         /// <summary>
@@ -26,30 +29,41 @@ namespace AdvancedSharpAdbClient.Tests
         public void Close() => Connected = false;
 
         public void Connect(EndPoint endPoint) => Connected = true;
-        public Task ConnectAsync(EndPoint endPoint)
+
+        public async ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
         {
+            await Task.Yield();
             Connected = true;
-            return Task.CompletedTask;
+        }
+
+        public void Reconnect(bool isForce = false) => Connected = true;
+
+        public async ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
+        {
+            await Task.Yield();
+            Connected = true;
         }
 
         public void Dispose() => Connected = false;
 
         public Stream GetStream() => OutputStream;
 
-        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
-        {
-            int result = Send(buffer, offset, size, socketFlags);
-            TaskCompletionSource<int> tcs = new();
-            tcs.SetResult(result);
-            return tcs.Task;
-        }
-
         public int Receive(byte[] buffer, int size, SocketFlags socketFlags) => InputStream.Read(buffer, 0, size);
 
-        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken)
+        public int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) => InputStream.Read(buffer, offset, size);
+
+        public int Receive(Span<byte> buffer, SocketFlags socketFlags) => InputStream.Read(buffer);
+
+        public Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => InputStream.ReadAsync(buffer, 0, size, cancellationToken);
+
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) => InputStream.ReadAsync(buffer, offset, size, cancellationToken);
+
+        public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) => InputStream.ReadAsync(buffer, cancellationToken);
+
+        public int Send(byte[] buffer, int size, SocketFlags socketFlags)
         {
-            int value = InputStream.Read(buffer, offset, size);
-            return Task.FromResult(value);
+            OutputStream.Write(buffer, 0, size);
+            return size;
         }
 
         public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags)
@@ -58,8 +72,30 @@ namespace AdvancedSharpAdbClient.Tests
             return size;
         }
 
-        public byte[] GetBytesSent() => OutputStream.ToArray();
+        public int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
+        {
+            OutputStream.Write(buffer);
+            return buffer.Length;
+        }
 
-        public void Reconnect() => throw new NotImplementedException();
+        public async Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
+        {
+            await OutputStream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
+            return size;
+        }
+
+        public async Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
+        {
+            await OutputStream.WriteAsync(buffer.AsMemory(offset, size), cancellationToken).ConfigureAwait(false);
+            return size;
+        }
+
+        public async ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default)
+        {
+            await OutputStream.WriteAsync(buffer, cancellationToken).ConfigureAwait(false);
+            return buffer.Length;
+        }
+
+        public byte[] GetBytesSent() => OutputStream.ToArray();
     }
 }

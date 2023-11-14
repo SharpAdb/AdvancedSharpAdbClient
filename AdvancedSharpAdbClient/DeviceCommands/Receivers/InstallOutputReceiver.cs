@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
 {
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
@@ -43,14 +43,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         private const string ErrorPattern = @"Error:\s+(.*)?";
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="InstallOutputReceiver"/> class.
+        /// </summary>
+        public InstallOutputReceiver() { }
+
+        /// <summary>
         /// Gets the error message if the install was unsuccessful.
         /// </summary>
-        public string ErrorMessage { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Gets the success message if the install is successful.
         /// </summary>
-        public string SuccessMessage { get; private set; }
+        public string? SuccessMessage { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the install was a success.
@@ -99,7 +104,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                         }
 
                         Success = false;
@@ -114,7 +119,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         if (m.Success)
                         {
                             string msg = m.Groups[1].Value;
-                            ErrorMessage = msg.IsNullOrWhiteSpace() ? UnknownError : msg;
+                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                         }
 
                         Success = false;

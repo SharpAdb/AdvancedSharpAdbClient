@@ -2,8 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,10 +26,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
 
-        private static readonly char[] InvalidCharacters = new char[]
-        {
-            '|', '\\', '?', '*', '<', '\"', ':', '>'
-        };
+        private static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
 
         /// <summary>
         /// Combine the specified paths to form one path.
@@ -114,7 +111,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="PathTooLongException">The path parameter is longer
         /// than the system-defined maximum length.</exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetDirectoryName(string path)
+        [return: NotNullIfNotNull(nameof(path))]
+        public static string? GetDirectoryName(string? path)
         {
             if (path != null)
             {
@@ -123,11 +121,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 string tpath = path;
                 if (tpath.Length > 1)
                 {
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
                     if (tpath.EndsWith(DirectorySeparatorChar))
-#else
-                    if (tpath.EndsWith(new string(new char[] { DirectorySeparatorChar })))
-#endif
                     {
                         return tpath;
                     }
@@ -140,14 +134,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
                 else if (tpath.Length == 1)
                 {
-                    return new string(new char[] { DirectorySeparatorChar });
+                    return new string([DirectorySeparatorChar]);
                 }
             }
 
             return null;
         }
 
-        /// <summary>Returns the file name and extension of the specified path string.</summary>
+        /// <summary>
+        /// Returns the file name and extension of the specified path string.
+        /// </summary>
         /// <returns>A <see cref="string"/> consisting of the characters after the last directory character in path.
         /// If the last character of path is a directory or volume separator character,
         /// this method returns <see cref="string.Empty"/>. If path is null, this method returns null.</returns>
@@ -155,7 +151,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="ArgumentException">path contains one or more of the invalid characters
         /// defined in <see cref="InvalidCharacters"/>, or contains a wildcard character. </exception>
         /// <filterpriority>1</filterpriority>
-        public static string GetFileName(string path)
+        [return: NotNullIfNotNull(nameof(path))]
+        public static string? GetFileName(string path)
         {
             if (path != null)
             {
@@ -190,7 +187,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 CheckInvalidPathChars(path);
                 int length = path.Length;
                 if ((length >= 1 && (path[0] == DirectorySeparatorChar)) ||
-                    (length == 1))
+                    length == 1)
                 {
                     return true;
                 }
@@ -234,28 +231,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The fixup path</returns>
         private static string FixupPath(string path)
         {
-            string sb = path;
-            sb = sb.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
+            string sb = path.Replace(Path.DirectorySeparatorChar, DirectorySeparatorChar);
 
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (sb != "." && !sb.StartsWith(DirectorySeparatorChar))
-#else
-            if (sb != "." && !sb.StartsWith(new string(new char[] { DirectorySeparatorChar })))
-#endif
             {
                 sb = $".{DirectorySeparatorChar}{sb}";
             }
 
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             if (!sb.EndsWith(DirectorySeparatorChar))
-#else
-            if (!sb.EndsWith(new string(new char[] { DirectorySeparatorChar })))
-#endif
             {
                 sb = $"{sb}{DirectorySeparatorChar}";
             }
 
-            sb = sb.Replace("//", new string(new char[] { DirectorySeparatorChar }));
+            sb = sb.Replace("//", new string([DirectorySeparatorChar]));
 
             return sb;
         }

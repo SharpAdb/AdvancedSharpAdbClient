@@ -2,7 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Defines a command that can be sent to, or a response that can be received from the sync service.
@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// List the files in a folder.
         /// </summary>
-        LIST,
+        LIST = 1,
 
         /// <summary>
         /// Retrieve a file from device.

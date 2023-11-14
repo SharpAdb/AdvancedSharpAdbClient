@@ -2,69 +2,74 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Provides access to the framebuffer (that is, a copy of the image being displayed on the device screen).
     /// </summary>
-    public class Framebuffer : IDisposable
+    /// <param name="device">The device for which to fetch the frame buffer.</param>
+    /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+    /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+    public class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
-        private byte[] headerData;
+        private byte[] headerData = new byte[FramebufferHeader.MaxLength];
         private bool headerInitialized;
         private bool disposed = false;
+
+        /// <summary>
+        /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
+        /// </summary>
+        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory = adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
-        public Framebuffer(DeviceData device, EndPoint endPoint)
-        {
-            Device = device ?? throw new ArgumentNullException(nameof(device));
-
-            EndPoint = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
-
-            // Initialize the headerData buffer
-#if NETCORE
-            headerData = new byte[56];
-#else
-#if !NETFRAMEWORK || NET451_OR_GREATER
-            int size = Marshal.SizeOf<FramebufferHeader>();
-#else
-            int size = Marshal.SizeOf(default(FramebufferHeader));
-#endif
-            headerData = new byte[size];
-#endif
-        }
+        public Framebuffer(DeviceData device, EndPoint endPoint) : this(device, endPoint, Factories.AdbSocketFactory) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        /// <param name="client">A <see cref="AdbClient"/> which manages the connection with adb.</param>
-        public Framebuffer(DeviceData device, AdbClient client) : this(device, client?.EndPoint) { }
+        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public Framebuffer(DeviceData device, IAdbClient client, Func<EndPoint, IAdbSocket> adbSocketFactory) : this(device, client?.EndPoint!, adbSocketFactory) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
         /// </summary>
         /// <param name="device">The device for which to fetch the frame buffer.</param>
-        public Framebuffer(DeviceData device) : this(device, AdbClient.DefaultEndPoint) { }
+        /// <param name="client">A <see cref="IAdbClient"/> which manages the connection with adb.</param>
+        public Framebuffer(DeviceData device, IAdbClient client) : this(device, client?.EndPoint!, Factories.AdbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+        public Framebuffer(DeviceData device, Func<EndPoint, IAdbSocket> adbSocketFactory) : this(device, AdbClient.DefaultEndPoint, adbSocketFactory) { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Framebuffer"/> class.
+        /// </summary>
+        /// <param name="device">The device for which to fetch the frame buffer.</param>
+        public Framebuffer(DeviceData device) : this(device, AdbClient.DefaultEndPoint, Factories.AdbSocketFactory) { }
 
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; }
+        public DeviceData Device { get; } = device ?? throw new ArgumentNullException(nameof(device));
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; }
+        public EndPoint EndPoint { get; init; } = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.
@@ -76,18 +81,19 @@ namespace AdvancedSharpAdbClient
         /// Gets the framebuffer data. You need to parse the <see cref="FramebufferHeader"/> to interpret this data (such as the color encoding).
         /// This property is set after you call <see cref="Refresh"/>.
         /// </summary>
-        public byte[] Data { get; private set; }
+        public byte[]? Data { get; private set; }
 
         /// <summary>
         /// Refreshes the framebuffer: fetches the latest framebuffer data from the device. Access the <see cref="Header"/>
         /// and <see cref="Data"/> properties to get the updated framebuffer data.
         /// </summary>
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
+        [MemberNotNull(nameof(Data))]
         public virtual void Refresh(bool reset = false)
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
             // Select the target device
             socket.SetDevice(Device);
 
@@ -100,7 +106,7 @@ namespace AdvancedSharpAdbClient
 
             if (reset || !headerInitialized)
             {
-                Header = FramebufferHeader.Read(headerData);
+                Header = new FramebufferHeader(headerData);
                 headerInitialized = true;
             }
 
@@ -120,7 +126,11 @@ namespace AdvancedSharpAdbClient
             }
 
             // followed by the actual framebuffer content
+#if HAS_BUFFERS
+            _ = socket.Read(Data.AsSpan(0, (int)Header.Size));
+#else
             _ = socket.Read(Data, (int)Header.Size);
+#endif
         }
 
 #if HAS_TASK
@@ -135,20 +145,20 @@ namespace AdvancedSharpAdbClient
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = Factories.AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = adbSocketFactory(EndPoint);
             // Select the target device
-            socket.SetDevice(Device);
+            await socket.SetDeviceAsync(Device, cancellationToken).ConfigureAwait(false);
 
             // Send the framebuffer command
-            socket.SendAdbRequest("framebuffer:");
-            socket.ReadAdbResponse();
+            await socket.SendAdbRequestAsync("framebuffer:", cancellationToken).ConfigureAwait(false);
+            await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             // The result first is a FramebufferHeader object,
             _ = await socket.ReadAsync(headerData, cancellationToken).ConfigureAwait(false);
 
             if (reset || !headerInitialized)
             {
-                Header = FramebufferHeader.Read(headerData);
+                Header = new FramebufferHeader(headerData);
                 headerInitialized = true;
             }
 
@@ -168,11 +178,15 @@ namespace AdvancedSharpAdbClient
             }
 
             // followed by the actual framebuffer content
+#if HAS_BUFFERS
+            _ = await socket.ReadAsync(Data.AsMemory(0, (int)Header.Size), cancellationToken).ConfigureAwait(false);
+#else
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
+#endif
         }
 #endif
 
-#if HAS_DRAWING
+#if HAS_IMAGING
         /// <summary>
         /// Converts the framebuffer data to a <see cref="Bitmap"/>.
         /// </summary>
@@ -180,7 +194,7 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public virtual Bitmap ToImage()
+        public virtual Bitmap? ToImage()
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(Refresh)} first") : Header.ToImage(Data);
@@ -190,13 +204,13 @@ namespace AdvancedSharpAdbClient
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public static explicit operator Image(Framebuffer value) => value.ToImage();
+        public static explicit operator Image?(Framebuffer value) => value.ToImage();
 
         /// <inheritdoc/>
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public static explicit operator Bitmap(Framebuffer value) => value.ToImage();
+        public static explicit operator Bitmap?(Framebuffer value) => value.ToImage();
 #endif
 
 #if WINDOWS_UWP
@@ -205,7 +219,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, cancellationToken);
@@ -217,7 +231,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -229,7 +243,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
@@ -247,7 +261,7 @@ namespace AdvancedSharpAdbClient
                     ArrayPool<byte>.Shared.Return(Data, clearArray: false);
                 }
 #endif
-                headerData = null;
+                headerData = null!;
                 headerInitialized = false;
                 disposed = true;
             }

@@ -2,11 +2,12 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -34,14 +35,14 @@ namespace AdvancedSharpAdbClient
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
     {
+        private static readonly char[] separator = Extensions.NewLineSeparator;
+
         private bool disposed = false;
 
-#if HAS_LOGGER
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         protected readonly ILogger<DeviceMonitor> logger;
-#endif
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
@@ -70,62 +71,79 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The <see cref="Thread"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Thread monitorThread;
+        protected Thread? monitorThread;
 #endif
 
-#if !HAS_LOGGER
-#pragma warning disable CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataChangeEventArgs>? DeviceChanged;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataNotifyEventArgs>? DeviceNotified;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataConnectEventArgs>? DeviceConnected;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataNotifyEventArgs>? DeviceListChanged;
+
+        /// <inheritdoc/>
+        public event EventHandler<DeviceDataConnectEventArgs>? DeviceDisconnected;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger to use when logging.</param>
+        public DeviceMonitor(ILogger<DeviceMonitor>? logger = null)
+            : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), logger)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <param name="logger">The logger to use when logging.</param>
+        public DeviceMonitor(EndPoint endPoint, ILogger<DeviceMonitor>? logger = null)
+            : this(Factories.AdbSocketFactory(endPoint), logger)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceMonitor"/> class.
         /// </summary>
         /// <param name="socket">The <see cref="IAdbSocket"/> that manages the connection with the adb server.</param>
         /// <param name="logger">The logger to use when logging.</param>
-        public DeviceMonitor(IAdbSocket socket
-#if HAS_LOGGER
-            , ILogger<DeviceMonitor> logger = null
-#endif
-            )
+        public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor>? logger = null)
         {
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            devices = new List<DeviceData>();
+            devices = [];
             Devices = devices.AsReadOnly();
-#if HAS_LOGGER
-            this.logger = logger ?? NullLogger<DeviceMonitor>.Instance;
-#endif
+            this.logger = logger ?? LoggerProvider.CreateLogger<DeviceMonitor>();
         }
-#if !HAS_LOGGER
-#pragma warning restore CS1572 // XML 注释中有 param 标记，但是没有该名称的参数
-#endif
 
         /// <inheritdoc/>
-        public event EventHandler<DeviceDataChangeEventArgs> DeviceChanged;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataNotifyEventArgs> DeviceNotified;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceConnected;
-
-        /// <inheritdoc/>
-        public event EventHandler<DeviceDataConnectEventArgs> DeviceDisconnected;
-
-        /// <inheritdoc/>
-        public ReadOnlyCollection<DeviceData> Devices { get; private set; }
+        public ReadOnlyCollection<DeviceData> Devices { get; init; }
 
         /// <summary>
         /// Gets the <see cref="IAdbSocket"/> that represents the connection to the
         /// Android Debug Bridge.
         /// </summary>
-        public IAdbSocket Socket { get; private set; }
+        public IAdbSocket Socket { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is running.
         /// </summary>
         /// <value><see langword="true"/> if this instance is running; otherwise, <see langword="false"/>.</value>
-        public bool IsRunning { get; private set; }
+        public bool IsRunning { get; protected set; }
 
         /// <inheritdoc/>
+        [MemberNotNull(
+#if HAS_TASK
+            nameof(monitorTask)
+#else
+            nameof(monitorThread)
+#endif
+            )]
         public virtual void Start()
         {
 #if HAS_TASK
@@ -198,7 +216,7 @@ namespace AdvancedSharpAdbClient
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
                 isMonitorThreadCancel = true;
-                Socket?.Dispose();
+                Socket?.Close();
                 _ = monitorLoopFinished.WaitOne();
 
                 monitorThread = null;
@@ -222,30 +240,6 @@ namespace AdvancedSharpAdbClient
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
-        /// <summary>
-        /// Raises the <see cref="DeviceChanged"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataChangeEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceChanged(DeviceDataChangeEventArgs e) => DeviceChanged?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceNotified"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="IEnumerable{DeviceData}"/> instance containing the event data.</param>
-        protected void OnDeviceNotified(DeviceDataNotifyEventArgs e) => DeviceNotified?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceConnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceConnected(DeviceDataConnectEventArgs e) => DeviceConnected?.Invoke(this, e);
-
-        /// <summary>
-        /// Raises the <see cref="DeviceDisconnected"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="DeviceDataConnectEventArgs"/> instance containing the event data.</param>
-        protected void OnDeviceDisconnected(DeviceDataConnectEventArgs e) => DeviceDisconnected?.Invoke(this, e);
 
 #if !HAS_TASK
         /// <summary>
@@ -284,16 +278,20 @@ namespace AdvancedSharpAdbClient
                             {
                                 // The adb server was killed, for whatever reason. Try to restart it and recover from this.
                                 AdbServer.Instance.RestartServer();
-                                Socket.Reconnect();
+                                Socket.Reconnect(false);
                                 InitializeSocket();
                             }
                             else
                             {
+                                // The exception was unexpected, so log it & rethrow.
+                                logger.LogError(ex, ex.Message);
                                 throw ex;
                             }
                         }
                         else
                         {
+                            // The exception was unexpected, so log it & rethrow.
+                            logger.LogError(adbException, adbException.Message);
                             throw;
                         }
                     }
@@ -320,18 +318,18 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         private void ProcessIncomingDeviceData(string result)
         {
-            string[] deviceValues = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            IEnumerable<DeviceData> currentDevices = deviceValues.Select(DeviceData.CreateFromAdbData);
+            string[] deviceValues = result.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<DeviceData> currentDevices = deviceValues.Select(x => new DeviceData(x));
             UpdateDevices(currentDevices);
+            DeviceNotified?.Invoke(this, new DeviceDataNotifyEventArgs(currentDevices));
         }
 
         /// <summary>
         /// Processes the incoming <see cref="DeviceData"/>.
         /// </summary>
-        protected virtual void UpdateDevices(IEnumerable<DeviceData> devices)
+        protected virtual void UpdateDevices(IEnumerable<DeviceData> collection)
         {
-            lock (this.devices)
+            lock (devices)
             {
                 // For each device in the current list, we look for a matching the new list.
                 // * if we find it, we update the current object with whatever new information
@@ -342,34 +340,47 @@ namespace AdvancedSharpAdbClient
                 // Once this is done, the new list contains device we aren't monitoring yet, so we
                 // add them to the list, and start monitoring them.
 
-                // Add or update existing devices
-                foreach (DeviceData device in devices)
+                bool isChanged = false;
+                List<DeviceData> devices = collection.ToList();
+                for (int i = this.devices.Count; --i >= 0;)
                 {
-                    DeviceData existingDevice = Devices.SingleOrDefault(d => d.Serial == device.Serial);
+                    DeviceData currentDevice = this.devices[i];
+                    int index = devices.FindIndex(d => d.Serial == currentDevice.Serial);
+                    if (index == -1)
+                    {
+                        // Remove disconnected devices
+                        this.devices.RemoveAt(i);
+                        DeviceDisconnected?.Invoke(this, new DeviceDataConnectEventArgs(currentDevice, false));
+                        isChanged = true;
+                    }
+                    else
+                    {
+                        DeviceData device = devices[index];
+                        if (currentDevice.State != device.State)
+                        {
+                            // Change device state
+                            this.devices[i] = device;
+                            DeviceChanged?.Invoke(this, new DeviceDataChangeEventArgs(device, device.State, currentDevice.State));
+                            isChanged = true;
+                        }
+                        devices.RemoveAt(index);
+                    }
+                }
 
-                    if (existingDevice == null)
+                if (devices.Count > 0)
+                {
+                    // Add connected devices
+                    foreach (DeviceData device in devices)
                     {
                         this.devices.Add(device);
-                        OnDeviceConnected(new DeviceDataConnectEventArgs(device, true));
+                        DeviceConnected?.Invoke(this, new DeviceDataConnectEventArgs(device, false));
                     }
-                    else if (existingDevice.State != device.State)
-                    {
-                        DeviceState oldState = existingDevice.State;
-                        existingDevice.State = device.State;
-                        OnDeviceChanged(new DeviceDataChangeEventArgs(existingDevice, device.State, oldState));
-                    }
+                    isChanged = true;
                 }
 
-                // Remove devices
-                foreach (DeviceData device in Devices.Where(d => !devices.Any(e => e.Serial == d.Serial)).ToArray())
+                if (isChanged)
                 {
-                    this.devices.Remove(device);
-                    OnDeviceDisconnected(new DeviceDataConnectEventArgs(device, false));
-                }
-
-                if (devices.Any())
-                {
-                    OnDeviceNotified(new DeviceDataNotifyEventArgs(devices));
+                    DeviceListChanged?.Invoke(this, new DeviceDataNotifyEventArgs(devices));
                 }
             }
         }

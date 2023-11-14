@@ -9,6 +9,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <summary>
     /// Thrown when an executed command identifies that it is being aborted.
     /// </summary>
+    [Serializable]
     public class CommandAbortingException : Exception
     {
         /// <summary>
@@ -22,7 +23,16 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        public CommandAbortingException(string message) : base(message)
+        public CommandAbortingException(string? message) : base(message)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="innerException">The inner exception.</param>
+        public CommandAbortingException(string? message, Exception? innerException) : base(message, innerException)
         {
         }
 
@@ -39,14 +49,5 @@ namespace AdvancedSharpAdbClient.Exceptions
         {
         }
 #endif
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandAbortingException"/> class.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="innerException">The inner exception.</param>
-        public CommandAbortingException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
     }
 }

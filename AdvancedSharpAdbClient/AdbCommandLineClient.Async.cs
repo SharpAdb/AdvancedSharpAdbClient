@@ -3,11 +3,11 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using AdvancedSharpAdbClient.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -22,19 +22,15 @@ namespace AdvancedSharpAdbClient
         public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
-            List<string> standardOutput = new();
-
-            await RunAdbProcessAsync("version", null, standardOutput, cancellationToken);
+            List<string> standardOutput = [];
+            await RunAdbProcessAsync("version", null, standardOutput, cancellationToken).ConfigureAwait(false);
 
             // Parse the output to get the version.
             Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-
             if (version < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
-#if HAS_LOGGER
                 logger.LogError(ex, ex.Message);
-#endif
                 throw ex;
             }
 
@@ -48,13 +44,8 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
-            int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken);
-
-            if (status == 0)
-            {
-                return;
-            }
-
+            int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
+            if (status == 0) { return; }
 #if HAS_PROCESS && !WINDOWS_UWP
             try
             {
@@ -85,10 +76,9 @@ namespace AdvancedSharpAdbClient
                 // This platform does not support getting a list of processes.
             }
 #endif
-
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
-            await RunAdbProcessAsync("start-server", null, null, cancellationToken);
+            await RunAdbProcessAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -105,14 +95,10 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual async Task RunAdbProcessAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected virtual async Task RunAdbProcessAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
-            int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken);
-
-            if (status != 0)
-            {
-                throw new AdbException($"The adb process returned error code {status} when running command {command}");
-            }
+            int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
+            if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
         }
 
         /// <summary>
@@ -128,13 +114,66 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which return the return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual async Task<int> RunAdbProcessInnerAsync(string command, List<string> errorOutput, List<string> standardOutput, CancellationToken cancellationToken = default)
+        protected virtual async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(command);
+            return await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
+        }
 
-            int status = await CrossPlatformFunc.RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken);
+        /// <summary>
+        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// </summary>
+        /// <returns>The return code of the process.</returns>
+#if !HAS_PROCESS
+        [DoesNotReturn]
+#endif
+        protected virtual async Task<int> RunProcessAsync(string filename, string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
+        {
+#if HAS_PROCESS
+            ProcessStartInfo psi = new(filename, command)
+            {
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
 
-            return status;
+            using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
+
+            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
+#if NET5_0_OR_GREATER
+            using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
+            {
+                try
+                {
+                    await process.WaitForExitAsync(completionSource.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) when (completionSource.IsCancellationRequested)
+                {
+                    if (!process.HasExited)
+                    {
+                        process.Kill();
+                    }
+                }
+            }
+#else
+            if (!process.WaitForExit(5000))
+            {
+                process.Kill();
+            }
+#endif
+            // get the return code from the process
+            return process.ExitCode;
+#else
+            await Task.CompletedTask;
+            throw new PlatformNotSupportedException("This platform is not support System.Diagnostics.Process. You can start adb server by running `adb start-server` manually.");
+#endif
         }
     }
 }

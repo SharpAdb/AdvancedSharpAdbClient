@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.Exceptions.Tests
 {
@@ -17,6 +18,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
             ExceptionTester<AdbException>.MessageAndInnerConstructorTest((message, inner) => new AdbException(message, inner));
 
         [Fact]
+        [Obsolete]
         public void SerializationConstructorTest() =>
             ExceptionTester<AdbException>.SerializationConstructorTest((info, context) => new AdbException(info, context));
     }

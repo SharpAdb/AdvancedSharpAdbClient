@@ -3,12 +3,35 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
     public partial interface IAdbSocket
     {
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
+        ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken);
+#else
+        /// <summary>
+        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        Task ReconnectAsync(bool isForce, CancellationToken cancellationToken);
+#endif
+
         /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
@@ -66,15 +89,6 @@ namespace AdvancedSharpAdbClient
         Task SendAdbRequestAsync(string request, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
-        /// the connection is in sync mode.
-        /// </summary>
-        /// <param name="data" >The buffer to store the read data into.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken);
-
-        /// <summary>
         /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
         /// </summary>
         /// <param name="data">An array of type <see cref="byte"/> that is the storage location for the received data.</param>
@@ -113,6 +127,42 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
         Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken);
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
+        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+        /// </summary>
+        /// <param name="data">An array of type Byte that is the storage location for the received data.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <remarks>Cancelling the task will also close the socket.</remarks>
+        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
+        public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken);
+#else
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        Task SendAsync(byte[] data, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// the connection is in sync mode.
+        /// </summary>
+        /// <param name="data" >The buffer to store the read data into.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
+        Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken);
+#endif
 
         /// <summary>
         /// Ask to switch the connection to the device/emulator identified by

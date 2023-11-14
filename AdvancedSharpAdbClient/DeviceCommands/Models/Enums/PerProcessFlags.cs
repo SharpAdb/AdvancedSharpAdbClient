@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient.DeviceCommands
+namespace AdvancedSharpAdbClient.Models.DeviceCommands
 {
     /// <summary>
     /// Per process flags.

@@ -2,11 +2,10 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests
+namespace AdvancedSharpAdbClient.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="FramebufferHeader"/> struct.
@@ -18,7 +17,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-v1.bin");
 
-            FramebufferHeader header = FramebufferHeader.Read(data);
+            FramebufferHeader header = [.. data];
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -34,6 +33,13 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1440u, header.Width);
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
+
+            for (int i = 0; i < header.Count; i++)
+            {
+                Assert.Equal(data[i], header[i]);
+            }
+
+            Assert.Equal(data.AsSpan(), [.. header]);
         }
 
         [Fact]
@@ -41,7 +47,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
 
-            FramebufferHeader header = FramebufferHeader.Read(data);
+            FramebufferHeader header = [.. data];
 
             Assert.Equal(8u, header.Alpha.Length);
             Assert.Equal(24u, header.Alpha.Offset);
@@ -57,14 +63,20 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1080u, header.Width);
             Assert.Equal(2u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
+
+            for (int i = 0; i < header.Count; i++)
+            {
+                Assert.Equal(data[i], header[i]);
+            }
+
+            Assert.Equal(data.AsSpan(), [.. header]);
         }
 
+#if WINDOWS
         [Fact]
         [SupportedOSPlatform("windows")]
         public void ToImageTest()
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { return; }
-
             byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
             byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
@@ -86,15 +98,14 @@ namespace AdvancedSharpAdbClient.Tests
         [SupportedOSPlatform("windows")]
         public void ToImageEmptyTest()
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) { return; }
-
             byte[] data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
 
-            byte[] framebuffer = Array.Empty<byte>();
+            byte[] framebuffer = [];
 
             Bitmap image = header.ToImage(framebuffer);
             Assert.Null(image);
         }
+#endif
     }
 }

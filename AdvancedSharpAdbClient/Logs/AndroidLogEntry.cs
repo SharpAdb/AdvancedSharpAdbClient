@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Maps Android log priorities to chars used to represent them in the system log.
         /// </summary>
-        private static readonly Dictionary<Priority, char> PriorityFormatters = new()
+        private static readonly Dictionary<Priority, char> PriorityFormatters = new(6)
         {
             { Priority.Verbose, 'V' },
             { Priority.Debug, 'D' },
@@ -26,6 +26,11 @@ namespace AdvancedSharpAdbClient.Logs
         };
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="AndroidLogEntry"/> class.
+        /// </summary>
+        public AndroidLogEntry() { }
+
+        /// <summary>
         /// Gets or sets the priority of the log message.
         /// </summary>
         public Priority Priority { get; set; }
@@ -34,12 +39,12 @@ namespace AdvancedSharpAdbClient.Logs
         /// Gets or sets the log tag of the message. Used to identify the source of a log message.
         /// It usually identifies the class or activity where the log call occurred.
         /// </summary>
-        public string Tag { get; set; }
+        public string Tag { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the message that has been logged.
         /// </summary>
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
 
         /// <inheritdoc/>
         public override string ToString() =>
@@ -51,6 +56,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="value">The value to convert.</param>
         /// <returns>A <see cref="char"/> that represents <paramref name="value"/> in the system log.</returns>
         private static char FormatPriority(Priority value) =>
-            PriorityFormatters?.TryGetValue(value, out var result) == true ? result : '?';
+            PriorityFormatters.TryGetValue(value, out char result) == true ? result : '?';
     }
 }

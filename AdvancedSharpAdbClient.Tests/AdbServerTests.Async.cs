@@ -1,5 +1,4 @@
-﻿using AdvancedSharpAdbClient.Exceptions;
-using NSubstitute;
+﻿using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using System;
 using System.Net.Sockets;
@@ -10,19 +9,25 @@ namespace AdvancedSharpAdbClient.Tests
 {
     public partial class AdbServerTests
     {
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatusAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetStatusAsyncNotRunningTest()
         {
-            IAdbClient adbClientMock = Substitute.For<IAdbClient>();
-            adbClientMock.GetAdbVersionAsync(Arg.Any<CancellationToken>()).Throws(new AggregateException(new SocketException(AdbServer.ConnectionRefused)));
+            IAdbSocket adbSocketMock = Substitute.For<IAdbSocket>();
+            adbSocketMock.SendAdbRequestAsync("host:version", Arg.Any<CancellationToken>()).Throws(new AggregateException(new SocketException(AdbServer.ConnectionRefused)));
 
-            AdbServer adbServer = new(adbClientMock, adbCommandLineClientFactory);
+            AdbServer adbServer = new((endPoint) => adbSocketMock, adbCommandLineClientFactory);
 
             AdbServerStatus status = await adbServer.GetStatusAsync();
             Assert.False(status.IsRunning);
             Assert.Null(status.Version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatusAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetStatusAsyncRunningTest()
         {
@@ -40,28 +45,35 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(new Version(1, 0, 32), status.Version);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatusAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetStatusAsyncOtherSocketExceptionTest()
         {
             adbSocketFactory = (endPoint) => throw new SocketException();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<SocketException>(async () => await adbServer.GetStatusAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.GetStatusAsync(CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void GetStatusAsyncOtherExceptionTest()
         {
             adbSocketFactory = (endPoint) => throw new Exception();
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<Exception>(async () => await adbServer.GetStatusAsync());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncAlreadyRunningTest()
         {
@@ -77,6 +89,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncOutdatedRunningNoExecutableTest()
         {
@@ -86,17 +101,22 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<AdbException>(async () => await adbServer.StartServerAsync(null, false));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncNotRunningNoExecutableTest()
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             _ = await Assert.ThrowsAsync<AdbException>(async () => await adbServer.StartServerAsync(null, false));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncOutdatedRunningTest()
         {
@@ -115,13 +135,15 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:kill", socket.Requests[1]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncNotRunningTest()
         {
             adbSocketFactory = (endPoint) => throw new SocketException(AdbServer.ConnectionRefused);
 
-            adbClient = new AdbClient(AdbClient.DefaultEndPoint, adbSocketFactory);
-            adbServer = new AdbServer(adbClient, adbCommandLineClientFactory);
+            adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
             commandLineClient.Version = new Version(1, 0, 32);
 
@@ -132,6 +154,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.True(commandLineClient.ServerStarted);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncIntermediateRestartRequestedRunningTest()
         {
@@ -150,6 +175,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:kill", socket.Requests[1]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StartServerAsync(string, bool, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void StartServerAsyncIntermediateRestartNotRequestedRunningTest()
         {
@@ -167,6 +195,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("host:version", socket.Requests[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbServer.RestartServerAsync(string, CancellationToken)"/> method.
+        /// </summary>
         [Fact]
         public async void RestartServerAsyncTest()
         {
@@ -178,10 +209,23 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.False(commandLineClient.ServerStarted);
             _ = await adbServer.RestartServerAsync(ServerName);
 
-            Assert.False(commandLineClient.ServerStarted);
+            Assert.True(commandLineClient.ServerStarted);
+
+            Assert.Equal(2, socket.Requests.Count);
+            Assert.Equal("host:version", socket.Requests[0]);
+            Assert.Equal("host:kill", socket.Requests[1]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbServer.StopServerAsync(CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void StopServerAsyncTest()
+        {
+            await adbServer.StopServerAsync();
 
             Assert.Single(socket.Requests);
-            Assert.Equal("host:version", socket.Requests[0]);
+            Assert.Equal("host:kill", socket.Requests[0]);
         }
     }
 }

@@ -3,10 +3,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
-using System.Runtime.InteropServices;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Tests.Models
+namespace AdvancedSharpAdbClient.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="Framebuffer"/> class.
@@ -44,9 +43,8 @@ namespace AdvancedSharpAdbClient.Tests.Models
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device);
+            using Framebuffer framebuffer = new(device, (endPoint) => socket);
 
-            Factories.AdbSocketFactory = (endPoint) => socket;
             framebuffer.Refresh();
 
             Assert.NotNull(framebuffer);
@@ -70,21 +68,20 @@ namespace AdvancedSharpAdbClient.Tests.Models
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                using Bitmap image = (Bitmap)framebuffer;
-                Assert.NotNull(image);
-                Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
+#if WINDOWS
+            using Bitmap image = (Bitmap)framebuffer;
+            Assert.NotNull(image);
+            Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+            Assert.Equal(1, image.Width);
+            Assert.Equal(1, image.Height);
 
-                Color pixel = image.GetPixel(0, 0);
-                Assert.Equal(0x35, pixel.R);
-                Assert.Equal(0x4a, pixel.G);
-                Assert.Equal(0x4c, pixel.B);
-                Assert.Equal(0xff, pixel.A);
-            }
+            Color pixel = image.GetPixel(0, 0);
+            Assert.Equal(0x35, pixel.R);
+            Assert.Equal(0x4a, pixel.G);
+            Assert.Equal(0x4c, pixel.B);
+            Assert.Equal(0xff, pixel.A);
+#endif
         }
 
         [Fact]
@@ -104,12 +101,11 @@ namespace AdvancedSharpAdbClient.Tests.Models
             socket.Requests.Add("host:transport:169.254.109.177:5555");
             socket.Requests.Add("framebuffer:");
 
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebufferheader.bin"));
-            socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/framebuffer.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/framebufferheader.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device);
+            using Framebuffer framebuffer = new(device, (endPoint) => socket);
 
-            Factories.AdbSocketFactory = (endPoint) => socket;
             await framebuffer.RefreshAsync();
 
             Assert.NotNull(framebuffer);
@@ -133,21 +129,20 @@ namespace AdvancedSharpAdbClient.Tests.Models
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                using Bitmap image = (Bitmap)framebuffer;
-                Assert.NotNull(image);
-                Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
+#if WINDOWS
+            using Bitmap image = (Bitmap)framebuffer;
+            Assert.NotNull(image);
+            Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
 
-                Assert.Equal(1, image.Width);
-                Assert.Equal(1, image.Height);
+            Assert.Equal(1, image.Width);
+            Assert.Equal(1, image.Height);
 
-                Color pixel = image.GetPixel(0, 0);
-                Assert.Equal(0x35, pixel.R);
-                Assert.Equal(0x4a, pixel.G);
-                Assert.Equal(0x4c, pixel.B);
-                Assert.Equal(0xff, pixel.A);
-            }
+            Color pixel = image.GetPixel(0, 0);
+            Assert.Equal(0x35, pixel.R);
+            Assert.Equal(0x4a, pixel.G);
+            Assert.Equal(0x4c, pixel.B);
+            Assert.Equal(0xff, pixel.A);
+#endif
         }
     }
 }
