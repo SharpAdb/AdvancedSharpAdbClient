@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient.Polyfills.Tests
         [Fact]
         public static void ThrowIfNegativeTest()
         {
-            Assert.Equal(-1, Assert.Throws<ArgumentOutOfRangeException>(() => ExceptionExtensions.ThrowIfNegative(-1)).ActualValue);
+            Assert.Equal(-1d, Assert.Throws<ArgumentOutOfRangeException>(() => ExceptionExtensions.ThrowIfNegative(-1d)).ActualValue);
 
             ExceptionExtensions.ThrowIfNegative(0);
             ExceptionExtensions.ThrowIfNegative(1);

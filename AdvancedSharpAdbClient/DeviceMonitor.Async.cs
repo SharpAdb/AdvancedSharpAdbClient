@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         public async ValueTask DisposeAsync()
 #else
         public async Task DisposeAsync()

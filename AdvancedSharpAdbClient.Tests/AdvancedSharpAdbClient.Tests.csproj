@@ -3,9 +3,25 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <NoWarn>CS1591</NoWarn>
-    <TargetFramework Condition="'$(IsWindows)' != 'True'">net8.0</TargetFramework>
-    <TargetFramework Condition="'$(IsWindows)' == 'True'">net8.0-windows10.0.17763.0</TargetFramework>
   </PropertyGroup>
+  
+  <Choose>
+    <When Condition="'$(IsStandard)' == 'True'">
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(IsWindows)' == 'True'">
+      <PropertyGroup>
+        <TargetFramework Condition="'$(IsWindows)' == 'True'">net8.0-windows10.0.17763.0</TargetFramework>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
 
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="6.0.0" PrivateAssets="all">
