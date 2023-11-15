@@ -404,7 +404,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device);
+        Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device)
+#if WINDOWS10_0_17763_0_OR_GREATER
+        {
+            Windows.Data.Xml.Dom.XmlDocument doc = new();
+            doc.LoadXml(DumpScreen(device)?.OuterXml);
+            return doc;
+        }
+#else
+            ;
+#endif
 #endif
 
         /// <summary>

@@ -13,7 +13,12 @@ namespace AdvancedSharpAdbClient
 {
     public partial class AdbSocket
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Use this when the socket was disconnected by adb and you have restarted adb.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         public
 #if NET6_0_OR_GREATER
             ValueTask

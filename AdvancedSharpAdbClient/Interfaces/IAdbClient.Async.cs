@@ -407,7 +407,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the screen snapshot.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken);
+        Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(DeviceData device, CancellationToken cancellationToken)
+#if WINDOWS10_0_17763_0_OR_GREATER
+            => DumpScreenAsync(device, cancellationToken).ContinueWith(x =>
+            {
+                Windows.Data.Xml.Dom.XmlDocument doc = new();
+                doc.LoadXml(x.Result?.OuterXml);
+                return doc;
+            })!
+#endif
+            ;
 #endif
 
         /// <summary>

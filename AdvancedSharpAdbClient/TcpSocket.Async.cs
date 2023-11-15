@@ -79,7 +79,12 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
+        /// socket to disconnect.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         public
 #if NET6_0_OR_GREATER
             ValueTask

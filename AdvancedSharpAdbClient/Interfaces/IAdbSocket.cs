@@ -125,7 +125,7 @@ namespace AdvancedSharpAdbClient
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A span of bytes that acts as a buffer, containing the data to send.</param>
-        void Send(ReadOnlySpan<byte> data);
+        void Send(ReadOnlySpan<byte> data) => Send(data.ToArray(), data.Length);
 
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
@@ -134,7 +134,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="data" >A span of bytes to store the read data into.</param>
         /// <returns>The total number of bytes read.</returns>
         /// <remarks>This uses the default time out value.</remarks>
-        int Read(Span<byte> data);
+        int Read(Span<byte> data)
+        {
+            byte[] bytes = new byte[data.Length];
+            int length = Read(bytes, bytes.Length);
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = bytes[i];
+            }
+            return length;
+        }
 #else
         /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
@@ -151,7 +160,6 @@ namespace AdvancedSharpAdbClient
         /// <remarks>This uses the default time out value.</remarks>
         int Read(byte[] data);
 #endif
-
 
         /// <summary>
         /// Gets a <see cref="Stream"/> that can be used to send and receive shell output to and
