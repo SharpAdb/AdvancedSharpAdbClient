@@ -16,14 +16,12 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StartAsync(CancellationToken cancellationToken);
 
-#if !NETCOREAPP3_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting
         /// unmanaged resources asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task"/> that represents the asynchronous dispose operation.</returns>
         Task DisposeAsync();
-#endif
     }
 }
 #endif

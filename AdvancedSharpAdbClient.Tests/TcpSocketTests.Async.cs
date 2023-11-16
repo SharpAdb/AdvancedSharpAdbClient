@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async void CreateUnsupportedSocketAsyncTest()
         {
             using TcpSocket socket = new();
-            _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint()).AsTask());
+            _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint()));
         }
     }
 }

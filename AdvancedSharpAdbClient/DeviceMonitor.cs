@@ -34,6 +34,9 @@ namespace AdvancedSharpAdbClient
     /// </code>
     /// </example>
     public partial class DeviceMonitor : IDeviceMonitor
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        , IAsyncDisposable
+#endif
     {
         private static readonly char[] separator = Extensions.NewLineSeparator;
 

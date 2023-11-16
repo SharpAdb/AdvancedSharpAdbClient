@@ -40,11 +40,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
-#if HAS_BUFFERS
-        public FramebufferHeader(ReadOnlySpan<byte> data)
-#else
         public FramebufferHeader(byte[] data)
-#endif
         {
             if (data.Length is < MiniLength or > MaxLength)
             {
@@ -97,13 +93,71 @@ namespace AdvancedSharpAdbClient.Models
                 Length = ReadUInt32(in data)
             };
 
-#if HAS_BUFFERS
-            uint ReadUInt32(in ReadOnlySpan<byte> data)
-#else
-            uint ReadUInt32(in byte[] data)
-#endif
-                => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
+            uint ReadUInt32(in byte[] data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
+        /// </summary>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
+        /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
+        public FramebufferHeader(ReadOnlySpan<byte> data)
+        {
+            if (data.Length is < MiniLength or > MaxLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must between {MiniLength} and {MaxLength}.");
+            }
+
+            int index = 0;
+
+            Version = ReadUInt32(in data);
+
+            if (Version > 2)
+            {
+                // Technically, 0 is not a supported version either; we assume version 0 indicates
+                // an empty framebuffer.
+                throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
+            }
+
+            Bpp = ReadUInt32(in data);
+
+            if (Version >= 2)
+            {
+                ColorSpace = ReadUInt32(in data);
+            }
+
+            Size = ReadUInt32(in data);
+            Width = ReadUInt32(in data);
+            Height = ReadUInt32(in data);
+
+            Red = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Blue = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Green = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            Alpha = new ColorData
+            {
+                Offset = ReadUInt32(in data),
+                Length = ReadUInt32(in data)
+            };
+
+            uint ReadUInt32(in ReadOnlySpan<byte> data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
+        }
+#endif
 
         /// <summary>
         /// Gets or sets the version of the framebuffer struct.
@@ -210,10 +264,15 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
-#if HAS_BUFFERS
-        public static FramebufferHeader Read(ReadOnlySpan<byte> data) => new(data);
-#else
         public static FramebufferHeader Read(byte[] data) => new(data);
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Creates a new <see cref="FramebufferHeader"/> object based on a byte array which contains the data.
+        /// </summary>
+        /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
+        /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
+        public static FramebufferHeader Read(ReadOnlySpan<byte> data) => new(data);
 #endif
 
 #if HAS_IMAGING

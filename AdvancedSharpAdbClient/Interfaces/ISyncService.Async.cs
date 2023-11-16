@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -57,7 +58,13 @@ namespace AdvancedSharpAdbClient
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken);
+        async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (FileStatistics statistics in await GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false))
+            {
+                yield return statistics;
+            }
+        }
 #endif
 
         /// <summary>

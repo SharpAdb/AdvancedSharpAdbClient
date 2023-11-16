@@ -90,12 +90,20 @@ namespace AdvancedSharpAdbClient
         public virtual void Close() => Socket.Close();
 
         /// <inheritdoc/>
+        public virtual int Send(byte[] buffer, SocketFlags socketFlags) =>
+            Socket.Send(buffer, socketFlags);
+
+        /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int size, SocketFlags socketFlags) =>
             Socket.Send(buffer, size, socketFlags);
 
         /// <inheritdoc/>
         public virtual int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
             Socket.Send(buffer, offset, size, socketFlags);
+
+        /// <inheritdoc/>
+        public virtual int Receive(byte[] buffer, SocketFlags socketFlags) =>
+            Socket.Receive(buffer, socketFlags);
 
         /// <inheritdoc/>
         public virtual int Receive(byte[] buffer, int size, SocketFlags socketFlags) =>
@@ -112,14 +120,6 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual int Receive(Span<byte> buffer, SocketFlags socketFlags) =>
-            Socket.Receive(buffer, socketFlags);
-#else
-        /// <inheritdoc/>
-        public virtual int Send(byte[] buffer, SocketFlags socketFlags) =>
-            Socket.Send(buffer, socketFlags);
-
-        /// <inheritdoc/>
-        public virtual int Receive(byte[] buffer, SocketFlags socketFlags) =>
             Socket.Receive(buffer, socketFlags);
 #endif
 

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         [Fact]
         public void GetCommandNullTest() =>
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetCommand(null));
+            _ = Assert.Throws<ArgumentNullException>(() => SyncCommandConverter.GetCommand(null));
 
         [Fact]
         public void GetCommandInvalidNumberOfBytesTest() =>

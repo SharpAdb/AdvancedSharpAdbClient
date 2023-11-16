@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Xml;
@@ -518,7 +519,13 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task"/> which return the <see cref="IAsyncEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
-        IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath, CancellationToken cancellationToken);
+        async IAsyncEnumerable<Element> FindAsyncElements(DeviceData device, string xpath, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (Element element in await FindElementsAsync(device, xpath, cancellationToken).ConfigureAwait(false))
+            {
+                yield return element;
+            }
+        }
 #endif
 
         /// <summary>

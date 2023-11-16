@@ -19,22 +19,29 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
-        public
-#if NET6_0_OR_GREATER
-            ValueTask
-#else
-            Task
-#endif
-            ReconnectAsync(CancellationToken cancellationToken = default) => ReconnectAsync(false, cancellationToken);
+        public Task ReconnectAsync(CancellationToken cancellationToken = default) => ReconnectAsync(false, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual
-#if NET6_0_OR_GREATER
-            ValueTask
-#else
-            Task
-#endif
-            ReconnectAsync(bool isForce, CancellationToken cancellationToken = default) => Socket.ReconnectAsync(isForce, cancellationToken);
+        public virtual Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default) => Socket.ReconnectAsync(isForce, cancellationToken);
+
+        /// <inheritdoc/>
+        public virtual async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                int count = await Socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
 
         /// <inheritdoc/>
         public virtual async Task SendAsync(byte[] data, int length, CancellationToken cancellationToken = default)
@@ -121,8 +128,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
+#if HAS_BUFFERS
+            ReadAsync(data.AsMemory(), cancellationToken).AsTask();
+#else
+            ReadAsync(data, 0, data.Length, cancellationToken);
+#endif
+
+        /// <inheritdoc/>
         public virtual Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) =>
+#if HAS_BUFFERS
+            ReadAsync(data.AsMemory(0, length), cancellationToken).AsTask();
+#else
             ReadAsync(data, 0, length, cancellationToken);
+#endif
 
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
@@ -332,29 +351,6 @@ namespace AdvancedSharpAdbClient
 
             return totalRead;
         }
-#else
-        /// <inheritdoc/>
-        public virtual async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                int count = await Socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
-                if (count < 0)
-                {
-                    throw new AdbException("channel EOF");
-                }
-            }
-            catch (SocketException ex)
-            {
-                logger.LogError(ex, ex.Message);
-                throw;
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-            ReadAsync(data, 0, data.Length, cancellationToken);
 #endif
 
         /// <summary>
@@ -364,11 +360,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
-#if HAS_BUFFERS
-        protected virtual async ValueTask<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
-#else
         protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
-#endif
         {
             try
             {
@@ -382,6 +374,30 @@ namespace AdvancedSharpAdbClient
 
             return true;
         }
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Write until all data in "data" is written or the connection fails or times out.
+        /// </summary>
+        /// <param name="data">The data to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
+        protected virtual async ValueTask<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                await SendAsync(data, cancellationToken).ConfigureAwait(false);
+            }
+            catch (IOException e)
+            {
+                logger.LogError(e, e.Message);
+                return false;
+            }
+
+            return true;
+        }
+#endif
 
         /// <summary>
         /// Reads the response from ADB after a command.

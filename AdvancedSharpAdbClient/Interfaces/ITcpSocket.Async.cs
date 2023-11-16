@@ -12,24 +12,6 @@ namespace AdvancedSharpAdbClient
 {
     public partial interface ITcpSocket
     {
-#if NET6_0_OR_GREATER
-        /// <summary>
-        /// Begins an asynchronous request for a connection to a remote host.
-        /// </summary>
-        /// <param name="endPoint">An <see cref="EndPoint"/> that represents the remote device.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-        ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
-        /// socket to disconnect.
-        /// </summary>
-        /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-        ValueTask ReconnectAsync(bool isForce, CancellationToken cancellationToken);
-#else
         /// <summary>
         /// Begins an asynchronous request for a connection to a remote host.
         /// </summary>
@@ -46,7 +28,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
         Task ReconnectAsync(bool isForce, CancellationToken cancellationToken);
-#endif
+
+        /// <summary>
+        /// Asynchronously sends the specified number of bytes of data to a connected
+        /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
+        /// </summary>
+        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
+        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <returns>The number of bytes sent to the Socket.</returns>
+        Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously sends the specified number of bytes of data to a connected
@@ -71,6 +62,17 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
         Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// using the specified SocketFlags.
+        /// </summary>
+        /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
+        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
+        /// <remarks>Cancelling the task will also close the socket.</remarks>
+        /// <returns>The number of bytes received.</returns>
+        Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
@@ -106,7 +108,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
-        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
+        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken) => new(ReceiveAsync(buffer.ToArray(), socketFlags, cancellationToken));
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
@@ -117,28 +119,19 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>The number of bytes received.</returns>
-        public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
-#else
-        /// <summary>
-        /// Asynchronously sends the specified number of bytes of data to a connected
-        /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
-        /// </summary>
-        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
-        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>The number of bytes sent to the Socket.</returns>
-        Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
-        /// using the specified SocketFlags.
-        /// </summary>
-        /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
-        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
-        Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
+        public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
+        {
+            byte[] bytes = new byte[buffer.Length];
+            return new(ReceiveAsync(bytes, socketFlags, cancellationToken).ContinueWith(x =>
+            {
+                int length = x.Result;
+                for (int i = 0; i < length; i++)
+                {
+                    buffer.Span[i] = bytes[i];
+                }
+                return length;
+            }));
+        }
 #endif
     }
 }

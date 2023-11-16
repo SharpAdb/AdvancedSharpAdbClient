@@ -47,11 +47,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Stops the monitoring
         /// </summary>
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        protected virtual async ValueTask DisposeAsyncCore()
-#else
         protected virtual async Task DisposeAsyncCore()
-#endif
         {
             if (disposed) { return; }
 
@@ -84,21 +80,26 @@ namespace AdvancedSharpAdbClient
             disposed = true;
         }
 
-        /// <inheritdoc/>
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        public async ValueTask DisposeAsync()
-#else
-        public async Task DisposeAsync()
-#endif
+        /// <inheritdoc/>
+        async ValueTask IAsyncDisposable.DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             GC.SuppressFinalize(this);
-#else
-            Dispose();
-#endif
         }
+
+        /// <inheritdoc/>
+        public Task DisposeAsync() => ((IAsyncDisposable)this).DisposeAsync().AsTask();
+#else
+        /// <inheritdoc/>
+        public async Task DisposeAsync()
+        {
+            await DisposeAsyncCore().ConfigureAwait(false);
+            Dispose(disposing: false);
+            Dispose();
+        }
+#endif
 
         /// <summary>
         /// Monitors the devices. This connects to the Debug Bridge

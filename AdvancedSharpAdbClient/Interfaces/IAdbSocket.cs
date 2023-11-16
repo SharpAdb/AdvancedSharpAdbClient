@@ -31,6 +31,12 @@ namespace AdvancedSharpAdbClient
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
+        void Send(byte[] data);
+
+        /// <summary>
+        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// </summary>
+        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="length">The number of bytes to send.</param>
         void Send(byte[] data, int length);
 
@@ -70,6 +76,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="request">The request to send.</param>
         void SendAdbRequest(string request);
+
+        /// <summary>
+        /// Reads from the socket until the array is filled, or no more data is coming(because
+        /// the socket closed or the timeout expired).
+        /// </summary>
+        /// <param name="data" >The buffer to store the read data into.</param>
+        /// <returns>The total number of bytes read.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
+        int Read(byte[] data);
 
         /// <summary>
         /// Reads from the socket until the array is filled, the optional<paramref name= "length"/>
@@ -125,7 +140,7 @@ namespace AdvancedSharpAdbClient
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A span of bytes that acts as a buffer, containing the data to send.</param>
-        void Send(ReadOnlySpan<byte> data) => Send(data.ToArray(), data.Length);
+        void Send(ReadOnlySpan<byte> data) => Send(data.ToArray());
 
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
@@ -137,28 +152,13 @@ namespace AdvancedSharpAdbClient
         int Read(Span<byte> data)
         {
             byte[] bytes = new byte[data.Length];
-            int length = Read(bytes, bytes.Length);
+            int length = Read(bytes);
             for (int i = 0; i < length; i++)
             {
                 data[i] = bytes[i];
             }
             return length;
         }
-#else
-        /// <summary>
-        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
-        /// </summary>
-        /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
-        void Send(byte[] data);
-
-        /// <summary>
-        /// Reads from the socket until the array is filled, or no more data is coming(because
-        /// the socket closed or the timeout expired).
-        /// </summary>
-        /// <param name="data" >The buffer to store the read data into.</param>
-        /// <returns>The total number of bytes read.</returns>
-        /// <remarks>This uses the default time out value.</remarks>
-        int Read(byte[] data);
 #endif
 
         /// <summary>

@@ -45,6 +45,15 @@ namespace AdvancedSharpAdbClient
         /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
         /// </summary>
         /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
+        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
+        /// <returns>The number of bytes sent to the Socket.</returns>
+        int Send(byte[] buffer, SocketFlags socketFlags);
+
+        /// <summary>
+        /// Sends the specified number of bytes of data to a connected
+        /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
+        /// </summary>
+        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
         /// <param name="size">The number of bytes to send.</param>
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
@@ -61,6 +70,15 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
         int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags);
+
+        /// <summary>
+        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// using the specified SocketFlags.
+        /// </summary>
+        /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
+        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
+        /// <returns>The number of bytes received.</returns>
+        int Receive(byte[] buffer, SocketFlags socketFlags);
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
@@ -110,24 +128,6 @@ namespace AdvancedSharpAdbClient
             }
             return length;
         }
-#else
-        /// <summary>
-        /// Sends the specified number of bytes of data to a connected
-        /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
-        /// </summary>
-        /// <param name="buffer">An array of type Byte that contains the data to be sent.</param>
-        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
-        /// <returns>The number of bytes sent to the Socket.</returns>
-        int Send(byte[] buffer, SocketFlags socketFlags);
-
-        /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
-        /// using the specified SocketFlags.
-        /// </summary>
-        /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
-        /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
-        /// <returns>The number of bytes received.</returns>
-        int Receive(byte[] buffer, SocketFlags socketFlags);
 #endif
 
         /// <summary>

@@ -83,10 +83,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">The reply.</param>
         /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
-#if HAS_BUFFERS
-        public static bool IsOkay(ReadOnlySpan<byte> reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
-#else
         public static bool IsOkay(byte[] reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Determines whether the specified reply is okay.
+        /// </summary>
+        /// <param name="reply">The reply.</param>
+        /// <returns><see langword="true"/> if the specified reply is okay; otherwise, <see langword="false"/>.</returns>
+        public static bool IsOkay(ReadOnlySpan<byte> reply) => AdbClient.Encoding.GetString(reply).Equals("OKAY");
 #endif
 
         /// <inheritdoc/>
@@ -94,6 +99,24 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual void Reconnect(bool isForce = false) => Socket.Reconnect(isForce);
+
+        /// <inheritdoc/>
+        public virtual void Send(byte[] data)
+        {
+            try
+            {
+                int count = Socket.Send(data, SocketFlags.None);
+                if (count < 0)
+                {
+                    throw new AdbException("channel EOF");
+                }
+            }
+            catch (SocketException sex)
+            {
+                logger.LogError(sex, sex.Message);
+                throw;
+            }
+        }
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data, int length)
@@ -180,7 +203,20 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual int Read(byte[] data, int length) => Read(data, 0, length);
+        public virtual int Read(byte[] data) =>
+#if HAS_BUFFERS
+            Read(data.AsSpan());
+#else
+            Read(data, 0, data.Length);
+#endif
+
+        /// <inheritdoc/>
+        public virtual int Read(byte[] data, int length) =>
+#if HAS_BUFFERS
+            Read(data.AsSpan(0, length));
+#else
+            Read(data, 0, length);
+#endif
 
         /// <inheritdoc/>
         public virtual int Read(byte[] data, int offset, int length)
@@ -356,27 +392,6 @@ namespace AdvancedSharpAdbClient
 
             return totalRead;
         }
-#else
-        /// <inheritdoc/>
-        public virtual void Send(byte[] data)
-        {
-            try
-            {
-                int count = Socket.Send(data, SocketFlags.None);
-                if (count < 0)
-                {
-                    throw new AdbException("channel EOF");
-                }
-            }
-            catch (SocketException sex)
-            {
-                logger.LogError(sex, sex.Message);
-                throw;
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual int Read(byte[] data) => Read(data, 0, data.Length);
 #endif
 
         /// <inheritdoc/>
@@ -419,11 +434,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="data">The data to send.</param>
         /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
-#if HAS_BUFFERS
-        protected virtual bool Write(ReadOnlySpan<byte> data)
-#else
         protected virtual bool Write(byte[] data)
-#endif
         {
             try
             {
@@ -437,6 +448,29 @@ namespace AdvancedSharpAdbClient
 
             return true;
         }
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Write until all data in "data" is written or the connection fails or times out.
+        /// </summary>
+        /// <param name="data">The data to send.</param>
+        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>This uses the default time out value.</remarks>
+        protected virtual bool Write(ReadOnlySpan<byte> data)
+        {
+            try
+            {
+                Send(data);
+            }
+            catch (IOException e)
+            {
+                logger.LogError(e, e.Message);
+                return false;
+            }
+
+            return true;
+        }
+#endif
 
         /// <summary>
         /// Reads the response from ADB after a command.
@@ -464,11 +498,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
         /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
-#if HAS_BUFFERS
-        protected virtual string ReplyToString(ReadOnlySpan<byte> reply)
-#else
         protected virtual string ReplyToString(byte[] reply)
-#endif
         {
             string result;
             try
@@ -482,6 +512,28 @@ namespace AdvancedSharpAdbClient
             }
             return result;
         }
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Converts an ADB reply to a string.
+        /// </summary>
+        /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
+        /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
+        protected virtual string ReplyToString(ReadOnlySpan<byte> reply)
+        {
+            string result;
+            try
+            {
+                result = Encoding.ASCII.GetString(reply);
+            }
+            catch (DecoderFallbackException e)
+            {
+                logger.LogError(e, e.Message);
+                result = string.Empty;
+            }
+            return result;
+        }
+#endif
 
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="AdbSocket"/> class.
