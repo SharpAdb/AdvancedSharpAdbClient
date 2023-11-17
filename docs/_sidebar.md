@@ -1,0 +1,25 @@
+- **About**
+    - [Introduction](introduction)
+    - [Consulting and Support](support)
+    - [Licence](licence)
+- **Getting started**
+    - [Installation](installation)
+    - [Connecting to device](connecting)
+    - [Working with lib](working)
+- **Reference**
+    - Screen automation
+        - [Find elements]()
+        - [Click on an element]()
+        - [Swipe]()
+        - [Type text]()
+        - [Send key events]()
+        - [Dump xml hierarchy]()
+        - [Create screenshots]()
+    - Device commands
+        - [Install applications]()
+        - [Starting applications]()
+        - [Working with files]()
+        - [Run shell commands]()
+        - [Forward connection]()
+- **Tutorials**
+    - [Automate multiple Nox emulators]()
