@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
             // Only fields in Linux 2.1.10 and earlier are listed here,
             // additional fields exist in newer versions of Linux.
             string state = parts[0];
-            State = (AndroidProcessState)Enum.Parse(typeof(AndroidProcessState), state, true);
+            State = (AndroidProcessState)state[0];
 
             int ppid = ParseInt(parts[1]);
             ParentProcessId = ppid;

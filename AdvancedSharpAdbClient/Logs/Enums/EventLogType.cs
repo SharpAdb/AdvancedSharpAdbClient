@@ -32,6 +32,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// The value is a four-byte signed floating number.
         /// </summary>
-        Float,
+        Float
     }
 }

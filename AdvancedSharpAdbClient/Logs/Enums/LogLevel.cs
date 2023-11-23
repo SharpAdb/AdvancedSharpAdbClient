@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Defines logging severity levels.
     /// </summary>
-    public enum LogLevel : byte
+    public enum LogLevel
     {
         /// <summary>
         /// Logs that contain the most detailed messages. These messages may contain sensitive application data.
@@ -47,6 +47,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Not used for writing log messages. Specifies that a logging category should not write any messages.
         /// </summary>
-        None = 6,
+        None = 6
     }
 }

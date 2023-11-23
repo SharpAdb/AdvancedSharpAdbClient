@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents a protocol which is being forwarded over adb.
     /// </summary>
-    public enum ForwardProtocol : byte
+    public enum ForwardProtocol
     {
         /// <summary>
         /// Enables the forwarding of a TCP port.

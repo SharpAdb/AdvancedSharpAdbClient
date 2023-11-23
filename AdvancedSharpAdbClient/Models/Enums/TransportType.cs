@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Specifies the transport type used between the device and the Android Debug Bridge server.
     /// </summary>
-    public enum TransportType : byte
+    public enum TransportType
     {
         /// <summary>
         /// The device is connected through USB.

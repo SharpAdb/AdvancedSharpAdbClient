@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Defines a command that can be sent to, or a response that can be received from the sync service.
     /// </summary>
-    public enum SyncCommand : byte
+    public enum SyncCommand
     {
         /// <summary>
         /// List the files in a folder.

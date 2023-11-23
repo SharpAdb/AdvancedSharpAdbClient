@@ -7,56 +7,56 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
     /// <summary>
     /// Represents the state of a process running on an Android device.
     /// </summary>
-    public enum AndroidProcessState : byte
+    public enum AndroidProcessState
     {
         /// <summary>
         /// The process state is unknown.
         /// </summary>
-        Unknown,
+        Unknown = 0,
 
         /// <summary>
         /// Foreground or runnable (on run queue).
         /// </summary>
-        R,
+        R = 'R',
 
         /// <summary>
         /// Interruptible sleep (waiting for an event to complete).
         /// </summary>
-        S,
+        S = 'S',
 
         /// <summary>
         /// Uninterruptible sleep (usually IO).
         /// </summary>
-        D,
+        D = 'D',
 
         /// <summary>
         /// Defunct ("zombie") process, terminated but not reaped by its parent.
         /// </summary>
-        Z,
+        Z = 'Z',
 
         /// <summary>
         /// Stopped, either by a job control signal or because it is being traced.
         /// </summary>
-        T,
+        T = 'T',
 
         /// <summary>
         /// paging (not valid since the 2.6.xx kernel).
         /// </summary>
-        W,
+        W = 'W',
 
         /// <summary>
         /// dead (should never be seen).
         /// </summary>
-        X,
+        X = 'X',
 
         /// <summary>
         /// Wakekill.
         /// </summary>
-        K,
+        K = 'K',
 
         /// <summary>
         /// Parked.
         /// </summary>
-        P
+        P = 'P'
     }
 }

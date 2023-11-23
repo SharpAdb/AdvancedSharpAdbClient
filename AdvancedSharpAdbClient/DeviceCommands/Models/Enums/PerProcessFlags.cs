@@ -175,6 +175,6 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
         /// <summary>
         /// This thread called freeze_processes() and should not be frozen.
         /// </summary>
-        SUSPEND_TASK = 0x80000000,
+        SUSPEND_TASK = 0x80000000
     }
 }

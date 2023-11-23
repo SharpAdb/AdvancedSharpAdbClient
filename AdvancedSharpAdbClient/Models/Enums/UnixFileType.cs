@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The file is a regular file.
         /// </summary>
-        Regular = 0x8000,
+        Regular = TypeMask,
 
         /// <summary>
         /// The file is a block device.

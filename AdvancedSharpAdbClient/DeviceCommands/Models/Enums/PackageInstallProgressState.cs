@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
     /// <summary>
     /// Represents the state of the installation.
     /// </summary>
-    public enum PackageInstallProgressState : byte
+    public enum PackageInstallProgressState
     {
         /// <summary>
         /// Uploading packages to the device.
@@ -37,6 +37,6 @@ namespace AdvancedSharpAdbClient.Models.DeviceCommands
         /// <summary>
         /// The operation has completed.
         /// </summary>
-        Finished,
+        Finished
     }
 }

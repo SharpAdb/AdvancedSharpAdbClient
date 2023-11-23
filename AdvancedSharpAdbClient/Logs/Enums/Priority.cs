@@ -38,6 +38,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Represents an assertion which failed.
         /// </summary>
-        Assert = 7,
+        Assert = 7
     }
 }
