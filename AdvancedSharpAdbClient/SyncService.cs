@@ -46,9 +46,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const int MaxPathLength = 1024;
 
-        /// <inheritdoc/>
-        public event EventHandler<SyncProgressChangedEventArgs>? SyncProgressChanged;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
@@ -127,7 +124,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -192,14 +189,8 @@ namespace AdvancedSharpAdbClient
 #else
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 #endif
-
-                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
-
                 // Let the caller know about our progress, if requested
-                if (progress != null && totalBytesToProcess != 0)
-                {
-                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
-                }
+                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             // create the DONE message
@@ -223,14 +214,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<int>? progress = null, in bool isCancelled = false)
+        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
             // Get file information, including the file size, used to calculate the total amount of bytes to receive.
             FileStatistics stat = Stat(remoteFilePath);
-            long totalBytesToProcess = stat.Size;
+            int totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
@@ -286,13 +277,8 @@ namespace AdvancedSharpAdbClient
 #endif
                 totalBytesRead += size;
 
-                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
-
                 // Let the caller know about our progress, if requested
-                if (progress != null && totalBytesToProcess != 0)
-                {
-                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
-                }
+                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
         }
 

@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Pull(string, Stream, IProgress{int}, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Pull(string, Stream, IProgress{SyncProgressChangedEventArgs}, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PullTest()
@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, IProgress{int}, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PushTest()

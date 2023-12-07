@@ -7,7 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
-    /// Provides data for the <see cref="ISyncService.SyncProgressChanged"/> event.
+    /// Provides data for the <see cref="ISyncService"/> interface.
     /// </summary>
     public class SyncProgressChangedEventArgs(long current, long total) : EventArgs
     {
@@ -26,6 +26,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the number of progress percentage (from <see langword="0"/> to <see langword="100"/>) for the sync operation.
         /// </summary>
-        public double ProgressPercentage => TotalBytesToReceive != 0L ? ReceivedBytesSize * 100.0 / TotalBytesToReceive : 0.0;
+        public double ProgressPercentage => TotalBytesToReceive == 0L ? 0.0 : ReceivedBytesSize * 100.0 / TotalBytesToReceive;
     }
 }

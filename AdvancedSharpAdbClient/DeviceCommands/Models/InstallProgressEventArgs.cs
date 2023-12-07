@@ -7,7 +7,7 @@ using System;
 namespace AdvancedSharpAdbClient.Models.DeviceCommands
 {
     /// <summary>
-    /// Represents the state of the installation for <see cref="PackageManager.InstallProgressChanged"/>.
+    /// Represents the state of the installation for <see cref="PackageManager"/>.
     /// </summary>
     public class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {

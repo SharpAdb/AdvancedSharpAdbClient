@@ -72,23 +72,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to pull the file.</param>
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
-        /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
-            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
+            IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            if (syncProgressEventHandler != null)
-            {
-                service.SyncProgressChanged -= syncProgressEventHandler;
-                service.SyncProgressChanged += syncProgressEventHandler;
-            }
             await service.PullAsync(remotePath, stream, progress, cancellationToken).ConfigureAwait(false);
-            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>
@@ -100,23 +92,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
         /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
-        /// <param name="syncProgressEventHandler">An optional handler for the <see cref="ISyncService.SyncProgressChanged"/> event.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            EventHandler<SyncProgressChangedEventArgs>? syncProgressEventHandler = null,
-            IProgress<int>? progress = null, CancellationToken cancellationToken = default)
+            IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            if (syncProgressEventHandler != null)
-            {
-                service.SyncProgressChanged -= syncProgressEventHandler;
-                service.SyncProgressChanged += syncProgressEventHandler;
-            }
             await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken).ConfigureAwait(false);
-            service.SyncProgressChanged -= syncProgressEventHandler;
         }
 
         /// <summary>

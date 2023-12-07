@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// or zero (0) if the buffer's length is zero or the end of the stream has been reached.</returns>
         public static int Read(this Stream stream, byte[] buffer, int count) =>
             stream.Read(buffer, 0, count);
-        
+
         /// <summary>
         /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
         /// </summary>

@@ -147,7 +147,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{int}, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{SyncProgressChangedEventArgs}, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PullAsyncTest()
@@ -182,7 +182,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{int}, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PushAsyncTest()

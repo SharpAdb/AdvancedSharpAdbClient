@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<int>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -101,14 +101,8 @@ namespace AdvancedSharpAdbClient
 #else
                 await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
 #endif
-
-                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
-
                 // Let the caller know about our progress, if requested
-                if (progress != null && totalBytesToProcess != 0)
-                {
-                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
-                }
+                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             // create the DONE message
@@ -132,7 +126,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<int>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
@@ -196,13 +190,8 @@ namespace AdvancedSharpAdbClient
 #endif
                 totalBytesRead += size;
 
-                SyncProgressChanged?.Invoke(this, new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
-
                 // Let the caller know about our progress, if requested
-                if (progress != null && totalBytesToProcess != 0)
-                {
-                    progress.Report((int)(100.0 * totalBytesRead / totalBytesToProcess));
-                }
+                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
         }
 
