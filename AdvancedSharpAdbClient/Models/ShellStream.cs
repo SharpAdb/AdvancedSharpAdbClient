@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -210,7 +211,7 @@ namespace AdvancedSharpAdbClient.Models
                     }
 
                     byte[] miniBuffer = new byte[1];
-                    int miniRead = Inner.Read(miniBuffer, 1);
+                    int miniRead = Inner.Read(miniBuffer, 0, 1);
 
                     if (miniRead == 0)
                     {
@@ -411,7 +412,7 @@ namespace AdvancedSharpAdbClient.Models
                         continue;
                     }
 
-                    int miniRead = await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
+                    int miniRead = await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
 
                     if (miniRead == 0)
                     {
@@ -431,7 +432,7 @@ namespace AdvancedSharpAdbClient.Models
             // we need to read one more byte from the inner stream.
             if (read > 0 && buffer[offset + read - 1] == 0x0d)
             {
-                _ = await Inner.ReadAsync(miniBuffer, 1, cancellationToken).ConfigureAwait(false);
+                _ = await Inner.ReadAsync(miniBuffer, 0, 1, cancellationToken).ConfigureAwait(false);
                 int nextByte = miniBuffer[0];
 
                 if (nextByte == 0x0a)

@@ -602,14 +602,17 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
+#if HAS_BUFFERS
             while ((read = apk.Read(buffer)) > 0)
             {
-#if HAS_BUFFERS
                 socket.Send(buffer.AsSpan(0, read));
-#else
-                socket.Send(buffer, read);
-#endif
             }
+#else
+            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                socket.Send(buffer, read);
+            }
+#endif
 
             read = socket.Read(buffer);
             string value =
@@ -762,14 +765,17 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
+#if HAS_BUFFERS
             while ((read = apk.Read(buffer)) > 0)
             {
-#if HAS_BUFFERS
                 socket.Send(buffer.AsSpan(0, read));
-#else
-                socket.Send(buffer, read);
-#endif
             }
+#else
+            while ((read = apk.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                socket.Send(buffer, read);
+            }
+#endif
 
             read = socket.Read(buffer);
             string value =

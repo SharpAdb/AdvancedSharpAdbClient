@@ -186,7 +186,7 @@ namespace AdvancedSharpAdbClient
                 await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
 #else
                 await Socket.ReadAsync(buffer, size, cancellationToken).ConfigureAwait(false);
-                await stream.WriteAsync(buffer, size, cancellationToken).ConfigureAwait(false);
+                await stream.WriteAsync(buffer, 0, size, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += size;
 

@@ -455,14 +455,17 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
+#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-#if HAS_BUFFERS
                 await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
-#else
-                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
-#endif
             }
+#else
+            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+            {
+                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
+            }
+#endif
 
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
@@ -616,14 +619,17 @@ namespace AdvancedSharpAdbClient
             byte[] buffer = new byte[32 * 1024];
             int read = 0;
 
+#if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
-#if HAS_BUFFERS
                 await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
-#else
-                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
-#endif
             }
+#else
+            while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+            {
+                await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
+            }
+#endif
 
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
