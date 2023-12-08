@@ -37,13 +37,10 @@ namespace AdvancedSharpAdbClient.Receivers
         /// <returns>A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.</returns>
         public override string ToString() => output.ToString();
 
-        /// <summary>
-        /// Throws an error message if the console output line contains an error message.
-        /// </summary>
-        /// <param name="line">The line to inspect.</param>
-        public virtual void ThrowOnError(string line)
+        /// <inheritdoc/>
+        protected override void ThrowOnError(string line)
         {
-            if (!ParsesErrors)
+            if (ParsesErrors && !line.StartsWith('#') && !line.StartsWith('$'))
             {
                 if (line.EndsWith(": not found"))
                 {

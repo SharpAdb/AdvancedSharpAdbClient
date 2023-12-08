@@ -233,10 +233,8 @@ namespace AdvancedSharpAdbClient
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
-
                     if (line == null) { break; }
-
-                    receiver?.AddOutput(line);
+                    if (receiver?.AddOutput(line) is false) { break; }
                 }
             }
             catch (Exception e)

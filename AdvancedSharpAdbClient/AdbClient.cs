@@ -382,7 +382,7 @@ namespace AdvancedSharpAdbClient
                 {
                     string? line = reader.ReadLine();
                     if (line == null) { break; }
-                    receiver?.AddOutput(line);
+                    if (receiver?.AddOutput(line) is false) { break; }
                 }
             }
             catch (Exception e)
@@ -1175,6 +1175,7 @@ namespace AdvancedSharpAdbClient
                 throw new InvalidTextException();
             }
         }
+
         /// <inheritdoc/>
         public void StartApp(DeviceData device, string packageName)
         {

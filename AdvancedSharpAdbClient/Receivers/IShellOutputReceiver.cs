@@ -14,17 +14,11 @@ namespace AdvancedSharpAdbClient.Receivers
     public interface IShellOutputReceiver
     {
         /// <summary>
-        /// Gets a value indicating whether the receiver parses error messages.
+        /// Adds a line to the output.
         /// </summary>
-        /// <value><see langword="true"/> if this receiver parsers error messages; otherwise <see langword="false"/>.</value>
-        /// <remarks>The default value is <see langword="false"/>. If set to <see langword="false"/>, the <see cref="AdbClient"/>
-        /// will detect common error messages and throw an exception.</remarks>
-        bool ParsesErrors { get; }
-
-        /// <summary>
-        /// Adds the output.
-        /// </summary>
-        void AddOutput(string line);
+        /// <param name="line">The line to add to the output.</param>
+        /// <value><see langword="true"/> if continue receive messages; otherwise <see langword="false"/>.</value>
+        bool AddOutput(string line);
 
         /// <summary>
         /// Flushes the output.
