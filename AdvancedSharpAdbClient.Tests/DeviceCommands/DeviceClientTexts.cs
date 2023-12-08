@@ -233,6 +233,21 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
+        /// Tests the <see cref="DeviceClient.Swipe(Point, Point, long)"/> method.
+        /// </summary>
+        [Fact]
+        public void SwipePointTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
+
+            new DeviceClient(client, Device).Swipe(new Point(100, 200), new Point(300, 400), 500);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input swipe 100 200 300 400 500", client.ReceivedCommands[0]);
+        }
+
+        /// <summary>
         /// Tests the <see cref="DeviceClient.Swipe(Element, Element, long)"/> method.
         /// </summary>
         [Fact]

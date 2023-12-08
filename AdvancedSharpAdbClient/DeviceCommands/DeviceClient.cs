@@ -147,7 +147,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Generates a swipe gesture from first element to second element Specify the speed in ms.
+        /// Generates a swipe gesture from first element to second element. Specify the speed in ms.
         /// </summary>
         /// <param name="first">The start element.</param>
         /// <param name="second">The end element.</param>
@@ -170,7 +170,30 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed Specify the speed in ms.
+        /// Generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
+        /// </summary>
+        /// <param name="first">The start <see cref="Point"/>.</param>
+        /// <param name="second">The end <see cref="Point"/>.</param>
+        /// <param name="speed">The time spent in swiping.</param>
+        public void Swipe(Point first, Point second, long speed)
+        {
+            ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
+            AdbClient.ExecuteShellCommand(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver);
+
+            string result = receiver.ToString().Trim();
+
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
+            {
+                throw new ElementNotFoundException("Coordinates of element is invalid");
+            }
+        }
+
+        /// <summary>
+        /// Generates a swipe gesture from co-ordinates [x1, y1] to [x2, y2] with speed. Specify the speed in ms.
         /// </summary>
         /// <param name="x1">The start X co-ordinate.</param>
         /// <param name="y1">The start Y co-ordinate.</param>

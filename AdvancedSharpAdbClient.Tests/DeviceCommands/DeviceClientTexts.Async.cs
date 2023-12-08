@@ -219,6 +219,21 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
+        /// Tests the <see cref="DeviceClient.SwipeAsync(Point, Point, long, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void SwipePointAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
+
+            await new DeviceClient(client, Device).SwipeAsync(new Point(100, 200), new Point(300, 400), 500);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input swipe 100 200 300 400 500", client.ReceivedCommands[0]);
+        }
+
+        /// <summary>
         /// Tests the <see cref="DeviceClient.SwipeAsync(Element, Element, long, CancellationToken)"/> method.
         /// </summary>
         [Fact]
