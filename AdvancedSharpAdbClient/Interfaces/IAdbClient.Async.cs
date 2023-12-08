@@ -15,30 +15,29 @@ namespace AdvancedSharpAdbClient
     public partial interface IAdbClient
     {
         /// <summary>
-        /// Ask the ADB server for its internal version number.
+        /// Asynchronously ask the ADB server for its internal version number.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the ADB version number.</returns>
         Task<int> GetAdbVersionAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Ask the ADB server to quit immediately. This is used when the
-        /// ADB client detects that an obsolete server is running after an
-        /// upgrade.
+        /// Asynchronously ask the ADB server to quit immediately. This is used when the
+        /// ADB client detects that an obsolete server is running after an upgrade.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task KillAdbAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the devices that are available for communication.
+        /// Asynchronously gets the devices that are available for communication.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the list of devices that are connected.</returns>
         Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Asks the ADB server to forward local connections from <paramref name="local"/>
+        /// Asynchronously asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
         /// <param name="device">The device on which to forward the connections.</param>
@@ -76,7 +75,7 @@ namespace AdvancedSharpAdbClient
         Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
+        /// Asynchronously asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
         /// <param name="device">The device on which to reverse forward the connections.</param>
@@ -114,7 +113,7 @@ namespace AdvancedSharpAdbClient
         Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Remove a reverse port forwarding between a remote and a local port.
+        /// Asynchronously remove a reverse port forwarding between a remote and a local port.
         /// </summary>
         /// <param name="device">The device on which to remove the reverse port forwarding</param>
         /// <param name="remote">Specification of the remote that was forwarded</param>
@@ -123,7 +122,7 @@ namespace AdvancedSharpAdbClient
         Task RemoveReverseForwardAsync(DeviceData device, string remote, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Removes all reverse forwards for a given device.
+        /// Asynchronously removes all reverse forwards for a given device.
         /// </summary>
         /// <param name="device">The device on which to remove all reverse port forwarding</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -131,7 +130,7 @@ namespace AdvancedSharpAdbClient
         Task RemoveAllReverseForwardsAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Remove a port forwarding between a local and a remote port.
+        /// Asynchronously remove a port forwarding between a local and a remote port.
         /// </summary>
         /// <param name="device">The device on which to remove the port forwarding.</param>
         /// <param name="localPort">Specification of the local port that was forwarded.</param>
@@ -140,7 +139,7 @@ namespace AdvancedSharpAdbClient
         Task RemoveForwardAsync(DeviceData device, int localPort, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Removes all forwards for a given device.
+        /// Asynchronously removes all forwards for a given device.
         /// </summary>
         /// <param name="device">The device on which to remove the port forwarding.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -148,7 +147,7 @@ namespace AdvancedSharpAdbClient
         Task RemoveAllForwardsAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
-        /// List all existing forward connections from this server.
+        /// Asynchronously list all existing forward connections from this server.
         /// </summary>
         /// <param name="device">The device for which to list the existing forward connections.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -164,7 +163,7 @@ namespace AdvancedSharpAdbClient
         Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -175,7 +174,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -187,7 +186,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Asynchronously executes a command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -197,7 +196,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -209,7 +208,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -222,7 +221,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Asynchronously executes a command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -233,7 +232,7 @@ namespace AdvancedSharpAdbClient
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the frame buffer from the specified end point.
+        /// Asynchronously gets the frame buffer from the specified end point.
         /// </summary>
         /// <param name="device">The device for which to get the framebuffer.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.</param>
@@ -253,7 +252,7 @@ namespace AdvancedSharpAdbClient
         Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
 
         /// <summary>
-        /// Reboots the specified device in to the specified mode.
+        /// Asynchronously reboots the specified device in to the specified mode.
         /// </summary>
         /// <param name="into">The mode into which to reboot the device.</param>
         /// <param name="device">The device to reboot.</param>
@@ -262,7 +261,7 @@ namespace AdvancedSharpAdbClient
         Task RebootAsync(string into, DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication
+        /// Asynchronously pair with a device for secure TCP/IP communication
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="code">The pairing code.</param>
@@ -271,7 +270,7 @@ namespace AdvancedSharpAdbClient
         Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Connect to a device via TCP/IP.
+        /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -279,7 +278,7 @@ namespace AdvancedSharpAdbClient
         Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Disconnects a remote device from this local ADB server.
+        /// Asynchronously disconnects a remote device from this local ADB server.
         /// </summary>
         /// <param name="endpoint">The endpoint of the remote device to disconnect.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -287,7 +286,7 @@ namespace AdvancedSharpAdbClient
         Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Restarts the ADB daemon running on the device with root privileges.
+        /// Asynchronously restarts the ADB daemon running on the device with root privileges.
         /// </summary>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -295,7 +294,7 @@ namespace AdvancedSharpAdbClient
         Task RootAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Restarts the ADB daemon running on the device without root privileges.
+        /// Asynchronously restarts the ADB daemon running on the device without root privileges.
         /// </summary>
         /// <param name="device">The device on which to restart ADB without root privileges.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -335,7 +334,7 @@ namespace AdvancedSharpAdbClient
         Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
-        /// Like "install", but starts an install session.
+        /// Like "install", but starts an install session asynchronously.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The package name of the baseAPK to install.</param>
@@ -345,7 +344,7 @@ namespace AdvancedSharpAdbClient
         Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
-        /// Write an apk into the given install session.
+        /// Asynchronously write an apk into the given install session.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
@@ -356,7 +355,7 @@ namespace AdvancedSharpAdbClient
         Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Commit the given active install session, installing the app.
+        /// Asynchronously commit the given active install session, installing the app.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="session">The session ID of the install session.</param>
@@ -365,7 +364,7 @@ namespace AdvancedSharpAdbClient
         Task InstallCommitAsync(DeviceData device, string session, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Uninstalls an Android application on an device.
+        /// Asynchronously uninstalls an Android application on an device.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
@@ -375,7 +374,7 @@ namespace AdvancedSharpAdbClient
         Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
-        /// Lists all features supported by the current device.
+        /// Asynchronously lists all features supported by the current device.
         /// </summary>
         /// <param name="device">The device for which to get the list of features supported.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

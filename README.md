@@ -60,15 +60,15 @@ If you want to automate 2 or more devices at the same time, you must remember: 1
 You can look at the examples to understand more
 
 ```cs
-static AdbClient client;
-
-static DeviceData device;
+static AdbClient adbClient;
+static DeviceData deviceData;
 
 static void Main(string[] args)
 {
-    client = new AdbClient();
-    client.Connect("127.0.0.1:62001");
-    device = client.GetDevices().FirstOrDefault(); // Get first connected device
+    adbClient = new AdbClient();
+    adbClient.Connect("127.0.0.1:62001");
+    device = adbClient.GetDevices().FirstOrDefault(); // Get first connected device
+    ...
 }
 ```
 
@@ -78,29 +78,27 @@ static void Main(string[] args)
 You can find the element on the screen by xpath
 
 ```cs
-static AdbClient client;
-
-static DeviceData device;
+static DeviceClient deviceClient;
 
 static void Main(string[] args)
 {
-    client = new AdbClient();
-    client.Connect("127.0.0.1:62001");
-    device = client.GetDevices().FirstOrDefault();
-    Element element = client.FindElement(device, "//node[@text='Login']");
+    ...
+    deviceClient = new DeviceClient(adbClient, deviceData);
+    Element element = deviceClient.FindElement("//node[@text='Login']");
+    ...
 }
 ```
 
 You can also specify the waiting time for the element
 
 ```cs
-Element element = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(5));
+Element element = deviceClient.FindElement("//node[@text='Login']", TimeSpan.FromSeconds(5));
 ```
 
 And you can find several elements
 
 ```cs
-Element[] element = client.FindElements(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
+Element[] element = deviceClient.FindElements("//node[@resource-id='Login']", TimeSpan.FromSeconds(5));
 ```
 
 ### Getting element attributes
@@ -110,7 +108,7 @@ You can get all element attributes
 static void Main(string[] args)
 {
     ...
-    Element element = client.FindElement(device, "//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
+    Element element = deviceClient.FindElement("//node[@resource-id='Login']", TimeSpan.FromSeconds(3));
     string eltext = element.Attributes["text"];
     string bounds = element.Attributes["bounds"];
     ...
@@ -125,7 +123,7 @@ You can click on the x and y coordinates
 static void Main(string[] args)
 {
     ...
-    client.Click(device, 600, 600); // Click on the coordinates (600;600)
+    deviceClient.Click(600, 600); // Click on the coordinates (600;600)
     ...
 }
 ```
@@ -136,7 +134,7 @@ Or on the element(need xpath)
 static void Main(string[] args)
 {
     ...
-    Element element = client.FindElement(device, "//node[@text='Login']", TimeSpan.FromSeconds(3));
+    Element element = deviceClient.FindElement("//node[@text='Login']", TimeSpan.FromSeconds(3));
     element.Click(); // Click on element by xpath //node[@text='Login']
     ...
 }
@@ -163,9 +161,9 @@ You can swipe from one element to another
 static void Main(string[] args)
 {
     ...
-    Element first = client.FindElement(device, "//node[@text='Login']");
-    Element second = client.FindElement(device, "//node[@text='Password']");
-    client.Swipe(device, first, second, 100); // Swipe 100 ms
+    Element first = deviceClient.FindElement("//node[@text='Login']");
+    Element second = deviceClient.FindElement("//node[@text='Password']");
+    deviceClient.Swipe(first, second, 100); // Swipe 100 ms
     ...
 }
 ```
@@ -176,8 +174,7 @@ Or swipe by coordinates
 static void Main(string[] args)
 {
     ...
-    device = client.GetDevices().FirstOrDefault();
-    client.Swipe(device, 600, 1000, 600, 500, 100); // Swipe from (600;1000) to (600;500) on 100 ms
+    deviceClient.Swipe(600, 1000, 600, 500, 100); // Swipe from (600;1000) to (600;500) on 100 ms
     ...
 }
 ```
@@ -187,9 +184,9 @@ The Swipe() method throw ElementNotFoundException if the element is not found
 ```cs
 try
 {
-    client.Swipe(device, 0x2232323, 0x954, 0x9128, 0x11111, 200);
+    deviceClient.Swipe(0x2232323, 0x954, 0x9128, 0x11111, 200);
     ...
-    client.Swipe(device, first, second, 200);
+    deviceClient.Swipe(first, second, 200);
 }
 catch (Exception ex)
 {
@@ -207,7 +204,7 @@ The text field should be in focus
 static void Main(string[] args)
 {
     ...
-    client.SendText(device, "text"); // Send text to device
+    deviceClient.SendText("text"); // Send text to device
     ...
 }
 ```
@@ -218,7 +215,7 @@ You can also send text to the element (clicks on the element and sends the text)
 static void Main(string[] args)
 {
     ...
-    client.FindElement(device, "//node[@resource-id='Login']").SendText("text"); // Send text to the element by xpath //node[@resource-id='Login']
+    deviceClient.FindElement("//node[@resource-id='Login']").SendText("text"); // Send text to the element by xpath //node[@resource-id='Login']
     ...
 }
 ```
@@ -228,7 +225,7 @@ The SendText() method throw InvalidTextException if text is incorrect
 ```cs
 try
 {
-    client.SendText(device, null);
+    deviceClient.SendText(null);
 }
 catch (Exception ex)
 {
@@ -249,7 +246,7 @@ The text field should be in focus
 static void Main(string[] args)
 {
     ...
-    client.ClearInput(device, 25); // The second argument is to specify the maximum number of characters to be erased
+    adbClient.ClearInput(deviceData, 25); // The second argument is to specify the maximum number of characters to be erased
     ...
 }
 ```
@@ -260,7 +257,7 @@ static void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    client.FindElement(device, "//node[@resource-id='Login']").ClearInput(); // Get element text attribute and remove text length symbols
+    deviceClient.FindElement("//node[@resource-id='Login']").ClearInput(); // Get element text attribute and remove text length symbols
     ...
 }
 ```
@@ -273,7 +270,7 @@ You can see key events here https://developer.android.com/reference/android/view
 static void Main(string[] args)
 {
     ...
-    client.SendKeyEvent(device, "KEYCODE_TAB");
+    deviceClient.SendKeyEvent("KEYCODE_TAB");
     ...
 }
 ```
@@ -283,7 +280,7 @@ The SendKeyEvent method throw InvalidKeyEventException if key event is incorrect
 ```cs
 try
 {
-    client.SendKeyEvent(device, null);
+    deviceClient.SendKeyEvent(null);
 }
 catch (Exception ex)
 {
@@ -297,9 +294,9 @@ catch (Exception ex)
 static void Main(string[] args)
 {
     ...
-    client.ClickBackButton(device); // Click Back button
+    adbClient.ClickBackButton(device); // Click Back button
     ...
-    client.ClickHomeButton(device); // Click Home button
+    adbClient.ClickHomeButton(device); // Click Home button
     ...
 }
 ```
@@ -312,7 +309,7 @@ static void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    PackageManager manager = new PackageManager(client, device);
+    PackageManager manager = new PackageManager(adbClient, deviceData);
     manager.InstallPackage(@"C:\Users\me\Documents\mypackage.apk");
     manager.UninstallPackage("com.android.app");
     ...
@@ -327,8 +324,8 @@ static void Main(string[] args)
     ...
     using (FileStream stream = File.OpenRead("Application.apk"))
     {
-        client.Install(device, stream);
-        client.Uninstall(device, "com.android.app");
+        adbClient.Install(device, stream);
+        adbClient.Uninstall(device, "com.android.app");
     }
     ...
 }
@@ -339,7 +336,7 @@ static void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    PackageManager manager = new PackageManager(client, device);
+    PackageManager manager = new PackageManager(adbClient, deviceData);
     manager.InstallMultiplePackage(@"C:\Users\me\Documents\base.apk", new[] { @"C:\Users\me\Documents\split_1.apk", @"C:\Users\me\Documents\split_2.apk" }); // Install split app whith base app
     manager.InstallMultiplePackage(new[] { @"C:\Users\me\Documents\split_3.apk", @"C:\Users\me\Documents\split_4.apk" }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
@@ -352,8 +349,8 @@ Or you can use AdbClient.InstallMultiple
 static void Main(string[] args)
 {
     ...
-    client.InstallMultiple(device, File.OpenRead("base.apk"), new[] { File.OpenRead("split_1.apk"), File.OpenRead("split_2.apk") }); // Install split app whith base app
-    client.InstallMultiple(device, new[] { File.OpenRead("split_3.apk"), File.OpenRead("split_4.apk") }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
+    adbClient.InstallMultiple(device, File.OpenRead("base.apk"), new[] { File.OpenRead("split_1.apk"), File.OpenRead("split_2.apk") }); // Install split app whith base app
+    adbClient.InstallMultiple(device, new[] { File.OpenRead("split_3.apk"), File.OpenRead("split_4.apk") }, "com.android.app"); // Add split app to base app which packagename is 'com.android.app'
     ...
 }
 ```
@@ -364,8 +361,8 @@ static void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    client.StartApp(device, "com.android.app");
-    client.StopApp(device, "com.android.app"); // force-stop
+    deviceClient.StartApp("com.android.app");
+    deviceClient.StopApp("com.android.app"); // force-stop
     ...
 }
 ```
@@ -376,9 +373,9 @@ static void Main(string[] args)
 static async void Main(string[] args)
 {
     ...
-    Image img = client.GetFrameBuffer(device, CancellationToken.None); // synchronously
+    Image img = adbClient.GetFrameBuffer(deviceData, CancellationToken.None); // synchronously
     ...
-    Image img = await client.GetFrameBufferAsync(device, CancellationToken.None); // asynchronously
+    Image img = await adbClient.GetFrameBufferAsync(deviceData, CancellationToken.None); // asynchronously
     ...
 }
 ```
@@ -389,7 +386,7 @@ static async void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    XmlDocument screen = client.DumpScreen(device);
+    XmlDocument screen = deviceClient.DumpScreen();
     ...
 }
 ```
@@ -399,7 +396,7 @@ static void Main(string[] args)
 ```cs
 void DownloadFile()
 {
-    using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
+    using (SyncService service = new SyncService(deviceData))
     {
         using (FileStream stream = File.OpenWrite(@"C:\MyFile.txt"))
         {
@@ -410,7 +407,7 @@ void DownloadFile()
 
 void UploadFile()
 {
-    using (SyncService service = new SyncService(new AdbSocket(client.EndPoint), device))
+    using (SyncService service = new SyncService(deviceData))
     {
         using (FileStream stream = File.OpenRead(@"C:\MyFile.txt"))
         {
@@ -427,9 +424,9 @@ static async void Main(string[] args)
 {
     ...
     ConsoleOutputReceiver receiver = new ConsoleOutputReceiver();
-    client.ExecuteRemoteCommand("echo Hello, World", device, receiver); // synchronously
+    adbClient.ExecuteRemoteCommand("echo Hello, World", device, receiver); // synchronously
     ...
-    await client.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, CancellationToken.None); // asynchronously
+    await adbClient.ExecuteRemoteCommandAsync("echo Hello, World", device, receiver, default); // asynchronously
     ...
 }
 ```

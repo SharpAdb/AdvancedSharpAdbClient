@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbCommandLineClient
     {
         /// <summary>
-        /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
+        /// Asynchronously queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Starts the adb server by running the <c>adb start-server</c> command.
+        /// Asynchronously starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -82,7 +82,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// Asynchronously runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// Asynchronously runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
@@ -121,7 +121,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// Asynchronously runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
 #if !HAS_PROCESS

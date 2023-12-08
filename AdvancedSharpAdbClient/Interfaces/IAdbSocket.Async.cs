@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient
     public partial interface IAdbSocket
     {
         /// <summary>
-        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Asynchronously reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
         /// Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
         /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         Task ReconnectAsync(bool isForce, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// Asynchronously sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient
         Task SendAsync(byte[] data, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// Asynchronously sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient
         Task SendAsync(byte[] data, int length, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// Asynchronously sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="offset">The index of the first byte in the array to send.</param>
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient
         Task SendAsync(byte[] data, int offset, int length, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends a sync request to the device.
+        /// Asynchronously sends a sync request to the device.
         /// </summary>
         /// <param name="command" >The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient
         Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends a sync request to the device.
+        /// Asynchronously sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
@@ -68,7 +68,7 @@ namespace AdvancedSharpAdbClient
         Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Sends a sync request to the device.
+        /// Asynchronously sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
         /// <param name="length">The length of the data packet that follows.</param>
@@ -86,7 +86,7 @@ namespace AdvancedSharpAdbClient
         Task SendAdbRequestAsync(string request, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// Asynchronously reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
         /// the connection is in sync mode.
         /// </summary>
         /// <param name="data" >The buffer to store the read data into.</param>
@@ -95,7 +95,7 @@ namespace AdvancedSharpAdbClient
         Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+        /// Asynchronously receives data from a <see cref="IAdbSocket"/> into a receive buffer.
         /// </summary>
         /// <param name="data">An array of type <see cref="byte"/> that is the storage location for the received data.</param>
         /// <param name="length">The number of bytes to receive.</param>
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
         Task<string> ReadStringAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
+        /// Asynchronously reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance when
         /// the connection is in sync mode.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient
         Task<string> ReadSyncStringAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reads the response to a sync command.
+        /// Asynchronously reads the response to a sync command.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the response that was sent by the device.</returns>
@@ -136,7 +136,7 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_BUFFERS
         /// <summary>
-        /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
+        /// Asynchronously sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -144,7 +144,7 @@ namespace AdvancedSharpAdbClient
         public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default) => new(SendAsync(data.ToArray(), cancellationToken));
 
         /// <summary>
-        /// Receives data from a <see cref="IAdbSocket"/> into a receive buffer.
+        /// Asynchronously receives data from a <see cref="IAdbSocket"/> into a receive buffer.
         /// </summary>
         /// <param name="data">An array of type Byte that is the storage location for the received data.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -166,7 +166,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Ask to switch the connection to the device/emulator identified by
+        /// Asynchronously ask to switch the connection to the device/emulator identified by
         /// <paramref name="device"/>. After this request, every client request will
         /// be sent directly to the adbd daemon running on the device.
         /// </summary>

@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public static partial class DeviceExtensions
     {
         /// <summary>
-        /// Executes a shell command on the device.
+        /// Asynchronously executes a shell command on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a shell command on the device.
+        /// Asynchronously executes a shell command on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Gets the current device screen snapshot asynchronously.
+        /// Asynchronously gets the current device screen snapshot asynchronously.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).DumpScreenAsync(cancellationToken);
 
         /// <summary>
-        /// Clicks on the specified coordinates.
+        /// Asynchronously clicks on the specified coordinates.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).ClickAsync(cords, cancellationToken);
 
         /// <summary>
-        /// Generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
+        /// Asynchronously generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -73,7 +73,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SwipeAsync(first, second, speed, cancellationToken);
 
         /// <summary>
-        /// Get the <see cref="AppStatus"/> of the app.
+        /// Asynchronously get the <see cref="AppStatus"/> of the app.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).GetAppStatusAsync(packageName, cancellationToken);
 
         /// <summary>
-        /// Get element by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Asynchronously get element by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -96,7 +96,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).FindElementAsync(xpath, cancellationToken);
 
         /// <summary>
-        /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Asynchronously get elements by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).FindElementsAsync(xpath, cancellationToken);
 
         /// <summary>
-        /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
+        /// Asynchronously send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendKeyEventAsync(key, cancellationToken);
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Asynchronously send text to device. Doesn't support Russian.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -130,7 +130,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendTextAsync(text, cancellationToken);
 
         /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
+        /// Asynchronously clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Click BACK button.
+        /// Asynchronously click BACK button.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click BACK button.</param>
@@ -155,7 +155,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_BACK", cancellationToken);
 
         /// <summary>
-        /// Click HOME button.
+        /// Asynchronously click HOME button.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
@@ -165,7 +165,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_HOME", cancellationToken);
 
         /// <summary>
-        /// Start an Android application on device.
+        /// Asynchronously start an Android application on device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
@@ -176,7 +176,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteShellCommandAsync(device, $"monkey -p {packageName} 1", cancellationToken);
 
         /// <summary>
-        /// Stop an Android application on device.
+        /// Asynchronously stop an Android application on device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
@@ -187,7 +187,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteShellCommandAsync(device, $"am force-stop {packageName}", cancellationToken);
 
         /// <summary>
-        /// Gets the file statistics of a given file.
+        /// Asynchronously gets the file statistics of a given file.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to look for the file.</param>
@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Lists the contents of a directory on the device.
+        /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to list the directory.</param>
@@ -215,7 +215,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Pulls (downloads) a file from the remote device.
+        /// Asynchronously pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to pull the file.</param>
@@ -233,7 +233,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Pushes (uploads) a file to the remote device.
+        /// Asynchronously pushes (uploads) a file to the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to put the file.</param>
@@ -253,7 +253,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the property of a device.
+        /// Asynchronously gets the property of a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to get the property.</param>
@@ -268,7 +268,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the properties of a device.
+        /// Asynchronously gets the properties of a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the properties.</param>
@@ -282,7 +282,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the environment variables currently defined on a device.
+        /// Asynchronously gets the environment variables currently defined on a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the environment variables.</param>
@@ -296,7 +296,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Uninstalls a package from the device.
+        /// Asynchronously uninstalls a package from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
@@ -310,7 +310,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Requests the version information from the device.
+        /// Asynchronously requests the version information from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
@@ -324,7 +324,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Lists all processes running on the device.
+        /// Asynchronously lists all processes running on the device.
         /// </summary>
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>

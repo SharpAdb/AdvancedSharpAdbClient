@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Logs
     public partial class LogReader
     {
         /// <summary>
-        /// Reads the next <see cref="LogEntry"/> from the stream.
+        /// Asynchronously reads the next <see cref="LogEntry"/> from the stream.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a new <see cref="LogEntry"/> object.</returns>

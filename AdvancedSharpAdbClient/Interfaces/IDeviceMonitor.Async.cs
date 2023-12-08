@@ -10,14 +10,14 @@ namespace AdvancedSharpAdbClient
     public partial interface IDeviceMonitor
     {
         /// <summary>
-        /// Starts the monitoring.
+        /// Asynchronously starts the monitoring.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StartAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting
+        /// Asynchronously performs application-defined tasks associated with freeing, releasing, or resetting
         /// unmanaged resources asynchronously.
         /// </summary>
         /// <returns>A <see cref="Task"/> that represents the asynchronous dispose operation.</returns>

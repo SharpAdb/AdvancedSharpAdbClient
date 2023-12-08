@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public partial class PackageManager
     {
         /// <summary>
-        /// Refreshes the packages.
+        /// Asynchronously refreshes the packages.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs an Android application on device.
+        /// Asynchronously installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
@@ -65,7 +65,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs the application package that was pushed to a temporary location on the device.
+        /// Asynchronously installs the application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs Android multiple application on device.
+        /// Asynchronously installs Android multiple application on device.
         /// </summary>
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
@@ -174,7 +174,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs Android multiple application on device.
+        /// Asynchronously installs Android multiple application on device.
         /// </summary>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
@@ -239,7 +239,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs the multiple application package that was pushed to a temporary location on the device.
+        /// Asynchronously installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
@@ -287,7 +287,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Installs the multiple application package that was pushed to a temporary location on the device.
+        /// Asynchronously installs the multiple application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
@@ -331,7 +331,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Uninstalls a package from the device.
+        /// Asynchronously ininstalls a package from the device.
         /// </summary>
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
@@ -340,7 +340,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             UninstallPackageAsync(packageName, default, arguments);
 
         /// <summary>
-        /// Uninstalls a package from the device.
+        /// Asynchronously uninstalls a package from the device.
         /// </summary>
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -372,7 +372,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Requests the version information from the device.
+        /// Asynchronously requests the version information from the device.
         /// </summary>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -387,7 +387,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Pushes a file to device
+        /// Asynchronously pushes a file to device
         /// </summary>
         /// <param name="localFilePath">The absolute path to file on local host.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
@@ -440,7 +440,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Remove a file from device.
+        /// Asynchronously remove a file from device.
         /// </summary>
         /// <param name="remoteFilePath">Path on device of file to remove.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -461,7 +461,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Like "install", but starts an install session.
+        /// Like "install", but starts an install session asynchronously.
         /// </summary>
         /// <param name="packageName">The absolute package name of the base app.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -503,7 +503,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Write an apk into the given install session.
+        /// Asynchronously write an apk into the given install session.
         /// </summary>
         /// <param name="session">The session ID of the install session.</param>
         /// <param name="apkName">The name of the application.</param>

@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
 #if HAS_TASK
         /// <summary>
-        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// Asynchronously creates an array from a <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             source.ContinueWith(x => x.Result.ToArray());
 
         /// <summary>
-        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// Asynchronously creates an array from a <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>

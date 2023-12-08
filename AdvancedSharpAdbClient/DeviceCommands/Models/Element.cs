@@ -280,7 +280,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
 #if HAS_TASK
         /// <summary>
-        /// Clicks on this coordinates.
+        /// Asynchronously clicks on this coordinates.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         public async Task ClickAsync(CancellationToken cancellationToken = default)
@@ -301,7 +301,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Asynchronously send text to device. Doesn't support Russian.
         /// </summary>
         /// <param name="text">The text to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -326,7 +326,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -335,7 +335,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             ClearInputAsync(Text!.Length, cancellationToken);
 
         /// <summary>
-        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

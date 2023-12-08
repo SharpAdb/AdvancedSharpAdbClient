@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient
     public partial interface ISyncService
     {
         /// <summary>
-        /// Pushes (uploads) a file to the remote device.
+        /// Asynchronously pushes (uploads) a file to the remote device.
         /// </summary>
         /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
         /// <param name="remotePath">The path, on the device, to which to push the file.</param>
@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
         Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Pulls (downloads) a file from the remote device.
+        /// Asynchronously pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient
         Task PullAsync(string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns information about a file on the device.
+        /// Asynchronously returns information about a file on the device.
         /// </summary>
         /// <param name="remotePath">The path of the file on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient
         Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Lists the contents of a directory on the device.
+        /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <summary>
-        /// Lists the contents of a directory on the device.
+        /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -68,14 +68,14 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Opens this connection.
+        /// Asynchronously opens this connection.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task OpenAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reopen this connection. Use this when the socket was disconnected by adb and you have restarted adb.
+        /// Asynchronously reopen this connection. Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
