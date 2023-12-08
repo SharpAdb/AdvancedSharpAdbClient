@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes command line output of a <c>adb</c> shell command.

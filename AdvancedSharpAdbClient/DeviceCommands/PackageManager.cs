@@ -110,7 +110,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        protected IAdbClient AdbClient { get; init; }
+        public IAdbClient AdbClient { get; init; }
 
         /// <summary>
         /// Refreshes the packages.

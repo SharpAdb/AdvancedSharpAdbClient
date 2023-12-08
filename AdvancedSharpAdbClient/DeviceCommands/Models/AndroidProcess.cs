@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient.Models.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
     /// <summary>
     /// Represents a process running on an Android device.

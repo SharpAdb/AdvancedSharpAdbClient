@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Runtime.Versioning;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Models.Tests
@@ -24,6 +25,9 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
+#if WINDOWS
+        [SupportedOSPlatform("windows")]
+#endif
         public void RefreshTest()
         {
             DeviceData device = new()

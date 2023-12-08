@@ -5,7 +5,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.

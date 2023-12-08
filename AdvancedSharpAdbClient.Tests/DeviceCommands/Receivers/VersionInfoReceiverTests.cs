@@ -8,7 +8,7 @@ using System;
 using System.IO;
 using Xunit;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers.Tests
 {
     /// <summary>
     /// Tests the <see cref="VersionInfoReceiver"/> class.

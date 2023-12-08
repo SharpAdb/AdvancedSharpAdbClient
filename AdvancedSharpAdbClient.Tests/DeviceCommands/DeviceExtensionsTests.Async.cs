@@ -8,6 +8,53 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     public partial class DeviceExtensionsTests
     {
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClearInputAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
+            client.Commands["shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"] = string.Empty;
+
+            await client.ClearInputAsync(Device, 3);
+
+            Assert.Equal(2, client.ReceivedCommands.Count);
+            Assert.Equal("shell:input keyevent KEYCODE_MOVE_END", client.ReceivedCommands[0]);
+            Assert.Equal("shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL", client.ReceivedCommands[1]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickBackButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickBackButtonAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_BACK"] = string.Empty;
+
+            await client.ClickBackButtonAsync(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_BACK", client.ReceivedCommands[0]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickHomeButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickHomeButtonAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_HOME"] = string.Empty;
+
+            await client.ClickHomeButtonAsync(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_HOME", client.ReceivedCommands[0]);
+        }
+
         [Fact]
         public async void StatAsyncTest()
         {

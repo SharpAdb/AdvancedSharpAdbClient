@@ -36,6 +36,33 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
         /// <summary>
+        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="charCount">The length of text to clear.</param>
+        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)
+        {
+            DeviceClient deviceClient = new(client, device);
+            deviceClient.SendKeyEvent("KEYCODE_MOVE_END");
+            deviceClient.SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
+        }
+
+        /// <summary>
+        /// Click BACK button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click BACK button.</param>
+        public static void ClickBackButton(this IAdbClient client, DeviceData device) => new DeviceClient(client, device).SendKeyEvent("KEYCODE_BACK");
+
+        /// <summary>
+        /// Click HOME button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        public static void ClickHomeButton(this IAdbClient client, DeviceData device) => new DeviceClient(client, device).SendKeyEvent("KEYCODE_HOME");
+
+        /// <summary>
         /// Gets the file statistics of a given file.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>

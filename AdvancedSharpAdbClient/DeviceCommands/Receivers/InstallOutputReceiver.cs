@@ -4,7 +4,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes output of the <c>pm install</c> command.

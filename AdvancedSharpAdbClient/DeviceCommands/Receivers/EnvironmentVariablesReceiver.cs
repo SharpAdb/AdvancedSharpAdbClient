@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.

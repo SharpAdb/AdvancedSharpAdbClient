@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Parses the output of the various <c>pm</c> commands.

@@ -10,6 +10,59 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
     /// </summary>
     public partial class DeviceExtensionsTests
     {
+        protected static DeviceData Device { get; } = new()
+        {
+            Serial = "169.254.109.177:5555",
+            State = DeviceState.Online
+        };
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void ClearInputTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
+            client.Commands["shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"] = string.Empty;
+
+            client.ClearInput(Device, 3);
+
+            Assert.Equal(2, client.ReceivedCommands.Count);
+            Assert.Equal("shell:input keyevent KEYCODE_MOVE_END", client.ReceivedCommands[0]);
+            Assert.Equal("shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL", client.ReceivedCommands[1]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickBackButton(IAdbClient, DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void ClickBackButtonTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_BACK"] = string.Empty;
+
+            client.ClickBackButton(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_BACK", client.ReceivedCommands[0]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickHomeButton(IAdbClient, DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void ClickHomeButtonTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_HOME"] = string.Empty;
+
+            client.ClickHomeButton(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_HOME", client.ReceivedCommands[0]);
+        }
+
         [Fact]
         public void StatTest()
         {
@@ -19,15 +72,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             ISyncService mock = Substitute.For<ISyncService>();
             mock.Stat("/test").Returns(stats);
 
-            DeviceData device = new();
-
             Factories.SyncServiceFactory = (c, d) =>
             {
                 Factories.Reset();
                 return mock;
             };
 
-            Assert.Equal(stats, client.Stat(device, "/test"));
+            Assert.Equal(stats, client.Stat(Device, "/test"));
         }
 
         [Fact]
@@ -37,9 +88,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.Commands[$"shell:{EnvironmentVariablesReceiver.PrintEnvCommand}"] = "a=b";
 
-            DeviceData device = new();
-
-            Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(device);
+            Dictionary<string, string> variables = adbClient.GetEnvironmentVariables(Device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
@@ -54,11 +103,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands["shell:pm uninstall com.example"] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            adbClient.UninstallPackage(device, "com.example");
+            adbClient.UninstallPackage(Device, "com.example");
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
@@ -299,11 +344,7 @@ Compiler stats:
             adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            VersionInfo version = adbClient.GetPackageVersion(device, packageName);
+            VersionInfo version = adbClient.GetPackageVersion(Device, packageName);
 
             Assert.Equal(versionCode, version.VersionCode);
             Assert.Equal(versionName, version.VersionName);
@@ -342,8 +383,7 @@ asound";
 
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
 
-            DeviceData device = new();
-            AndroidProcess[] processes = adbClient.ListProcesses(device).ToArray();
+            AndroidProcess[] processes = adbClient.ListProcesses(Device).ToArray();
 
             Assert.Equal(3, processes.Length);
             Assert.Equal("init", processes[0].Name);

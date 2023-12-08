@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.Receivers
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.</returns>
-        public override string ToString() => output.ToString();
+        public override string ToString() => TrimLines ? output.ToString().Trim() : output.ToString();
 
         /// <inheritdoc/>
         protected override void ThrowOnError(string line)

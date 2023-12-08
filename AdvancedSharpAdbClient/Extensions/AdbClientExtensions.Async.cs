@@ -324,38 +324,6 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task UninstallAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
             client.UninstallAsync(device, packageName, default, arguments);
-
-        /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="charCount">The length of text to clear.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static async Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default)
-        {
-            await client.SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await client.SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Click BACK button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click BACK button.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ClickBackButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.SendKeyEventAsync(device, "KEYCODE_BACK", cancellationToken);
-
-        /// <summary>
-        /// Click HOME button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click HOME button.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ClickHomeButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.SendKeyEventAsync(device, "KEYCODE_HOME", cancellationToken);
     }
 }
 #endif
