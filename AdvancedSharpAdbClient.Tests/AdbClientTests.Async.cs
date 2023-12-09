@@ -677,7 +677,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncRequests,
                     NoSyncResponses,
                     [response],
-                    applicationDataChunks.ToArray(),
+                    applicationDataChunks,
                     () => TestClient.InstallAsync(Device, stream,
                         new InstallProgress(
                             PackageInstallProgressState.Preparing,
@@ -685,6 +685,140 @@ namespace AdvancedSharpAdbClient.Tests
                             PackageInstallProgressState.Installing,
                             PackageInstallProgressState.Finished)));
             }
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{Stream}, string, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public async void InstallMultipleAsyncTest()
+        {
+            // The app data is sent in chunks of 32 kb
+            List<byte[]> applicationDataChunks = [];
+
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            await using FileStream abiStream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk");
+
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-create' -p com.google.android.gms",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {abiStream.Length} 936013062 splitAPK0.apk",
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-commit' 936013062"
+            ];
+
+            byte[][] responses =
+            [
+                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n")
+            ];
+
+            await using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            await using MemoryStream commitStream = new("Success\n"u8.ToArray());
+
+            await RunTestAsync(
+                OkResponses(6),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                responses,
+                applicationDataChunks,
+                [sessionStream, commitStream],
+                () => TestClient.InstallMultipleAsync(Device, [abiStream], "com.google.android.gms",
+                    new InstallProgress(
+                        PackageInstallProgressState.Preparing,
+                        PackageInstallProgressState.CreateSession,
+                        PackageInstallProgressState.Uploading,
+                        PackageInstallProgressState.Installing,
+                        PackageInstallProgressState.Finished)));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, Stream, IEnumerable{Stream}, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public async void InstallMultipleWithBaseAsyncTest()
+        {
+            // The app data is sent in chunks of 32 kb
+            List<byte[]> applicationDataChunks = [];
+
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            await using FileStream baseStream = File.OpenRead("Assets/TestApp/base.apk");
+            await using FileStream abiStream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk");
+
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-create'",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {baseStream.Length} 936013062 baseAPK.apk",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {abiStream.Length} 936013062 splitAPK0.apk",
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-commit' 936013062"
+            ];
+
+            byte[][] responses =
+            [
+                Encoding.ASCII.GetBytes($"Success: streamed {baseStream.Length} bytes\n"),
+                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n")
+            ];
+
+            using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            using MemoryStream commitStream = new("Success\n"u8.ToArray());
+
+            await RunTestAsync(
+                OkResponses(8),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                responses,
+                applicationDataChunks,
+                [sessionStream, commitStream],
+                () => TestClient.InstallMultipleAsync(Device, baseStream, [abiStream],
+                    new InstallProgress(
+                        PackageInstallProgressState.Preparing,
+                        PackageInstallProgressState.CreateSession,
+                        PackageInstallProgressState.Uploading,
+                        PackageInstallProgressState.Installing,
+                        PackageInstallProgressState.Finished)));
         }
 
         /// <summary>
@@ -758,7 +892,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncRequests,
                     NoSyncResponses,
                     [response],
-                    applicationDataChunks.ToArray(),
+                    applicationDataChunks,
                     () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062", progress));
             }
         }

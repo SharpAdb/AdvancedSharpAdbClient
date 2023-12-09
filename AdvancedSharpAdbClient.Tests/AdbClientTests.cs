@@ -785,7 +785,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncRequests,
                     NoSyncResponses,
                     [response],
-                    applicationDataChunks.ToArray(),
+                    applicationDataChunks,
                     () => TestClient.Install(Device, stream,
                         new InstallProgress(
                             PackageInstallProgressState.Preparing,
@@ -793,6 +793,172 @@ namespace AdvancedSharpAdbClient.Tests
                             PackageInstallProgressState.Installing,
                             PackageInstallProgressState.Finished)));
             }
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, IEnumerable{Stream}, string, IProgress{InstallProgressEventArgs}?, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public void InstallMultipleTest()
+        {
+            // The app data is sent in chunks of 32 kb
+            List<byte[]> applicationDataChunks = [];
+
+            using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.xxhdpi.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            using FileStream abiStream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk");
+            using FileStream dpiStream = File.OpenRead("Assets/TestApp/split_config.xxhdpi.apk");
+
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-create' -p com.google.android.gms",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {abiStream.Length} 936013062 splitAPK0.apk",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {dpiStream.Length} 936013062 splitAPK1.apk",
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-commit' 936013062"
+            ];
+
+            byte[][] responses =
+            [
+                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
+                Encoding.ASCII.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
+            ];
+
+            using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            using MemoryStream commitStream = new("Success\n"u8.ToArray());
+
+            RunTest(
+                OkResponses(8),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                responses,
+                applicationDataChunks,
+                [sessionStream, commitStream],
+                () => TestClient.InstallMultiple(Device, [abiStream, dpiStream], "com.google.android.gms",
+                    new InstallProgress(
+                        PackageInstallProgressState.Preparing,
+                        PackageInstallProgressState.CreateSession,
+                        PackageInstallProgressState.Uploading,
+                        PackageInstallProgressState.Installing,
+                        PackageInstallProgressState.Finished)));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, Stream, IEnumerable{Stream}, IProgress{InstallProgressEventArgs}?, string[])"/> method.
+        /// </summary>
+        [Fact]
+        public void InstallMultipleWithBaseTest()
+        {
+            // The app data is sent in chunks of 32 kb
+            List<byte[]> applicationDataChunks = [];
+
+            using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            using (FileStream stream = File.OpenRead("Assets/TestApp/split_config.xxhdpi.apk"))
+            {
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
+
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
+                }
+            }
+
+            using FileStream baseStream = File.OpenRead("Assets/TestApp/base.apk");
+            using FileStream abiStream = File.OpenRead("Assets/TestApp/split_config.arm64_v8a.apk");
+            using FileStream dpiStream = File.OpenRead("Assets/TestApp/split_config.xxhdpi.apk");
+
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-create'",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {baseStream.Length} 936013062 baseAPK.apk",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {abiStream.Length} 936013062 splitAPK0.apk",
+                "host:transport:169.254.109.177:5555",
+                $"exec:cmd package 'install-write' -S {dpiStream.Length} 936013062 splitAPK1.apk",
+                "host:transport:169.254.109.177:5555",
+                "exec:cmd package 'install-commit' 936013062"
+            ];
+
+            byte[][] responses =
+            [
+                Encoding.ASCII.GetBytes($"Success: streamed {baseStream.Length} bytes\n"),
+                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
+                Encoding.ASCII.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
+            ];
+
+            using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            using MemoryStream commitStream = new("Success\n"u8.ToArray());
+
+            RunTest(
+                OkResponses(10),
+                NoResponseMessages,
+                requests,
+                NoSyncRequests,
+                NoSyncResponses,
+                responses,
+                applicationDataChunks,
+                [sessionStream, commitStream],
+                () => TestClient.InstallMultiple(Device, baseStream, [abiStream, dpiStream],
+                    new InstallProgress(
+                        PackageInstallProgressState.Preparing,
+                        PackageInstallProgressState.CreateSession,
+                        PackageInstallProgressState.Uploading,
+                        PackageInstallProgressState.Installing,
+                        PackageInstallProgressState.Finished)));
         }
 
         /// <summary>
@@ -851,14 +1017,6 @@ namespace AdvancedSharpAdbClient.Tests
 
                 byte[] response = Encoding.ASCII.GetBytes($"Success: streamed {stream.Length} bytes\n");
 
-                double temp = 0;
-                Progress<double> progress = new();
-                progress.ProgressChanged += (sender, args) =>
-                {
-                    Assert.True(temp <= args, $"{nameof(args)}: {args} is less than {temp}.");
-                    temp = args;
-                };
-
                 RunTest(
                     OkResponses(2),
                     NoResponseMessages,
@@ -866,8 +1024,8 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncRequests,
                     NoSyncResponses,
                     [response],
-                    applicationDataChunks.ToArray(),
-                    () => TestClient.InstallWrite(Device, stream, "base", "936013062", progress));
+                    applicationDataChunks,
+                    () => TestClient.InstallWrite(Device, stream, "base", "936013062", new InstallProgress()));
             }
         }
 
@@ -987,7 +1145,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () => test(Device));
         }
 
-        private struct InstallProgress(params PackageInstallProgressState[] states) : IProgress<InstallProgressEventArgs>
+        private struct InstallProgress(params PackageInstallProgressState[] states) : IProgress<InstallProgressEventArgs>, IProgress<double>
         {
             private PackageInstallProgressState? state;
             private int packageFinished;
@@ -1032,6 +1190,12 @@ namespace AdvancedSharpAdbClient.Tests
                 state = value.State;
                 packageFinished = value.PackageFinished;
                 uploadProgress = value.UploadProgress;
+            }
+
+            public void Report(double value)
+            {
+                Assert.True(uploadProgress <= value, $"{nameof(value)}: {value} is less than {uploadProgress}.");
+                uploadProgress = value;
             }
         }
     }

@@ -267,11 +267,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
@@ -280,7 +280,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -291,23 +291,23 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToArray(), Socket.Responses);
-                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+                Assert.Equal(responses, Socket.Responses);
+                Assert.Equal(responseMessages, Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses, Socket.SyncResponses);
                 }
                 else
                 {
@@ -316,7 +316,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                    Assert.Equal(syncDataReceived, Socket.SyncDataReceived);
                 }
                 else
                 {
@@ -325,7 +325,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -334,7 +334,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (shellStreams != null)
                 {
-                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                    Assert.Equal(shellStreams, Socket.ShellStreams);
                 }
                 else
                 {
@@ -560,11 +560,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
@@ -573,7 +573,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -584,23 +584,23 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToArray(), Socket.Responses);
-                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+                Assert.Equal(responses, Socket.Responses);
+                Assert.Equal(responseMessages, Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses, Socket.SyncResponses);
                 }
                 else
                 {
@@ -609,7 +609,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                    Assert.Equal(syncDataReceived, Socket.SyncDataReceived);
                 }
                 else
                 {
@@ -618,7 +618,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -627,7 +627,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (shellStreams != null)
                 {
-                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                    Assert.Equal(shellStreams, Socket.ShellStreams);
                 }
                 else
                 {
@@ -853,11 +853,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
@@ -866,7 +866,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -877,23 +877,23 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToArray(), Socket.Responses);
-                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+                Assert.Equal(responses, Socket.Responses);
+                Assert.Equal(responseMessages, Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses, Socket.SyncResponses);
                 }
                 else
                 {
@@ -902,7 +902,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                    Assert.Equal(syncDataReceived, Socket.SyncDataReceived);
                 }
                 else
                 {
@@ -911,7 +911,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -920,7 +920,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (shellStreams != null)
                 {
-                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                    Assert.Equal(shellStreams, Socket.ShellStreams);
                 }
                 else
                 {
@@ -1150,11 +1150,11 @@ namespace AdvancedSharpAdbClient.Tests
                 Assert.Empty(Socket.ShellStreams);
 
                 // Make sure a request was sent
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
@@ -1163,7 +1163,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -1174,23 +1174,23 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 // Make sure the traffic sent on the wire matches the traffic
                 // we have defined in our unit test.
-                Assert.Equal(requests.ToArray(), Socket.Requests);
+                Assert.Equal(requests, Socket.Requests);
 
                 if (syncRequests != null)
                 {
-                    Assert.Equal(syncRequests.ToArray(), Socket.SyncRequests);
+                    Assert.Equal(syncRequests, Socket.SyncRequests);
                 }
                 else
                 {
                     Assert.Empty(Socket.SyncRequests);
                 }
 
-                Assert.Equal(responses.ToArray(), Socket.Responses);
-                Assert.Equal(responseMessages.ToArray(), Socket.ResponseMessages);
+                Assert.Equal(responses, Socket.Responses);
+                Assert.Equal(responseMessages, Socket.ResponseMessages);
 
                 if (syncResponses != null)
                 {
-                    Assert.Equal(syncResponses.ToArray(), Socket.SyncResponses);
+                    Assert.Equal(syncResponses, Socket.SyncResponses);
                 }
                 else
                 {
@@ -1199,7 +1199,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataReceived != null)
                 {
-                    AssertEqual(syncDataReceived.ToArray(), Socket.SyncDataReceived.ToArray());
+                    Assert.Equal(syncDataReceived, Socket.SyncDataReceived);
                 }
                 else
                 {
@@ -1208,7 +1208,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (syncDataSent != null)
                 {
-                    AssertEqual(syncDataSent.ToArray(), Socket.SyncDataSent.ToArray());
+                    Assert.Equal(syncDataSent, Socket.SyncDataSent);
                 }
                 else
                 {
@@ -1217,7 +1217,7 @@ namespace AdvancedSharpAdbClient.Tests
 
                 if (shellStreams != null)
                 {
-                    Assert.Equal(shellStreams.ToArray(), [.. Socket.ShellStreams]);
+                    Assert.Equal(shellStreams, [.. Socket.ShellStreams]);
                 }
                 else
                 {
@@ -1231,15 +1231,5 @@ namespace AdvancedSharpAdbClient.Tests
         #endregion
 
         protected static IEnumerable<AdbResponse> OkResponses(int count) => Enumerable.Repeat(AdbResponse.OK, count);
-
-        private static void AssertEqual(IList<byte[]> expected, IList<byte[]> actual)
-        {
-            Assert.Equal(expected.Count, actual.Count);
-
-            for (int i = 0; i < expected.Count; i++)
-            {
-                Assert.Equal(expected[i], actual[i]);
-            }
-        }
     }
 }
