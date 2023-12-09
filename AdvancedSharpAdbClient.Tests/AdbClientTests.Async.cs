@@ -344,8 +344,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoSyncRequests,
                 NoSyncResponses,
                 [
-                    await File.ReadAllBytesAsync("Assets/framebufferheader.bin"),
-                    await File.ReadAllBytesAsync("Assets/framebuffer.bin")
+                    await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin"),
+                    await File.ReadAllBytesAsync("Assets/Framebuffer.bin")
                 ],
                 null,
                 () => TestClient.GetFrameBufferAsync(Device));
@@ -403,7 +403,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            await using FileStream stream = File.OpenRead("Assets/logcat.bin");
+            await using FileStream stream = File.OpenRead("Assets/Logcat.bin");
             await using ShellStream shellStream = new(stream, false);
             List<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
@@ -640,43 +640,36 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.InstallAsync(IAdbClient, DeviceData, Stream, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallAsyncTest()
         {
-            string[] requests =
-            [
-                "host:transport:169.254.109.177:5555",
-                "exec:cmd package 'install' -S 205774"
-            ];
-
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
-            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
-                while (true)
-                {
-                    byte[] buffer = new byte[32 * 1024];
-                    int read = await stream.ReadAsync(buffer);
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
 
-                    if (read == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        buffer = buffer.Take(read).ToArray();
-                        applicationDataChunks.Add(buffer);
-                    }
+                while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
                 }
             }
 
             byte[] response = "Success\n"u8.ToArray();
 
-            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
+                string[] requests =
+                [
+                    "host:transport:169.254.109.177:5555",
+                    $"exec:cmd package 'install' -S {stream.Length}"
+                ];
+
                 await RunTestAsync(
                     OkResponses(2),
                     NoResponseMessages,
@@ -685,7 +678,12 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.InstallAsync(Device, stream));
+                    () => TestClient.InstallAsync(Device, stream,
+                        new InstallProgress(
+                            PackageInstallProgressState.Preparing,
+                            PackageInstallProgressState.Uploading,
+                            PackageInstallProgressState.Installing,
+                            PackageInstallProgressState.Finished)));
             }
         }
 
@@ -715,43 +713,44 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, IProgress{double}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void InstallWriteAsyncTest()
         {
-            string[] requests =
-            [
-                "host:transport:169.254.109.177:5555",
-                "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
-            ];
-
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
-            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
-                while (true)
-                {
-                    byte[] buffer = new byte[32 * 1024];
-                    int read = await stream.ReadAsync(buffer);
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
 
-                    if (read == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        buffer = buffer.Take(read).ToArray();
-                        applicationDataChunks.Add(buffer);
-                    }
+                while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
                 }
             }
 
-            byte[] response = "Success: streamed 205774 bytes\n"u8.ToArray();
-
-            await using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            await using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
+                string[] requests =
+                [
+                    "host:transport:169.254.109.177:5555",
+                    $"exec:cmd package 'install-write' -S {stream.Length} 936013062 base.apk"
+                ];
+
+                byte[] response = Encoding.ASCII.GetBytes($"Success: streamed {stream.Length} bytes\n");
+
+                double temp = 0;
+                Progress<double> progress = new();
+                progress.ProgressChanged += (sender, args) =>
+                {
+                    Assert.True(temp <= args, $"{nameof(args)}: {args} is less than {temp}.");
+                    temp = args;
+                };
+
                 await RunTestAsync(
                     OkResponses(2),
                     NoResponseMessages,
@@ -760,7 +759,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062"));
+                    () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062", progress));
             }
         }
 

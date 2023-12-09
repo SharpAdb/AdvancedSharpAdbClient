@@ -142,6 +142,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         public virtual void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             void OnSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
@@ -201,6 +203,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             int splitPackageFileCount = splitPackageFilePaths.Count();
@@ -260,6 +264,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             int splitPackageFileCount = splitPackageFilePaths.Count();
@@ -444,7 +450,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
         protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? progress)
         {
-            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));
+            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0L, 100L));
 
             ValidateDevice();
 
@@ -480,7 +486,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             finally
             {
-                progress?.Invoke(null, new SyncProgressChangedEventArgs(100, 100));
+                progress?.Invoke(null, new SyncProgressChangedEventArgs(100L, 100L));
             }
         }
 

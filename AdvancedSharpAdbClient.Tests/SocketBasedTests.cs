@@ -6,7 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Tests
 {
     public class SocketBasedTests
     {

@@ -10,6 +10,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     public enum PackageInstallProgressState
     {
         /// <summary>
+        /// Preparing the installation.
+        /// </summary>
+        Preparing,
+
+        /// <summary>
         /// Uploading packages to the device.
         /// </summary>
         Uploading,

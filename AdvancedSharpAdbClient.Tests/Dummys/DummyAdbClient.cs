@@ -171,9 +171,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task<Framebuffer> IAdbClient.GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        void IAdbClient.Install(DeviceData device, Stream apk, params string[] arguments) => throw new NotImplementedException();
+        void IAdbClient.Install(DeviceData device, Stream apk, IProgress<InstallProgressEventArgs> progress, params string[] arguments) => throw new NotImplementedException();
 
-        Task IAdbClient.InstallAsync(DeviceData device, Stream apk, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+        Task IAdbClient.InstallAsync(DeviceData device, Stream apk, IProgress<InstallProgressEventArgs> progress, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
         void IAdbClient.InstallCommit(DeviceData device, string session) => throw new NotImplementedException();
 
@@ -183,17 +183,17 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task<string> IAdbClient.InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
-        void IAdbClient.InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) => throw new NotImplementedException();
+        void IAdbClient.InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs> progress, params string[] arguments) => throw new NotImplementedException();
 
-        void IAdbClient.InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) => throw new NotImplementedException();
+        void IAdbClient.InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs> progress, params string[] arguments) => throw new NotImplementedException();
 
-        Task IAdbClient.InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+        Task IAdbClient.InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs> progress, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
-        Task IAdbClient.InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
+        Task IAdbClient.InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs> progress, CancellationToken cancellationToken, params string[] arguments) => throw new NotImplementedException();
 
-        void IAdbClient.InstallWrite(DeviceData device, Stream apk, string apkName, string session) => throw new NotImplementedException();
+        void IAdbClient.InstallWrite(DeviceData device, Stream apk, string apkName, string session, IProgress<double> progress) => throw new NotImplementedException();
 
-        Task IAdbClient.InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task IAdbClient.InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, IProgress<double> progress, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         void IAdbClient.KillAdb() => throw new NotImplementedException();
 

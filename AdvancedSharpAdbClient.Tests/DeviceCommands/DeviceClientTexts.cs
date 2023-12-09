@@ -31,8 +31,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void DumpScreenStringTest()
         {
-            string dump = File.ReadAllText(@"Assets/dumpscreen.txt");
-            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
+            string dump = File.ReadAllText(@"Assets/DumpScreen.txt");
+            string cleanDump = File.ReadAllText(@"Assets/DumpScreen.Clean.xml");
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = dump;
@@ -51,8 +51,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void DumpScreenStringMIUITest()
         {
-            string miuidump = File.ReadAllText(@"Assets/dumpscreen_miui.txt");
-            string cleanMIUIDump = File.ReadAllText(@"Assets/dumpscreen_miui_clean.txt");
+            string miuidump = File.ReadAllText(@"Assets/DumpScreen.MIUI.txt");
+            string cleanMIUIDump = File.ReadAllText(@"Assets/DumpScreen.Clean.xml");
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = miuidump;
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void DumpScreenStringErrorTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen_error.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.Error.txt");
 
             _ = Assert.Throws<XmlException>(() => new DeviceClient(client, Device).DumpScreenString());
 
@@ -104,14 +104,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void DumpScreenTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             XmlDocument xml = new DeviceClient(client, Device).DumpScreen();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
+            string cleanDump = File.ReadAllText(@"Assets/DumpScreen.Clean.xml");
             XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -126,14 +126,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void DumpScreenWinRTTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             Windows.Data.Xml.Dom.XmlDocument xml = new DeviceClient(client, Device).DumpScreenWinRT();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = File.ReadAllText(@"Assets/dumpscreen_clean.txt");
+            string cleanDump = File.ReadAllText(@"Assets/DumpScreen.Clean.xml");
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -356,7 +356,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public void FindElementTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             Element element = new DeviceClient(client, Device).FindElement();
 
@@ -381,7 +381,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public void FindElementsTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             Element[] elements = new DeviceClient(client, Device).FindElements().ToArray();
 

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public void ReadLogTest()
         {
-            using FileStream stream = File.OpenRead(@"Assets/logcat.bin");
+            using FileStream stream = File.OpenRead(@"Assets/Logcat.bin");
             using ShellStream shellStream = new(stream, false);
             LogReader reader = new(shellStream);
 
@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         [Fact]
         public async void ReadLogAsyncTest()
         {
-            await using FileStream stream = File.OpenRead(@"Assets/logcat.bin");
+            await using FileStream stream = File.OpenRead(@"Assets/Logcat.bin");
             await using ShellStream shellStream = new(stream, false);
             LogReader reader = new(shellStream);
 
@@ -70,7 +70,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            using FileStream stream = File.OpenRead(@"Assets/logcatevents.bin");
+            using FileStream stream = File.OpenRead(@"Assets/LogcatEvents.bin");
             LogReader reader = new(stream);
             LogEntry entry = reader.ReadEntry();
 
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.
-            await using FileStream stream = File.OpenRead(@"Assets/logcatevents.bin");
+            await using FileStream stream = File.OpenRead(@"Assets/LogcatEvents.bin");
             LogReader reader = new(stream);
             LogEntry entry = await reader.ReadEntryAsync();
 

@@ -17,8 +17,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async void DumpScreenStringAsyncTest()
         {
-            string dump = await File.ReadAllTextAsync(@"Assets/dumpscreen.txt");
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/dumpscreen_clean.txt");
+            string dump = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = dump;
@@ -37,8 +37,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async void DumpScreenStringMIUIAsyncTest()
         {
-            string miuidump = await File.ReadAllTextAsync(@"Assets/dumpscreen_miui.txt");
-            string cleanMIUIDump = await File.ReadAllTextAsync(@"Assets/dumpscreen_miui_clean.txt");
+            string miuidump = await File.ReadAllTextAsync(@"Assets/DumpScreen.MIUI.txt");
+            string cleanMIUIDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = miuidump;
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async void DumpScreenStringErrorAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/dumpscreen_error.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.Error.txt");
 
             _ = await Assert.ThrowsAsync<XmlException>(() => new DeviceClient(client, Device).DumpScreenStringAsync());
 
@@ -90,14 +90,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async void DumpScreenAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
 
             XmlDocument xml = await new DeviceClient(client, Device).DumpScreenAsync();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/dumpscreen_clean.txt");
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
             XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -112,14 +112,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async void DumpScreenWinRTAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
 
             Windows.Data.Xml.Dom.XmlDocument xml = await new DeviceClient(client, Device).DumpScreenWinRTAsync();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/dumpscreen_clean.txt");
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -342,7 +342,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async void FindElementAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             Element element = await new DeviceClient(client, Device).FindElementAsync();
 
@@ -367,7 +367,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async void FindElementsAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             Element[] elements = (await new DeviceClient(client, Device).FindElementsAsync()).ToArray();
 
@@ -389,7 +389,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async void FindAsyncElementsTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/dumpscreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
             List<Element> elements = [];
             await foreach (Element value in new DeviceClient(client, Device).FindAsyncElements())

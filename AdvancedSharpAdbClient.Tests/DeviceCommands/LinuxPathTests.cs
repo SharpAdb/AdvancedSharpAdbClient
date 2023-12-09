@@ -58,8 +58,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void CombineCurrentDirTest()
         {
-            string result = LinuxPath.Combine(".", "test.txt");
-            Assert.Equal("./test.txt", result);
+            string result = LinuxPath.Combine(".", "Test.txt");
+            Assert.Equal("./Test.txt", result);
         }
 
         [Fact]

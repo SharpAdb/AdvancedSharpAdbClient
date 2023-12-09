@@ -455,8 +455,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoSyncRequests,
                 NoSyncResponses,
                 [
-                    File.ReadAllBytes("Assets/framebufferheader.bin"),
-                    File.ReadAllBytes("Assets/framebuffer.bin")
+                    File.ReadAllBytes("Assets/FramebufferHeader.bin"),
+                    File.ReadAllBytes("Assets/Framebuffer.bin")
                 ],
                 null,
                 () => TestClient.GetFrameBuffer(Device));
@@ -511,7 +511,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             ConsoleOutputReceiver receiver = new();
 
-            using FileStream stream = File.OpenRead("Assets/logcat.bin");
+            using FileStream stream = File.OpenRead("Assets/Logcat.bin");
             using ShellStream shellStream = new(stream, false);
             List<LogEntry> logs = [];
             Action<LogEntry> sink = logs.Add;
@@ -748,43 +748,36 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, string[])"/> method.
+        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, IProgress{InstallProgressEventArgs}?, string[])"/> method.
         /// </summary>
         [Fact]
         public void InstallTest()
         {
-            string[] requests =
-            [
-                "host:transport:169.254.109.177:5555",
-                "exec:cmd package 'install' -S 205774"
-            ];
-
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
-            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
-                while (true)
-                {
-                    byte[] buffer = new byte[32 * 1024];
-                    int read = stream.Read(buffer.AsSpan(0, buffer.Length));
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
 
-                    if (read == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        buffer = buffer.Take(read).ToArray();
-                        applicationDataChunks.Add(buffer);
-                    }
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
                 }
             }
 
             byte[] response = "Success\n"u8.ToArray();
 
-            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
+                string[] requests =
+                [
+                    "host:transport:169.254.109.177:5555",
+                    $"exec:cmd package 'install' -S {stream.Length}"
+                ];
+
                 RunTest(
                     OkResponses(2),
                     NoResponseMessages,
@@ -793,7 +786,12 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.Install(Device, stream));
+                    () => TestClient.Install(Device, stream,
+                        new InstallProgress(
+                            PackageInstallProgressState.Preparing,
+                            PackageInstallProgressState.Uploading,
+                            PackageInstallProgressState.Installing,
+                            PackageInstallProgressState.Finished)));
             }
         }
 
@@ -823,43 +821,44 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string)"/> method.
+        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string, IProgress{double}?)"/> method.
         /// </summary>
         [Fact]
         public void InstallWriteTest()
         {
-            string[] requests =
-            [
-                "host:transport:169.254.109.177:5555",
-                "exec:cmd package 'install-write' -S 205774 936013062 base.apk"
-            ];
-
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
-            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
-                while (true)
-                {
-                    byte[] buffer = new byte[32 * 1024];
-                    int read = stream.Read(buffer.AsSpan(0, buffer.Length));
+                byte[] buffer = new byte[32 * 1024];
+                int read = 0;
 
-                    if (read == 0)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        buffer = buffer.Take(read).ToArray();
-                        applicationDataChunks.Add(buffer);
-                    }
+                while ((read = stream.Read(buffer.AsSpan(0, buffer.Length))) > 0)
+                {
+                    byte[] array = buffer.AsSpan(0, read).ToArray();
+                    applicationDataChunks.Add(array);
                 }
             }
 
-            byte[] response = "Success: streamed 205774 bytes\n"u8.ToArray();
-
-            using (FileStream stream = File.OpenRead("Assets/testapp.apk"))
+            using (FileStream stream = File.OpenRead("Assets/TestApp/base.apk"))
             {
+                string[] requests =
+                [
+                    "host:transport:169.254.109.177:5555",
+                    $"exec:cmd package 'install-write' -S {stream.Length} 936013062 base.apk"
+                ];
+
+                byte[] response = Encoding.ASCII.GetBytes($"Success: streamed {stream.Length} bytes\n");
+
+                double temp = 0;
+                Progress<double> progress = new();
+                progress.ProgressChanged += (sender, args) =>
+                {
+                    Assert.True(temp <= args, $"{nameof(args)}: {args} is less than {temp}.");
+                    temp = args;
+                };
+
                 RunTest(
                     OkResponses(2),
                     NoResponseMessages,
@@ -868,7 +867,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncResponses,
                     [response],
                     applicationDataChunks.ToArray(),
-                    () => TestClient.InstallWrite(Device, stream, "base", "936013062"));
+                    () => TestClient.InstallWrite(Device, stream, "base", "936013062", progress));
             }
         }
 
@@ -986,6 +985,54 @@ namespace AdvancedSharpAdbClient.Tests
                 [null],
                 requests,
                 () => test(Device));
+        }
+
+        private struct InstallProgress(params PackageInstallProgressState[] states) : IProgress<InstallProgressEventArgs>
+        {
+            private PackageInstallProgressState? state;
+            private int packageFinished;
+            private int packageRequired;
+            private double uploadProgress;
+
+            private int step = 0;
+
+            public void Report(InstallProgressEventArgs value)
+            {
+                if (value.State == state)
+                {
+                    Assert.True(uploadProgress <= value.UploadProgress, $"{nameof(value.UploadProgress)}: {value.UploadProgress} is less than {uploadProgress}.");
+                    Assert.True(packageFinished <= value.PackageFinished, $"{nameof(value.PackageFinished)}: {value.PackageFinished} is less than {packageFinished}.");
+                }
+                else
+                {
+                    Assert.Equal(states[step++], value.State);
+                }
+
+                if (value.State is
+                    PackageInstallProgressState.CreateSession
+                    or PackageInstallProgressState.Installing
+                    or PackageInstallProgressState.Finished)
+                {
+                    Assert.Equal(0, value.UploadProgress);
+                    Assert.Equal(0, value.PackageRequired);
+                    Assert.Equal(0, value.PackageFinished);
+                }
+                else
+                {
+                    if (packageRequired == 0)
+                    {
+                        packageRequired = value.PackageRequired;
+                    }
+                    else
+                    {
+                        Assert.Equal(packageRequired, value.PackageRequired);
+                    }
+                }
+
+                state = value.State;
+                packageFinished = value.PackageFinished;
+                uploadProgress = value.UploadProgress;
+            }
         }
     }
 }

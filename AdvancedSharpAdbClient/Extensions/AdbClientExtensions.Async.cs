@@ -4,9 +4,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 
@@ -270,41 +267,7 @@ namespace AdvancedSharpAdbClient
             client.ConnectAsync(Extensions.CreateDnsEndPoint(host, port), cancellationToken);
 
         /// <summary>
-        /// Asynchronously installs an Android application on an device.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallAsync(this IAdbClient client, DeviceData device, Stream apk, params string[] arguments) => client.InstallAsync(device, apk, default, arguments);
-
-        /// <summary>
-        /// Asynchronously push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) =>
-            client.InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
-
-        /// <summary>
-        /// Asynchronously push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) =>
-            client.InstallMultipleAsync(device, baseAPK, splitAPKs, default, arguments);
-
-        /// <summary>
-        /// Like "install", but starts an install session ssynchronously.
+        /// Like "install", but starts an install session synchronously.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to install the application.</param>

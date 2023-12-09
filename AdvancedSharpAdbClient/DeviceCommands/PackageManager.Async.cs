@@ -48,6 +48,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public virtual async Task InstallPackageAsync(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             void OnSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
@@ -111,6 +113,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public virtual async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             int splitPackageFileCount = splitPackageFilePaths.Count();
@@ -184,6 +188,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public virtual async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
             ValidateDevice();
 
             int splitPackageFileCount = splitPackageFilePaths.Count();

@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void PullTest()
         {
             using MemoryStream stream = new();
-            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            byte[] content = File.ReadAllBytes("Assets/Fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             RunTest(
@@ -138,8 +138,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void PushTest()
         {
-            FileStream stream = File.OpenRead("Assets/fstab.bin");
-            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            FileStream stream = File.OpenRead("Assets/Fstab.bin");
+            byte[] content = File.ReadAllBytes("Assets/Fstab.bin");
             byte[] contentMessage =
             [
                 .. SyncCommandConverter.GetBytes(SyncCommand.DATA),
