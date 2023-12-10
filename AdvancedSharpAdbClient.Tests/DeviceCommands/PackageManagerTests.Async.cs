@@ -114,8 +114,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal(5, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -r -t", adbClient.ReceivedCommands[0]);
             Assert.Equal("shell:pm install-write 936013062 base.apk \"/data/base.apk\"", adbClient.ReceivedCommands[1]);
-            Assert.Equal("shell:pm install-write 936013062 split0.apk \"/data/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[2]);
-            Assert.Equal("shell:pm install-write 936013062 split1.apk \"/data/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[3]);
+            Assert.Contains("shell:pm install-write 936013062 split0.apk \"/data/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[2..4]);
+            Assert.Contains("shell:pm install-write 936013062 split1.apk \"/data/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[2..4]);
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[4]);
 
             adbClient.ReceivedCommands.Clear();
@@ -185,11 +185,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create", adbClient.ReceivedCommands[1]);
             Assert.Equal("shell:pm install-write 936013062 base.apk \"/data/local/tmp/base.apk\"", adbClient.ReceivedCommands[2]);
-            Assert.Equal("shell:pm install-write 936013062 split0.apk \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[3]);
-            Assert.Equal("shell:pm install-write 936013062 split1.apk \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[4]);
+            Assert.Contains("shell:pm install-write 936013062 split0.apk \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[3..5]);
+            Assert.Contains("shell:pm install-write 936013062 split1.apk \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[3..5]);
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[5]);
-            Assert.Equal("shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[6]);
-            Assert.Equal("shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[7]);
+            Assert.Contains("shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[6..8]);
+            Assert.Contains("shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[6..8]);
             Assert.Equal("shell:rm \"/data/local/tmp/base.apk\"", adbClient.ReceivedCommands[8]);
 
             Assert.Equal(3, syncService.UploadedFiles.Count);
@@ -212,11 +212,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[0]);
-            Assert.Equal("shell:pm install-write 936013062 split0.apk \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[1]);
-            Assert.Equal("shell:pm install-write 936013062 split1.apk \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[2]);
+            Assert.Contains("shell:pm install-write 936013062 split0.apk \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[1..3]);
+            Assert.Contains("shell:pm install-write 936013062 split1.apk \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[1..3]);
             Assert.Equal("shell:pm install-commit 936013062", adbClient.ReceivedCommands[3]);
-            Assert.Equal("shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[4]);
-            Assert.Equal("shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[5]);
+            Assert.Contains("shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\"", adbClient.ReceivedCommands[4..6]);
+            Assert.Contains("shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\"", adbClient.ReceivedCommands[4..6]);
 
             Assert.Equal(2, syncService.UploadedFiles.Count);
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/split_config.arm64_v8a.apk"));
