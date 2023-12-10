@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -14,6 +15,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <param name="y">The y-coordinate of the upper-left corner of the rectangle.</param>
     /// <param name="width">The width of the rectangle.</param>
     /// <param name="height">The height of the rectangle.</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public struct Rectangle(int x, int y, int width, int height) : IEquatable<Rectangle>
     {
         /// <summary>

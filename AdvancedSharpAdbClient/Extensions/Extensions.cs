@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -20,6 +21,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Extension methods for the <see cref="AdvancedSharpAdbClient"/> namespace.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     internal static class Extensions
     {
         public static char[] NewLineSeparator { get; } = ['\r', '\n'];
@@ -138,6 +140,20 @@ namespace AdvancedSharpAdbClient
             Task
 #endif
             .Yield();
+
+        /// <summary>
+        /// Creates a System.Threading.Tasks.Task`1 that's completed successfully with the specified result.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
+        /// <param name="result">The result to store into the completed task.</param>
+        /// <returns>The successfully completed task.</returns>
+        public static Task<TResult> FromResult<TResult>(TResult result) =>
+#if NETFRAMEWORK && !NET45_OR_GREATER
+            TaskEx
+#else
+            Task
+#endif
+            .FromResult(result);
 
 #if !NET7_0_OR_GREATER
         /// <summary>

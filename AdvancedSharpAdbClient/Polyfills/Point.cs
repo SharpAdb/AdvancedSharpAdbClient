@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -10,6 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public struct Point : IEquatable<Point>
     {
         /// <summary>

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -11,6 +12,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="string"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class StringExtensions
     {
         /// <summary>

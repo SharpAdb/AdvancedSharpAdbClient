@@ -20,6 +20,7 @@ global using System.Numerics;
 global using Windows.Foundation;
 global using Windows.Foundation.Metadata;
 global using Windows.Graphics.Imaging;
+global using Windows.Storage;
 global using Windows.Storage.Streams;
 global using Windows.System;
 global using Windows.UI.Core;

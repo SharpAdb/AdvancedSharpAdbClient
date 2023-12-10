@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -7,6 +8,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="Enumerable"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class EnumerableExtensions
     {
         /// <summary>

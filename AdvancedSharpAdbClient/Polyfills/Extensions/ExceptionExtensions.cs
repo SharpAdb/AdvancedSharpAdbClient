@@ -1,4 +1,9 @@
-﻿using System;
+﻿// <copyright file="ExceptionExtensions.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
+// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
+// </copyright>
+
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -8,6 +13,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="Exception"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ExceptionExtensions
     {
         /// <summary>

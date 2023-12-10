@@ -22,6 +22,8 @@ namespace AdvancedSharpAdbClient.Tests
         // No validation done in the dummy adb client.
         public override bool CheckFileExists(string adbPath) => true;
 
+        public override Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => Task.FromResult(true);
+
         protected override int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
             if (filename == AdbPath)

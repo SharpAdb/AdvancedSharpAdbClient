@@ -399,6 +399,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Asynchronously opens an existing file for reading.
+        /// </summary>
+        /// <param name="path">The file to be opened for reading.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
+        protected virtual Task<Stream> GetFileStreamAsync(string path, CancellationToken cancellationToken = default) =>
+#if WINDOWS_UWP
+            StorageFile.GetFileFromPathAsync(path).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenReadAsync().AsTask(cancellationToken)).Unwrap().ContinueWith(x => x.Result.AsStream());
+#else
+            Extensions.FromResult<Stream>(File.OpenRead(path));
+#endif
+
+        /// <summary>
         /// Asynchronously pushes a file to device
         /// </summary>
         /// <param name="localFilePath">The absolute path to file on local host.</param>
@@ -428,7 +441,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NETCOREAPP3_0_OR_GREATER
                     await
 #endif
-                    using FileStream stream = File.OpenRead(localFilePath);
+                    using Stream stream = await GetFileStreamAsync(localFilePath, cancellationToken).ConfigureAwait(false);
 
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 

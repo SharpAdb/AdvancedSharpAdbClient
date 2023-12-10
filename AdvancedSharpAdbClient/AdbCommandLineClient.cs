@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -61,10 +62,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         public string AdbPath { get; protected set; }
 
-        /// <summary>
-        /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
-        /// </summary>
-        /// <returns>A <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
+        /// <inheritdoc/>
         public virtual Version GetVersion()
         {
             // Run the adb.exe version command and capture the output.
@@ -83,9 +81,7 @@ namespace AdvancedSharpAdbClient
             return version;
         }
 
-        /// <summary>
-        /// Starts the adb server by running the <c>adb start-server</c> command.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void StartServer()
         {
             int status = RunAdbProcessInner("start-server", null, null);
@@ -126,7 +122,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool CheckFileExists(string adbPath) => Factories.CheckFileExists(adbPath);
+        public virtual bool CheckFileExists(string adbPath) =>
+#if WINDOWS_UWP
+            StorageFile.GetFileFromPathAsync(adbPath).GetResults() is StorageFile file && file.IsOfType(StorageItemTypes.File);
+#else
+            File.Exists(adbPath);
+#endif
 
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.

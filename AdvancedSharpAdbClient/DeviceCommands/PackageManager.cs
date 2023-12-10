@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -448,6 +449,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Opens an existing file for reading.
+        /// </summary>
+        /// <param name="path">The file to be opened for reading.</param>
+        /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
+        protected virtual Stream GetFileStream(string path) =>
+#if WINDOWS_UWP
+            StorageFile.GetFileFromPathAsync(path).GetResults().OpenReadAsync().GetResults().AsStream();
+#else
+            File.OpenRead(path);
+#endif
+
+        /// <summary>
         /// Pushes a file to device
         /// </summary>
         /// <param name="localFilePath">The absolute path to file on local host.</param>
@@ -473,7 +486,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 using (ISyncService sync = syncServiceFactory(AdbClient, Device))
                 {
-                    using FileStream stream = File.OpenRead(localFilePath);
+                    using Stream stream = GetFileStream(localFilePath);
 
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 
@@ -580,6 +593,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="localFilePath">The absolute path to file on local host.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected readonly struct SyncProgress(string localFilePath, Action<string?, SyncProgressChangedEventArgs> progress) : IProgress<SyncProgressChangedEventArgs>
         {
             /// <inheritdoc/>

@@ -22,9 +22,8 @@ namespace AdvancedSharpAdbClient
                 Version? commandLineVersion = null;
 
                 IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-                CheckFileExists = commandLineClient.CheckFileExists;
 
-                if (commandLineClient.CheckFileExists(adbPath))
+                if (await commandLineClient.CheckFileExistsAsync(adbPath, cancellationToken).ConfigureAwait(false))
                 {
                     CachedAdbPath = adbPath;
                     commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ConfigureAwait(false);
@@ -36,8 +35,8 @@ namespace AdvancedSharpAdbClient
                     return !serverStatus.IsRunning
                         ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
                         : serverStatus.Version >= RequiredAdbVersion
-                        ? StartServerResult.AlreadyRunning
-                        : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                            ? StartServerResult.AlreadyRunning
+                            : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
                 }
 
                 if (serverStatus.IsRunning)
@@ -45,8 +44,6 @@ namespace AdvancedSharpAdbClient
                     if (serverStatus.Version < RequiredAdbVersion
                         || (restartServerIfNewer && serverStatus.Version < commandLineVersion))
                     {
-                        ExceptionExtensions.ThrowIfNull(adbPath);
-
                         await StopServerAsync(cancellationToken);
                         await commandLineClient.StartServerAsync(cancellationToken);
                         return StartServerResult.RestartedOutdatedDaemon;
@@ -58,8 +55,6 @@ namespace AdvancedSharpAdbClient
                 }
                 else
                 {
-                    ExceptionExtensions.ThrowIfNull(adbPath);
-
                     await commandLineClient.StartServerAsync(cancellationToken);
                     return StartServerResult.Started;
                 }

@@ -3,12 +3,14 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 
 namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Enum"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class EnumExtensions
     {
         /// <summary>

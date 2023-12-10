@@ -1,5 +1,6 @@
 ﻿#if NETFRAMEWORK && !NET40_OR_GREATER
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
@@ -9,6 +10,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Represents a network endpoint as a host name or a string representation of an IP address and a port number.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class DnsEndPoint : EndPoint
     {
         private readonly AddressFamily _family;

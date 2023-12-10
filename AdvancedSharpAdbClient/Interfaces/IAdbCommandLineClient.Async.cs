@@ -23,6 +23,14 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StartServerAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Determines whether the <c>adb.exe</c> file exists.
+        /// </summary>
+        /// <param name="adbPath">The path to validate.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if the <c>adb.exe</c> file is exists, otherwise <see langword="false"/>.</returns>
+        Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken);
     }
 }
 #endif

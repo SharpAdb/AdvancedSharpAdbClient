@@ -3,12 +3,14 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 
 namespace AdvancedSharpAdbClient.Polyfills
 {
     /// <summary>
     /// Provides helper methods for working with Unix-based date formats.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class DateTimeExtensions
     {
 #if NETFRAMEWORK && !NET46_OR_GREATER

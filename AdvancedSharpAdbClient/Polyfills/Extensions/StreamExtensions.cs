@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 
@@ -12,6 +13,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="Stream"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class StreamExtensions
     {
         /// <summary>

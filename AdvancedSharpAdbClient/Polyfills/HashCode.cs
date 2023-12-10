@@ -55,6 +55,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Combines the hash code for multiple values into a single hash code.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public struct HashCode
     {
         private static readonly uint s_seed = GenerateGlobalSeed();
