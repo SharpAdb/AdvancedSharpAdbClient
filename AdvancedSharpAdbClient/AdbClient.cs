@@ -616,9 +616,9 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess));
+                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
-            progress?.Report(new InstallProgressEventArgs(1, 1, 100d));
+            progress?.Report(new InstallProgressEventArgs(1, 1, 100));
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             read = socket.Read(buffer);
@@ -782,7 +782,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void InstallWrite(DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null)
         {
-            progress?.Report(0d);
+            progress?.Report(0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -823,7 +823,7 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Report(totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess);
+                progress?.Report(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
 
             read = socket.Read(buffer);
@@ -838,7 +838,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(100d);
+            progress?.Report(100);
         }
 
         /// <summary>
@@ -851,7 +851,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         protected virtual void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<string?, double>? progress)
         {
-            progress?.Invoke(apkName, 0d);
+            progress?.Invoke(apkName, 0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -892,9 +892,9 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Invoke(apkName, totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess);
+                progress?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
-            progress?.Invoke(apkName, 100d);
+            progress?.Invoke(apkName, 100);
 
             read = socket.Read(buffer);
             string value =
@@ -908,7 +908,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Invoke(null, 100d);
+            progress?.Invoke(null, 100);
         }
 
         /// <inheritdoc/>

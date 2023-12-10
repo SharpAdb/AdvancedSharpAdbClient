@@ -470,9 +470,9 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
-                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess));
+                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
-            progress?.Report(new InstallProgressEventArgs(1, 1, 100d));
+            progress?.Report(new InstallProgressEventArgs(1, 1, 100));
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
@@ -631,7 +631,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
         {
-            progress?.Report(0d);
+            progress?.Report(0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -672,7 +672,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
-                progress?.Report(totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess);
+                progress?.Report(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
 
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
@@ -687,7 +687,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(100d);
+            progress?.Report(100);
         }
 
         /// <summary>
@@ -703,7 +703,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected virtual async Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, Action<string?, double>? progress, CancellationToken cancellationToken = default)
         {
-            progress?.Invoke(apkName, 0d);
+            progress?.Invoke(apkName, 0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -744,9 +744,9 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
-                progress?.Invoke(apkName, totalBytesToProcess == 0L ? 0.0 : totalBytesRead * 100.0 / totalBytesToProcess);
+                progress?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
-            progress?.Invoke(apkName, 100d);
+            progress?.Invoke(apkName, 100);
 
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
@@ -760,7 +760,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Invoke(null, 100d);
+            progress?.Invoke(null, 100);
         }
 
         /// <inheritdoc/>

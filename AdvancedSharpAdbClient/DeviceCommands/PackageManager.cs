@@ -450,7 +450,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
         protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? progress)
         {
-            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0L, 100L));
+            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));
 
             ValidateDevice();
 
@@ -486,7 +486,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             finally
             {
-                progress?.Invoke(null, new SyncProgressChangedEventArgs(100L, 100L));
+                progress?.Invoke(null, new SyncProgressChangedEventArgs(100, 100));
             }
         }
 

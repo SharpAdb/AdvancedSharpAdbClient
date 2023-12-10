@@ -26,6 +26,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the number of progress percentage (from <see langword="0"/> to <see langword="100"/>) for the sync operation.
         /// </summary>
-        public double ProgressPercentage => TotalBytesToReceive == 0L ? 0.0 : ReceivedBytesSize * 100.0 / TotalBytesToReceive;
+        public double ProgressPercentage => TotalBytesToReceive == 0 ? 0 : ReceivedBytesSize * 100d / TotalBytesToReceive;
     }
 }
