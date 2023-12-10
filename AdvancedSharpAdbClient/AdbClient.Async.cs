@@ -491,50 +491,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
-        {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
-
-            EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
-            ExceptionExtensions.ThrowIfNull(packageName);
-
-            if (splitAPKs.Any(apk => apk == null || !apk.CanRead || !apk.CanSeek))
-            {
-                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
-            }
-
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
-            string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
-
-            int progressCount = 0;
-            int splitAPKsCount = splitAPKs.Count();
-            Dictionary<string, double> status = new(splitAPKsCount);
-            void OnSyncProgressChanged(string? sender, double args)
-            {
-                lock (status)
-                {
-                    if (sender is null)
-                    {
-                        progressCount++;
-                    }
-                    else if (sender is string path)
-                    {
-                        status[path] = args;
-                    }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
-                }
-            }
-
-            int i = 0;
-            await Extensions.WhenAll(splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken))).ConfigureAwait(false);
-
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
-            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
-        }
-
-        /// <inheritdoc/>
         public virtual async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -582,6 +538,50 @@ namespace AdvancedSharpAdbClient
 
             int i = 0;
             await Extensions.WhenAll(splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken))).ConfigureAwait(false);
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
+            ExceptionExtensions.ThrowIfNull(packageName);
+
+            if (splitAPKs.Any(apk => apk == null || !apk.CanRead || !apk.CanSeek))
+            {
+                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
+            }
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
+
+            int progressCount = 0;
+            int splitAPKsCount = splitAPKs.Count();
+            Dictionary<string, double> status = new(splitAPKsCount);
+            void OnSyncProgressChanged(string? sender, double args)
+            {
+                lock (status)
+                {
+                    if (sender is null)
+                    {
+                        progressCount++;
+                    }
+                    else if (sender is string path)
+                    {
+                        status[path] = args;
+                    }
+                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                }
+            }
+
+            int i = 0;
+            await Extensions.WhenAll(splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken))).ConfigureAwait(false);
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);

@@ -322,23 +322,23 @@ namespace AdvancedSharpAdbClient
         /// Push multiple APKs to the device and install them.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
-        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
-
-        /// <summary>
-        /// Push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="device">The device on which to install the application.</param>
         /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.

@@ -296,6 +296,59 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Asynchronously installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallPackageAsync(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallPackageAsync(packageFilePath, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(basePackageFilePath, splitPackageFilePaths, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
         /// Asynchronously uninstalls a package from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
@@ -305,8 +358,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.UninstallPackageAsync(packageName, cancellationToken);
+        }
+
+        /// <summary>
+        /// Asynchronously uninstalls a package from the device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.UninstallPackageAsync(packageName, cancellationToken, arguments);
         }
 
         /// <summary>
@@ -319,7 +387,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which return the <see cref="VersionInfo"/> of target application.</returns>
         public static Task<VersionInfo> GetPackageVersionAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.GetVersionInfoAsync(packageName, cancellationToken);
         }
 

@@ -42,7 +42,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Asynchronously installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -70,7 +71,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Asynchronously installs the application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -107,7 +109,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -182,7 +185,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -249,7 +253,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -297,7 +302,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -337,7 +343,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Asynchronously ininstalls a package from the device.
+        /// Asynchronously uninstalls a package from the device.
         /// </summary>
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>

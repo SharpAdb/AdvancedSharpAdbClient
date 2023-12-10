@@ -272,15 +272,63 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallPackage(packageFilePath, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
+        }
+
+        /// <summary>
         /// Uninstalls a package from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
-        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
+        /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName, params string[] arguments)
         {
-            PackageManager manager = new(client, device);
-            manager.UninstallPackage(packageName);
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.UninstallPackage(packageName, arguments);
         }
 
         /// <summary>
@@ -291,7 +339,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.GetVersionInfo(packageName);
         }
 

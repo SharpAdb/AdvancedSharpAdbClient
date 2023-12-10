@@ -98,7 +98,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands["shell:pm uninstall com.example"] = "Success";
 
             DeviceData device = new()
@@ -107,9 +106,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
             await adbClient.UninstallPackageAsync(device, "com.example");
 
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[1]);
+            Assert.Single(adbClient.ReceivedCommands);
+            Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[0]);
         }
 
         [Theory]
@@ -343,7 +341,6 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
             DeviceData device = new()
@@ -355,9 +352,8 @@ Compiler stats:
             Assert.Equal(versionCode, version.VersionCode);
             Assert.Equal(versionName, version.VersionName);
 
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[1]);
+            Assert.Single(adbClient.ReceivedCommands);
+            Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[0]);
         }
 
         [Fact]

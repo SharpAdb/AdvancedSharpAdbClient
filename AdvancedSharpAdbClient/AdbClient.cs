@@ -637,53 +637,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
-        {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
-
-            EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
-            ExceptionExtensions.ThrowIfNull(packageName);
-
-            if (splitAPKs.Any(apk => apk == null || !apk.CanRead || !apk.CanSeek))
-            {
-                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
-            }
-
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
-            string session = InstallCreate(device, packageName, arguments);
-
-            int progressCount = 0;
-            int splitAPKsCount = splitAPKs.Count();
-            Dictionary<string, double> status = new(splitAPKsCount);
-            void OnSyncProgressChanged(string? sender, double args)
-            {
-                lock (status)
-                {
-                    if (sender is null)
-                    {
-                        progressCount++;
-                    }
-                    else if (sender is string path)
-                    {
-                        status[path] = args;
-                    }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
-                }
-            }
-
-            int i = 0;
-            foreach (Stream splitAPK in splitAPKs)
-            {
-                InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged);
-            }
-
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
-            InstallCommit(device, session);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
-        }
-
-        /// <inheritdoc/>
         public void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -733,6 +686,53 @@ namespace AdvancedSharpAdbClient
             foreach (Stream splitAPK in splitAPKs)
             {
                 InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged);
+            }
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            InstallCommit(device, session);
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+        }
+
+        /// <inheritdoc/>
+        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
+            ExceptionExtensions.ThrowIfNull(packageName);
+
+            if (splitAPKs.Any(apk => apk == null || !apk.CanRead || !apk.CanSeek))
+            {
+                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
+            }
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            string session = InstallCreate(device, packageName, arguments);
+
+            int progressCount = 0;
+            int splitAPKsCount = splitAPKs.Count();
+            Dictionary<string, double> status = new(splitAPKsCount);
+            void OnSyncProgressChanged(string? sender, double args)
+            {
+                lock (status)
+                {
+                    if (sender is null)
+                    {
+                        progressCount++;
+                    }
+                    else if (sender is string path)
+                    {
+                        status[path] = args;
+                    }
+                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                }
+            }
+
+            int i = 0;
+            foreach (Stream splitAPK in splitAPKs)
+            {
+                InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged);
             }
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
