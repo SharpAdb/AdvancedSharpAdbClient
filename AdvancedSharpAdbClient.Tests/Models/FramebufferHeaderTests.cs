@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void ReadFramebufferTest()
         {
-            byte[] data = File.ReadAllBytes("Assets/framebufferheader-v1.bin");
+            byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.V1.bin");
 
             FramebufferHeader header = [.. data];
 
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void ReadFramebufferV2Test()
         {
-            byte[] data = File.ReadAllBytes("Assets/framebufferheader-v2.bin");
+            byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.V2.bin");
 
             FramebufferHeader header = [.. data];
 
@@ -77,9 +77,9 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [SupportedOSPlatform("windows")]
         public void ToImageTest()
         {
-            byte[] data = File.ReadAllBytes("Assets/framebufferheader.bin");
+            byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
-            byte[] framebuffer = File.ReadAllBytes("Assets/framebuffer.bin");
+            byte[] framebuffer = File.ReadAllBytes("Assets/Framebuffer.bin");
             using Bitmap image = header.ToImage(framebuffer);
             Assert.NotNull(image);
             Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [SupportedOSPlatform("windows")]
         public void ToImageEmptyTest()
         {
-            byte[] data = File.ReadAllBytes("Assets/framebufferheader-empty.bin");
+            byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.Empty.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
 
             byte[] framebuffer = [];

@@ -8,17 +8,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
     public partial class AdbCommandLineClient
     {
-        /// <summary>
-        /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
+        /// <inheritdoc/>
         public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
@@ -36,12 +33,8 @@ namespace AdvancedSharpAdbClient
 
             return version;
         }
-
-        /// <summary>
-        /// Starts the adb server by running the <c>adb start-server</c> command.
-        /// </summary>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        
+        /// <inheritdoc/>
         public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
@@ -81,8 +74,16 @@ namespace AdvancedSharpAdbClient
             await RunAdbProcessAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
+        public virtual Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) =>
+#if WINDOWS_UWP
+            StorageFile.GetFileFromPathAsync(adbPath).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));
+#else
+            Extensions.FromResult(File.Exists(adbPath));
+#endif
+
         /// <summary>
-        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// Asynchronously runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
@@ -102,7 +103,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
+        /// Asynchronously runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>,
         /// and reads the standard output and standard error output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
@@ -121,7 +122,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Runs process, invoking a specific command, and reads the standard output and standard error output.
+        /// Asynchronously runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
         /// <returns>The return code of the process.</returns>
 #if !HAS_PROCESS

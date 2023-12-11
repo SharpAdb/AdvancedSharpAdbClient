@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Stops the monitoring
+        /// Asynchronously stops the monitoring
         /// </summary>
         protected virtual async Task DisposeAsyncCore()
         {
@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Monitors the devices. This connects to the Debug Bridge
+        /// Asynchronously monitors the devices. This connects to the Debug Bridge
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>

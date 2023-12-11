@@ -2,7 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient.Models.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
     /// <summary>
     /// Represents the state of a process running on an Android device.

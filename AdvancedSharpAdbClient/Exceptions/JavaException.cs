@@ -85,7 +85,6 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <returns>The equivalent <see cref="JavaException"/>.</returns>
         public static JavaException Parse(string line) => Parse(line.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
-
         /// <summary>
         /// Creates a <see cref="JavaException"/> from it <see cref="string"/> representation.
         /// </summary>

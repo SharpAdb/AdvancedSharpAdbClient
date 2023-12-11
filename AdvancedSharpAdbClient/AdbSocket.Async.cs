@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbSocket
     {
         /// <summary>
-        /// Reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
+        /// Asynchronously reconnects the <see cref="IAdbSocket"/> to the same endpoint it was initially connected to.
         /// Use this when the socket was disconnected by adb and you have restarted adb.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
@@ -354,11 +354,11 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Write until all data in "data" is written or the connection fails or times out.
+        /// Asynchronously write until all data in "data" is written or the connection fails or times out.
         /// </summary>
         /// <param name="data">The data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
@@ -377,11 +377,11 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_BUFFERS
         /// <summary>
-        /// Write until all data in "data" is written or the connection fails or times out.
+        /// Asynchronously write until all data in "data" is written or the connection fails or times out.
         /// </summary>
         /// <param name="data">The data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>Returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         protected virtual async ValueTask<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
         {
@@ -400,10 +400,10 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Reads the response from ADB after a command.
+        /// Asynchronously reads the response from ADB after a command.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
+        /// <returns>A <see cref="Task"/> which return a <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected virtual async Task<AdbResponse> ReadAdbResponseInnerAsync(CancellationToken cancellationToken = default)
         {
             byte[] reply = new byte[4];

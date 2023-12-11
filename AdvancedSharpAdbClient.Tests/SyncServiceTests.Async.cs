@@ -147,13 +147,13 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{SyncProgressChangedEventArgs}, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PullAsyncTest()
         {
             await using MemoryStream stream = new();
-            byte[] content = await File.ReadAllBytesAsync("Assets/fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             await RunTestAsync(
@@ -182,13 +182,13 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PushAsyncTest()
         {
-            FileStream stream = File.OpenRead("Assets/fstab.bin");
-            byte[] content = await File.ReadAllBytesAsync("Assets/fstab.bin");
+            FileStream stream = File.OpenRead("Assets/Fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
             byte[] contentMessage =
             [
                 .. SyncCommandConverter.GetBytes(SyncCommand.DATA),

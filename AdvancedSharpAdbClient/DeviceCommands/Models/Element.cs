@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Xml;
 
-namespace AdvancedSharpAdbClient.Models
+namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
     /// <summary>
     /// Implement of screen element, likes Selenium.
@@ -222,7 +222,22 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Clicks on this coordinates.
         /// </summary>
-        public void Click() => Client.Click(Device, Center);
+        public void Click()
+        {
+            ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
+            Client.ExecuteShellCommand(Device, $"input tap {Center.X} {Center.Y}", receiver);
+
+            string result = receiver.ToString();
+
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
+            {
+                throw new ElementNotFoundException("Coordinates of element is invalid");
+            }
+        }
 
         /// <summary>
         /// Send text to device. Doesn't support Russian.
@@ -231,17 +246,30 @@ namespace AdvancedSharpAdbClient.Models
         public void SendText(string text)
         {
             Click();
-            Client.SendText(Device, text);
+
+            ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
+            Client.ExecuteShellCommand(Device, $"input text {text}", receiver);
+
+            string result = receiver.ToString();
+
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
+            {
+                throw new InvalidTextException();
+            }
         }
 
         /// <summary>
-        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
         /// </summary>
         [MemberNotNull(nameof(Text))]
         public void ClearInput() => ClearInput(Text!.Length);
 
         /// <summary>
-        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         public void ClearInput(int charCount)
@@ -252,14 +280,28 @@ namespace AdvancedSharpAdbClient.Models
 
 #if HAS_TASK
         /// <summary>
-        /// Clicks on this coordinates.
+        /// Asynchronously clicks on this coordinates.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        public Task ClickAsync(CancellationToken cancellationToken = default) =>
-            Client.ClickAsync(Device, Center, cancellationToken);
+        public async Task ClickAsync(CancellationToken cancellationToken = default)
+        {
+            ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
+            await Client.ExecuteShellCommandAsync(Device, $"input tap {Center.X} {Center.Y}", receiver, cancellationToken).ConfigureAwait(false);
+
+            string result = receiver.ToString();
+
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
+            {
+                throw new ElementNotFoundException("Coordinates of element is invalid");
+            }
+        }
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Asynchronously send text to device. Doesn't support Russian.
         /// </summary>
         /// <param name="text">The text to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -267,11 +309,24 @@ namespace AdvancedSharpAdbClient.Models
         public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
         {
             await ClickAsync(cancellationToken).ConfigureAwait(false);
-            await Client.SendTextAsync(Device, text, cancellationToken).ConfigureAwait(false);
+
+            ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
+            await Client.ExecuteShellCommandAsync(Device, $"input text {text}", receiver, cancellationToken).ConfigureAwait(false);
+
+            string result = receiver.ToString();
+
+            if (result.StartsWith("java.lang."))
+            {
+                throw JavaException.Parse(result);
+            }
+            else if (result.Contains("ERROR", StringComparison.OrdinalIgnoreCase)) // error or ERROR
+            {
+                throw new InvalidTextException();
+            }
         }
 
         /// <summary>
-        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -280,7 +335,7 @@ namespace AdvancedSharpAdbClient.Models
             ClearInputAsync(Text!.Length, cancellationToken);
 
         /// <summary>
-        /// Clear the input text. Use <see cref="AdbClientExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

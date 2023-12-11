@@ -3,6 +3,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System.ComponentModel;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -10,6 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="StringBuilder"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class StringBuilderExtensions
     {
         /// <summary>

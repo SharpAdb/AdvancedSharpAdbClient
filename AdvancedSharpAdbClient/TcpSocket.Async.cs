@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
+        /// Asynchronously re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
         /// socket to disconnect.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>

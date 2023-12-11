@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace AdvancedSharpAdbClient.Models.DeviceCommands.Tests
+namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
 {
     /// <summary>
     /// Tests the <see cref="VersionInfo"/> class.

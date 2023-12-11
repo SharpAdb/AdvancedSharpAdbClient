@@ -13,11 +13,6 @@ namespace AdvancedSharpAdbClient.Models
     public enum UnixFileType
     {
         /// <summary>
-        /// The mask that can be used to retrieve the file type from a <see cref="UnixFileType"/>.
-        /// </summary>
-        TypeMask = 0x8000,
-
-        /// <summary>
         /// The file is a Unix socket.
         /// </summary>
         Socket = 0xC000,
@@ -30,7 +25,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The file is a regular file.
         /// </summary>
-        Regular = TypeMask,
+        Regular = 0x8000,
 
         /// <summary>
         /// The file is a block device.
@@ -50,6 +45,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The file is a first-in first-out queue.
         /// </summary>
-        FIFO = 0x1000
+        FIFO = 0x1000,
+
+        /// <summary>
+        /// The mask that can be used to retrieve the file type from a <see cref="UnixFileType"/>.
+        /// </summary>
+        TypeMask = Regular
     }
 }

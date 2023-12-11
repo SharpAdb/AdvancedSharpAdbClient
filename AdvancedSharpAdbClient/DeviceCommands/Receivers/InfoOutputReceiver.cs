@@ -6,12 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes command line output of a <c>adb</c> shell command.
     /// </summary>
-    public class InfoOutputReceiver : MultiLineReceiver
+    public class InfoOutputReceiver : ShellOutputReceiver
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="InfoOutputReceiver"/> class.
@@ -56,28 +56,23 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
         /// <param name="parser">Function parsing one string and returning the property value if possible. </param>
         public void AddPropertyParser(string property, Func<string, object?> parser) => PropertyParsers[property] = parser;
 
-        /// <summary>
-        /// Processes the new lines, and sets version information if the line represents package information data.
-        /// </summary>
-        /// <param name="lines">The lines to process.</param>
-        protected override void ProcessNewLines(IEnumerable<string> lines)
+        /// <inheritdoc/>
+        public override bool AddOutput(string line)
         {
-            foreach (string line in lines)
+            if (line == null)
             {
-                if (line == null)
-                {
-                    continue;
-                }
+                return true;
+            }
 
-                foreach (KeyValuePair<string, Func<string, object?>> parser in PropertyParsers)
+            foreach (KeyValuePair<string, Func<string, object?>> parser in PropertyParsers)
+            {
+                object? propertyValue = parser.Value(line);
+                if (propertyValue != null)
                 {
-                    object? propertyValue = parser.Value(line);
-                    if (propertyValue != null)
-                    {
-                        Properties[parser.Key] = propertyValue;
-                    }
+                    Properties[parser.Key] = propertyValue;
                 }
             }
+            return true;
         }
     }
 }

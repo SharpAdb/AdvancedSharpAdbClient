@@ -51,14 +51,14 @@ namespace AdvancedSharpAdbClient.Receivers.Tests
             AssertThrowsException<PermissionDeniedException>("/dev/test: access denied");
 
             // Should not thrown an exception
-            ConsoleOutputReceiver receiver = new();
-            receiver.ThrowOnError("Stay calm and watch cat movies.");
+            ConsoleOutputReceiver receiver = new() { ParsesErrors = true };
+            receiver.AddOutput("Stay calm and watch cat movies.");
         }
 
         private static void AssertThrowsException<T>(string line) where T : Exception
         {
-            ConsoleOutputReceiver receiver = new();
-            _ = Assert.Throws<T>(() => receiver.ThrowOnError(line));
+            ConsoleOutputReceiver receiver = new() { ParsesErrors = true };
+            _ = Assert.Throws<T>(() => receiver.AddOutput(line));
         }
     }
 }

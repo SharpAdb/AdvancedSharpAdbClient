@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Xml;
 
 namespace AdvancedSharpAdbClient
 {
@@ -18,6 +17,12 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public partial interface IAdbClient
     {
+        // remount: not implemented
+        // dev:<path> not implemented
+        // track-jdwp: not implemented
+        // localreserved:<path> not implemented
+        // localabstract:<path> not implemented
+
         /// <summary>
         /// Gets the <see cref="EndPoint"/> at which the Android Debug Bridge server is listening.
         /// </summary>
@@ -237,15 +242,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 
-        // shell: not implemented
-        // remount: not implemented
-        // dev:<path> not implemented
-        // tcp:<port> not implemented
-        // tcp:<port>:<server-name> not implemented
-        // local:<path> not implemented
-        // localreserved:<path> not implemented
-        // localabstract:<path> not implemented
-
         /// <summary>
         /// Gets a <see cref="Framebuffer"/> which contains the framebuffer data for this device. The framebuffer data can be refreshed,
         /// giving you high performance access to the device's framebuffer.
@@ -270,12 +266,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
-
-        // jdwp:<pid>: not implemented
-        // track-jdwp: not implemented
-        // sync: not implemented
-        // reverse:<forward-command>: not implemented
-
+        
         /// <summary>
         /// Reboots the specified device in to the specified mode.
         /// </summary>
@@ -322,17 +313,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        void Install(DeviceData device, Stream apk, params string[] arguments);
-
-        /// <summary>
-        /// Push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments);
+        void Install(DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -340,8 +324,21 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments);
+        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
@@ -359,7 +356,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
         /// <param name="apkName">The name of the application.</param>
         /// <param name="session">The session ID of the install session.</param>
-        void InstallWrite(DeviceData device, Stream apk, string apkName, string session);
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        void InstallWrite(DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress);
 
         /// <summary>
         /// Commit the given active install session, installing the app.
@@ -382,146 +381,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device for which to get the list of features supported.</param>
         /// <returns>A list of all features supported by the current device.</returns>
         IEnumerable<string> GetFeatureSet(DeviceData device);
-
-        /// <summary>
-        /// Gets the current device screen snapshot.
-        /// </summary>
-        /// <param name="device">The device for which to get the screen snapshot.</param>
-        /// <returns>A <see cref="string"/> containing current hierarchy.
-        /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
-        string DumpScreenString(DeviceData device);
-
-        /// <summary>
-        /// Gets the current device screen snapshot.
-        /// </summary>
-        /// <param name="device">The device for which to get the screen snapshot.</param>
-        /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        XmlDocument? DumpScreen(DeviceData device);
-
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        /// <summary>
-        /// Gets the current device screen snapshot.
-        /// </summary>
-        /// <param name="device">The device for which to get the screen snapshot.</param>
-        /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT(DeviceData device)
-#if WINDOWS10_0_17763_0_OR_GREATER
-        {
-            Windows.Data.Xml.Dom.XmlDocument doc = new();
-            doc.LoadXml(DumpScreen(device)?.OuterXml);
-            return doc;
-        }
-#else
-            ;
-#endif
-#endif
-
-        /// <summary>
-        /// Clicks on the specified coordinates.
-        /// </summary>
-        /// <param name="device">The device on which to click.</param>
-        /// <param name="cords">The <see cref="Point"/> to click.</param>
-        void Click(DeviceData device, Point cords);
-
-        /// <summary>
-        /// Clicks on the specified coordinates.
-        /// </summary>
-        /// <param name="device">The device on which to click.</param>
-        /// <param name="x">The X co-ordinate to click.</param>
-        /// <param name="y">The Y co-ordinate to click.</param>
-        void Click(DeviceData device, int x, int y);
-
-        /// <summary>
-        /// Generates a swipe gesture from first element to second element Specify the speed in ms.
-        /// </summary>
-        /// <param name="device">The device on which to swipe.</param>
-        /// <param name="first">The start element.</param>
-        /// <param name="second">The end element.</param>
-        /// <param name="speed">The time spent in swiping.</param>
-        void Swipe(DeviceData device, Element first, Element second, long speed);
-
-        /// <summary>
-        /// Generates a swipe gesture from co-ordinates x1,y1 to x2,y2 with speed Specify the speed in ms.
-        /// </summary>
-        /// <param name="device">The device on which to swipe.</param>
-        /// <param name="x1">The start X co-ordinate.</param>
-        /// <param name="y1">The start Y co-ordinate.</param>
-        /// <param name="x2">The end X co-ordinate.</param>
-        /// <param name="y2">The end Y co-ordinate.</param>
-        /// <param name="speed">The time spent in swiping.</param>
-        void Swipe(DeviceData device, int x1, int y1, int x2, int y2, long speed);
-
-        /// <summary>
-        /// Check if the app is running in foreground.
-        /// </summary>
-        /// <param name="device">The device on which to check.</param>
-        /// <param name="packageName">The package name of the app to check.</param>
-        /// <returns><see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        bool IsAppInForeground(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Check if the app is running in background.
-        /// </summary>
-        /// <param name="device">The device on which to check.</param>
-        /// <param name="packageName">The package name of the app to check.</param>
-        /// <returns><see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
-        bool IsAppRunning(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Get the <see cref="AppStatus"/> of the app.
-        /// </summary>
-        /// <param name="device">The device on which to get status.</param>
-        /// <param name="packageName">The package name of the app to check.</param>
-        /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
-        AppStatus GetAppStatus(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Get element by xpath. You can specify the waiting time in timeout.
-        /// </summary>
-        /// <param name="device">The device on which to get element.</param>
-        /// <param name="xpath">The xpath of the element.</param>
-        /// <param name="timeout">The timeout for waiting the element.
-        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
-        /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        Element? FindElement(DeviceData device, string xpath, TimeSpan timeout = default);
-
-        /// <summary>
-        /// Get elements by xpath. You can specify the waiting time in timeout.
-        /// </summary>
-        /// <param name="device">The device on which to get elements.</param>
-        /// <param name="xpath">The xpath of the elements.</param>
-        /// <param name="timeout">The timeout for waiting the elements.
-        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
-        /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
-        IEnumerable<Element> FindElements(DeviceData device, string xpath, TimeSpan timeout = default);
-
-        /// <summary>
-        /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
-        /// </summary>
-        /// <param name="device">The device on which to send key event.</param>
-        /// <param name="key">The key event to send.</param>
-        void SendKeyEvent(DeviceData device, string key);
-
-        /// <summary>
-        /// Send text to device. Doesn't support Russian.
-        /// </summary>
-        /// <param name="device">The device on which to send text.</param>
-        /// <param name="text">The text to send.</param>
-        void SendText(DeviceData device, string text);
-
-        /// <summary>
-        /// Start an Android application on device.
-        /// </summary>
-        /// <param name="device">The device on which to start an application.</param>
-        /// <param name="packageName">The package name of the application to start.</param>
-        void StartApp(DeviceData device, string packageName);
-
-        /// <summary>
-        /// Stop an Android application on device.
-        /// </summary>
-        /// <param name="device">The device on which to stop an application.</param>
-        /// <param name="packageName">The package name of the application to stop.</param>
-        void StopApp(DeviceData device, string packageName);
     }
 
     /// <summary>

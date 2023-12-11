@@ -8,6 +8,53 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     public partial class DeviceExtensionsTests
     {
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClearInputAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
+            client.Commands["shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"] = string.Empty;
+
+            await client.ClearInputAsync(Device, 3);
+
+            Assert.Equal(2, client.ReceivedCommands.Count);
+            Assert.Equal("shell:input keyevent KEYCODE_MOVE_END", client.ReceivedCommands[0]);
+            Assert.Equal("shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL", client.ReceivedCommands[1]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickBackButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickBackButtonAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_BACK"] = string.Empty;
+
+            await client.ClickBackButtonAsync(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_BACK", client.ReceivedCommands[0]);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ClickHomeButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ClickHomeButtonAsyncTest()
+        {
+            DummyAdbClient client = new();
+            client.Commands["shell:input keyevent KEYCODE_HOME"] = string.Empty;
+
+            await client.ClickHomeButtonAsync(Device);
+
+            Assert.Single(client.ReceivedCommands);
+            Assert.Equal("shell:input keyevent KEYCODE_HOME", client.ReceivedCommands[0]);
+        }
+
         [Fact]
         public async void StatAsyncTest()
         {
@@ -51,7 +98,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands["shell:pm uninstall com.example"] = "Success";
 
             DeviceData device = new()
@@ -60,9 +106,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             };
             await adbClient.UninstallPackageAsync(device, "com.example");
 
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[1]);
+            Assert.Single(adbClient.ReceivedCommands);
+            Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[0]);
         }
 
         [Theory]
@@ -296,7 +341,6 @@ Compiler stats:
         {
             DummyAdbClient adbClient = new();
 
-            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
             DeviceData device = new()
@@ -308,9 +352,8 @@ Compiler stats:
             Assert.Equal(versionCode, version.VersionCode);
             Assert.Equal(versionName, version.VersionName);
 
-            Assert.Equal(2, adbClient.ReceivedCommands.Count);
-            Assert.Equal("shell:pm list packages -f", adbClient.ReceivedCommands[0]);
-            Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[1]);
+            Assert.Single(adbClient.ReceivedCommands);
+            Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[0]);
         }
 
         [Fact]

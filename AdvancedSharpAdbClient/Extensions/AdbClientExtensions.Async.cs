@@ -4,9 +4,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 
@@ -15,7 +12,7 @@ namespace AdvancedSharpAdbClient
     public static partial class AdbClientExtensions
     {
         /// <summary>
-        /// Asks the ADB server to forward local connections from <paramref name="local"/>
+        /// Asynchronously asks the ADB server to forward local connections from <paramref name="local"/>
         /// to the <paramref name="remote"/> address on the <paramref name="device"/>.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
@@ -32,7 +29,7 @@ namespace AdvancedSharpAdbClient
             client.CreateForwardAsync(device, local.ToString(), remote.ToString(), allowRebind, cancellationToken);
 
         /// <summary>
-        /// Creates a port forwarding between a local and a remote port.
+        /// Asynchronously creates a port forwarding between a local and a remote port.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device to which to forward the connections.</param>
@@ -47,7 +44,7 @@ namespace AdvancedSharpAdbClient
             client.CreateForwardAsync(device, $"tcp:{localPort}", $"tcp:{remotePort}", true, cancellationToken);
 
         /// <summary>
-        /// Forwards a remote Unix socket to a local TCP socket.
+        /// Asynchronously forwards a remote Unix socket to a local TCP socket.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device to which to forward the connections.</param>
@@ -63,7 +60,7 @@ namespace AdvancedSharpAdbClient
             client.CreateForwardAsync(device, $"tcp:{localPort}", $"local:{remoteSocket}", true, cancellationToken);
 
         /// <summary>
-        /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
+        /// Asynchronously asks the ADB server to reverse forward local connections from <paramref name="remote"/>
         /// to the <paramref name="local"/> address on the <paramref name="device"/>.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
@@ -80,7 +77,7 @@ namespace AdvancedSharpAdbClient
             client.CreateReverseForwardAsync(device, remote.ToString(), local.ToString(), allowRebind, cancellationToken);
 
         /// <summary>
-        /// Remove a reverse port forwarding between a remote and a local port.
+        /// Asynchronously remove a reverse port forwarding between a remote and a local port.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to remove the reverse port forwarding</param>
@@ -91,7 +88,7 @@ namespace AdvancedSharpAdbClient
             client.RemoveReverseForwardAsync(device, remote.ToString(), cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
@@ -104,7 +101,7 @@ namespace AdvancedSharpAdbClient
             client.ExecuteServerCommandAsync(target, command, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
@@ -117,7 +114,7 @@ namespace AdvancedSharpAdbClient
             client.ExecuteServerCommandAsync(target, command, socket, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Asynchronously executes a command on the device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="command">The command to execute.</param>
@@ -128,7 +125,7 @@ namespace AdvancedSharpAdbClient
             client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
@@ -140,7 +137,7 @@ namespace AdvancedSharpAdbClient
             client.ExecuteServerCommandAsync(target, command, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a command on the adb server.
+        /// Asynchronously executes a command on the adb server.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
@@ -154,7 +151,7 @@ namespace AdvancedSharpAdbClient
             client.ExecuteServerCommandAsync(target, command, socket, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a command on the device.
+        /// Asynchronously executes a command on the device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="command">The command to execute.</param>
@@ -177,7 +174,7 @@ namespace AdvancedSharpAdbClient
             client.RunLogServiceAsync(device, messageSink, default, logNames);
 
         /// <summary>
-        /// Reboots the specified adb socket address.
+        /// Asynchronously reboots the specified adb socket address.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device.</param>
@@ -186,7 +183,7 @@ namespace AdvancedSharpAdbClient
         public static Task RebootAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.RebootAsync(string.Empty, device, cancellationToken);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication.
+        /// Asynchronously pair with a device for secure TCP/IP communication.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
@@ -199,7 +196,7 @@ namespace AdvancedSharpAdbClient
                 : client.PairAsync(new IPEndPoint(address, AdbClient.DefaultPort), code, cancellationToken);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication.
+        /// Asynchronously pair with a device for secure TCP/IP communication.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
@@ -212,7 +209,7 @@ namespace AdvancedSharpAdbClient
                 : client.PairAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), code, cancellationToken);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication.
+        /// Asynchronously pair with a device for secure TCP/IP communication.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
@@ -223,7 +220,7 @@ namespace AdvancedSharpAdbClient
             client.PairAsync(Extensions.CreateDnsEndPoint(host, AdbClient.DefaultPort), code, cancellationToken);
 
         /// <summary>
-        /// Pair with a device for secure TCP/IP communication.
+        /// Asynchronously pair with a device for secure TCP/IP communication.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
@@ -235,7 +232,7 @@ namespace AdvancedSharpAdbClient
             client.PairAsync(Extensions.CreateDnsEndPoint(host, port), code, cancellationToken);
 
         /// <summary>
-        /// Connect to a device via TCP/IP.
+        /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
@@ -247,7 +244,7 @@ namespace AdvancedSharpAdbClient
                 : client.ConnectAsync(new IPEndPoint(address, AdbClient.DefaultPort), cancellationToken);
 
         /// <summary>
-        /// Connect to a device via TCP/IP.
+        /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
@@ -259,7 +256,7 @@ namespace AdvancedSharpAdbClient
                 : client.ConnectAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), cancellationToken);
 
         /// <summary>
-        /// Connect to a device via TCP/IP.
+        /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
@@ -270,41 +267,7 @@ namespace AdvancedSharpAdbClient
             client.ConnectAsync(Extensions.CreateDnsEndPoint(host, port), cancellationToken);
 
         /// <summary>
-        /// Asynchronously installs an Android application on an device.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallAsync(this IAdbClient client, DeviceData device, Stream apk, params string[] arguments) => client.InstallAsync(device, apk, default, arguments);
-
-        /// <summary>
-        /// Asynchronously push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, params string[] arguments) =>
-            client.InstallMultipleAsync(device, splitAPKs, packageName, default, arguments);
-
-        /// <summary>
-        /// Asynchronously push multiple APKs to the device and install them.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to install the application.</param>
-        /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
-        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, params string[] arguments) =>
-            client.InstallMultipleAsync(device, baseAPK, splitAPKs, default, arguments);
-
-        /// <summary>
-        /// Like "install", but starts an install session.
+        /// Like "install", but starts an install session synchronously.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to install the application.</param>
@@ -315,7 +278,7 @@ namespace AdvancedSharpAdbClient
             client.InstallCreateAsync(device, packageName, default, arguments);
 
         /// <summary>
-        /// Uninstalls an Android application on an device.
+        /// Asynchronously uninstalls an Android application on an device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to install the application.</param>
@@ -324,38 +287,6 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task UninstallAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
             client.UninstallAsync(device, packageName, default, arguments);
-
-        /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="charCount">The length of text to clear.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static async Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default)
-        {
-            await client.SendKeyEventAsync(device, "KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await client.SendKeyEventAsync(device, StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Click BACK button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click BACK button.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ClickBackButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.SendKeyEventAsync(device, "KEYCODE_BACK", cancellationToken);
-
-        /// <summary>
-        /// Click HOME button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click HOME button.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ClickHomeButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.SendKeyEventAsync(device, "KEYCODE_HOME", cancellationToken);
     }
 }
 #endif

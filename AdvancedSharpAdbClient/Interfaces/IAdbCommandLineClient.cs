@@ -25,6 +25,7 @@ namespace AdvancedSharpAdbClient
         /// Determines whether the <c>adb.exe</c> file exists.
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
+        /// <returns><see langword="true"/> if the <c>adb.exe</c> file is exists, otherwise <see langword="false"/>.</returns>
         bool CheckFileExists(string adbPath);
     }
 }

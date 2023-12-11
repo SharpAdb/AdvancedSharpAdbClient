@@ -155,11 +155,6 @@ namespace AdvancedSharpAdbClient
         public static IAdbServer Instance { get; set; } = new AdbServer();
 
         /// <summary>
-        /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
-        /// </summary>
-        protected static Func<string, bool> CheckFileExists { get; set; } = Factories.CheckFileExists;
-
-        /// <summary>
         /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
         /// </summary>
         protected static bool IsStarting { get; set; } = false;
@@ -179,7 +174,6 @@ namespace AdvancedSharpAdbClient
                 Version? commandLineVersion = null;
 
                 IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
-                CheckFileExists = commandLineClient.CheckFileExists;
 
                 if (commandLineClient.CheckFileExists(adbPath))
                 {
@@ -193,8 +187,8 @@ namespace AdvancedSharpAdbClient
                     return !serverStatus.IsRunning
                         ? throw new AdbException("The adb server is not running, but no valid path to the adb.exe executable was provided. The adb server cannot be started.")
                         : serverStatus.Version >= RequiredAdbVersion
-                        ? StartServerResult.AlreadyRunning
-                        : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
+                            ? StartServerResult.AlreadyRunning
+                            : throw new AdbException($"The adb daemon is running an outdated version ${commandLineVersion}, but not valid path to the adb.exe executable was provided. A more recent version of the adb server cannot be started.");
                 }
 
                 if (serverStatus.IsRunning)
@@ -202,8 +196,6 @@ namespace AdvancedSharpAdbClient
                     if (serverStatus.Version < RequiredAdbVersion
                         || (restartServerIfNewer && serverStatus.Version < commandLineVersion))
                     {
-                        ExceptionExtensions.ThrowIfNull(adbPath);
-
                         StopServer();
                         commandLineClient.StartServer();
                         return StartServerResult.RestartedOutdatedDaemon;
@@ -215,8 +207,6 @@ namespace AdvancedSharpAdbClient
                 }
                 else
                 {
-                    ExceptionExtensions.ThrowIfNull(adbPath);
-
                     commandLineClient.StartServer();
                     return StartServerResult.Started;
                 }

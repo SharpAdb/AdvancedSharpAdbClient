@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -7,6 +8,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <summary>
     /// Provides extension methods for the <see cref="Enumerable"/> class.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class EnumerableExtensions
     {
         /// <summary>
@@ -44,7 +46,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
 #if HAS_TASK
         /// <summary>
-        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// Asynchronously creates an array from a <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
@@ -53,7 +55,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             source.ContinueWith(x => x.Result.ToArray());
 
         /// <summary>
-        /// Creates an array from a <see cref="IEnumerable{T}"/>.
+        /// Asynchronously creates an array from a <see cref="IEnumerable{T}"/>.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>

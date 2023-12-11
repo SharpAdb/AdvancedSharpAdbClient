@@ -98,13 +98,13 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Pull(string, Stream, IProgress{SyncProgressChangedEventArgs}, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Pull(string, Stream, IProgress{SyncProgressChangedEventArgs}?, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PullTest()
         {
             using MemoryStream stream = new();
-            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            byte[] content = File.ReadAllBytes("Assets/Fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             RunTest(
@@ -133,13 +133,13 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}?, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PushTest()
         {
-            FileStream stream = File.OpenRead("Assets/fstab.bin");
-            byte[] content = File.ReadAllBytes("Assets/fstab.bin");
+            FileStream stream = File.OpenRead("Assets/Fstab.bin");
+            byte[] content = File.ReadAllBytes("Assets/Fstab.bin");
             byte[] contentMessage =
             [
                 .. SyncCommandConverter.GetBytes(SyncCommand.DATA),

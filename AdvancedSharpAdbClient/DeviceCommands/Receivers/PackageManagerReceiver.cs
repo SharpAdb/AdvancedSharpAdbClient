@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Parses the output of the various <c>pm</c> commands.
@@ -22,10 +22,7 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
         /// </summary>
         public PackageManager PackageManager { get; } = packageManager;
 
-        /// <summary>
-        /// Processes the new lines.
-        /// </summary>
-        /// <param name="lines">The lines.</param>
+        /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)
         {
             PackageManager.Packages.Clear();

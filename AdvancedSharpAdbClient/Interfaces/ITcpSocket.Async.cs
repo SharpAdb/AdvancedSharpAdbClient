@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
+        /// Asynchronously re-establishes the connection to a remote host. Assumes you have resolved the reason that caused the
         /// socket to disconnect.
         /// </summary>
         /// <param name="isForce">Force reconnect whatever the socket is connected or not.</param>
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient
         Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// Asynchronously receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
         /// using the specified SocketFlags.
         /// </summary>
         /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
         Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// Asynchronously receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
         /// using the specified SocketFlags.
         /// </summary>
         /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient
         Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// Asynchronously receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
         /// into the specified offset position of the receive buffer, using the specified SocketFlags.
         /// </summary>
         /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient
         public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken) => new(ReceiveAsync(buffer.ToArray(), socketFlags, cancellationToken));
 
         /// <summary>
-        /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
+        /// Asynchronously receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
         /// using the specified SocketFlags.
         /// </summary>
         /// <param name="buffer">An array of type Byte that is the storage location for received data.</param>

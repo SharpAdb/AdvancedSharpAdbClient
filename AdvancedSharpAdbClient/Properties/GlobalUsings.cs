@@ -1,12 +1,11 @@
 ﻿#region AdvancedSharpAdbClient
-global using AdvancedSharpAdbClient.DeviceCommands;
+global using AdvancedSharpAdbClient.DeviceCommands.Models;
+global using AdvancedSharpAdbClient.DeviceCommands.Receivers;
 global using AdvancedSharpAdbClient.Exceptions;
 global using AdvancedSharpAdbClient.Logs;
 global using AdvancedSharpAdbClient.Models;
-global using AdvancedSharpAdbClient.Models.DeviceCommands;
 global using AdvancedSharpAdbClient.Polyfills;
 global using AdvancedSharpAdbClient.Receivers;
-global using AdvancedSharpAdbClient.Receivers.DeviceCommands;
 #endregion
 
 #if NET
@@ -21,6 +20,7 @@ global using System.Numerics;
 global using Windows.Foundation;
 global using Windows.Foundation.Metadata;
 global using Windows.Graphics.Imaging;
+global using Windows.Storage;
 global using Windows.Storage.Streams;
 global using Windows.System;
 global using Windows.UI.Core;

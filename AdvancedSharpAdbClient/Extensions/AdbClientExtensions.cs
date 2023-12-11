@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Linq;
 using System.Net;
 
 namespace AdvancedSharpAdbClient
@@ -225,31 +224,5 @@ namespace AdvancedSharpAdbClient
         /// <returns>The results from adb.</returns>
         public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort) =>
             client.Connect(Extensions.CreateDnsEndPoint(host, port));
-
-        /// <summary>
-        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="charCount">The length of text to clear.</param>
-        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)
-        {
-            client.SendKeyEvent(device, "KEYCODE_MOVE_END");
-            client.SendKeyEvent(device, StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
-        }
-
-        /// <summary>
-        /// Click BACK button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click BACK button.</param>
-        public static void ClickBackButton(this IAdbClient client, DeviceData device) => client.SendKeyEvent(device, "KEYCODE_BACK");
-
-        /// <summary>
-        /// Click HOME button.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device on which to click HOME button.</param>
-        public static void ClickHomeButton(this IAdbClient client, DeviceData device) => client.SendKeyEvent(device, "KEYCODE_HOME");
     }
 }

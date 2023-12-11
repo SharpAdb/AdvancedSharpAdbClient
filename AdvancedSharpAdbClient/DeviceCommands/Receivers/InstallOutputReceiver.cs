@@ -2,15 +2,14 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
-    public partial class InstallOutputReceiver : MultiLineReceiver
+    public partial class InstallOutputReceiver : ShellOutputReceiver
     {
         /// <summary>
         /// The error message that indicates an unknown error occurred.
@@ -65,67 +64,64 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
         /// </value>
         public bool Success { get; private set; }
 
-        /// <summary>
-        /// Processes the new lines.
-        /// </summary>
-        /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(IEnumerable<string> lines)
+        /// <inheritdoc/>
+        public override bool AddOutput(string line)
         {
-            Regex successRegex = SuccessRegex();
-            Regex failureRegex = FailureRegex();
-            Regex errorRegex = ErrorRegex();
-
-            foreach (string line in lines)
+            if (line.Length > 0)
             {
-                if (line.Length > 0)
+                if (line.StartsWith(SuccessOutput))
                 {
-                    if (line.StartsWith(SuccessOutput))
+                    Regex successRegex = SuccessRegex();
+                    Match m = successRegex.Match(line);
+                    SuccessMessage = string.Empty;
+
+                    ErrorMessage = null;
+
+                    if (m.Success)
                     {
-                        Match m = successRegex.Match(line);
-                        SuccessMessage = string.Empty;
-
-                        ErrorMessage = null;
-
-                        if (m.Success)
-                        {
-                            string msg = m.Groups[1].Value;
-                            SuccessMessage = msg ?? string.Empty;
-                        }
-
-                        Success = true;
+                        string msg = m.Groups[1].Value;
+                        SuccessMessage = msg ?? string.Empty;
                     }
-                    else if (line.StartsWith(FailureOutput))
+
+                    Success = true;
+                    return false;
+                }
+                else if (line.StartsWith(FailureOutput))
+                {
+                    Regex failureRegex = FailureRegex();
+                    Match m = failureRegex.Match(line);
+                    ErrorMessage = UnknownError;
+
+                    SuccessMessage = null;
+
+                    if (m.Success)
                     {
-                        Match m = failureRegex.Match(line);
-                        ErrorMessage = UnknownError;
-
-                        SuccessMessage = null;
-
-                        if (m.Success)
-                        {
-                            string msg = m.Groups[1].Value;
-                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
-                        }
-
-                        Success = false;
+                        string msg = m.Groups[1].Value;
+                        ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                     }
-                    else
+
+                    Success = false;
+                    return false;
+                }
+                else
+                {
+                    Regex errorRegex = ErrorRegex();
+                    Match m = errorRegex.Match(line);
+                    ErrorMessage = UnknownError;
+
+                    SuccessMessage = null;
+
+                    if (m.Success)
                     {
-                        Match m = errorRegex.Match(line);
-                        ErrorMessage = UnknownError;
-
-                        SuccessMessage = null;
-
-                        if (m.Success)
-                        {
-                            string msg = m.Groups[1].Value;
-                            ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
-                        }
-
-                        Success = false;
+                        string msg = m.Groups[1].Value;
+                        ErrorMessage = StringExtensions.IsNullOrWhiteSpace(msg) ? UnknownError : msg;
                     }
+
+                    Success = false;
+                    return false;
                 }
             }
+            return true;
         }
 
 #if NET7_0_OR_GREATER

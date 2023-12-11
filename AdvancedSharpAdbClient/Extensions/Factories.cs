@@ -17,11 +17,6 @@ namespace AdvancedSharpAdbClient
         static Factories() => Reset();
 
         /// <summary>
-        /// Determines whether the specified file exists.
-        /// </summary>
-        public static Func<string, bool> CheckFileExists { get; set; }
-
-        /// <summary>
         /// Gets or sets a delegate which creates a new instance of the <see cref="AdbSocket"/> class.
         /// </summary>
         /// <returns>A new instance of the <see cref="AdbSocket"/> class.</returns>
@@ -51,14 +46,12 @@ namespace AdvancedSharpAdbClient
         /// Resets all factories to their default values.
         /// </summary>
         [MemberNotNull(
-            nameof(CheckFileExists),
             nameof(AdbSocketFactory),
             nameof(AdbClientFactory),
             nameof(AdbCommandLineClientFactory),
             nameof(SyncServiceFactory))]
         public static void Reset()
         {
-            CheckFileExists = File.Exists;
             AdbSocketFactory = endPoint => new AdbSocket(endPoint);
             AdbClientFactory = endPoint => new AdbClient(endPoint, AdbSocketFactory);
             AdbCommandLineClientFactory = path => new AdbCommandLineClient(path);

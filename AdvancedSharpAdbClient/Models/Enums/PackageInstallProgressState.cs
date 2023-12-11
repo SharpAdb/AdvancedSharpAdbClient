@@ -2,13 +2,18 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-namespace AdvancedSharpAdbClient.Models.DeviceCommands
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Represents the state of the installation.
     /// </summary>
     public enum PackageInstallProgressState
     {
+        /// <summary>
+        /// Preparing the installation.
+        /// </summary>
+        Preparing,
+
         /// <summary>
         /// Uploading packages to the device.
         /// </summary>

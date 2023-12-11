@@ -5,13 +5,13 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace AdvancedSharpAdbClient.Models.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
     /// <summary>
-    /// The classes in this namespace provide models for <see cref="AdvancedSharpAdbClient.DeviceCommands"/>.
+    /// The classes in this namespace provide models for <see cref="DeviceCommands"/>.
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal class NamespaceDoc : Models.NamespaceDoc { }
+    internal class NamespaceDoc : AdvancedSharpAdbClient.Models.NamespaceDoc { }
 }

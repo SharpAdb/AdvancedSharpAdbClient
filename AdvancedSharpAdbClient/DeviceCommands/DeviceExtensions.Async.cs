@@ -9,13 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Xml;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
     public static partial class DeviceExtensions
     {
         /// <summary>
-        /// Executes a shell command on the device.
+        /// Asynchronously executes a shell command on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -26,7 +27,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Executes a shell command on the device.
+        /// Asynchronously executes a shell command on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
@@ -38,7 +39,155 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
         /// <summary>
-        /// Gets the file statistics of a given file.
+        /// Asynchronously gets the current device screen snapshot asynchronously.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
+        public static Task<XmlDocument?> DumpScreenAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).DumpScreenAsync(cancellationToken);
+
+        /// <summary>
+        /// Asynchronously clicks on the specified coordinates.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="cords">The <see cref="Point"/> to click.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ClickAsync(this IAdbClient client, DeviceData device, Point cords, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).ClickAsync(cords, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="first">The start element.</param>
+        /// <param name="second">The end element.</param>
+        /// <param name="speed">The time spent in swiping.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task SwipeAsync(this IAdbClient client, DeviceData device, Point first, Point second, long speed, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).SwipeAsync(first, second, speed, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously get the <see cref="AppStatus"/> of the app.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        public static Task<AppStatus> GetAppStatusAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).GetAppStatusAsync(packageName, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously get element by xpath asynchronously. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
+        public static Task<Element?> FindElementAsync(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).FindElementAsync(xpath, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
+        public static Task<IEnumerable<Element>> FindElementsAsync(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).FindElementsAsync(xpath, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="key">The key event to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task SendKeyEventAsync(this IAdbClient client, DeviceData device, string key, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).SendKeyEventAsync(key, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously send text to device. Doesn't support Russian.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="text">The text to send.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task SendTextAsync(this IAdbClient client, DeviceData device, string text, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).SendTextAsync(text, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="charCount">The length of text to clear.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default)
+        {
+            DeviceClient deviceClient = new(client, device);
+            await deviceClient.SendKeyEventAsync("KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
+            await deviceClient.SendKeyEventAsync(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously click BACK button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click BACK button.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ClickBackButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_BACK", cancellationToken);
+
+        /// <summary>
+        /// Asynchronously click HOME button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ClickHomeButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_HOME", cancellationToken);
+
+        /// <summary>
+        /// Asynchronously start an Android application on device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="packageName">The package name of the application to start.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task StartAppAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
+            client.ExecuteShellCommandAsync(device, $"monkey -p {packageName} 1", cancellationToken);
+
+        /// <summary>
+        /// Asynchronously stop an Android application on device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="packageName">The package name of the application to stop.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task StopAppAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
+            client.ExecuteShellCommandAsync(device, $"am force-stop {packageName}", cancellationToken);
+
+        /// <summary>
+        /// Asynchronously gets the file statistics of a given file.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to look for the file.</param>
@@ -52,7 +201,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Lists the contents of a directory on the device.
+        /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to list the directory.</param>
@@ -66,7 +215,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Pulls (downloads) a file from the remote device.
+        /// Asynchronously pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to pull the file.</param>
@@ -84,7 +233,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Pushes (uploads) a file to the remote device.
+        /// Asynchronously pushes (uploads) a file to the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to put the file.</param>
@@ -104,7 +253,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the property of a device.
+        /// Asynchronously gets the property of a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to get the property.</param>
@@ -119,7 +268,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the properties of a device.
+        /// Asynchronously gets the properties of a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the properties.</param>
@@ -133,7 +282,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Gets the environment variables currently defined on a device.
+        /// Asynchronously gets the environment variables currently defined on a device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the environment variables.</param>
@@ -147,7 +296,60 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Uninstalls a package from the device.
+        /// Asynchronously installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallPackageAsync(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallPackageAsync(packageFilePath, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(basePackageFilePath, splitPackageFilePaths, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously uninstalls a package from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
@@ -156,12 +358,27 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.UninstallPackageAsync(packageName, cancellationToken);
         }
 
         /// <summary>
-        /// Requests the version information from the device.
+        /// Asynchronously uninstalls a package from the device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageName">The name of the package to uninstall.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.UninstallPackageAsync(packageName, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously requests the version information from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
@@ -170,12 +387,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which return the <see cref="VersionInfo"/> of target application.</returns>
         public static Task<VersionInfo> GetPackageVersionAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.GetVersionInfoAsync(packageName, cancellationToken);
         }
 
         /// <summary>
-        /// Lists all processes running on the device.
+        /// Asynchronously lists all processes running on the device.
         /// </summary>
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>

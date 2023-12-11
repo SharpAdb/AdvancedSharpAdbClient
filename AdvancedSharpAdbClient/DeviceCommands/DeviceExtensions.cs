@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -34,6 +35,134 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
+
+        /// <summary>
+        /// Gets the current device screen snapshot.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
+        public static XmlDocument? DumpScreen(this IAdbClient client, DeviceData device) =>
+            new DeviceClient(client, device).DumpScreen();
+
+        /// <summary>
+        /// Clicks on the specified coordinates.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="cords">The <see cref="Point"/> to click.</param>
+        public static void Click(this IAdbClient client, DeviceData device, Point cords) =>
+            new DeviceClient(client, device).Click(cords);
+
+        /// <summary>
+        /// Generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="first">The start <see cref="Point"/>.</param>
+        /// <param name="second">The end <see cref="Point"/>.</param>
+        /// <param name="speed">The time spent in swiping.</param>
+        public static void Swipe(this IAdbClient client, DeviceData device, Point first, Point second, long speed) =>
+            new DeviceClient(client, device).Swipe(first, second, speed);
+
+        /// <summary>
+        /// Get the <see cref="AppStatus"/> of the app.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="packageName">The package name of the app to check.</param>
+        /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        public static AppStatus GetAppStatus(this IAdbClient client, DeviceData device, string packageName) =>
+            new DeviceClient(client, device).GetAppStatus(packageName);
+
+        /// <summary>
+        /// Get element by xpath. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="xpath">The xpath of the element.</param>
+        /// <param name="timeout">The timeout for waiting the element.
+        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
+        /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
+        public static Element? FindElement(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default) =>
+            new DeviceClient(client, device).FindElement(xpath, timeout);
+
+        /// <summary>
+        /// Get elements by xpath. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="timeout">The timeout for waiting the elements.
+        /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
+        /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        public static IEnumerable<Element> FindElements(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default) =>
+            new DeviceClient(client, device).FindElements(xpath, timeout);
+
+        /// <summary>
+        /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="key">The key event to send.</param>
+        public static void SendKeyEvent(this IAdbClient client, DeviceData device, string key) =>
+            new DeviceClient(client, device).SendKeyEvent(key);
+
+        /// <summary>
+        /// Send text to device. Doesn't support Russian.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="text">The text to send.</param>
+        public static void SendText(this IAdbClient client, DeviceData device, string text) =>
+            new DeviceClient(client, device).SendText(text);
+
+        /// <summary>
+        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to clear the input text.</param>
+        /// <param name="charCount">The length of text to clear.</param>
+        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)
+        {
+            DeviceClient deviceClient = new(client, device);
+            deviceClient.SendKeyEvent("KEYCODE_MOVE_END");
+            deviceClient.SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
+        }
+
+        /// <summary>
+        /// Click BACK button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click BACK button.</param>
+        public static void ClickBackButton(this IAdbClient client, DeviceData device) =>
+            new DeviceClient(client, device).SendKeyEvent("KEYCODE_BACK");
+
+        /// <summary>
+        /// Click HOME button.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        public static void ClickHomeButton(this IAdbClient client, DeviceData device) =>
+            new DeviceClient(client, device).SendKeyEvent("KEYCODE_HOME");
+
+        /// <summary>
+        /// Start an Android application on device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="packageName">The package name of the application to start.</param>
+        public static void StartApp(this IAdbClient client, DeviceData device, string packageName) =>
+            client.ExecuteShellCommand(device, $"monkey -p {packageName} 1");
+
+        /// <summary>
+        /// Stop an Android application on device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to click HOME button.</param>
+        /// <param name="packageName">The package name of the application to stop.</param>
+        public static void StopApp(this IAdbClient client, DeviceData device, string packageName) =>
+            client.ExecuteShellCommand(device, $"am force-stop {packageName}");
 
         /// <summary>
         /// Gets the file statistics of a given file.
@@ -143,15 +272,63 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallPackage(packageFilePath, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
+        }
+
+        /// <summary>
         /// Uninstalls a package from the device.
         /// </summary>
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
-        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName)
+        /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName, params string[] arguments)
         {
-            PackageManager manager = new(client, device);
-            manager.UninstallPackage(packageName);
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.UninstallPackage(packageName, arguments);
         }
 
         /// <summary>
@@ -162,7 +339,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
         {
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, device, skipInit: true);
             return manager.GetVersionInfo(packageName);
         }
 

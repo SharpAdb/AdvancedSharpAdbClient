@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient
     public partial interface IAdbServer
     {
         /// <summary>
-        /// Starts the adb server if it was not previously running.
+        /// Asynchronously starts the adb server if it was not previously running.
         /// </summary>
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable that can be used to start the adb server.
         /// If this path is not provided, this method will throw an exception if the server
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient
         Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Restarts the adb server if it suddenly became unavailable. Call this class if, for example,
+        /// Asynchronously restarts the adb server if it suddenly became unavailable. Call this class if, for example,
         /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
         /// set to <see langword="true"/> - a clear indicating the ADB server died.
         /// </summary>
@@ -58,7 +58,7 @@ namespace AdvancedSharpAdbClient
         Task<StartServerResult> RestartServerAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Restarts the adb server with new adb path if it suddenly became unavailable. Call this class if, for example,
+        /// Asynchronously restarts the adb server with new adb path if it suddenly became unavailable. Call this class if, for example,
         /// you receive an <see cref="AdbException"/> with the <see cref="AdbException.ConnectionReset"/> flag
         /// set to <see langword="true"/> - a clear indicating the ADB server died.
         /// </summary>
@@ -72,12 +72,13 @@ namespace AdvancedSharpAdbClient
         Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Stop the adb server asynchronously.
+        /// Asynchronously stop the adb server asynchronously.
         /// </summary>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StopServerAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Gets the status of the adb server asynchronously.
+        /// Asynchronously gets the status of the adb server asynchronously.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>

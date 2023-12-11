@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -186,7 +185,7 @@ namespace AdvancedSharpAdbClient
                 await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
 #else
                 await Socket.ReadAsync(buffer, size, cancellationToken).ConfigureAwait(false);
-                await stream.WriteAsync(buffer, size, cancellationToken).ConfigureAwait(false);
+                await stream.WriteAsync(buffer, 0, size, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += size;
 
@@ -307,7 +306,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <summary>
-        /// Reads the statistics of a file from the socket.
+        /// Asynchronously reads the statistics of a file from the socket.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>

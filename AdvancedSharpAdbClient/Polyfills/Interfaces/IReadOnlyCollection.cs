@@ -3,6 +3,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace AdvancedSharpAdbClient.Polyfills
 {
@@ -10,6 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Represents a strongly-typed, read-only collection of elements.
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IReadOnlyCollection<T> : IEnumerable<T>
     {
         /// <summary>

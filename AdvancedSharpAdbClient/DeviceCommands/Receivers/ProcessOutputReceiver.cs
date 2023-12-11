@@ -4,12 +4,12 @@
 
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
+namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
     /// </summary>
-    public class ProcessOutputReceiver : MultiLineReceiver
+    public class ProcessOutputReceiver : ShellOutputReceiver
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessOutputReceiver"/> class.
@@ -22,25 +22,23 @@ namespace AdvancedSharpAdbClient.Receivers.DeviceCommands
         public List<AndroidProcess> Processes { get; } = [];
 
         /// <inheritdoc/>
-        protected override void ProcessNewLines(IEnumerable<string> lines)
+        public override bool AddOutput(string line)
         {
-            foreach (string line in lines)
+            // Process has already died (e.g. the cat process itself)
+            if (line.Contains("No such file or directory"))
             {
-                // Process has already died (e.g. the cat process itself)
-                if (line.Contains("No such file or directory"))
-                {
-                    continue;
-                }
-
-                try
-                {
-                    Processes.Add(new AndroidProcess(line, cmdLinePrefix: true));
-                }
-                catch
-                {
-                    // Swallow
-                }
+                return false;
             }
+
+            try
+            {
+                Processes.Add(new AndroidProcess(line, cmdLinePrefix: true));
+            }
+            catch
+            {
+                // Swallow
+            }
+            return true;
         }
     }
 }
