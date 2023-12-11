@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
@@ -36,10 +37,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                     // package:mwc2015.be
 
                     // Remove the "package:" prefix
-#if HAS_INDEXRANGE
-                    string package = line[8..];
+                    string package =
+#if HAS_BUFFERS
+                        line.AsSpan(8).ToString();
+#elif HAS_RANGE
+                        line[8..];
 #else
-                    string package = line.Substring(8);
+                        line.Substring(8);
 #endif
                     //// If there's a '=' included, use the last instance,
                     //// to accommodate for values like
@@ -54,7 +58,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                     }
                     else
                     {
-#if HAS_INDEXRANGE
+#if HAS_BUFFERS
+                        string path = package.AsSpan(0, separator).ToString();
+                        string name = package.AsSpan(separator + 1).ToString();
+#elif HAS_RANGE
                         string path = package[..separator];
                         string name = package[(separator + 1)..];
 #else

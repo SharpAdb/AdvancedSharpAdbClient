@@ -58,11 +58,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         capacity += paths[i].Length;
                     }
-#if HAS_INDEXRANGE
                     char ch = paths[i][^1];
-#else
-                    char ch = paths[i][paths[i].Length - 1];
-#endif
                     if (ch != DirectorySeparatorChar)
                     {
                         capacity++;
@@ -81,16 +77,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-#if HAS_INDEXRANGE
                         char ch2 = builder[^1];
-#else
-                        char ch2 = builder[builder.Length - 1];
-#endif
                         if (ch2 != DirectorySeparatorChar)
                         {
                             _ = builder.Append(DirectorySeparatorChar);
                         }
-
                         _ = builder.Append(paths[j]);
                     }
                 }
@@ -125,11 +116,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         return tpath;
                     }
-#if HAS_INDEXRANGE
-                    tpath = tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
+
+                    tpath =
+#if HAS_BUFFERS
+                        tpath.AsSpan(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1).ToString();
+#elif HAS_RANGE
+                        tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 #else
-                    tpath = tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
+                        tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
 #endif
+
                     return FixupPath(tpath);
                 }
                 else if (tpath.Length == 1)

@@ -148,13 +148,26 @@
     <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.0-client'
+                        and '$(TargetFramework)' != 'net3.5-client'
+                        and '$(TargetFramework)' != 'net4.0-client'
+                        and '$(TargetFramework)' != 'net4.5.2'
+                        and '$(TargetFramework)' != 'net4.6.2'
+                        and '$(TargetFramework)' != 'netstandard1.3'
+                        and '$(TargetFramework)' != 'netcore5.0'
+                        and '$(TargetFramework)' != 'uap10.0'">
+    <DefineConstants>$(DefineConstants);HAS_RANGE</DefineConstants>
+    <PolySharpIncludeGeneratedTypes>$(PolySharpIncludeGeneratedTypes);System.Range</PolySharpIncludeGeneratedTypes>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
                          or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'net8.0'
                          or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'netcoreapp3.1'
                          or '$(TargetFramework)' == 'netstandard2.1'">
-    <DefineConstants>$(DefineConstants);HAS_BUFFERS;HAS_INDEXRANGE</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_BUFFERS</DefineConstants>
     <PolySharpIncludeGeneratedTypes>$(PolySharpIncludeGeneratedTypes);System.Runtime.CompilerServices.CollectionBuilderAttribute</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
