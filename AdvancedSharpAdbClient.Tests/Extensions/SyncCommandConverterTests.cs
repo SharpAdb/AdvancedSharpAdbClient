@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         [Fact]
         public void GetBytesInvalidCommandTest() =>
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => SyncCommandConverter.GetBytes((SyncCommand)99));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => ((SyncCommand)99).GetBytes());
 
         [Fact]
         public void SyncCommandConverterTest()
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Tests
             SyncCommand[] commands = Enum.GetValues<SyncCommand>();
             foreach (SyncCommand command in commands)
             {
-                byte[] bytes = SyncCommandConverter.GetBytes(command);
+                byte[] bytes = command.GetBytes();
                 Assert.Equal(4, bytes.Length);
                 Assert.Equal(command, SyncCommandConverter.GetCommand(bytes));
             }

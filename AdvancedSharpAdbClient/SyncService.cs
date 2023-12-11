@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
             // We need 4 bytes of the buffer to send the 'DATA' command,
             // and an additional X bytes to inform how much data we are
             // sending.
-            byte[] dataBytes = SyncCommandConverter.GetBytes(SyncCommand.DATA);
+            byte[] dataBytes = SyncCommand.DATA.GetBytes();
             byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
             int headerSize = dataBytes.Length + lengthBytes.Length;
             int reservedHeaderSize = headerSize;
@@ -155,23 +155,20 @@ namespace AdvancedSharpAdbClient
             long totalBytesToProcess = stream.CanSeek ? stream.Length : 0;
             long totalBytesRead = 0;
 
+            int read;
             // look while there is something to read
-            while (!isCancelled)
+            while (!isCancelled && (read =
+#if HAS_BUFFERS
+                stream.Read(buffer.AsSpan(headerSize, maxDataSize))
+#else
+                stream.Read(buffer, headerSize, maxDataSize)
+#endif
+                ) > 0)
             {
                 // read up to SYNC_DATA_MAX
-#if HAS_BUFFERS
-                int read = stream.Read(buffer.AsSpan(headerSize, maxDataSize));
-#else
-                int read = stream.Read(buffer, headerSize, maxDataSize);
-#endif
                 totalBytesRead += read;
 
-                if (read == 0)
-                {
-                    // we reached the end of the file
-                    break;
-                }
-                else if (read != maxDataSize)
+                if (read != maxDataSize)
                 {
                     // At the end of the line, so we need to recalculate the length of the header
                     lengthBytes = BitConverter.GetBytes(read);
@@ -201,15 +198,13 @@ namespace AdvancedSharpAdbClient
             // (id, size)
             SyncCommand result = Socket.ReadSyncResponse();
 
-            if (result == SyncCommand.FAIL)
+            switch (result)
             {
-                string message = Socket.ReadSyncString();
-
-                throw new AdbException(message);
-            }
-            else if (result != SyncCommand.OKAY)
-            {
-                throw new AdbException($"The server sent an invalid response {result}");
+                case SyncCommand.FAIL:
+                    string message = Socket.ReadSyncString();
+                    throw new AdbException(message);
+                case not SyncCommand.OKAY:
+                    throw new AdbException($"The server sent an invalid response {result}");
             }
         }
 
@@ -232,18 +227,15 @@ namespace AdvancedSharpAdbClient
             {
                 SyncCommand response = Socket.ReadSyncResponse();
 
-                if (response == SyncCommand.DONE)
+                switch (response)
                 {
-                    break;
-                }
-                else if (response == SyncCommand.FAIL)
-                {
-                    string message = Socket.ReadSyncString();
-                    throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
-                }
-                else if (response != SyncCommand.DATA)
-                {
-                    throw new AdbException($"The server sent an invalid response {response}");
+                    case SyncCommand.DONE:
+                        goto finish;
+                    case SyncCommand.FAIL:
+                        string message = Socket.ReadSyncString();
+                        throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
+                    case not SyncCommand.DATA:
+                        throw new AdbException($"The server sent an invalid response {response}");
                 }
 
                 // The first 4 bytes contain the length of the data packet
@@ -280,6 +272,8 @@ namespace AdvancedSharpAdbClient
                 // Let the caller know about our progress, if requested
                 progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
+
+            finish: return;
         }
 
         /// <inheritdoc/>
@@ -315,26 +309,18 @@ namespace AdvancedSharpAdbClient
             {
                 SyncCommand response = Socket.ReadSyncResponse();
 
-                if (response == 0)
+                switch (response)
                 {
-                    if (isLocked)
-                    {
+                    case 0 when isLocked:
                         throw new AdbException("The server returned an empty sync response.");
-                    }
-                    else
-                    {
+                    case 0:
                         Reopen();
                         isLocked = true;
                         goto start;
-                    }
-                }
-                else if (response == SyncCommand.DONE)
-                {
-                    break;
-                }
-                else if (response != SyncCommand.DENT)
-                {
-                    throw new AdbException($"The server returned an invalid sync response {response}.");
+                    case SyncCommand.DONE:
+                        goto finish;
+                    case not SyncCommand.DENT:
+                        throw new AdbException($"The server returned an invalid sync response {response}.");
                 }
 
                 FileStatistics entry = ReadStatistics();
@@ -343,6 +329,9 @@ namespace AdvancedSharpAdbClient
                 yield return entry;
                 isLocked = true;
             }
+
+            finish:
+            yield break;
         }
 
         /// <summary>
@@ -373,19 +362,22 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected FileStatistics ReadStatistics()
         {
+#if HAS_BUFFERS
+            Span<byte> statResult = stackalloc byte[12];
+            _ = Socket.Read(statResult);
+            return EnumerableBuilder.FileStatisticsCreator(statResult);
+#else
             byte[] statResult = new byte[12];
             _ = Socket.Read(statResult);
-
             int index = 0;
-
             return new FileStatistics
             {
                 FileType = (UnixFileType)ReadInt32(in statResult),
                 Size = ReadInt32(in statResult),
                 Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult))
             };
-
             int ReadInt32(in byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
+#endif
         }
     }
 }

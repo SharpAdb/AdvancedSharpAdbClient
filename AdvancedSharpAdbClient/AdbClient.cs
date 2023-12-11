@@ -601,7 +601,7 @@ namespace AdvancedSharpAdbClient
             _ = socket.ReadAdbResponse();
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;
@@ -808,7 +808,7 @@ namespace AdvancedSharpAdbClient
             _ = socket.ReadAdbResponse();
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;
@@ -877,7 +877,7 @@ namespace AdvancedSharpAdbClient
             _ = socket.ReadAdbResponse();
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;

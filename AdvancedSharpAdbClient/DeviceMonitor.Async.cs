@@ -80,9 +80,17 @@ namespace AdvancedSharpAdbClient
             disposed = true;
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
+        /// <summary>
+        /// Asynchronously performs application-defined tasks associated with freeing, releasing, or resetting
+        /// unmanaged resources asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation.</returns>
+#else
         /// <inheritdoc/>
-        async ValueTask IAsyncDisposable.DisposeAsync()
+#endif
+        public async ValueTask DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
@@ -90,10 +98,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task DisposeAsync() => ((IAsyncDisposable)this).DisposeAsync().AsTask();
+        public Task AsyncDispose() => DisposeAsync().AsTask();
 #else
         /// <inheritdoc/>
-        public async Task DisposeAsync()
+        public async Task AsyncDispose()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);

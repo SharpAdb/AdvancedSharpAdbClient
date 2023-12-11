@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient
             // First four bytes: command
             // Next four bytes: length of the path
             // Final bytes: path
-            byte[] commandBytes = SyncCommandConverter.GetBytes(command);
+            byte[] commandBytes = command.GetBytes();
 
             byte[] lengthBytes = BitConverter.GetBytes(length);
 

@@ -407,6 +407,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="FindDescendants"/>.
+        /// </summary>
+        /// <returns>An enumerator that can be used to iterate through the <see cref="Element"/>.</returns>
+        public IEnumerator<Element> GetEnumerator() => FindDescendants().GetEnumerator();
+
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as Element);
 

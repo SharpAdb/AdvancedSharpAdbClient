@@ -455,7 +455,7 @@ namespace AdvancedSharpAdbClient
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;
@@ -657,7 +657,7 @@ namespace AdvancedSharpAdbClient
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;
@@ -729,7 +729,7 @@ namespace AdvancedSharpAdbClient
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
-            int read = 0;
+            int read;
 
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;

@@ -202,10 +202,9 @@ namespace AdvancedSharpAdbClient.Logs
         private async Task<byte[]?> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;
-            int read = 0;
-
             byte[] data = new byte[count];
 
+            int read;
 #if HAS_BUFFERS
             while ((read = await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)) > 0)
 #else

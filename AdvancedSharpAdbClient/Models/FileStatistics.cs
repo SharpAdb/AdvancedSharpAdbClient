@@ -4,12 +4,16 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Contains information about a file on the remote device.
     /// </summary>
+#if HAS_BUFFERS
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsCreator))]
+#endif
     public struct FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>

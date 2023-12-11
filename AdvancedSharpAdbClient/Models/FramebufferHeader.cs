@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.Models
     /// information about the framebuffer.
     /// </summary>
 #if HAS_BUFFERS
-    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreate))]
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreator))]
 #endif
     public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
