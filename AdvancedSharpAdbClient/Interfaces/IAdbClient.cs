@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
-        
+
         /// <summary>
         /// Reboots the specified device in to the specified mode.
         /// </summary>

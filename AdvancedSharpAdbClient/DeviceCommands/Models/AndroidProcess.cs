@@ -43,13 +43,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
             if (cmdLinePrefix)
             {
-                string[] cmdLineParts =
-#if HAS_RANGE
-                    line[..processNameStart]
-#else
-                    line.Substring(0, processNameStart)
-#endif
-                    .Split('\0');
+                string[] cmdLineParts = line[..processNameStart].Split('\0');
 
                 if (cmdLineParts.Length <= 1)
                 {
@@ -73,10 +67,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 pid =
 #if HAS_BUFFERS
                     int.Parse(line.AsSpan(0, processNameStart));
-#elif HAS_RANGE
-                    int.Parse(line[..processNameStart]);
 #else
-                    int.Parse(line.Substring(0, processNameStart));
+                    int.Parse(line[..processNameStart]);
 #endif
                 ProcessId = pid;
 
@@ -85,10 +77,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             }
 
             string[] parts =
-#if HAS_RANGE
-                line[(processNameEnd + 1)..]
+#if HAS_BUFFERS
+                line.AsSpan(processNameEnd + 1).ToString()
 #else
-                line.Substring(processNameEnd + 1)
+                line[(processNameEnd + 1)..]
 #endif
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 

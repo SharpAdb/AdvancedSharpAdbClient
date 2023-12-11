@@ -42,6 +42,7 @@
       System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
       System.Diagnostics.StackTraceHiddenAttribute;
       System.Index;
+      System.Range;
       System.Runtime.CompilerServices.CallerArgumentExpressionAttribute;
       System.Runtime.CompilerServices.IsExternalInit;
     </PolySharpIncludeGeneratedTypes>
@@ -126,6 +127,18 @@
     <DefineConstants>$(DefineConstants);HAS_IMAGING</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.0-client'
+                        and '$(TargetFramework)' != 'net3.5-client'
+                        and '$(TargetFramework)' != 'net4.0-client'
+                        and '$(TargetFramework)' != 'net4.5.2'
+                        and '$(TargetFramework)' != 'net4.6.2'
+                        and '$(TargetFramework)' != 'netstandard1.3'
+                        and '$(TargetFramework)' != 'netcore5.0'
+                        and '$(TargetFramework)' != 'uap10.0'">
+    <DefineConstants>$(DefineConstants);HAS_VALUETUPLE</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
                          or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'net8.0'
@@ -146,19 +159,6 @@
                         and '$(TargetFramework)' != 'netcore5.0'
                         and '$(TargetFramework)' != 'uap10.0'">
     <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
-                        and '$(TargetFramework)' != 'net3.0-client'
-                        and '$(TargetFramework)' != 'net3.5-client'
-                        and '$(TargetFramework)' != 'net4.0-client'
-                        and '$(TargetFramework)' != 'net4.5.2'
-                        and '$(TargetFramework)' != 'net4.6.2'
-                        and '$(TargetFramework)' != 'netstandard1.3'
-                        and '$(TargetFramework)' != 'netcore5.0'
-                        and '$(TargetFramework)' != 'uap10.0'">
-    <DefineConstants>$(DefineConstants);HAS_RANGE</DefineConstants>
-    <PolySharpIncludeGeneratedTypes>$(PolySharpIncludeGeneratedTypes);System.Range</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'

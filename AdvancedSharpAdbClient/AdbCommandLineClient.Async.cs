@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient
 
             return version;
         }
-        
+
         /// <inheritdoc/>
         public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {

@@ -87,10 +87,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                 : line != null && line.Trim().StartsWith("versionName=")
 #if HAS_BUFFERS
                 ? line.Trim().AsSpan(12).ToString().Trim() : null;
-#elif HAS_RANGE
-                ? line.Trim()[12..].Trim() : null;
 #else
-                ? line.Trim().Substring(12).Trim() : null;
+                ? line.Trim()[12..].Trim() : null;
 #endif
         }
 

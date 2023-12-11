@@ -40,10 +40,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                     string package =
 #if HAS_BUFFERS
                         line.AsSpan(8).ToString();
-#elif HAS_RANGE
-                        line[8..];
 #else
-                        line.Substring(8);
+                        line[8..];
 #endif
                     //// If there's a '=' included, use the last instance,
                     //// to accommodate for values like
@@ -61,12 +59,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 #if HAS_BUFFERS
                         string path = package.AsSpan(0, separator).ToString();
                         string name = package.AsSpan(separator + 1).ToString();
-#elif HAS_RANGE
+#else
                         string path = package[..separator];
                         string name = package[(separator + 1)..];
-#else
-                        string path = package.Substring(0, separator);
-                        string name = package.Substring(separator + 1);
 #endif
                         PackageManager.Packages[name] = path;
                     }

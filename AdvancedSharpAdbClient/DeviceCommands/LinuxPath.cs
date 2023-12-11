@@ -120,10 +120,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     tpath =
 #if HAS_BUFFERS
                         tpath.AsSpan(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1).ToString();
-#elif HAS_RANGE
-                        tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 #else
-                        tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
+                        tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 #endif
 
                     return FixupPath(tpath);
