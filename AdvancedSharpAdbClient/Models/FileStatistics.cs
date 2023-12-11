@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -40,6 +41,29 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets or sets the time of last modification.
         /// </summary>
         public DateTimeOffset Time { get; init; }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="FileStatistics"/>.
+        /// </summary>
+        /// <returns>An enumerator that can be used to iterate through the <see cref="FileStatistics"/>.</returns>
+        public readonly IEnumerator<byte> GetEnumerator()
+        {
+            yield return (byte)FileType;
+            yield return (byte)((int)FileType >> 8);
+            yield return (byte)((int)FileType >> 16);
+            yield return (byte)((int)FileType >> 24);
+
+            yield return (byte)Size;
+            yield return (byte)(Size >> 8);
+            yield return (byte)(Size >> 16);
+            yield return (byte)(Size >> 24);
+
+            long time = Time.ToUnixTimeSeconds();
+            yield return (byte)time;
+            yield return (byte)(time >> 8);
+            yield return (byte)(time >> 16);
+            yield return (byte)(time >> 24);
+        }
 
         /// <inheritdoc/>
         public override readonly bool Equals([NotNullWhen(true)] object? obj) => obj is FileStatistics other && Equals(other);

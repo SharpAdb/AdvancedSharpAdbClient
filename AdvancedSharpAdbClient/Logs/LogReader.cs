@@ -140,34 +140,32 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                 case LogId.Events:
+                    // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
+                    EventLogEntry entry = new()
                     {
-                        // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry entry = new()
-                        {
-                            Data = data,
-                            ProcessId = pid,
-                            ThreadId = tid,
-                            TimeStamp = timestamp,
-                            NanoSeconds = nsec,
-                            Id = id
-                        };
+                        Data = data,
+                        ProcessId = pid,
+                        ThreadId = tid,
+                        TimeStamp = timestamp,
+                        NanoSeconds = nsec,
+                        Id = id
+                    };
 
-                        // Use a stream on the data buffer. This will make sure that,
-                        // if anything goes wrong parsing the data, we never go past
-                        // the message boundary itself.
-                        using (MemoryStream dataStream = new(data))
-                        {
-                            using BinaryReader reader = new(dataStream);
-                            int priority = reader.ReadInt32();
+                    // Use a stream on the data buffer. This will make sure that,
+                    // if anything goes wrong parsing the data, we never go past
+                    // the message boundary itself.
+                    using (MemoryStream dataStream = new(data))
+                    {
+                        using BinaryReader reader = new(dataStream);
+                        int priority = reader.ReadInt32();
 
-                            while (dataStream.Position < dataStream.Length)
-                            {
-                                ReadLogEntry(reader, entry.Values);
-                            }
+                        while (dataStream.Position < dataStream.Length)
+                        {
+                            ReadLogEntry(reader, entry.Values);
                         }
-
-                        return entry;
                     }
+
+                    return entry;
 
                 default:
                     return new LogEntry
@@ -205,14 +203,11 @@ namespace AdvancedSharpAdbClient.Logs
 
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
-
                     List<object> list = [];
-
                     for (int i = 0; i < listLength; i++)
                     {
                         ReadLogEntry(reader, list);
                     }
-
                     parent.Add(list);
                     break;
 

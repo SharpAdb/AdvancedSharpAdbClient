@@ -134,37 +134,35 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                 case LogId.Events:
+                    // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
+                    EventLogEntry entry = new()
                     {
-                        // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry entry = new()
-                        {
-                            Data = data,
-                            ProcessId = pid,
-                            ThreadId = tid,
-                            TimeStamp = timestamp,
-                            NanoSeconds = nsec,
-                            Id = id
-                        };
+                        Data = data,
+                        ProcessId = pid,
+                        ThreadId = tid,
+                        TimeStamp = timestamp,
+                        NanoSeconds = nsec,
+                        Id = id
+                    };
 
-                        // Use a stream on the data buffer. This will make sure that,
-                        // if anything goes wrong parsing the data, we never go past
-                        // the message boundary itself.
+                    // Use a stream on the data buffer. This will make sure that,
+                    // if anything goes wrong parsing the data, we never go past
+                    // the message boundary itself.
 #if NETCOREAPP3_0_OR_GREATER
-                        await
+                    await
 #endif
-                        using (MemoryStream dataStream = new(data))
+                    using (MemoryStream dataStream = new(data))
+                    {
+                        using BinaryReader reader = new(dataStream);
+                        int priority = reader.ReadInt32();
+
+                        while (dataStream.Position < dataStream.Length)
                         {
-                            using BinaryReader reader = new(dataStream);
-                            int priority = reader.ReadInt32();
-
-                            while (dataStream.Position < dataStream.Length)
-                            {
-                                ReadLogEntry(reader, entry.Values);
-                            }
+                            ReadLogEntry(reader, entry.Values);
                         }
-
-                        return entry;
                     }
+
+                    return entry;
 
                 default:
                     return new LogEntry
