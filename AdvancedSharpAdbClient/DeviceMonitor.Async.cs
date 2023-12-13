@@ -4,8 +4,10 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -38,7 +40,7 @@ namespace AdvancedSharpAdbClient
                 try
                 {
                     FirstDeviceListParsed = new TaskCompletionSource<object?>();
-                    cancellationToken.Register(() => FirstDeviceListParsed.SetCanceled());
+                    using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(() => FirstDeviceListParsed.SetCanceled());
                     MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
                     // Wait for the worker thread to have read the first list of devices.
                     _ = await FirstDeviceListParsed.Task.ConfigureAwait(false);
@@ -122,7 +124,7 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
-            await TaskExExtensions.Yield();
+            await this;
 
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -234,6 +236,32 @@ namespace AdvancedSharpAdbClient
             // Set up the connection to track the list of devices.
             await Socket.SendAdbRequestAsync("host:track-devices", cancellationToken).ConfigureAwait(false);
             _ = await Socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets an awaiter used to switch to background thread.
+        /// </summary>
+        /// <returns>An awaiter instance.</returns>
+        private ThreadSwitcher GetAwaiter() => new();
+
+        /// <summary>
+        /// A helper type for switch thread by <see cref="Task"/>. This type is not intended to be used directly from your code.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        private readonly struct ThreadSwitcher() : INotifyCompletion
+        {
+            /// <summary>
+            /// Gets a value that indicates whether the asynchronous operation has completed.
+            /// </summary>
+            public bool IsCompleted { get; } = false;
+
+            /// <summary>
+            /// Ends the await on the completed task.
+            /// </summary>
+            public void GetResult() { }
+
+            /// <inheritdoc/>
+            public void OnCompleted(Action continuation) => _ = Task.Factory.StartNew(continuation, default, TaskCreationOptions.None, TaskScheduler.Default);
         }
     }
 }

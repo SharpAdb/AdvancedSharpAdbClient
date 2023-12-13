@@ -221,7 +221,6 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                cancellationToken.Register(socket.Dispose);
                 using StreamReader reader = new(socket.GetShellStream(), encoding);
                 // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
                 // break too soon in certain cases (about every 10 loops, so it appears to be a timing

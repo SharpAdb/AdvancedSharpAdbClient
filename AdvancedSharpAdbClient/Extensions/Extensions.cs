@@ -55,13 +55,17 @@ namespace AdvancedSharpAdbClient
         /// <returns>A value task that represents the asynchronous read operation. The value of the
         /// TResult parameter contains the next line from the text reader, or is null if
         /// all of the characters have been read.</returns>
-        public static async Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
+        public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
         {
-            using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            return await Task.Factory.StartNew(() => reader.ReadLine(), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
+            return Task.Factory.StartNew(() => reader.ReadLine(), default, TaskCreationOptions.None, TaskScheduler.Default);
 #else
-            return await reader.ReadLineAsync().ConfigureAwait(false);
+            CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
+            return reader.ReadLineAsync().ContinueWith(x =>
+            {
+                cancellationTokenRegistration.Dispose();
+                return x.Result;
+            });
 #endif
         }
 
@@ -73,13 +77,17 @@ namespace AdvancedSharpAdbClient
         /// <returns>A task that represents the asynchronous read operation. The value of the TResult
         /// parameter contains a string with the characters from the current position to
         /// the end of the stream.</returns>
-        public static async Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken)
+        public static Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken)
         {
-            using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            return await Task.Factory.StartNew(() => reader.ReadToEnd(), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
+            return Task.Factory.StartNew(() => reader.ReadToEnd(), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
 #else
-            return await reader.ReadToEndAsync().ConfigureAwait(false);
+            CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
+            return reader.ReadToEndAsync().ContinueWith(x =>
+            {
+                cancellationTokenRegistration.Dispose();
+                return x.Result;
+            });
 #endif
         }
 #endif

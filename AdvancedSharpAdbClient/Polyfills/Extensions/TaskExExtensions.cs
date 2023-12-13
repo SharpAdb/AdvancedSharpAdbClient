@@ -60,24 +60,6 @@ namespace AdvancedSharpAdbClient.Polyfills
             .Delay(dueTime, cancellationToken);
 
         /// <summary>
-        /// Queues the specified work to run on the thread pool and returns a proxy for the <see cref="Task{TResult}"/>
-        /// returned by function. A cancellation token allows the work to be cancelled if it has not yet started.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result returned by the proxy task.</typeparam>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
-        /// <returns>A <see cref="Task{TResult}"/> that represents a proxy for the
-        /// <see cref="Task{TResult}"/> returned by <paramref name="function"/>.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
-        public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken = default) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Run(function, cancellationToken);
-
-        /// <summary>
         /// Creates a task that will complete when all of the <see cref="Task"/> objects in an enumerable collection have completed.
         /// </summary>
         /// <param name="tasks">The tasks to wait on for completion.</param>
@@ -105,20 +87,6 @@ namespace AdvancedSharpAdbClient.Polyfills
             .WhenAll(tasks);
 
         /// <summary>
-        /// Creates an awaitable task that asynchronously yields back to the current context when awaited.
-        /// </summary>
-        /// <returns>A context that, when awaited, will asynchronously transition back into the current context at the time of the await.
-        /// If the current <see cref="SynchronizationContext"/> is non-null, it is treated as the current context. Otherwise, the task scheduler
-        /// that is associated with the currently executing task is treated as the current context.</returns>
-        public static YieldAwaitable Yield() =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Yield();
-
-        /// <summary>
         /// Creates a <see cref="Task{TResult}"/> that's completed successfully with the specified result.
         /// </summary>
         /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
@@ -144,7 +112,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();
             Task<TResult> task = taskCompletionSource.Task;
-            _ = Task.Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
                 try
                 {
@@ -170,7 +138,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         {
             TaskCompletionSource<object?> taskCompletionSource = new();
             Task<object?> task = taskCompletionSource.Task;
-            _ = Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
                 try
                 {
@@ -196,7 +164,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();
             Task<TResult> task = taskCompletionSource.Task;
-            _ = Run(async () =>
+            _ = Task.Factory.StartNew(async () =>
             {
                 try
                 {
