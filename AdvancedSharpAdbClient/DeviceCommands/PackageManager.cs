@@ -29,14 +29,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<PackageManager> logger;
+        private readonly ILogger<PackageManager> logger;
 
         /// <summary>
         /// A function which returns a new instance of a class
         /// that implements the <see cref="ISyncService"/> interface,
         /// that can be used to transfer files to and from a given device.
         /// </summary>
-        protected readonly Func<IAdbClient, DeviceData, ISyncService> syncServiceFactory;
+        protected readonly Func<IAdbClient, DeviceData, ISyncService> SyncServiceFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageManager"/> class.
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
             Arguments = arguments;
 
-            this.syncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
+            this.SyncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
 
             if (!skipInit)
             {
@@ -455,7 +455,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
         protected virtual Stream GetFileStream(string path) =>
 #if WINDOWS_UWP
-            StorageFile.GetFileFromPathAsync(path).GetResults().OpenReadAsync().GetResults().AsStream();
+            StorageFile.GetFileFromPathAsync(path).AwaitByTaskCompleteSource().OpenReadAsync().AwaitByTaskCompleteSource().AsStream();
 #else
             File.OpenRead(path);
 #endif
@@ -484,7 +484,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
-                using (ISyncService sync = syncServiceFactory(AdbClient, Device))
+                using (ISyncService sync = SyncServiceFactory(AdbClient, Device))
                 {
                     using Stream stream = GetFileStream(localFilePath);
 

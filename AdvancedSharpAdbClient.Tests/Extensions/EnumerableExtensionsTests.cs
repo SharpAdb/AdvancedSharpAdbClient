@@ -42,8 +42,8 @@ namespace AdvancedSharpAdbClient.Polyfills.Tests
         public async void TaskToArrayTest()
         {
             int[] array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            Task<IEnumerable<int>> arrayTask = Extensions.Delay(10).ContinueWith(_ => array.Select(x => x));
-            IEnumerable<Task<int>> taskArray = array.Select(x => Extensions.Delay(x).ContinueWith(_ => x));
+            Task<IEnumerable<int>> arrayTask = TaskExExtensions.Delay(10).ContinueWith(_ => array.Select(x => x));
+            IEnumerable<Task<int>> taskArray = array.Select(x => TaskExExtensions.Delay(x).ContinueWith(_ => x));
             Assert.Equal(array, await taskArray.ToArrayAsync());
             Assert.Equal(array, await arrayTask.ToArrayAsync());
         }

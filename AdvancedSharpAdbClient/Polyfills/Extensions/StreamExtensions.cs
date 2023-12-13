@@ -36,7 +36,6 @@ namespace AdvancedSharpAdbClient.Polyfills
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(stream.Close);
-
             TaskCompletionSource<int> taskCompletionSource = new(stream);
 
             IAsyncResult asyncResult = stream.BeginRead(buffer, offset, count, iar =>

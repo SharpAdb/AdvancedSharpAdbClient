@@ -16,6 +16,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     public class Element : IEquatable<Element>
     {
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that separate the coordinates of the element.
+        /// </summary>
         private static readonly char[] separator = ['[', ']', ',', ' '];
 
         /// <summary>

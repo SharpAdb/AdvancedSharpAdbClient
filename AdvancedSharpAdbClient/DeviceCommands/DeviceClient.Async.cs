@@ -233,7 +233,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get the <see cref="AppStatus"/> of the app.
+        /// Gets the <see cref="AppStatus"/> of the app.
         /// </summary>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
@@ -253,7 +253,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get element by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Gets element by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
@@ -302,7 +302,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Gets elements by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
@@ -359,7 +359,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <summary>
-        /// Get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Gets elements by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.

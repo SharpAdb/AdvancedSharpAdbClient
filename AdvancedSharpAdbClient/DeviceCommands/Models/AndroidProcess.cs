@@ -602,12 +602,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <returns>A <see cref="string"/> that represents this <see cref="AndroidProcess"/>.</returns>
         public override string ToString() => $"{Name} ({ProcessId})";
 
+        /// <summary>
+        /// Converts the string representation of a number to its 32-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="value">A string containing a number to convert.</param>
+        /// <returns>A 32-bit signed integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static int ParseInt(string value) => value == "-" ? 0 : int.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 32-bit unsigned integer equivalent.
+        /// </summary>
+        /// <param name="value">A string representing the number to convert.</param>
+        /// <returns>A 32-bit unsigned integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static uint ParseUInt(string value) => value == "-" ? 0 : uint.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 64-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="value">A string containing a number to convert.</param>
+        /// <returns>A 64-bit signed integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static long ParseLong(string value) => value == "-" ? 0 : long.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 64-bit unsigned integer equivalent.
+        /// </summary>
+        /// <param name="value">A string that represents the number to convert.</param>
+        /// <returns>A 64-bit unsigned integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static ulong ParseULong(string value) => value == "-" ? 0 : ulong.Parse(value);
     }
 }

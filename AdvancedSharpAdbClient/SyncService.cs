@@ -214,7 +214,7 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
-            // Get file information, including the file size, used to calculate the total amount of bytes to receive.
+            // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
             FileStatistics stat = Stat(remoteFilePath);
             int totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;

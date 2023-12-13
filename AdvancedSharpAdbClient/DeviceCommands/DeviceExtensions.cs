@@ -66,7 +66,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).Swipe(first, second, speed);
 
         /// <summary>
-        /// Get the <see cref="AppStatus"/> of the app.
+        /// Gets the <see cref="AppStatus"/> of the app.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).GetAppStatus(packageName);
 
         /// <summary>
-        /// Get element by xpath. You can specify the waiting time in timeout.
+        /// Gets element by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).FindElement(xpath, timeout);
 
         /// <summary>
-        /// Get elements by xpath. You can specify the waiting time in timeout.
+        /// Gets elements by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>

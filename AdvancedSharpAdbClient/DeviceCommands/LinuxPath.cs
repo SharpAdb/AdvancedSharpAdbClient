@@ -26,7 +26,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
 
-        private static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s which are invalid in a path.
+        /// </summary>
+        public static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
 
         /// <summary>
         /// Combine the specified paths to form one path.
@@ -246,6 +249,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         [GeneratedRegex(EscapePattern)]
         private static partial Regex EscapeRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> to escape filenames for shell command consumption.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> to escape filenames for shell command consumption.</returns>
         private static Regex EscapeRegex() => new(EscapePattern);
 #endif
     }

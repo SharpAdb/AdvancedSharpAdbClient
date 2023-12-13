@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
 #if WINDOWS_UWP
             StorageFile.GetFileFromPathAsync(adbPath).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));
 #else
-            Extensions.FromResult(File.Exists(adbPath));
+            TaskExExtensions.FromResult(File.Exists(adbPath));
 #endif
 
         /// <summary>

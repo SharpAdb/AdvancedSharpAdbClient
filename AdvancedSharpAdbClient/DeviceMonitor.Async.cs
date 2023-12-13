@@ -17,30 +17,36 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="StartAsync(CancellationToken)"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
-        protected readonly ManualResetEvent firstDeviceListParsed = new(false);
+        protected TaskCompletionSource<object?>? FirstDeviceListParsed;
 
         /// <summary>
-        /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="monitorTask"/>.
+        /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="MonitorTask"/>.
         /// </summary>
-        protected readonly CancellationTokenSource monitorTaskCancellationTokenSource = new();
+        protected readonly CancellationTokenSource MonitorTaskCancellationTokenSource = new();
 
         /// <summary>
         /// The <see cref="Task"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Task? monitorTask;
+        protected Task? MonitorTask;
 
         /// <inheritdoc/>
-        [MemberNotNull(nameof(monitorTask))]
+        [MemberNotNull(nameof(MonitorTask))]
         public virtual async Task StartAsync(CancellationToken cancellationToken = default)
         {
-            if (monitorTask == null)
+            if (MonitorTask == null)
             {
-                _ = firstDeviceListParsed.Reset();
-
-                monitorTask = DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token);
-
-                // Wait for the worker thread to have read the first list of devices.
-                _ = await Extensions.Run(firstDeviceListParsed.WaitOne, cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    FirstDeviceListParsed = new TaskCompletionSource<object?>();
+                    cancellationToken.Register(() => FirstDeviceListParsed.SetCanceled());
+                    MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
+                    // Wait for the worker thread to have read the first list of devices.
+                    _ = await FirstDeviceListParsed.Task.ConfigureAwait(false);
+                }
+                finally
+                {
+                    FirstDeviceListParsed = null;
+                }
             }
         }
 
@@ -53,18 +59,18 @@ namespace AdvancedSharpAdbClient
 
             // First kill the monitor task, which has a dependency on the socket,
             // then close the socket.
-            if (monitorTask != null)
+            if (MonitorTask != null)
             {
                 IsRunning = false;
 
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
-                monitorTaskCancellationTokenSource.Cancel();
-                await monitorTask.ConfigureAwait(false);
+                MonitorTaskCancellationTokenSource.Cancel();
+                await MonitorTask.ConfigureAwait(false);
 #if HAS_PROCESS
-                monitorTask.Dispose();
+                MonitorTask.Dispose();
 #endif
-                monitorTask = null;
+                MonitorTask = null;
             }
 
             // Close the connection to adb. To be done after the monitor task exited.
@@ -74,8 +80,7 @@ namespace AdvancedSharpAdbClient
                 Socket = null!;
             }
 
-            firstDeviceListParsed.Dispose();
-            monitorTaskCancellationTokenSource.Dispose();
+            MonitorTaskCancellationTokenSource.Dispose();
 
             disposed = true;
         }
@@ -117,7 +122,7 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
-            await Extensions.Yield();
+            await TaskExExtensions.Yield();
 
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -128,8 +133,7 @@ namespace AdvancedSharpAdbClient
                 {
                     string value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
                     ProcessIncomingDeviceData(value);
-
-                    firstDeviceListParsed.Set();
+                    FirstDeviceListParsed?.TrySetResult(null);
                 }
                 catch (TaskCanceledException ex)
                 {
@@ -220,6 +224,11 @@ namespace AdvancedSharpAdbClient
             while (!cancellationToken.IsCancellationRequested);
         }
 
+        /// <summary>
+        /// Initializes the <see cref="Socket"/> and sends the <c>host:track-devices</c> command to the adb server.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         private async Task InitializeSocketAsync(CancellationToken cancellationToken)
         {
             // Set up the connection to track the list of devices.

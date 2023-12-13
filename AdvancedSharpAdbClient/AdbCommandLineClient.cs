@@ -22,12 +22,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
 
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
+        /// </summary>
         private static readonly char[] separator = Extensions.NewLineSeparator;
 
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<AdbCommandLineClient> logger;
+        private readonly ILogger<AdbCommandLineClient> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
@@ -123,7 +126,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual bool CheckFileExists(string adbPath) =>
 #if WINDOWS_UWP
-            StorageFile.GetFileFromPathAsync(adbPath).GetResults() is StorageFile file && file.IsOfType(StorageItemTypes.File);
+            StorageFile.GetFileFromPathAsync(adbPath).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File);
 #else
             File.Exists(adbPath);
 #endif
@@ -265,6 +268,10 @@ namespace AdvancedSharpAdbClient
         [GeneratedRegex(AdbVersionPattern)]
         private static partial Regex AdbVersionRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> for parsing the adb version.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> for parsing the adb version.</returns>
         private static Regex AdbVersionRegex() => new(AdbVersionPattern);
 #endif
     }

@@ -9,6 +9,9 @@ namespace AdvancedSharpAdbClient.Logs
     /// </summary>
     public static class LoggerProvider
     {
+        /// <summary>
+        /// The current log provider.
+        /// </summary>
         private static ILoggerFactory? _loggerFactory = null;
 
         /// <summary>

@@ -15,7 +15,14 @@ namespace AdvancedSharpAdbClient.Models
     /// <remarks><seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/></remarks>
     public class ShellStream : Stream
     {
+        /// <summary>
+        /// The <see cref="bool"/> value which indicates whether the <see cref="ShellStream"/> should close the <see cref="Inner"/> stream when closed.
+        /// </summary>
         private readonly bool closeStream;
+
+        /// <summary>
+        /// The byte which is pending to be read.
+        /// </summary>
         private byte? pendingByte;
 
         /// <summary>
@@ -349,9 +356,6 @@ namespace AdvancedSharpAdbClient.Models
 #endif
 
 #if HAS_TASK
-#if NET8_0_OR_GREATER
-#pragma warning disable CA1835
-#endif
         /// <inheritdoc/>
         public
 #if !NETFRAMEWORK || NET45_OR_GREATER
@@ -451,9 +455,6 @@ namespace AdvancedSharpAdbClient.Models
 
             return read;
         }
-#if NET8_0_OR_GREATER
-#pragma warning restore CA1835
-#endif
 #endif
 
         /// <inheritdoc/>

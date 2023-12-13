@@ -12,10 +12,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-#if NET40
-using Microsoft.Runtime.CompilerServices;
-#endif
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -24,6 +20,9 @@ namespace AdvancedSharpAdbClient
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal static class Extensions
     {
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
+        /// </summary>
         public static char[] NewLineSeparator { get; } = ['\r', '\n'];
 
         /// <summary>
@@ -47,114 +46,6 @@ namespace AdvancedSharpAdbClient
         }
 
 #if HAS_TASK
-#if NETFRAMEWORK && !NET46_OR_GREATER
-        /// <summary>
-        /// Singleton cached task that's been completed successfully.
-        /// </summary>
-        internal static readonly Task s_cachedCompleted =
-#if NET45_OR_GREATER
-            Task.
-#else
-            TaskEx.
-#endif
-            FromResult<object?>(null);
-
-        /// <summary>
-        /// Gets a task that's already been completed successfully.
-        /// </summary>
-        public static Task CompletedTask => s_cachedCompleted;
-#else
-        public static Task CompletedTask => Task.CompletedTask;
-#endif
-
-        /// <summary>
-        /// Creates a task that completes after a specified number of milliseconds.
-        /// </summary>
-        /// <param name="dueTime">The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.</param>
-        /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-        /// <returns>A task that represents the time delay.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
-        public static Task Delay(int dueTime, CancellationToken cancellationToken = default) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Delay(dueTime, cancellationToken);
-
-        /// <summary>
-        /// Queues the specified work to run on the thread pool and returns a proxy for the <see cref="Task{TResult}"/>
-        /// returned by function. A cancellation token allows the work to be cancelled if it has not yet started.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result returned by the proxy task.</typeparam>
-        /// <param name="function">The work to execute asynchronously.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
-        /// <returns>A <see cref="Task{TResult}"/> that represents a proxy for the
-        /// <see cref="Task{TResult}"/> returned by <paramref name="function"/>.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was <see langword="null"/>.</exception>
-        public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken = default) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Run(function, cancellationToken);
-
-        /// <summary>
-        /// Creates a task that will complete when all of the <see cref="Task"/> objects in an enumerable collection have completed.
-        /// </summary>
-        /// <param name="tasks">The tasks to wait on for completion.</param>
-        /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
-        public static Task WhenAll(IEnumerable<Task> tasks) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .WhenAll(tasks);
-
-        /// <summary>
-        /// Creates a task that will complete when all of the <see cref="Task{TResult}"/> objects in an enumerable collection have completed.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the completed task.</typeparam>
-        /// <param name="tasks">The tasks to wait on for completion.</param>
-        /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
-        public static Task<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .WhenAll(tasks);
-
-        /// <summary>
-        /// Creates an awaitable task that asynchronously yields back to the current context when awaited.
-        /// </summary>
-        /// <returns>A context that, when awaited, will asynchronously transition back into the current context at the time of the await.
-        /// If the current <see cref="SynchronizationContext"/> is non-null, it is treated as the current context. Otherwise, the task scheduler
-        /// that is associated with the currently executing task is treated as the current context.</returns>
-        public static YieldAwaitable Yield() =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .Yield();
-
-        /// <summary>
-        /// Creates a System.Threading.Tasks.Task`1 that's completed successfully with the specified result.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
-        /// <param name="result">The result to store into the completed task.</param>
-        /// <returns>The successfully completed task.</returns>
-        public static Task<TResult> FromResult<TResult>(TResult result) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .FromResult(result);
-
 #if !NET7_0_OR_GREATER
         /// <summary>
         /// Reads a line of characters asynchronously and returns the data as a string.
@@ -168,10 +59,9 @@ namespace AdvancedSharpAdbClient
         {
             using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            await Yield();
-            return reader.ReadLine();
+            return await Task.Factory.StartNew(() => reader.ReadLine(), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
 #else
-            return await reader.ReadLineAsync();
+            return await reader.ReadLineAsync().ConfigureAwait(false);
 #endif
         }
 
@@ -187,10 +77,9 @@ namespace AdvancedSharpAdbClient
         {
             using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
 #if NET35
-            await Yield();
-            return reader.ReadToEnd();
+            return await Task.Factory.StartNew(() => reader.ReadToEnd(), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
 #else
-            return await reader.ReadToEndAsync();
+            return await reader.ReadToEndAsync().ConfigureAwait(false);
 #endif
         }
 #endif

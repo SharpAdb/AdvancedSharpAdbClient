@@ -70,13 +70,11 @@ namespace AdvancedSharpAdbClient.Polyfills
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(socket.Close);
-
             TaskCompletionSource<int> taskCompletionSource = new(socket);
 
             IAsyncResult asyncResult = socket.BeginReceive(buffer, offset, size, socketFlags, iar =>
             {
                 // this is the callback
-
                 TaskCompletionSource<int> taskCompletionSource = (TaskCompletionSource<int>)iar.AsyncState;
                 Socket socket = (Socket)taskCompletionSource.Task.AsyncState;
 
@@ -100,7 +98,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             return taskCompletionSource.Task;
 #else
-            return Extensions.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
+            return Task.Factory.StartNew(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
 #endif
         }
 
@@ -157,13 +155,11 @@ namespace AdvancedSharpAdbClient.Polyfills
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(socket.Dispose);
-
             TaskCompletionSource<int> taskCompletionSource = new(socket);
 
             _ = socket.BeginSend(buffer, offset, size, socketFlags, iar =>
             {
                 // this is the callback
-
                 TaskCompletionSource<int> taskCompletionSource = (TaskCompletionSource<int>)iar.AsyncState;
                 Socket socket = (Socket)taskCompletionSource.Task.AsyncState;
 
@@ -187,7 +183,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             return taskCompletionSource.Task;
 #else
-            return Extensions.Run(() => socket.Send(buffer, offset, size, socketFlags), cancellationToken);
+            return Task.Factory.StartNew(() => socket.Send(buffer, offset, size, socketFlags), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
 #endif
         }
     }

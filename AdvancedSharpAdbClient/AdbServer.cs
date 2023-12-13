@@ -45,14 +45,14 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
-        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory;
+        protected readonly Func<EndPoint, IAdbSocket> AdbSocketFactory;
 
         /// <summary>
         /// Gets or sets a function that returns a new instance of a class that implements the
         /// <see cref="IAdbCommandLineClient"/> interface, that can be used to interact with the
         /// <c>adb.exe</c> command line client.
         /// </summary>
-        protected readonly Func<string, IAdbCommandLineClient> adbCommandLineClientFactory;
+        protected readonly Func<string, IAdbCommandLineClient> AdbCommandLineClientFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
@@ -117,8 +117,8 @@ namespace AdvancedSharpAdbClient
             }
 
             EndPoint = endPoint;
-            this.adbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
-            this.adbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
+            this.AdbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+            this.AdbCommandLineClientFactory = adbCommandLineClientFactory ?? throw new ArgumentNullException(nameof(adbCommandLineClientFactory));
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace AdvancedSharpAdbClient
                 AdbServerStatus serverStatus = GetStatus();
                 Version? commandLineVersion = null;
 
-                IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+                IAdbCommandLineClient commandLineClient = AdbCommandLineClientFactory(adbPath);
 
                 if (commandLineClient.CheckFileExists(adbPath))
                 {
@@ -227,7 +227,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void StopServer()
         {
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
             socket.SendAdbRequest("host:kill");
 
             // The host will immediately close the connection after the kill
@@ -240,7 +240,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                using IAdbSocket socket = adbSocketFactory(EndPoint);
+                using IAdbSocket socket = AdbSocketFactory(EndPoint);
                 socket.SendAdbRequest("host:version");
                 AdbResponse response = socket.ReadAdbResponse();
                 string version = socket.ReadString();

@@ -176,27 +176,46 @@ namespace AdvancedSharpAdbClient.Logs
                     };
             }
         }
+
+        /// <summary>
+        /// Asynchronously reads a <see cref="ushort"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="ushort"/> value.</returns>
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously reads a <see cref="uint"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="uint"/> value.</returns>
         private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously reads a <see cref="int"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="int"/> value.</returns>
         private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously bytes from the stream, making sure that the requested number of bytes
+        /// </summary>
+        /// <param name="count">The number of bytes to read.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="byte"/> array.</returns>
         private async Task<byte[]?> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;

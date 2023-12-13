@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<AdbSocket> logger;
+        private readonly ILogger<AdbSocket> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.

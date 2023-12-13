@@ -11,11 +11,24 @@ namespace AdvancedSharpAdbClient.Exceptions
     [Serializable]
     public partial class JavaException : Exception
     {
+        /// <summary>
+        /// Unknown error message.
+        /// </summary>
         private const string UnknownError = "An error occurred in Java";
 
+        /// <summary>
+        /// The output of the Java exception.
+        /// </summary>
         private const string ExceptionOutput = "java.lang.";
+
+        /// <summary>
+        /// The pattern of the Java exception.
+        /// </summary>
         private const string ExceptionPattern = @"java.lang.(\w+Exception):\s+(.*)?";
 
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
+        /// </summary>
         private static readonly char[] separator = Extensions.NewLineSeparator;
 
         /// <summary>
@@ -125,6 +138,10 @@ namespace AdvancedSharpAdbClient.Exceptions
         [GeneratedRegex(ExceptionPattern, RegexOptions.IgnoreCase)]
         private static partial Regex ExceptionRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> that can be used to parse the Java exception.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> that can be used to parse the Java exception.</returns>
         private static Regex ExceptionRegex() => new(ExceptionPattern, RegexOptions.IgnoreCase);
 #endif
     }

@@ -24,18 +24,18 @@ namespace AdvancedSharpAdbClient.Receivers
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<ConsoleOutputReceiver> logger = logger ?? LoggerProvider.CreateLogger<ConsoleOutputReceiver>();
+        private readonly ILogger<ConsoleOutputReceiver> logger = logger ?? LoggerProvider.CreateLogger<ConsoleOutputReceiver>();
 
         /// <summary>
         /// A <see cref="StringBuilder"/> which receives all output from the device.
         /// </summary>
-        protected readonly StringBuilder output = new();
+        protected readonly StringBuilder Output = new();
 
         /// <summary>
         /// Gets a <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="ConsoleOutputReceiver"/>.</returns>
-        public override string ToString() => TrimLines ? output.ToString().Trim() : output.ToString();
+        public override string ToString() => TrimLines ? Output.ToString().Trim() : Output.ToString();
 
         /// <inheritdoc/>
         protected override void ThrowOnError(string line)
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Receivers
                 {
                     continue;
                 }
-                output.AppendLine(line);
+                Output.AppendLine(line);
                 logger.LogDebug(line);
             }
         }
@@ -113,10 +113,22 @@ namespace AdvancedSharpAdbClient.Receivers
         [GeneratedRegex("(permission|access) denied$", DefaultRegexOptions)]
         private static partial Regex DeniedRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> which matches lines which indicate that the command was aborted.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> which matches lines which indicate that the command was aborted.</returns>
         private static Regex AbortingRegex() => new("Aborting.$", DefaultRegexOptions);
 
+        /// <summary>
+        /// Gets a <see cref="Regex"/> which matches lines which indicate that the applet was not found.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> which matches lines which indicate that the applet was not found.</returns>
         private static Regex AppletRegex() => new("applet not found$", DefaultRegexOptions);
 
+        /// <summary>
+        /// Gets a <see cref="Regex"/> which matches lines which indicate that the permission to execute the command was denied.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> which matches lines which indicate that the permission to execute the command was denied.</returns>
         private static Regex DeniedRegex() => new("(permission|access) denied$", DefaultRegexOptions);
 #endif
     }

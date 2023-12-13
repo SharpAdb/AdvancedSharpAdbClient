@@ -13,12 +13,12 @@ namespace AdvancedSharpAdbClient.Models
     public class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>
-        /// Get the state of the installation.
+        /// Gets the state of the installation.
         /// </summary>
         public PackageInstallProgressState State { get; } = state;
 
         /// <summary>
-        /// Get the number of packages which is finished operation.
+        /// Gets the number of packages which is finished operation.
         /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
         /// <see cref="PackageInstallProgressState.WriteSession"/> and
         /// <see cref="PackageInstallProgressState.PostInstall"/> state.
@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient.Models
         public int PackageFinished { get; init; }
 
         /// <summary>
-        /// Get the number of packages required for this operation.
+        /// Gets the number of packages required for this operation.
         /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
         /// <see cref="PackageInstallProgressState.WriteSession"/> and
         /// <see cref="PackageInstallProgressState.PostInstall"/> state.
@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.Models
         public int PackageRequired { get; init; }
 
         /// <summary>
-        /// Get the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.
+        /// Gets the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.
         /// Used only in <see cref="PackageInstallProgressState.Uploading"/> state.
         /// </summary>
         public double UploadProgress { get; init; }
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="packageUploaded">The number of packages which is finished operation.</param>
         /// <param name="packageRequired">The number of packages required for this operation.</param>
-        /// <param name="uploadProgress">Get the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.</param>
+        /// <param name="uploadProgress">Gets the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.</param>
         public InstallProgressEventArgs(int packageUploaded, int packageRequired, double uploadProgress) : this(PackageInstallProgressState.Uploading)
         {
             PackageFinished = packageUploaded;

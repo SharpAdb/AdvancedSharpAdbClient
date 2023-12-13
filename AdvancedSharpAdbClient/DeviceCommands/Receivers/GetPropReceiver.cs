@@ -74,6 +74,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         [GeneratedRegex(GetPropPattern)]
         private static partial Regex GetPropRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> which can be used to parse the <c>getprop</c> output.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> which can be used to parse the <c>getprop</c> output.</returns>
         private static Regex GetPropRegex() => new(GetPropPattern);
 #endif
     }

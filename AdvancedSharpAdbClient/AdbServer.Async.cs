@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
                 AdbServerStatus serverStatus = await GetStatusAsync(cancellationToken).ConfigureAwait(false);
                 Version? commandLineVersion = null;
 
-                IAdbCommandLineClient commandLineClient = adbCommandLineClientFactory(adbPath);
+                IAdbCommandLineClient commandLineClient = AdbCommandLineClientFactory(adbPath);
 
                 if (await commandLineClient.CheckFileExistsAsync(adbPath, cancellationToken).ConfigureAwait(false))
                 {
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task StopServerAsync(CancellationToken cancellationToken = default)
         {
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
             await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
 
             // The host will immediately close the connection after the kill
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                using IAdbSocket socket = adbSocketFactory(EndPoint);
+                using IAdbSocket socket = AdbSocketFactory(EndPoint);
                 await socket.SendAdbRequestAsync("host:version", cancellationToken).ConfigureAwait(false);
                 AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
                 string version = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);

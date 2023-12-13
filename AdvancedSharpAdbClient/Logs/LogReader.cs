@@ -223,6 +223,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a <see cref="ushort"/> from the stream.
         /// </summary>
+        /// <returns>The <see cref="ushort"/> that was read.</returns>
         protected ushort? ReadUInt16()
         {
             byte[]? data = ReadBytesSafe(2);
@@ -238,6 +239,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a <see cref="uint"/> from the stream.
         /// </summary>
+        /// <returns>The <see cref="uint"/> that was read.</returns>
         protected uint? ReadUInt32()
         {
             byte[]? data = ReadBytesSafe(4);
@@ -253,6 +255,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a <see cref="int"/> from the stream.
         /// </summary>
+        /// <returns>The <see cref="int"/> that was read.</returns>
         protected int? ReadInt32()
         {
             byte[]? data = ReadBytesSafe(4);
@@ -269,6 +272,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// Reads bytes from the stream, making sure that the requested number of bytes
         /// </summary>
         /// <param name="count">The number of bytes to read.</param>
+        /// <returns>The bytes that were read.</returns>
         protected byte[]? ReadBytesSafe(int count)
         {
             int totalRead = 0;

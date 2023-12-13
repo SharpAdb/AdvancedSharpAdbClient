@@ -38,19 +38,25 @@ namespace AdvancedSharpAdbClient
         , IAsyncDisposable
 #endif
     {
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
+        /// </summary>
         private static readonly char[] separator = Extensions.NewLineSeparator;
 
+        /// <summary>
+        /// The <see cref="bool"/> that indicates whether this instance has been disposed.
+        /// </summary>
         private bool disposed = false;
 
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<DeviceMonitor> logger;
+        private readonly ILogger<DeviceMonitor> logger;
 
         /// <summary>
         /// The list of devices currently connected to the Android Debug Bridge.
         /// </summary>
-        protected readonly List<DeviceData> devices;
+        protected readonly List<DeviceData> devices = [];
 
 #if !HAS_TASK
         /// <summary>
@@ -58,23 +64,23 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="Start"/> method until the <see cref="DeviceMonitorLoop"/>
         /// has processed the first list of devices.
         /// </summary>
-        protected readonly ManualResetEvent firstDeviceListParsed = new(false);
+        protected readonly ManualResetEvent FirstDeviceListParsed = new(false);
 
         /// <summary>
         /// When the <see cref="DeviceMonitorLoop"/> method is called, this <see cref="ManualResetEvent"/>
         /// is used to block until the <see cref="DeviceMonitorLoop"/> is finished.
         /// </summary>
-        protected readonly ManualResetEvent monitorLoopFinished = new(false);
+        protected readonly ManualResetEvent MonitorLoopFinished = new(false);
 
         /// <summary>
-        /// A <see cref="bool"/> that can be used to cancel the <see cref="monitorThread"/>.
+        /// A <see cref="bool"/> that can be used to cancel the <see cref="MonitorThread"/>.
         /// </summary>
-        protected bool isMonitorThreadCancel = false;
+        protected bool IsMonitorThreadCancel = false;
 
         /// <summary>
         /// The <see cref="Thread"/> that monitors the <see cref="Socket"/> and waits for device notifications.
         /// </summary>
-        protected Thread? monitorThread;
+        protected Thread? MonitorThread;
 #endif
 
         /// <inheritdoc/>
@@ -119,7 +125,6 @@ namespace AdvancedSharpAdbClient
         public DeviceMonitor(IAdbSocket socket, ILogger<DeviceMonitor>? logger = null)
         {
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
-            devices = [];
             Devices = devices.AsReadOnly();
             this.logger = logger ?? LoggerProvider.CreateLogger<DeviceMonitor>();
         }
@@ -142,37 +147,42 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         [MemberNotNull(
 #if HAS_TASK
-            nameof(monitorTask)
+            nameof(MonitorTask)
 #else
-            nameof(monitorThread)
+            nameof(MonitorThread)
 #endif
             )]
         public virtual void Start()
         {
 #if HAS_TASK
-            if (monitorTask == null)
+            if (MonitorTask == null)
             {
-                _ = firstDeviceListParsed.Reset();
-
-                monitorTask = DeviceMonitorLoopAsync(monitorTaskCancellationTokenSource.Token);
-
-                // Wait for the worker thread to have read the first list of devices.
-                _ = firstDeviceListParsed.WaitOne();
+                try
+                {
+                    FirstDeviceListParsed = new TaskCompletionSource<object?>();
+                    MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
+                    // Wait for the worker thread to have read the first list of devices.
+                    _ = FirstDeviceListParsed.Task.AwaitByTaskCompleteSource();
+                }
+                finally
+                {
+                    FirstDeviceListParsed = null;
+                }
             }
 #else
-            if (monitorThread == null)
+            if (MonitorThread == null)
             {
-                _ = firstDeviceListParsed.Reset();
+                _ = FirstDeviceListParsed.Reset();
 
-                monitorThread = new Thread(DeviceMonitorLoop)
+                MonitorThread = new Thread(DeviceMonitorLoop)
                 {
                     Name = nameof(DeviceMonitorLoop),
                     IsBackground = true
                 };
-                monitorThread.Start();
+                MonitorThread.Start();
 
                 // Wait for the worker thread to have read the first list of devices.
-                _ = firstDeviceListParsed.WaitOne();
+                _ = FirstDeviceListParsed.WaitOne();
             }
 #endif
         }
@@ -186,18 +196,18 @@ namespace AdvancedSharpAdbClient
 #if HAS_TASK
             // First kill the monitor task, which has a dependency on the socket,
             // then close the socket.
-            if (monitorTask != null)
+            if (MonitorTask != null)
             {
                 IsRunning = false;
 
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
-                monitorTaskCancellationTokenSource.Cancel();
-                monitorTask.Wait();
+                MonitorTaskCancellationTokenSource.Cancel();
+                MonitorTask.AwaitByTaskCompleteSource();
 #if HAS_PROCESS
-                monitorTask.Dispose();
+                MonitorTask.Dispose();
 #endif
-                monitorTask = null;
+                MonitorTask = null;
             }
 
             // Close the connection to adb. To be done after the monitor task exited.
@@ -207,22 +217,21 @@ namespace AdvancedSharpAdbClient
                 Socket = null!;
             }
 
-            firstDeviceListParsed.Dispose();
-            monitorTaskCancellationTokenSource.Dispose();
+            MonitorTaskCancellationTokenSource.Dispose();
 #else
             // First kill the monitor task, which has a dependency on the socket,
             // then close the socket.
-            if (monitorThread != null)
+            if (MonitorThread != null)
             {
                 IsRunning = false;
 
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
-                isMonitorThreadCancel = true;
+                IsMonitorThreadCancel = true;
                 Socket?.Close();
-                _ = monitorLoopFinished.WaitOne();
+                _ = MonitorLoopFinished.WaitOne();
 
-                monitorThread = null;
+                MonitorThread = null;
             }
 
             // Close the connection to adb. To be done after the monitor task exited.
@@ -232,7 +241,7 @@ namespace AdvancedSharpAdbClient
                 Socket = null!;
             }
 
-            firstDeviceListParsed.Close();
+            FirstDeviceListParsed.Close();
 #endif
             disposed = true;
         }
@@ -251,7 +260,7 @@ namespace AdvancedSharpAdbClient
         protected virtual void DeviceMonitorLoop()
         {
             IsRunning = true;
-            monitorLoopFinished.Reset();
+            MonitorLoopFinished.Reset();
 
             try
             {
@@ -265,13 +274,13 @@ namespace AdvancedSharpAdbClient
                         string value = Socket.ReadString();
                         ProcessIncomingDeviceData(value);
 
-                        firstDeviceListParsed.Set();
+                        FirstDeviceListParsed.Set();
                     }
                     catch (AdbException adbException)
                     {
                         if (adbException.InnerException is SocketException ex)
                         {
-                            if (isMonitorThreadCancel)
+                            if (IsMonitorThreadCancel)
                             {
                                 // The DeviceMonitor is shutting down (disposing) and Dispose()
                                 // has called Socket.Close(). This exception is expected,
@@ -299,15 +308,18 @@ namespace AdvancedSharpAdbClient
                         }
                     }
                 }
-                while (!isMonitorThreadCancel);
-                isMonitorThreadCancel = false;
+                while (!IsMonitorThreadCancel);
+                IsMonitorThreadCancel = false;
             }
             finally
             {
-                monitorLoopFinished.Set();
+                MonitorLoopFinished.Set();
             }
         }
-
+        
+        /// <summary>
+        /// Initializes the <see cref="Socket"/> and sends the <c>host:track-devices</c> command to the adb server.
+        /// </summary>
         private void InitializeSocket()
         {
             // Set up the connection to track the list of devices.
