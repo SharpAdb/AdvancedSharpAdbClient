@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides a mechanism for releasing unmanaged resources asynchronously.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IAsyncDisposable
+    public interface IDisposableWithTask
     {
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting

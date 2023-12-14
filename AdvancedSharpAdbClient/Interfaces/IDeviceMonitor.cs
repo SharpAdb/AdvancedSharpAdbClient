@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public partial interface IDeviceMonitor : IDisposable
 #if HAS_TASK
-        , Polyfills.IAsyncDisposable
+        , IDisposableWithTask
 #endif
     {
         /// <summary>

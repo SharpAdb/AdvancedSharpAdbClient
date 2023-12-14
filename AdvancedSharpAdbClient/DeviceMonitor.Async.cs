@@ -44,7 +44,6 @@ namespace AdvancedSharpAdbClient
                     MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
                     // Wait for the worker thread to have read the first list of devices.
                     _ = await FirstDeviceListParsed.Task.ConfigureAwait(false);
-                    await this; // Switch to the background thread to avoid blocking the caller.
                 }
                 finally
                 {
@@ -88,17 +87,9 @@ namespace AdvancedSharpAdbClient
             disposed = true;
         }
 
-#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-#if NETCOREAPP && !NETCOREAPP3_0_OR_GREATER
-        /// <summary>
-        /// Asynchronously performs application-defined tasks associated with freeing, releasing, or resetting
-        /// unmanaged resources asynchronously.
-        /// </summary>
-        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation.</returns>
-#else
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
-#endif
-        async ValueTask System.IAsyncDisposable.DisposeAsync()
+        async ValueTask IAsyncDisposable.DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
@@ -106,13 +97,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task DisposeAsync() => ((System.IAsyncDisposable)this).DisposeAsync().AsTask();
+        public Task DisposeAsync() => ((IAsyncDisposable)this).DisposeAsync().AsTask();
 #else
         /// <inheritdoc/>
         public async Task DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
-            Dispose(disposing: false);
             Dispose();
         }
 #endif
@@ -138,8 +128,8 @@ namespace AdvancedSharpAdbClient
                     ProcessIncomingDeviceData(value);
                     if (FirstDeviceListParsed != null)
                     {
-                        FirstDeviceListParsed?.TrySetResult(null);
-                        await this; // Switch to the background thread to avoid blocking the caller.
+                        // Switch to the background thread to avoid blocking the caller.
+                        _ = Task.Factory.StartNew(() => FirstDeviceListParsed?.TrySetResult(null), default, TaskCreationOptions.None, TaskScheduler.Default);
                     }
                 }
                 catch (TaskCanceledException ex)
