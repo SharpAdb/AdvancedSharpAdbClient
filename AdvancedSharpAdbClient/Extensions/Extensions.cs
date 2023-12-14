@@ -55,13 +55,13 @@ namespace AdvancedSharpAdbClient
         /// <returns>A value task that represents the asynchronous read operation. The value of the
         /// TResult parameter contains the next line from the text reader, or is null if
         /// all of the characters have been read.</returns>
-        public static Task<string> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
+        public static Task<string?> ReadLineAsync(this TextReader reader, CancellationToken cancellationToken)
         {
 #if NET35
-            return Task.Factory.StartNew(() => reader.ReadLine(), default, TaskCreationOptions.None, TaskScheduler.Default);
+            return Task.Factory.StartNew<string?>(reader.ReadLine, default, TaskCreationOptions.None, TaskScheduler.Default);
 #else
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
-            return reader.ReadLineAsync().ContinueWith(x =>
+            return reader.ReadLineAsync().ContinueWith<string?>(x =>
             {
                 cancellationTokenRegistration.Dispose();
                 return x.Result;
@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient
         public static Task<string> ReadToEndAsync(this TextReader reader, CancellationToken cancellationToken)
         {
 #if NET35
-            return Task.Factory.StartNew(() => reader.ReadToEnd(), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
+            return Task.Factory.StartNew(reader.ReadToEnd, cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
 #else
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(reader.Close);
             return reader.ReadToEndAsync().ContinueWith(x =>
@@ -130,10 +130,10 @@ namespace AdvancedSharpAdbClient
 #endif
 
         public static bool IsWindowsPlatform() =>
-#if HAS_RUNTIMEINFORMATION
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#elif NETCORE
+#if NETCORE && !UAP10_0_15138_0
             true;
+#elif !NETFRAMEWORK || NET48_OR_GREATER
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #else
             Environment.OSVersion.Platform
                 is PlatformID.Win32S
@@ -144,15 +144,15 @@ namespace AdvancedSharpAdbClient
 #endif
 
         public static bool IsUnixPlatform() =>
-#if HAS_RUNTIMEINFORMATION
+#if NETCORE && !UAP10_0_15138_0
+            false;
+#elif !NETFRAMEWORK || NET48_OR_GREATER
             RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
             || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
 #if NETCOREAPP3_0_OR_GREATER
             || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
 #endif
             ;
-#elif NETCORE
-            false;
 #else
             Environment.OSVersion.Platform
                 is PlatformID.Unix
