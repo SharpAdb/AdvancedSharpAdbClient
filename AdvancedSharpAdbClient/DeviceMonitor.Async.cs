@@ -44,6 +44,7 @@ namespace AdvancedSharpAdbClient
                     MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
                     // Wait for the worker thread to have read the first list of devices.
                     _ = await FirstDeviceListParsed.Task.ConfigureAwait(false);
+                    await this; // Switch to the background thread to avoid blocking the caller.
                 }
                 finally
                 {
@@ -97,7 +98,7 @@ namespace AdvancedSharpAdbClient
 #else
         /// <inheritdoc/>
 #endif
-        public async ValueTask DisposeAsync()
+        async ValueTask System.IAsyncDisposable.DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
@@ -105,10 +106,10 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task AsyncDispose() => DisposeAsync().AsTask();
+        public Task DisposeAsync() => ((System.IAsyncDisposable)this).DisposeAsync().AsTask();
 #else
         /// <inheritdoc/>
-        public async Task AsyncDispose()
+        public async Task DisposeAsync()
         {
             await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(disposing: false);
@@ -124,7 +125,7 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
-            await this;
+            await this; // Switch to the background thread, so that the loop can continue to run.
 
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -135,7 +136,11 @@ namespace AdvancedSharpAdbClient
                 {
                     string value = await Socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
                     ProcessIncomingDeviceData(value);
-                    FirstDeviceListParsed?.TrySetResult(null);
+                    if (FirstDeviceListParsed != null)
+                    {
+                        FirstDeviceListParsed?.TrySetResult(null);
+                        await this; // Switch to the background thread to avoid blocking the caller.
+                    }
                 }
                 catch (TaskCanceledException ex)
                 {

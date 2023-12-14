@@ -11,6 +11,9 @@ namespace AdvancedSharpAdbClient
     /// Provides a common interface for any class that allows you to monitor the list of devices that are currently connected to the adb server.
     /// </summary>
     public partial interface IDeviceMonitor : IDisposable
+#if HAS_TASK
+        , Polyfills.IAsyncDisposable
+#endif
     {
         /// <summary>
         /// Occurs when the status of one of the connected devices has changed.

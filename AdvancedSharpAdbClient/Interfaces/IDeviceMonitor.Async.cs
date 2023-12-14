@@ -15,22 +15,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StartAsync(CancellationToken cancellationToken);
-
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        /// <summary>
-        /// Asynchronously performs application-defined tasks associated with freeing, releasing, or resetting
-        /// unmanaged resources asynchronously.
-        /// </summary>
-        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation.</returns>
-        ValueTask DisposeAsync() => new(AsyncDispose());
-#endif
-
-        /// <summary>
-        /// Asynchronously performs application-defined tasks associated with freeing, releasing, or resetting
-        /// unmanaged resources asynchronously.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous dispose operation.</returns>
-        Task AsyncDispose();
     }
 }
 #endif
