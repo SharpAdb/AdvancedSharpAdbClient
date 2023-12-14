@@ -134,10 +134,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         [GeneratedRegex(ErrorPattern, RegexOptions.IgnoreCase)]
         private static partial Regex ErrorRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> that matches output of the success.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> that matches output of the success.</returns>
         private static Regex SuccessRegex() => new(SuccessPattern, RegexOptions.IgnoreCase);
 
+        /// <summary>
+        /// Gets a <see cref="Regex"/> that matches output that indicates a failure.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> that matches output that indicates a failure.</returns>
         private static Regex FailureRegex() => new(FailurePattern, RegexOptions.IgnoreCase);
 
+        /// <summary>
+        /// Gets a <see cref="Regex"/> that matches output that indicates a error.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> that matches output that indicates a error.</returns>
         private static Regex ErrorRegex() => new(ErrorPattern, RegexOptions.IgnoreCase);
 #endif
     }

@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Models
     /// bytes that contain information for this color are stored.</param>
     /// <param name="Length">The number of bits that contain information for this color.</param>
 #if HAS_BUFFERS
-    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.ColorDataCreate))]
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.ColorDataCreator))]
 #endif
     public readonly record struct ColorData(uint Offset, uint Length) : IReadOnlyList<byte>
     {

@@ -69,6 +69,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         [GeneratedRegex(EnvPattern)]
         private static partial Regex EnvRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> which can be used to parse the output of the <c>printenv</c> command.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> which can be used to parse the output of the <c>printenv</c> command.</returns>
         private static Regex EnvRegex() => new(EnvPattern);
 #endif
     }

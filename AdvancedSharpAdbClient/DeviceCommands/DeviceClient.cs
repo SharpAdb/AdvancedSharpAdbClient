@@ -247,7 +247,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get the <see cref="AppStatus"/> of the app.
+        /// Gets the <see cref="AppStatus"/> of the app.
         /// </summary>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get element by xpath. You can specify the waiting time in timeout.
+        /// Gets element by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="xpath">The xpath of the element.</param>
         /// <param name="timeout">The timeout for waiting the element.
@@ -305,7 +305,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Get elements by xpath. You can specify the waiting time in timeout.
+        /// Gets elements by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="timeout">The timeout for waiting the elements.
@@ -419,6 +419,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         [GeneratedRegex("<\\?xml(.?)*")]
         private static partial Regex GetXmlRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> for parsing the xml.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> for parsing the xml.</returns>
         private static Regex GetXmlRegex() => new("<\\?xml(.?)*");
 #endif
     }

@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient.Models
         public override string ToString() => Serial;
 
         /// <summary>
-        /// Get the device state from the string value.
+        /// Gets the device state from the string value.
         /// </summary>
         /// <param name="state">The device state string.</param>
         /// <returns>The device state.</returns>
@@ -178,6 +178,10 @@ namespace AdvancedSharpAdbClient.Models
         [GeneratedRegex(DeviceDataRegexString, RegexOptions.IgnoreCase)]
         private static partial Regex DeviceDataRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="System.Text.RegularExpressions.Regex"/> that can be used to parse the device information that is returned by the Android Debut Bridge.
+        /// </summary>
+        /// <returns>The <see cref="System.Text.RegularExpressions.Regex"/> that can be used to parse the device information that is returned by the Android Debut Bridge.</returns>
         private static Regex DeviceDataRegex() => new(DeviceDataRegexString, RegexOptions.IgnoreCase);
 #endif
     }

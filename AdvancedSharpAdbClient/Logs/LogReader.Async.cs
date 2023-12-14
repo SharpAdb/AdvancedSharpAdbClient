@@ -134,37 +134,35 @@ namespace AdvancedSharpAdbClient.Logs
                     }
 
                 case LogId.Events:
+                    // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
+                    EventLogEntry entry = new()
                     {
-                        // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
-                        EventLogEntry entry = new()
-                        {
-                            Data = data,
-                            ProcessId = pid,
-                            ThreadId = tid,
-                            TimeStamp = timestamp,
-                            NanoSeconds = nsec,
-                            Id = id
-                        };
+                        Data = data,
+                        ProcessId = pid,
+                        ThreadId = tid,
+                        TimeStamp = timestamp,
+                        NanoSeconds = nsec,
+                        Id = id
+                    };
 
-                        // Use a stream on the data buffer. This will make sure that,
-                        // if anything goes wrong parsing the data, we never go past
-                        // the message boundary itself.
+                    // Use a stream on the data buffer. This will make sure that,
+                    // if anything goes wrong parsing the data, we never go past
+                    // the message boundary itself.
 #if NETCOREAPP3_0_OR_GREATER
-                        await
+                    await
 #endif
-                        using (MemoryStream dataStream = new(data))
+                    using (MemoryStream dataStream = new(data))
+                    {
+                        using BinaryReader reader = new(dataStream);
+                        int priority = reader.ReadInt32();
+
+                        while (dataStream.Position < dataStream.Length)
                         {
-                            using BinaryReader reader = new(dataStream);
-                            int priority = reader.ReadInt32();
-
-                            while (dataStream.Position < dataStream.Length)
-                            {
-                                ReadLogEntry(reader, entry.Values);
-                            }
+                            ReadLogEntry(reader, entry.Values);
                         }
-
-                        return entry;
                     }
+
+                    return entry;
 
                 default:
                     return new LogEntry
@@ -178,34 +176,52 @@ namespace AdvancedSharpAdbClient.Logs
                     };
             }
         }
+
+        /// <summary>
+        /// Asynchronously reads a <see cref="ushort"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="ushort"/> value.</returns>
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToUInt16(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously reads a <see cref="uint"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="uint"/> value.</returns>
         private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToUInt32(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously reads a <see cref="int"/> from the stream.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="int"/> value.</returns>
         private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-
             return data == null ? null : BitConverter.ToInt32(data, 0);
         }
 
+        /// <summary>
+        /// Asynchronously bytes from the stream, making sure that the requested number of bytes
+        /// </summary>
+        /// <param name="count">The number of bytes to read.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return the <see cref="byte"/> array.</returns>
         private async Task<byte[]?> ReadBytesSafeAsync(int count, CancellationToken cancellationToken = default)
         {
             int totalRead = 0;
-            int read = 0;
-
             byte[] data = new byte[count];
 
+            int read;
 #if HAS_BUFFERS
             while ((read = await stream.ReadAsync(data.AsMemory(totalRead, count - totalRead), cancellationToken).ConfigureAwait(false)) > 0)
 #else

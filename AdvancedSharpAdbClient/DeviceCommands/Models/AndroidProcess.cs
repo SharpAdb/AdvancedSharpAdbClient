@@ -43,13 +43,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
             if (cmdLinePrefix)
             {
-#if HAS_INDEXRANGE
-                string[] cmdLineParts = line[..processNameStart]
-#else
-
-                string[] cmdLineParts = line.Substring(0, processNameStart)
-#endif
-                    .Split('\0');
+                string[] cmdLineParts = line[..processNameStart].Split('\0');
 
                 if (cmdLineParts.Length <= 1)
                 {
@@ -57,11 +51,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 }
                 else
                 {
-#if HAS_INDEXRANGE
                     pid = int.Parse(cmdLineParts[^1]);
-#else
-                    pid = int.Parse(cmdLineParts[cmdLineParts.Length - 1]);
-#endif
                     ProcessId = pid;
 
                     comm = cmdLineParts[0];
@@ -74,10 +64,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
             if (!parsedCmdLinePrefix)
             {
-#if HAS_INDEXRANGE
-                pid = int.Parse(line[..processNameStart]);
+                pid =
+#if HAS_BUFFERS
+                    int.Parse(line.AsSpan(0, processNameStart));
 #else
-                pid = int.Parse(line.Substring(0, processNameStart));
+                    int.Parse(line[..processNameStart]);
 #endif
                 ProcessId = pid;
 
@@ -85,10 +76,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 Name = comm;
             }
 
-#if HAS_INDEXRANGE
-            string[] parts = line[(processNameEnd + 1)..]
+            string[] parts =
+#if HAS_BUFFERS
+                line.AsSpan(processNameEnd + 1).ToString()
 #else
-            string[] parts = line.Substring(processNameEnd + 1)
+                line[(processNameEnd + 1)..]
 #endif
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -610,12 +602,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <returns>A <see cref="string"/> that represents this <see cref="AndroidProcess"/>.</returns>
         public override string ToString() => $"{Name} ({ProcessId})";
 
+        /// <summary>
+        /// Converts the string representation of a number to its 32-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="value">A string containing a number to convert.</param>
+        /// <returns>A 32-bit signed integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static int ParseInt(string value) => value == "-" ? 0 : int.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 32-bit unsigned integer equivalent.
+        /// </summary>
+        /// <param name="value">A string representing the number to convert.</param>
+        /// <returns>A 32-bit unsigned integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static uint ParseUInt(string value) => value == "-" ? 0 : uint.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 64-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="value">A string containing a number to convert.</param>
+        /// <returns>A 64-bit signed integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static long ParseLong(string value) => value == "-" ? 0 : long.Parse(value);
 
+        /// <summary>
+        /// Converts the string representation of a number to its 64-bit unsigned integer equivalent.
+        /// </summary>
+        /// <param name="value">A string that represents the number to convert.</param>
+        /// <returns>A 64-bit unsigned integer equivalent to the number contained in <paramref name="value"/>.</returns>
         private static ulong ParseULong(string value) => value == "-" ? 0 : ulong.Parse(value);
     }
 }

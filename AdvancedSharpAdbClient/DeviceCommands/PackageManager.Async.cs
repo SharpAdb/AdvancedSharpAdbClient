@@ -162,7 +162,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             progress?.Report(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
+            await TaskExExtensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 count++;
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
@@ -233,7 +233,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             progress?.Report(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async x =>
+            await TaskExExtensions.WhenAll(splitRemoteFilePaths.Select(async x =>
             {
                 count++;
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             progress?.Report(new InstallProgressEventArgs(1, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
 
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
+            await TaskExExtensions.WhenAll(splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
             {
                 await WriteInstallSessionAsync(session, $"split{count++}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
                 progress?.Report(new InstallProgressEventArgs(count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
@@ -320,7 +320,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             progress?.Report(new InstallProgressEventArgs(0, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
 
             int count = 0;
-            await Extensions.WhenAll(splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
+            await TaskExExtensions.WhenAll(splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
             {
                 await WriteInstallSessionAsync(session, $"split{count++}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
                 progress?.Report(new InstallProgressEventArgs(count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
@@ -408,7 +408,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if WINDOWS_UWP
             StorageFile.GetFileFromPathAsync(path).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenReadAsync().AsTask(cancellationToken)).Unwrap().ContinueWith(x => x.Result.AsStream());
 #else
-            Extensions.FromResult<Stream>(File.OpenRead(path));
+            TaskExExtensions.FromResult<Stream>(File.OpenRead(path));
 #endif
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 logger.LogDebug("Uploading {0} onto device '{1}'", packageFileName, Device.Serial);
 
-                using (ISyncService sync = syncServiceFactory(AdbClient, Device))
+                using (ISyncService sync = SyncServiceFactory(AdbClient, Device))
                 {
 #if NETCOREAPP3_0_OR_GREATER
                     await

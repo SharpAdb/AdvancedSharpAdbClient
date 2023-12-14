@@ -36,6 +36,7 @@ global using Point = AdvancedSharpAdbClient.Polyfills.Point;
 #endif
 
 #if WINDOWS10_0_17763_0_OR_GREATER
+global using Windows.Foundation;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
 global using Point = System.Drawing.Point;

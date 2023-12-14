@@ -26,7 +26,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
 
-        private static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s which are invalid in a path.
+        /// </summary>
+        public static readonly char[] InvalidCharacters = ['|', '\\', '?', '*', '<', '\"', ':', '>'];
 
         /// <summary>
         /// Combine the specified paths to form one path.
@@ -58,11 +61,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         capacity += paths[i].Length;
                     }
-#if HAS_INDEXRANGE
                     char ch = paths[i][^1];
-#else
-                    char ch = paths[i][paths[i].Length - 1];
-#endif
                     if (ch != DirectorySeparatorChar)
                     {
                         capacity++;
@@ -81,16 +80,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     }
                     else
                     {
-#if HAS_INDEXRANGE
                         char ch2 = builder[^1];
-#else
-                        char ch2 = builder[builder.Length - 1];
-#endif
                         if (ch2 != DirectorySeparatorChar)
                         {
                             _ = builder.Append(DirectorySeparatorChar);
                         }
-
                         _ = builder.Append(paths[j]);
                     }
                 }
@@ -125,11 +119,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         return tpath;
                     }
-#if HAS_INDEXRANGE
-                    tpath = tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
+
+                    tpath =
+#if HAS_BUFFERS
+                        tpath.AsSpan(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1).ToString();
 #else
-                    tpath = tpath.Substring(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1);
+                        tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 #endif
+
                     return FixupPath(tpath);
                 }
                 else if (tpath.Length == 1)
@@ -252,6 +249,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         [GeneratedRegex(EscapePattern)]
         private static partial Regex EscapeRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> to escape filenames for shell command consumption.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> to escape filenames for shell command consumption.</returns>
         private static Regex EscapeRegex() => new(EscapePattern);
 #endif
     }

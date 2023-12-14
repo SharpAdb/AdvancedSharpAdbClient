@@ -26,11 +26,7 @@ namespace AdvancedSharpAdbClient
 #if NET6_0_OR_GREATER
             await Socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
 #else
-            using (CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(Socket.Close))
-            {
-                await Extensions.Yield();
-                Socket.Connect(endPoint);
-            }
+            await Task.Factory.StartNew(() => Socket.Connect(endPoint), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
 #endif
             Socket.Blocking = true;
         }
@@ -47,7 +43,7 @@ namespace AdvancedSharpAdbClient
             else
             {
                 // Already connected - nothing to do.
-                return Extensions.CompletedTask;
+                return TaskExExtensions.CompletedTask;
             }
         }
 

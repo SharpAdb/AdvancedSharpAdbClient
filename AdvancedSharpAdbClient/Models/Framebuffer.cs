@@ -17,14 +17,25 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
     public class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="byte"/>s which contains the framebuffer header.
+        /// </summary>
         private byte[] headerData = new byte[FramebufferHeader.MaxLength];
+
+        /// <summary>
+        /// The <see cref="bool"/> which indicates whether the header has been initialized.
+        /// </summary>
         private bool headerInitialized;
+
+        /// <summary>
+        /// The <see cref="bool"/> that indicates whether this instance has been disposed.
+        /// </summary>
         private bool disposed = false;
 
         /// <summary>
         /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
-        protected readonly Func<EndPoint, IAdbSocket> adbSocketFactory = adbSocketFactory;
+        protected readonly Func<EndPoint, IAdbSocket> AdbSocketFactory = adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -93,7 +104,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
             // Select the target device
             socket.SetDevice(Device);
 
@@ -145,7 +156,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             EnsureNotDisposed();
 
-            using IAdbSocket socket = adbSocketFactory(EndPoint);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
             // Select the target device
             await socket.SetDeviceAsync(Device, cancellationToken).ConfigureAwait(false);
 

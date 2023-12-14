@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 
 namespace AdvancedSharpAdbClient
 {
@@ -16,7 +17,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="command">The <see cref="SyncCommand"/> to convert.</param>
         /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
-        public static byte[] GetBytes(SyncCommand command)
+        public static byte[] GetBytes(this SyncCommand command)
         {
             if (command == 0)
             {
@@ -41,6 +42,13 @@ namespace AdvancedSharpAdbClient
 
             return commandBytes;
         }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="GetBytes(SyncCommand)"/>.
+        /// </summary>
+        /// <param name="command">The <see cref="SyncCommand"/> to convert.</param>
+        /// <returns>An enumerator that can be used to iterate through the <see cref="SyncCommand"/>.</returns>
+        public static IEnumerator<byte> GetEnumerator(this SyncCommand command) => ((IEnumerable<byte>)command.GetBytes()).GetEnumerator();
 
         /// <summary>
         /// Determines which <see cref="SyncCommand"/> is represented by this byte array.

@@ -15,12 +15,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         /// <summary>
         /// The name of the version code property.
         /// </summary>
-        private const string versionCode = "VersionCode";
+        private const string VersionCode = nameof(VersionCode);
 
         /// <summary>
         /// The name of the version name property.
         /// </summary>
-        private const string versionName = "VersionName";
+        private const string VersionName = nameof(VersionName);
 
         /// <summary>
         /// A regular expression that can be used to parse the version code.
@@ -37,21 +37,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         /// </summary>
         public VersionInfoReceiver()
         {
-            AddPropertyParser(versionCode, GetVersionCode);
-            AddPropertyParser(versionName, GetVersionName);
+            AddPropertyParser(VersionCode, GetVersionCode);
+            AddPropertyParser(VersionName, GetVersionName);
         }
 
         /// <summary>
         /// Gets the version code of the specified package.
         /// </summary>
         public VersionInfo VersionInfo =>
-            GetPropertyValue<string>(versionName) is string name
-                ? new VersionInfo(GetPropertyValue<int>(versionCode), name)
+            GetPropertyValue<string>(VersionName) is string name
+                ? new VersionInfo(GetPropertyValue<int>(VersionCode), name)
                 : default;
 
+        /// <summary>
+        /// Checks whether we're in the packages section of the dumpsys package output.
+        /// </summary>
+        /// <param name="line">The line to be checked.</param>
         private void CheckPackagesSection(string line)
         {
-            // This method check whether we're in the packages section of the dumpsys package output.
+            // This method checks whether we're in the packages section of the dumpsys package output.
             // See gapps.txt for what the output looks for. Each section starts with a header
             // which looks like:
             //
@@ -85,10 +89,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 
             return !inPackagesSection ? null
                 : line != null && line.Trim().StartsWith("versionName=")
-#if HAS_INDEXRANGE
-                ? line.Trim()[12..].Trim() : null;
+#if HAS_BUFFERS
+                ? line.Trim().AsSpan(12).ToString().Trim() : null;
 #else
-                ? line.Trim().Substring(12).Trim() : null;
+                ? line.Trim()[12..].Trim() : null;
 #endif
         }
 
@@ -120,6 +124,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         [GeneratedRegex(VersionCodePattern)]
         private static partial Regex VersionCodeRegex();
 #else
+        /// <summary>
+        /// Gets a <see cref="Regex"/> that can be used to parse the version code.
+        /// </summary>
+        /// <returns>The <see cref="Regex"/> that can be used to parse the version code.</returns>
         private static Regex VersionCodeRegex() => new(VersionCodePattern);
 #endif
     }

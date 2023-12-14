@@ -18,17 +18,35 @@
       <PropertyGroup>
         <NoWarn>$(NoWarn);NU1603;NU1605;NU1902;NU1903</NoWarn>
         <TargetFrameworks>net6.0;net8.0;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.0-client;net4.5.2;net4.6.2;net4.8.1;net6.0-windows10.0.17763.0;net8.0-windows10.0.17763.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.0-client;net4.5;net4.6.1;net4.8;net6.0-windows10.0.17763.0;net8.0-windows10.0.17763.0</TargetFrameworks>
         <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);netcore5.0;uap10.0;uap10.0.15138.0</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
         <TargetFrameworks>net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.5.2;net4.8.1;net8.0-windows10.0.17763.0</TargetFrameworks>
+        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net3.5-client;net4.5;net4.8;net8.0-windows10.0.17763.0</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>
+
+  <PropertyGroup>
+    <PolySharpIncludeGeneratedTypes>
+      System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute;
+      System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute;
+      System.Diagnostics.CodeAnalysis.MemberNotNullAttribute;
+      System.Diagnostics.CodeAnalysis.MaybeNullAttribute;
+      System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute;
+      System.Diagnostics.CodeAnalysis.NotNullAttribute;
+      System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute;
+      System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
+      System.Diagnostics.StackTraceHiddenAttribute;
+      System.Index;
+      System.Range;
+      System.Runtime.CompilerServices.CallerArgumentExpressionAttribute;
+      System.Runtime.CompilerServices.IsExternalInit;
+    </PolySharpIncludeGeneratedTypes>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
     <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
@@ -44,6 +62,10 @@
 
   <ItemGroup>
     <None Include="..\logo.png" Pack="True" PackagePath="\Icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.14.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'
@@ -71,9 +93,8 @@
     <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'
-                     or '$(TargetFramework)' == 'net4.7.2'
-                     or '$(TargetFramework)' == 'net4.8.1'
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.1'
+                     or '$(TargetFramework)' == 'net4.8'
                      or '$(TargetFramework)' == 'netstandard2.0'
                      or '$(TargetFramework)' == 'uap10.0.15138.0'">
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
@@ -96,13 +117,24 @@
                          or '$(TargetFramework)' == 'net3.0-client'
                          or '$(TargetFramework)' == 'net3.5-client'
                          or '$(TargetFramework)' == 'net4.0-client'
-                         or '$(TargetFramework)' == 'net4.5.2'
-                         or '$(TargetFramework)' == 'net4.6.2'
-                         or '$(TargetFramework)' == 'net4.7.2'
-                         or '$(TargetFramework)' == 'net4.8.1'
+                         or '$(TargetFramework)' == 'net4.5'
+                         or '$(TargetFramework)' == 'net4.6.1'
+                         or '$(TargetFramework)' == 'net4.8'
                          or '$(TargetFramework)' == 'net6.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'">
     <DefineConstants>$(DefineConstants);HAS_IMAGING</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
+                        and '$(TargetFramework)' != 'net3.0-client'
+                        and '$(TargetFramework)' != 'net3.5-client'
+                        and '$(TargetFramework)' != 'net4.0-client'
+                        and '$(TargetFramework)' != 'net4.5'
+                        and '$(TargetFramework)' != 'net4.6.1'
+                        and '$(TargetFramework)' != 'netstandard1.3'
+                        and '$(TargetFramework)' != 'netcore5.0'
+                        and '$(TargetFramework)' != 'uap10.0'">
+    <DefineConstants>$(DefineConstants);HAS_VALUETUPLE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'
@@ -119,9 +151,8 @@
                         and '$(TargetFramework)' != 'net3.0-client'
                         and '$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'
-                        and '$(TargetFramework)' != 'net4.5.2'
-                        and '$(TargetFramework)' != 'net4.6.2'
-                        and '$(TargetFramework)' != 'net4.7.2'
+                        and '$(TargetFramework)' != 'net4.5'
+                        and '$(TargetFramework)' != 'net4.6.1'
                         and '$(TargetFramework)' != 'netcore5.0'
                         and '$(TargetFramework)' != 'uap10.0'">
     <DefineConstants>$(DefineConstants);HAS_RUNTIMEINFORMATION</DefineConstants>
@@ -133,7 +164,8 @@
                          or '$(TargetFramework)' == 'net8.0-windows10.0.17763.0'
                          or '$(TargetFramework)' == 'netcoreapp3.1'
                          or '$(TargetFramework)' == 'netstandard2.1'">
-    <DefineConstants>$(DefineConstants);HAS_BUFFERS;HAS_INDEXRANGE</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_BUFFERS</DefineConstants>
+    <PolySharpIncludeGeneratedTypes>$(PolySharpIncludeGeneratedTypes);System.Runtime.CompilerServices.CollectionBuilderAttribute</PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcore5.0'

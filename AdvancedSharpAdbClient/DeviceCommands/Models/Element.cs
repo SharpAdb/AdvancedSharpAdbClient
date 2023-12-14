@@ -16,6 +16,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     public class Element : IEquatable<Element>
     {
+        /// <summary>
+        /// The <see cref="Array"/> of <see cref="char"/>s that separate the coordinates of the element.
+        /// </summary>
         private static readonly char[] separator = ['[', ']', ',', ' '];
 
         /// <summary>
@@ -406,6 +409,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 }
             }
         }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="FindDescendants"/>.
+        /// </summary>
+        /// <returns>An enumerator that can be used to iterate through the <see cref="Element"/>.</returns>
+        public IEnumerator<Element> GetEnumerator() => FindDescendants().GetEnumerator();
 
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as Element);

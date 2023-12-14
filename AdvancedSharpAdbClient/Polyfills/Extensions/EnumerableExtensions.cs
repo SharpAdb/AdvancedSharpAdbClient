@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="source">An <see cref="IEnumerable{T}"/> to create an array from.</param>
         /// <returns>An array that contains the elements from the input sequence.</returns>
         public static Task<TSource[]> ToArrayAsync<TSource>(this IEnumerable<Task<TSource>> source) =>
-            Extensions.WhenAll(source);
+            TaskExExtensions.WhenAll(source);
 #endif
     }
 }

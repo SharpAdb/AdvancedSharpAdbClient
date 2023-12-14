@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient.Tests
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
             byte[] contentMessage =
             [
-                .. SyncCommandConverter.GetBytes(SyncCommand.DATA),
+                .. SyncCommand.DATA.GetBytes(),
                 .. BitConverter.GetBytes(content.Length),
                 .. content,
             ];

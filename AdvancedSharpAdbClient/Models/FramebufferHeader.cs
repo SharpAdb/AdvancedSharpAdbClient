@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.Models
     /// information about the framebuffer.
     /// </summary>
 #if HAS_BUFFERS
-    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreate))]
+    [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreator))]
 #endif
     public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
@@ -356,7 +356,7 @@ namespace AdvancedSharpAdbClient.Models
                     throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported");
                 }
 
-                // Get the index at which the red, bue, green and alpha values are stored.
+                // Gets the index at which the red, bue, green and alpha values are stored.
                 int redIndex = (int)Red.Offset / 8;
                 int blueIndex = (int)Blue.Offset / 8;
                 int greenIndex = (int)Green.Offset / 8;
@@ -388,7 +388,7 @@ namespace AdvancedSharpAdbClient.Models
                     }
                 }
 
-                // Return RGB or RGBA, function of the presence of an alpha channel.
+                // Returns RGB or RGBA, function of the presence of an alpha channel.
                 return Alpha.Length == 0 ? PixelFormat.Format32bppRgb : PixelFormat.Format32bppArgb;
             }
             else if (Bpp == 24)
@@ -563,6 +563,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        /// Gets an <see cref="IEnumerable{T}"/> which enumerates the values of this <see cref="FramebufferHeader"/>.
+        /// </summary>
+        /// <returns>The values of the <see cref="FramebufferHeader"/>.</returns>
         private IEnumerable<uint> GetEnumerable()
         {
             yield return Version;

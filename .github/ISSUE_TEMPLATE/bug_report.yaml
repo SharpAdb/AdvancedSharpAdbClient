@@ -32,6 +32,7 @@ body:
       description: Specify the version of AdvancedSharpAdbClient you're using.
       options:
         - "Latest Source"
+        - "2.5.8"
         - "2.5.7"
         - "2.5.6"
         - "2.5.5"
@@ -49,6 +50,7 @@ body:
       multiple: true
       options:
         - ".NET Framework 2.0"
+        - ".NET Framework 3.0"
         - ".NET Framework 3.5"
         - ".NET Framework 4.0"
         - ".NET Framework 4.5.x"

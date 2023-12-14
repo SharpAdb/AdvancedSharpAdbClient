@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        protected readonly ILogger<AdbSocket> logger;
+        private readonly ILogger<AdbSocket> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient
             // First four bytes: command
             // Next four bytes: length of the path
             // Final bytes: path
-            byte[] commandBytes = SyncCommandConverter.GetBytes(command);
+            byte[] commandBytes = command.GetBytes();
 
             byte[] lengthBytes = BitConverter.GetBytes(length);
 
