@@ -67,7 +67,11 @@ namespace AdvancedSharpAdbClient
 
                 // Stop the thread. The tread will keep waiting for updated information from adb
                 // eternally, so we need to forcefully abort it here.
+#if NET8_0_OR_GREATER
+                await MonitorTaskCancellationTokenSource.CancelAsync();
+#else
                 MonitorTaskCancellationTokenSource.Cancel();
+#endif
                 await MonitorTask.ConfigureAwait(false);
 #if HAS_PROCESS
                 MonitorTask.Dispose();

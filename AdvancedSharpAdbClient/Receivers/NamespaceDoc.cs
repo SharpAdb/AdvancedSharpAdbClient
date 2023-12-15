@@ -14,5 +14,5 @@ namespace AdvancedSharpAdbClient.Receivers
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc { }
+    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc { }
 }

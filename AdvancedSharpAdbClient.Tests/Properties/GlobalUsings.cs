@@ -10,4 +10,5 @@ global using AdvancedSharpAdbClient.Receivers;
 
 #region AdvancedSharpAdbClient.Tests
 global using AdvancedSharpAdbClient.Tests;
+global using AdvancedSharpAdbClient.Logs.Tests;
 #endregion

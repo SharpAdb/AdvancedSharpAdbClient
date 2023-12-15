@@ -72,7 +72,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(socket.Close);
             TaskCompletionSource<int> taskCompletionSource = new(socket);
 
-            IAsyncResult asyncResult = socket.BeginReceive(buffer, offset, size, socketFlags, iar =>
+            _ = socket.BeginReceive(buffer, offset, size, socketFlags, iar =>
             {
                 // this is the callback
                 TaskCompletionSource<int> taskCompletionSource = (TaskCompletionSource<int>)iar.AsyncState;

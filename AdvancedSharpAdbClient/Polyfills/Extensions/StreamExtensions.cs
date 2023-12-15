@@ -38,10 +38,9 @@ namespace AdvancedSharpAdbClient.Polyfills
             CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(stream.Close);
             TaskCompletionSource<int> taskCompletionSource = new(stream);
 
-            IAsyncResult asyncResult = stream.BeginRead(buffer, offset, count, iar =>
+            _ = stream.BeginRead(buffer, offset, count, iar =>
             {
                 // this is the callback
-
                 TaskCompletionSource<int> taskCompletionSource = (TaskCompletionSource<int>)iar.AsyncState;
                 Stream stream = (Stream)taskCompletionSource.Task.AsyncState;
 
@@ -86,10 +85,9 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             TaskCompletionSource<object?> taskCompletionSource = new(stream);
 
-            IAsyncResult asyncResult = stream.BeginWrite(buffer, offset, count, iar =>
+            _ = stream.BeginWrite(buffer, offset, count, iar =>
             {
                 // this is the callback
-
                 TaskCompletionSource<object?> taskCompletionSource = (TaskCompletionSource<object?>)iar.AsyncState;
                 Stream stream = (Stream)taskCompletionSource.Task.AsyncState;
 

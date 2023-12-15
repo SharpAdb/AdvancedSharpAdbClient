@@ -1,6 +1,6 @@
 ﻿namespace AdvancedSharpAdbClient.Logs.Tests
 {
-    public class DummyLoggerFactory : ILoggerFactory
+    internal class DummyLoggerFactory : ILoggerFactory
     {
         public ILogger CreateLogger(string categoryName) => new DummyLogger(categoryName);
 
