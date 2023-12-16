@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
                 {
                     string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
                     if (line == null) { break; }
-                    if (receiver?.AddOutput(line) is false) { break; }
+                    if (receiver?.AddOutput(line) == false) { break; }
                 }
             }
             catch (Exception e)
@@ -384,7 +384,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="request">The command of root or unroot.</param>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return the results from adb.</returns>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected async Task RootAsync(string request, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
@@ -513,7 +513,7 @@ namespace AdvancedSharpAdbClient
 
             int splitAPKsCount = splitAPKs.Count();
             void OnMainSyncProgressChanged(string? sender, double args) =>
-                progress?.Report(new InstallProgressEventArgs(sender is null ? 1 : 0, splitAPKsCount + 1, args / 2));
+                progress?.Report(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
 
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged, cancellationToken).ConfigureAwait(false);
 
@@ -523,7 +523,7 @@ namespace AdvancedSharpAdbClient
             {
                 lock (status)
                 {
-                    if (sender is null)
+                    if (sender == null)
                     {
                         progressCount++;
                     }
@@ -536,7 +536,7 @@ namespace AdvancedSharpAdbClient
             }
 
             int i = 0;
-            await TaskExExtensions.WhenAll(splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken))).ConfigureAwait(false);
+            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -567,7 +567,7 @@ namespace AdvancedSharpAdbClient
             {
                 lock (status)
                 {
-                    if (sender is null)
+                    if (sender == null)
                     {
                         progressCount++;
                     }
@@ -580,7 +580,7 @@ namespace AdvancedSharpAdbClient
             }
 
             int i = 0;
-            await TaskExExtensions.WhenAll(splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken))).ConfigureAwait(false);
+            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);

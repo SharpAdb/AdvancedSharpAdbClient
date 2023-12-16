@@ -292,7 +292,7 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously reads the statistics of a file from the socket.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected async Task<FileStatistics> ReadStatisticsAsync(CancellationToken cancellationToken = default)
         {
 #if HAS_BUFFERS

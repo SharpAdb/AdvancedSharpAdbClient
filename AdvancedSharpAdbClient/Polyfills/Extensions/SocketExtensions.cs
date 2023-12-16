@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if HAS_BUFFERS
             socket.ReceiveAsync(buffer.AsMemory(), socketFlags, cancellationToken).AsTask();
@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if HAS_BUFFERS
             socket.ReceiveAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
 #if HAS_BUFFERS
@@ -110,7 +110,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if HAS_BUFFERS
             socket.SendAsync(buffer.AsMemory(), socketFlags, cancellationToken).AsTask();
@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if HAS_BUFFERS
             socket.SendAsync(buffer.AsMemory(0, size), socketFlags, cancellationToken).AsTask();
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="socketFlags">A bitwise combination of the <see cref="SocketFlags"/> values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>The number of bytes received.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default)
         {
 #if HAS_BUFFERS

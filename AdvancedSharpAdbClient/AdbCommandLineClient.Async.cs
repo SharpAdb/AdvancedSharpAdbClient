@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return the return code of the <c>adb</c> process.</returns>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         protected virtual async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)

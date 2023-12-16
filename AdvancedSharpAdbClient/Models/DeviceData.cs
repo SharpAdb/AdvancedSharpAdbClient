@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient.Models
 
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] DeviceData? other) =>
-            other is not null
+            other != null
                 && Serial == other.Serial
                 && State == other.State
                 && Model == other.Model

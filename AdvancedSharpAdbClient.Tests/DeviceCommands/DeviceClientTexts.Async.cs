@@ -391,11 +391,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
-            List<Element> elements = [];
-            await foreach (Element value in new DeviceClient(client, Device).FindAsyncElements())
-            {
-                elements.Add(value);
-            }
+            List<Element> elements = await new DeviceClient(client, Device).FindAsyncElements().ToListAsync();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);

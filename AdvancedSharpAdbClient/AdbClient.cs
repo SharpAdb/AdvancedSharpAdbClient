@@ -382,7 +382,7 @@ namespace AdvancedSharpAdbClient
                 {
                     string? line = reader.ReadLine();
                     if (line == null) { break; }
-                    if (receiver?.AddOutput(line) is false) { break; }
+                    if (receiver?.AddOutput(line) == false) { break; }
                 }
             }
             catch (Exception e)
@@ -663,7 +663,7 @@ namespace AdvancedSharpAdbClient
 
             int splitAPKsCount = splitAPKs.Count();
             void OnMainSyncProgressChanged(string? sender, double args) =>
-                progress?.Report(new InstallProgressEventArgs(sender is null ? 1 : 0, splitAPKsCount + 1, args / 2));
+                progress?.Report(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
 
             InstallWrite(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged);
 
@@ -673,7 +673,7 @@ namespace AdvancedSharpAdbClient
             {
                 lock (status)
                 {
-                    if (sender is null)
+                    if (sender == null)
                     {
                         progressCount++;
                     }
@@ -720,7 +720,7 @@ namespace AdvancedSharpAdbClient
             {
                 lock (status)
                 {
-                    if (sender is null)
+                    if (sender == null)
                     {
                         progressCount++;
                     }
@@ -1005,7 +1005,5 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     [Obsolete($"{nameof(AdvancedAdbClient)} is too long to remember. Please use {nameof(AdbClient)} instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class AdvancedAdbClient : AdbClient
-    {
-    }
+    public class AdvancedAdbClient : AdbClient, IAdvancedAdbClient;
 }

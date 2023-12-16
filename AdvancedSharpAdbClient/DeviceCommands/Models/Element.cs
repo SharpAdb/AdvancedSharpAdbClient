@@ -421,7 +421,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] Element? other) =>
-            other is not null
+            other != null
                 && Client == other.Client
                 && Device == other.Device
                 && (Node == null

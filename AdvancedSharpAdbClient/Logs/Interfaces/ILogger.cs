@@ -28,8 +28,5 @@ namespace AdvancedSharpAdbClient.Logs
     /// Generally used to enable activation of a named <see cref="ILogger"/> from dependency injection.
     /// </summary>
     /// <typeparam name="TCategoryName">The type whose name is used for the logger category name.</typeparam>
-    public interface ILogger<out TCategoryName> : ILogger
-    {
-
-    }
+    public interface ILogger<out TCategoryName> : ILogger;
 }

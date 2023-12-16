@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.Models
 
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] ForwardData? other) =>
-            other is not null
+            other != null
                 && SerialNumber == other.SerialNumber
                 && Local == other.Local
                 && Remote == other.Remote;

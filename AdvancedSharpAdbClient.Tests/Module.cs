@@ -5,6 +5,6 @@ namespace AdvancedSharpAdbClient.Tests
     public static class Module
     {
         [ModuleInitializer]
-        public static void ModuleMain() => LoggerProvider.SetLogProvider(new DummyLoggerFactory());
+        public static void Initialize() => LoggerProvider.SetLogProvider(new DummyLoggerFactory());
     }
 }

@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="remotePath">The path of the file on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
         Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken);
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken);
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             foreach (FileStatistics statistics in await GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false))

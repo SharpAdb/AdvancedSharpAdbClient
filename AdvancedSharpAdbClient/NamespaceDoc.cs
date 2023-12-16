@@ -45,5 +45,5 @@ namespace AdvancedSharpAdbClient
     /// </remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc { }
+    internal abstract class NamespaceDoc;
 }

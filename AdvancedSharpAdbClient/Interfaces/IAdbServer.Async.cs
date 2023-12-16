@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
         /// running; <see langword="false"/> to keep a previous version of the server running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>
-        /// A <see cref="Task"/> which return
+        /// A <see cref="Task{StartServerResult}"/> which return
         /// <list type="ordered">
         /// <item>
         ///   <see cref="StartServerResult.AlreadyRunning"/> if the adb server was already
@@ -81,7 +81,7 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously gets the status of the adb server asynchronously.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
+        /// <returns>A <see cref="Task{AdbServerStatus}"/> which returns a <see cref="AdbServerStatus"/> object that describes the status of the adb server.</returns>
         Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken);
     }
 }

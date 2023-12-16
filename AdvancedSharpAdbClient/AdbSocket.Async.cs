@@ -358,7 +358,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">The data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task{Boolean}"/> which returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         protected virtual async Task<bool> WriteAsync(byte[] data, CancellationToken cancellationToken = default)
         {
@@ -381,7 +381,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="data">The data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
+        /// <returns>A <see cref="ValueTask{Boolean}"/> which returns <see langword="true"/> if all data was written; otherwise, <see langword="false"/>.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         protected virtual async ValueTask<bool> WriteAsync(Memory<byte> data, CancellationToken cancellationToken = default)
         {
@@ -403,7 +403,7 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously reads the response from ADB after a command.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
+        /// <returns>A <see cref="Task{AdbResponse}"/> which returns a <see cref="AdbResponse"/> that represents the response received from ADB.</returns>
         protected virtual async Task<AdbResponse> ReadAdbResponseInnerAsync(CancellationToken cancellationToken = default)
         {
             byte[] reply = new byte[4];

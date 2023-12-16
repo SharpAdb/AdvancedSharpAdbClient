@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="XmlDocument"/> containing current hierarchy.</returns>
+        /// <returns>A <see cref="Task{XmlDocument}"/> which returns a <see cref="XmlDocument"/> containing current hierarchy.</returns>
         public static Task<XmlDocument?> DumpScreenAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).DumpScreenAsync(cancellationToken);
 
@@ -79,31 +79,31 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        /// <returns>A <see cref="Task{AppStatus}"/> which returns the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
         public static Task<AppStatus> GetAppStatusAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).GetAppStatusAsync(packageName, cancellationToken);
 
         /// <summary>
-        /// Asynchronously get element by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Asynchronously get element by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
-        /// <returns>A <see cref="Task"/> which return the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
+        /// <returns>A <see cref="Task{Element}"/> which returns the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
         public static Task<Element?> FindElementAsync(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).FindElementAsync(xpath, cancellationToken);
 
         /// <summary>
-        /// Asynchronously get elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// Asynchronously get elements by xpath. You can specify the waiting time in timeout.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="xpath">The xpath of the elements.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
-        /// <returns>A <see cref="Task"/> which return the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
+        /// <returns>A <see cref="Task{IEnumerable}"/> which returns the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
         public static Task<IEnumerable<Element>> FindElementsAsync(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).FindElementsAsync(xpath, cancellationToken);
 
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to look for the file.</param>
         /// <param name="path">The path to the file.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
         public static async Task<FileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -207,7 +207,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to list the directory.</param>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         public static async Task<List<FileStatistics>> ListAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -259,7 +259,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device for which to get the property.</param>
         /// <param name="property">The name of property which to get.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return the value of the property on the device.</returns>
+        /// <returns>A <see cref="Task{String}"/> which returns the value of the property on the device.</returns>
         public static async Task<string> GetPropertyAsync(this IAdbClient client, DeviceData device, string property, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new();
@@ -273,7 +273,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the properties.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return a dictionary containing the properties of the device, and their values.</returns>
+        /// <returns>A <see cref="Task{Dictionary}"/> which returns a dictionary containing the properties of the device, and their values.</returns>
         public static async Task<Dictionary<string, string>> GetPropertiesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             GetPropReceiver receiver = new();
@@ -287,7 +287,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device for which to list the environment variables.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return the a dictionary containing the environment variables of the device, and their values.</returns>
+        /// <returns>A <see cref="Task{Dictionary}"/> which returns the a dictionary containing the environment variables of the device, and their values.</returns>
         public static async Task<Dictionary<string, string>> GetEnvironmentVariablesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnvironmentVariablesReceiver receiver = new();
@@ -384,7 +384,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return the <see cref="VersionInfo"/> of target application.</returns>
+        /// <returns>A <see cref="Task{VersionInfo}"/> which returns the <see cref="VersionInfo"/> of target application.</returns>
         public static Task<VersionInfo> GetPackageVersionAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -397,7 +397,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">A connection to ADB.</param>
         /// <param name="device">The device on which to list the processes that are running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which return the an <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
+        /// <returns>A <see cref="Task{IEnumerable}"/> which returns the an <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
         /// that are currently running on the device.</returns>
         public static async Task<IEnumerable<AndroidProcess>> ListProcessesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {

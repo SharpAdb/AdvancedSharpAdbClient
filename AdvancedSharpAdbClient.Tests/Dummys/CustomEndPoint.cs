@@ -5,7 +5,5 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Used by the <see cref="TcpSocketTests.CreateUnsupportedSocketTest"/> test.
     /// </summary>
-    internal class CustomEndPoint : EndPoint
-    {
-    }
+    internal class CustomEndPoint : EndPoint;
 }

@@ -108,13 +108,8 @@ namespace AdvancedSharpAdbClient.Tests
                 null,
                 async () =>
                 {
-                    List<FileStatistics> value = [];
                     using SyncService service = new(Socket, Device);
-                    await foreach (FileStatistics statistics in service.GetDirectoryAsyncListing("/storage"))
-                    {
-                        value.Add(statistics);
-                    }
-                    return value;
+                    return await service.GetDirectoryAsyncListing("/storage").ToListAsync();
                 });
 
             Assert.Equal(4, value.Count);

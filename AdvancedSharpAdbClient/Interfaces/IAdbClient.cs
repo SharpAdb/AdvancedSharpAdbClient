@@ -388,7 +388,5 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     [Obsolete($"{nameof(IAdbCommandLineClient)} is too long to remember. Please use {nameof(IAdbClient)} instead.")]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IAdvancedAdbClient : IAdbClient
-    {
-    }
+    public interface IAdvancedAdbClient : IAdbClient;
 }

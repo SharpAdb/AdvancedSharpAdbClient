@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return a <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
+        /// <returns>A <see cref="Task{Version}"/> which returns a <see cref="Version"/> object that contains the version number of the Android Command Line client.</returns>
         Task<Version> GetVersionAsync(CancellationToken cancellationToken);
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which return <see langword="true"/> if the <c>adb.exe</c> file is exists, otherwise <see langword="false"/>.</returns>
+        /// <returns>A <see cref="Task{Boolean}"/> which returns <see langword="true"/> if the <c>adb.exe</c> file is exists, otherwise <see langword="false"/>.</returns>
         Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken);
     }
 }

@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// </summary>
         /// <param name="tasks">The tasks to wait on for completion.</param>
         /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
-        public static Task WhenAll(IEnumerable<Task> tasks) =>
+        public static Task WhenAll(this IEnumerable<Task> tasks) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <typeparam name="TResult">The type of the completed task.</typeparam>
         /// <param name="tasks">The tasks to wait on for completion.</param>
         /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
-        public static Task<TResult[]> WhenAll<TResult>(IEnumerable<Task<TResult>> tasks) =>
+        public static Task<TResult[]> WhenAll<TResult>(this IEnumerable<Task<TResult>> tasks) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
 #else
