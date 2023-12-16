@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
@@ -25,6 +26,79 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// Gets or sets the version name of an Android application.
         /// </summary>
         public string VersionName { get; init; } = VersionName;
+
+        /// <summary>
+        /// Try to parse the <see cref="VersionName"/> into a <see cref="Version"/> object.
+        /// </summary>
+        /// <param name="version">The <see cref="Version"/> object.</param>
+        /// <returns><see langword="true"/> if the <see cref="VersionName"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
+        public readonly bool TryAsVersion(out Version? version)
+        {
+            int[] numbs = GetVersionNumbers(VersionName).Split('.', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).Take(4).ToArray();
+            switch (numbs.Length)
+            {
+                case 0:
+                    version = null;
+                    return false;
+                case 1:
+                    version = new Version(numbs[0], 0, 0, 0);
+                    break;
+                case 2:
+                    version = new Version(numbs[0], numbs[1], 0, 0);
+                    break;
+                case 3:
+                    version = new Version(numbs[0], numbs[1], numbs[2], 0);
+                    break;
+                case >= 4:
+                    version = new Version(numbs[0], numbs[1], numbs[2], numbs[3]);
+                    break;
+                default: goto case 0;
+            }
+            return true;
+        }
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Try to parse the <see cref="VersionName"/> into a <see cref="PackageVersion"/> object.
+        /// </summary>
+        /// <param name="version">The <see cref="PackageVersion"/> object.</param>
+        /// <returns><see langword="true"/> if the <see cref="VersionName"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
+        public readonly bool TryAsPackageVersion(out PackageVersion version)
+        {
+            ushort[] numbs = GetVersionNumbers(VersionName).Split('.', StringSplitOptions.RemoveEmptyEntries).Select(ushort.Parse).Take(4).ToArray();
+            switch (numbs.Length)
+            {
+                case 0:
+                    version = default;
+                    return false;
+                case 1:
+                    version = new PackageVersion { Major = numbs[0], Minor = 0, Build = 0, Revision = 0 };
+                    break;
+                case 2:
+                    version = new PackageVersion { Major = numbs[0], Minor = numbs[1], Build = 0, Revision = 0 };
+                    break;
+                case 3:
+                    version = new PackageVersion { Major = numbs[0], Minor = numbs[1], Build = numbs[2], Revision = 0 };
+                    break;
+                case >= 4:
+                    version = new PackageVersion { Major = numbs[0], Minor = numbs[1], Build = numbs[2], Revision = numbs[3] };
+                    break;
+                default: goto case 0;
+            }
+            return true;
+        }
+#endif
+
+        /// <summary>
+        /// Gets the version numbers from a string.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <returns>The version numbers.</returns>
+        private static string GetVersionNumbers(string version)
+        {
+            string allowedChars = "01234567890.";
+            return new string(version.Where(allowedChars.Contains).ToArray());
+        }
 
         /// <inheritdoc/>
         public readonly int Compare([NotNull] object? x, [NotNull] object? y) =>

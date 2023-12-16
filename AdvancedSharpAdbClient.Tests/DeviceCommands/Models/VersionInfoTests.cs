@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
 {
@@ -8,11 +9,61 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
     public class VersionInfoTests
     {
         /// <summary>
+        /// Tests the <see cref="VersionInfo.TryAsVersion(out Version?)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData(1231, "1.2.3.1", true)]
+        [InlineData(9393, "v9.3.9.3", true)]
+        [InlineData(9393, "9.3.9.3.9.3", true)]
+        [InlineData(3450, "One.3.Two.4.5", true)]
+        [InlineData(12345432, "Version", false)]
+        [InlineData(098765456, "Unknown", false)]
+        public void TryAsVersionTest(int versionCode, string versionName, bool expected)
+        {
+            bool result = new VersionInfo(versionCode, versionName).TryAsVersion(out Version version);
+            Assert.Equal(expected, result);
+            if (expected)
+            {
+                Assert.Equal(versionCode, version.Major * 1000 + version.Minor * 100 + version.Build * 10 + version.Revision);
+            }
+            else
+            {
+                Assert.Null(version);
+            }
+        }
+
+#if WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Tests the <see cref="VersionInfo.TryAsPackageVersion(out Windows.ApplicationModel.PackageVersion)"/> method.
+        /// </summary>
+        [Theory]
+        [InlineData(1231, "1.2.3.1", true)]
+        [InlineData(9393, "v9.3.9.3", true)]
+        [InlineData(9393, "9.3.9.3.9.3", true)]
+        [InlineData(3450, "One.3.Two.4.5", true)]
+        [InlineData(12345432, "Version", false)]
+        [InlineData(098765456, "Unknown", false)]
+        public void TryAsPackageVersionTest(int versionCode, string versionName, bool expected)
+        {
+            bool result = new VersionInfo(versionCode, versionName).TryAsPackageVersion(out Windows.ApplicationModel.PackageVersion version);
+            Assert.Equal(expected, result);
+            if (expected)
+            {
+                Assert.Equal(versionCode, version.Major * 1000 + version.Minor * 100 + version.Build * 10 + version.Revision);
+            }
+            else
+            {
+                Assert.Equal(default, version);
+            }
+        }
+#endif
+
+        /// <summary>
         /// Tests the <see cref="VersionInfo.Deconstruct(out int, out string)"/> method.
         /// </summary>
         [Theory]
         [InlineData(1231, "1.2.3.1")]
-        [InlineData(9393, "9.3.9.3")]
+        [InlineData(9393, "v9.3.9.3")]
         [InlineData(12345432, "Version")]
         [InlineData(098765456, "Unknown")]
         public void DeconstructTest(int versionCode, string versionName)
@@ -23,6 +74,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
             Assert.Equal(versionName, name);
         }
 
+        /// <summary>
+        /// Tests the <see cref="VersionInfo.ToString"/> method.
+        /// </summary>
         [Fact]
         public void ToStringTest()
         {
