@@ -208,5 +208,77 @@ namespace AdvancedSharpAdbClient.Tests
                     await service.PushAsync(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null);
                 });
         }
+
+#if WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void PullWinRTAsyncTest()
+        {
+            using InMemoryRandomAccessStream stream = new();
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] contentLength = BitConverter.GetBytes(content.Length);
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [
+                    (SyncCommand.STAT, "/fstab.donatello"),
+                    (SyncCommand.RECV, "/fstab.donatello")
+                ],
+                [SyncCommand.STAT, SyncCommand.DATA, SyncCommand.DONE],
+                [
+                    [160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0],
+                    contentLength,
+                    content
+                ],
+                null,
+                async () =>
+                {
+                    using SyncService service = new(Socket, Device);
+                    await service.PullAsync("/fstab.donatello", stream, null);
+                });
+
+            IBuffer buffer = await stream.GetInputStreamAt(0).ReadAsync(new byte[(int)stream.Size].AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+            // Make sure the data that has been sent to the stream is the expected data
+            Assert.Equal(content, buffer.ToArray());
+        }
+
+        /// <summary>
+        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void PushWinRTAsyncTest()
+        {
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Fstab.bin"));
+            using IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync();
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] contentMessage =
+            [
+                .. SyncCommand.DATA.GetBytes(),
+                .. BitConverter.GetBytes(content.Length),
+                .. content,
+            ];
+
+            await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [
+                    (SyncCommand.SEND, "/sdcard/test,644"),
+                    (SyncCommand.DONE, "1446505200")
+                ],
+                [SyncCommand.OKAY],
+                null,
+                [contentMessage],
+                async () =>
+                {
+                    using SyncService service = new(Socket, Device);
+                    await service.PushAsync(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null);
+                });
+        }
+#endif
     }
 }
