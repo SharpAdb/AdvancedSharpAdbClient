@@ -779,6 +779,334 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Asynchronously installs an Android application on an device.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(apk);
+
+            if (!apk.CanRead)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
+            }
+
+            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install'");
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            // add size parameter [required for streaming installs]
+            // do last to override any user specified value
+            _ = requestBuilder.Append($" -S {apk.Size}");
+
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            byte[] buffer = new byte[32 * 1024];
+
+            ulong totalBytesToProcess = apk.Size;
+            ulong totalBytesRead = 0;
+
+            while (true)
+            {
+                IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
+                if (results.Length == 0) { break; }
+                await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+                totalBytesRead += results.Length;
+                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
+            }
+            progress?.Report(new InstallProgressEventArgs(1, 1, 100));
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
+
+            if (!value.Contains("Success"))
+            {
+                throw new AdbException(value);
+            }
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+        }
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseAPK">A <see cref="IRandomAccessStream"/> which represents the base APK to install.</param>
+        /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public virtual async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(baseAPK);
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
+
+            if (!baseAPK.CanRead)
+            {
+                throw new ArgumentOutOfRangeException(nameof(baseAPK), "The apk stream must be a readable stream");
+            }
+
+            if (splitAPKs.Any(apk => apk == null || !apk.CanRead))
+            {
+                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable stream");
+            }
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            string session = await InstallCreateAsync(device, null, cancellationToken, arguments).ConfigureAwait(false);
+
+            int splitAPKsCount = splitAPKs.Count();
+            void OnMainSyncProgressChanged(string? sender, double args) =>
+                progress?.Report(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
+
+            await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged, cancellationToken).ConfigureAwait(false);
+
+            int progressCount = 1;
+            Dictionary<string, double> status = new(splitAPKsCount);
+            void OnSplitSyncProgressChanged(string? sender, double args)
+            {
+                lock (status)
+                {
+                    if (sender == null)
+                    {
+                        progressCount++;
+                    }
+                    else if (sender is string path)
+                    {
+                        status[path] = args;
+                    }
+                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
+                }
+            }
+
+            int i = 0;
+            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+        }
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(splitAPKs);
+            ExceptionExtensions.ThrowIfNull(packageName);
+
+            if (splitAPKs.Any(apk => apk == null || !apk.CanRead))
+            {
+                throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable stream");
+            }
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
+
+            int progressCount = 0;
+            int splitAPKsCount = splitAPKs.Count();
+            Dictionary<string, double> status = new(splitAPKsCount);
+            void OnSyncProgressChanged(string? sender, double args)
+            {
+                lock (status)
+                {
+                    if (sender == null)
+                    {
+                        progressCount++;
+                    }
+                    else if (sender is string path)
+                    {
+                        status[path] = args;
+                    }
+                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                }
+            }
+
+            int i = 0;
+            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
+            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+        }
+
+        /// <summary>
+        /// Asynchronously write an apk into the given install session.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
+        {
+            progress?.Report(0);
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(apk);
+            ExceptionExtensions.ThrowIfNull(apkName);
+            ExceptionExtensions.ThrowIfNull(session);
+
+            if (!apk.CanRead)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
+            }
+
+            StringBuilder requestBuilder =
+                new StringBuilder().Append($"exec:cmd package 'install-write'")
+                                   // add size parameter [required for streaming installs]
+                                   // do last to override any user specified value
+                                   .AppendFormat(" -S {0}", apk.Size)
+                                   .AppendFormat(" {0} {1}.apk", session, apkName);
+
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            byte[] buffer = new byte[32 * 1024];
+
+            ulong totalBytesToProcess = apk.Size;
+            ulong totalBytesRead = 0;
+
+            while (true)
+            {
+                IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
+                if (results.Length == 0) { break; }
+                await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+                totalBytesRead += results.Length;
+                progress?.Report(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+            }
+
+            int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
+
+            if (!value.Contains("Success"))
+            {
+                throw new AdbException(value);
+            }
+            progress?.Report(100);
+        }
+
+        /// <summary>
+        /// Asynchronously write an apk into the given install session.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        protected virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<string?, double>? progress, CancellationToken cancellationToken = default)
+        {
+            progress?.Invoke(apkName, 0);
+
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(apk);
+            ExceptionExtensions.ThrowIfNull(apkName);
+            ExceptionExtensions.ThrowIfNull(session);
+
+            if (!apk.CanRead)
+            {
+                throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
+            }
+
+            StringBuilder requestBuilder =
+                new StringBuilder().Append($"exec:cmd package 'install-write'")
+                                   // add size parameter [required for streaming installs]
+                                   // do last to override any user specified value
+                                   .AppendFormat(" -S {0}", apk.Size)
+                                   .AppendFormat(" {0} {1}.apk", session, apkName);
+
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            byte[] buffer = new byte[32 * 1024];
+
+            ulong totalBytesToProcess = apk.Size;
+            ulong totalBytesRead = 0;
+
+            while (true)
+            {
+                IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
+                if (results.Length == 0) { break; }
+                await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+                totalBytesRead += results.Length;
+                progress?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+            }
+            progress?.Invoke(apkName, 100);
+
+            int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            string value =
+#if HAS_BUFFERS
+                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+#else
+                Encoding.UTF8.GetString(buffer, 0, read);
+#endif
+
+            if (!value.Contains("Success"))
+            {
+                throw new AdbException(value);
+            }
+            progress?.Invoke(null, 100);
+        }
+#endif
+
         /// <inheritdoc/>
         public virtual async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
         {
