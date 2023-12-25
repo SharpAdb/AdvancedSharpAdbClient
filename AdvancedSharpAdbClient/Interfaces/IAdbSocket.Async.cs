@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="data">An array of type Byte that is the storage location for the received data.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
-        /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
+        /// <returns>A <see cref="ValueTask{Int32}"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
         public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
         {
             byte[] bytes = new byte[data.Length];

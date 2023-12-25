@@ -294,16 +294,7 @@ namespace AdvancedSharpAdbClient
             byte[] reply = new byte[4];
             _ = Read(reply);
 
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(reply);
-            }
-
-#if HAS_BUFFERS
-            int len = BitConverter.ToInt32(reply);
-#else
-            int len = BitConverter.ToInt32(reply, 0);
-#endif
+            int len = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
             // And get the string
             reply = new byte[len];
@@ -503,7 +494,7 @@ namespace AdvancedSharpAdbClient
             string result;
             try
             {
-                result = Encoding.ASCII.GetString(reply);
+                result = AdbClient.Encoding.GetString(reply);
             }
             catch (DecoderFallbackException e)
             {
@@ -524,7 +515,7 @@ namespace AdvancedSharpAdbClient
             string result;
             try
             {
-                result = Encoding.ASCII.GetString(reply);
+                result = AdbClient.Encoding.GetString(reply);
             }
             catch (DecoderFallbackException e)
             {

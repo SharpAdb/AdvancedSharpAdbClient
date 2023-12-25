@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
 
 #if WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
-        /// Tests the <see cref="VersionInfo.TryAsPackageVersion(out Windows.ApplicationModel.PackageVersion)"/> method.
+        /// Tests the <see cref="VersionInfo.TryAsPackageVersion(out PackageVersion)"/> method.
         /// </summary>
         [Theory]
         [InlineData(1231, "1.2.3.1", true)]
@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
         [InlineData(098765456, "Unknown", false)]
         public void TryAsPackageVersionTest(int versionCode, string versionName, bool expected)
         {
-            bool result = new VersionInfo(versionCode, versionName).TryAsPackageVersion(out Windows.ApplicationModel.PackageVersion version);
+            bool result = new VersionInfo(versionCode, versionName).TryAsPackageVersion(out PackageVersion version);
             Assert.Equal(expected, result);
             if (expected)
             {

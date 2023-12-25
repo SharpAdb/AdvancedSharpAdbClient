@@ -4,8 +4,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.Logs
 {
@@ -27,14 +27,13 @@ namespace AdvancedSharpAdbClient.Logs
         public virtual LogEntry? ReadEntry()
         {
             // Read the log data in binary format. This format is defined at
-            // https://android.googlesource.com/platform/system/core/+/master/include/log/logger.h
-            // https://android.googlesource.com/platform/system/core/+/67d7eaf/include/log/logger.h
+            // https://android.googlesource.com/platform/system/logging/+/refs/heads/main/liblog/include/log/log_read.h#39
             ushort? payloadLengthValue = ReadUInt16();
             ushort? headerSizeValue = payloadLengthValue == null ? null : ReadUInt16();
             int? pidValue = headerSizeValue == null ? null : ReadInt32();
-            int? tidValue = pidValue == null ? null : ReadInt32();
-            int? secValue = tidValue == null ? null : ReadInt32();
-            int? nsecValue = secValue == null ? null : ReadInt32();
+            uint? tidValue = pidValue == null ? null : ReadUInt32();
+            uint? secValue = tidValue == null ? null : ReadUInt32();
+            uint? nsecValue = secValue == null ? null : ReadUInt32();
 
             if (nsecValue == null)
             {
@@ -44,15 +43,16 @@ namespace AdvancedSharpAdbClient.Logs
             ushort payloadLength = payloadLengthValue!.Value;
             ushort headerSize = headerSizeValue!.Value;
             int pid = pidValue!.Value;
-            int tid = tidValue!.Value;
-            int sec = secValue!.Value;
-            int nsec = nsecValue.Value;
+            uint tid = tidValue!.Value;
+            uint sec = secValue!.Value;
+            uint nsec = nsecValue.Value;
 
             // If the headerSize is not 0, we have on of the logger_entry_v* objects.
             // In all cases, it appears that they always start with a two uint16's giving the
             // header size and payload length.
             // For both objects, the size should be 0x18
-            uint id = 0;
+            LogId id = 0;
+            uint uid = 0;
 
             if (headerSize != 0)
             {
@@ -65,7 +65,8 @@ namespace AdvancedSharpAdbClient.Logs
                         return null;
                     }
 
-                    id = idValue.Value;
+                    uid = idValue.Value;
+                    id = (LogId)uid;
                 }
 
                 if (headerSize >= 0x1c)
@@ -77,18 +78,21 @@ namespace AdvancedSharpAdbClient.Logs
                         return null;
                     }
 
-                    _ = uidValue.Value;
-                }
-
-                if (headerSize >= 0x20)
-                {
-                    // Not sure what this is.
-                    _ = ReadUInt32();
+                    uid = uidValue.Value;
                 }
 
                 if (headerSize > 0x20)
                 {
-                    throw new AdbException($"An error occurred while reading data from the ADB stream. Although the header size was expected to be 0x18, a header size of 0x{headerSize:X} was sent by the device");
+                    if (headerSize == 0x20)
+                    {
+                        // Not sure what this is.
+                        _ = ReadUInt32();
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"An error occurred while reading data from the ADB stream. Although the header size was expected to be 0x18, a header size of 0x{headerSize:X} was sent by the device");
+                        return null;
+                    }
                 }
             }
 
@@ -101,54 +105,54 @@ namespace AdvancedSharpAdbClient.Logs
 
             DateTimeOffset timestamp = DateTimeExtensions.FromUnixTimeSeconds(sec);
 
-            switch ((LogId)id)
+            switch (id)
             {
-                case LogId.Crash
-                    or LogId.Kernel
-                    or LogId.Main
-                    or LogId.Radio
-                    or LogId.System:
+                case >= LogId.Min and <= LogId.Max and not LogId.Events:
+                    // format: <priority:1><tag:N>\0<message:N>\0
+                    byte priority = data[0];
+
+                    // Find the first \0 byte in the array. This is the separator
+                    // between the tag and the actual message
+                    int tagEnd = 1;
+
+                    while (data[tagEnd] != '\0' && tagEnd < data.Length)
                     {
-                        // format: <priority:1><tag:N>\0<message:N>\0
-                        byte priority = data[0];
-
-                        // Find the first \0 byte in the array. This is the separator
-                        // between the tag and the actual message
-                        int tagEnd = 1;
-
-                        while (data[tagEnd] != '\0' && tagEnd < data.Length)
-                        {
-                            tagEnd++;
-                        }
-
-                        // Message should be null terminated, so remove the last entry, too (-2 instead of -1)
-                        string tag = Encoding.ASCII.GetString(data, 1, tagEnd - 1);
-                        string message = Encoding.ASCII.GetString(data, tagEnd + 1, data.Length - tagEnd - 2);
-
-                        return new AndroidLogEntry
-                        {
-                            Data = data,
-                            ProcessId = pid,
-                            ThreadId = tid,
-                            TimeStamp = timestamp,
-                            NanoSeconds = nsec,
-                            Id = id,
-                            Priority = (Priority)priority,
-                            Message = message,
-                            Tag = tag
-                        };
+                        tagEnd++;
                     }
+
+                    // Message should be null terminated, so remove the last entry, too (-2 instead of -1)
+                    string tag = AdbClient.Encoding.GetString(data, 1, tagEnd - 1);
+                    string message = AdbClient.Encoding.GetString(data, tagEnd + 1, data.Length - tagEnd - 2);
+
+                    return new AndroidLogEntry
+                    {
+                        Data = data,
+                        PayloadLength = payloadLength,
+                        HeaderSize = headerSize,
+                        ProcessId = pid,
+                        ThreadId = tid,
+                        TimeStamp = timestamp,
+                        NanoSeconds = nsec,
+                        Id = id,
+                        Uid = uid,
+                        Priority = (Priority)priority,
+                        Message = message,
+                        Tag = tag
+                    };
 
                 case LogId.Events:
                     // https://android.googlesource.com/platform/system/core.git/+/master/liblog/logprint.c#547
                     EventLogEntry entry = new()
                     {
                         Data = data,
+                        PayloadLength = payloadLength,
+                        HeaderSize = headerSize,
                         ProcessId = pid,
                         ThreadId = tid,
                         TimeStamp = timestamp,
                         NanoSeconds = nsec,
-                        Id = id
+                        Id = id,
+                        Uid = uid
                     };
 
                     // Use a stream on the data buffer. This will make sure that,
@@ -157,7 +161,7 @@ namespace AdvancedSharpAdbClient.Logs
                     using (MemoryStream dataStream = new(data))
                     {
                         using BinaryReader reader = new(dataStream);
-                        int priority = reader.ReadInt32();
+                        _ = reader.ReadInt32();
 
                         while (dataStream.Position < dataStream.Length)
                         {
@@ -171,11 +175,14 @@ namespace AdvancedSharpAdbClient.Logs
                     return new LogEntry
                     {
                         Data = data,
+                        PayloadLength = payloadLength,
+                        HeaderSize = headerSize,
                         ProcessId = pid,
                         ThreadId = tid,
                         TimeStamp = timestamp,
                         NanoSeconds = nsec,
-                        Id = id
+                        Id = id,
+                        Uid = uid
                     };
             }
         }
@@ -183,16 +190,12 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Reads a single log entry from the stream.
         /// </summary>
-        protected void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
+        protected static void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
         {
             EventLogType type = (EventLogType)reader.ReadByte();
 
             switch (type)
             {
-                case EventLogType.Float:
-                    parent.Add(reader.ReadSingle());
-                    break;
-
                 case EventLogType.Integer:
                     parent.Add(reader.ReadInt32());
                     break;
@@ -201,9 +204,16 @@ namespace AdvancedSharpAdbClient.Logs
                     parent.Add(reader.ReadInt64());
                     break;
 
+                case EventLogType.String:
+                    int stringLength = reader.ReadInt32();
+                    byte[] messageData = reader.ReadBytes(stringLength);
+                    string message = AdbClient.Encoding.GetString(messageData);
+                    parent.Add(message);
+                    break;
+
                 case EventLogType.List:
                     byte listLength = reader.ReadByte();
-                    List<object> list = [];
+                    List<object> list = new(listLength);
                     for (int i = 0; i < listLength; i++)
                     {
                         ReadLogEntry(reader, list);
@@ -211,11 +221,8 @@ namespace AdvancedSharpAdbClient.Logs
                     parent.Add(list);
                     break;
 
-                case EventLogType.String:
-                    int stringLength = reader.ReadInt32();
-                    byte[] messageData = reader.ReadBytes(stringLength);
-                    string message = Encoding.ASCII.GetString(messageData);
-                    parent.Add(message);
+                case EventLogType.Float:
+                    parent.Add(reader.ReadSingle());
                     break;
             }
         }
@@ -227,13 +234,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected ushort? ReadUInt16()
         {
             byte[]? data = ReadBytesSafe(2);
-
-            return data == null ? null
-#if HAS_BUFFERS
-                : BitConverter.ToUInt16(data);
-#else
-                : BitConverter.ToUInt16(data, 0);
-#endif
+            return data == null ? null : (ushort)(data[0] | (data[1] << 8));
         }
 
         /// <summary>
@@ -243,13 +244,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected uint? ReadUInt32()
         {
             byte[]? data = ReadBytesSafe(4);
-
-            return data == null ? null
-#if HAS_BUFFERS
-                : BitConverter.ToUInt32(data);
-#else
-                : BitConverter.ToUInt32(data, 0);
-#endif
+            return data == null ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
         }
 
         /// <summary>
@@ -259,13 +254,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected int? ReadInt32()
         {
             byte[]? data = ReadBytesSafe(4);
-
-            return data == null ? null
-#if HAS_BUFFERS
-                : BitConverter.ToInt32(data);
-#else
-                : BitConverter.ToInt32(data, 0);
-#endif
+            return data == null ? null : data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
         }
 
         /// <summary>
@@ -280,7 +269,7 @@ namespace AdvancedSharpAdbClient.Logs
 
             int read;
 #if HAS_BUFFERS
-            while ((read = stream.Read(data.AsSpan(totalRead, count - totalRead))) > 0)
+            while ((read = stream.Read(data.AsSpan(totalRead))) > 0)
 #else
             while ((read = stream.Read(data, totalRead, count - totalRead)) > 0)
 #endif

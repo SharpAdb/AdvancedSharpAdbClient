@@ -264,8 +264,9 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to run the event log service.</param>
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        void RunLogService(DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames);
+        void RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames);
 
         /// <summary>
         /// Reboots the specified device in to the specified mode.
@@ -316,7 +317,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        void Install(DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
+        void Install(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -327,7 +328,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
+        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -338,7 +339,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress, params string[] arguments);
+        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
@@ -358,7 +359,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="session">The session ID of the install session.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
-        void InstallWrite(DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress);
+        void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<double>? progress);
 
         /// <summary>
         /// Commit the given active install session, installing the app.

@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient
                 await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
 #endif
                 // Let the caller know about our progress, if requested
-                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();
@@ -119,19 +119,19 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remoteFilePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(remoteFilePath);
+            ExceptionExtensions.ThrowIfNull(remotePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = await StatAsync(remoteFilePath, cancellationToken).ConfigureAwait(false);
+            FileStatistics stat = await StatAsync(remotePath, cancellationToken).ConfigureAwait(false);
             long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
-            await Socket.SendSyncRequestAsync(SyncCommand.RECV, remoteFilePath, cancellationToken).ConfigureAwait(false);
+            await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
 
             while (true)
             {
@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
                         goto finish;
                     case SyncCommand.FAIL:
                         string message = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
-                        throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
+                        throw new AdbException($"Failed to pull '{remotePath}'. {message}");
                     case not SyncCommand.DATA:
                         throw new AdbException($"The server sent an invalid response {response}");
                 }
@@ -152,17 +152,7 @@ namespace AdvancedSharpAdbClient
                 byte[] reply = new byte[4];
                 _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(reply);
-                }
-
-                int size =
-#if HAS_BUFFERS
-                    BitConverter.ToInt32(reply);
-#else
-                    BitConverter.ToInt32(reply, 0);
-#endif
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)
                 {
@@ -180,7 +170,7 @@ namespace AdvancedSharpAdbClient
                 totalBytesRead += size;
 
                 // Let the caller know about our progress, if requested
-                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();
@@ -188,6 +178,164 @@ namespace AdvancedSharpAdbClient
 
             finish: return;
         }
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <inheritdoc/>
+        public virtual async Task PushAsync(IInputStream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(stream);
+            ExceptionExtensions.ThrowIfNull(remotePath);
+
+            if (remotePath.Length > MaxPathLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
+            }
+
+            await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permissions, cancellationToken).ConfigureAwait(false);
+
+            // create the buffer used to read.
+            // we read max SYNC_DATA_MAX.
+            byte[] buffer = new byte[MaxBufferSize];
+
+            // We need 4 bytes of the buffer to send the 'DATA' command,
+            // and an additional X bytes to inform how much data we are
+            // sending.
+            byte[] dataBytes = SyncCommand.DATA.GetBytes();
+            byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
+            int headerSize = dataBytes.Length + lengthBytes.Length;
+            int reservedHeaderSize = headerSize;
+            int maxDataSize = MaxBufferSize - reservedHeaderSize;
+            lengthBytes = BitConverter.GetBytes(maxDataSize);
+
+            // Try to get the total amount of bytes to transfer. This is not always possible, for example,
+            // for forward-only streams.
+            ulong totalBytesToProcess = 0;
+            ulong totalBytesRead = 0;
+
+            try
+            {
+                if (stream is IRandomAccessStream random)
+                {
+                    totalBytesRead = random.Size;
+                }
+            }
+            catch { }
+
+            // look while there is something to read
+            while (true)
+            {
+                // read up to SYNC_DATA_MAX
+                IBuffer results = await stream.ReadAsync(buffer.AsBuffer(headerSize, maxDataSize), (uint)maxDataSize, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
+                uint read = results.Length;
+                totalBytesRead += read;
+
+                if (read == 0)
+                {
+                    break;
+                }
+                else if (read != maxDataSize)
+                {
+                    // At the end of the line, so we need to recalculate the length of the header
+                    lengthBytes = BitConverter.GetBytes(read);
+                    headerSize = dataBytes.Length + lengthBytes.Length;
+                }
+
+                int startPosition = reservedHeaderSize - headerSize;
+
+                Buffer.BlockCopy(dataBytes, 0, buffer, startPosition, dataBytes.Length);
+                Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
+
+                // now send the data to the device
+#if HAS_BUFFERS
+                await Socket.SendAsync(buffer.AsMemory(startPosition, (int)(read + dataBytes.Length + lengthBytes.Length)), cancellationToken).ConfigureAwait(false);
+#else
+                await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
+#endif
+                // Let the caller know about our progress, if requested
+                progress?.Invoke(new SyncProgressChangedEventArgs((long)totalBytesRead, (long)totalBytesToProcess));
+
+                // check if we're canceled
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            // create the DONE message
+            int time = (int)timestamp.ToUnixTimeSeconds();
+            await Socket.SendSyncRequestAsync(SyncCommand.DONE, time, cancellationToken).ConfigureAwait(false);
+
+            // read the result, in a byte array containing 2 int
+            // (id, size)
+            SyncCommand result = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            switch (result)
+            {
+                case SyncCommand.FAIL:
+                    string message = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
+                    throw new AdbException(message);
+                case not SyncCommand.OKAY:
+                    throw new AdbException($"The server sent an invalid response {result}");
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(remotePath);
+            ExceptionExtensions.ThrowIfNull(stream);
+
+            // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
+            FileStatistics stat = await StatAsync(remotePath, cancellationToken).ConfigureAwait(false);
+            long totalBytesToProcess = stat.Size;
+            long totalBytesRead = 0;
+
+            byte[] buffer = new byte[MaxBufferSize];
+
+            await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
+
+            while (true)
+            {
+                SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+
+                switch (response)
+                {
+                    case SyncCommand.DONE:
+                        goto finish;
+                    case SyncCommand.FAIL:
+                        string message = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
+                        throw new AdbException($"Failed to pull '{remotePath}'. {message}");
+                    case not SyncCommand.DATA:
+                        throw new AdbException($"The server sent an invalid response {response}");
+                }
+
+                // The first 4 bytes contain the length of the data packet
+                byte[] reply = new byte[4];
+                _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+                
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+
+                if (size > MaxBufferSize)
+                {
+                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
+                }
+
+                // now read the length we received
+#if HAS_BUFFERS
+                await Socket.ReadAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
+#else
+                await Socket.ReadAsync(buffer, size, cancellationToken).ConfigureAwait(false);
+#endif
+                uint write = await stream.WriteAsync(buffer.AsBuffer(0, size)).AsTask(cancellationToken).ConfigureAwait(false);
+                totalBytesRead += write;
+
+                // Let the caller know about our progress, if requested
+                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+
+                // check if we're canceled
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
+            finish: return;
+        }
+#endif
 
         /// <inheritdoc/>
         public virtual async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)

@@ -40,6 +40,9 @@ namespace AdvancedSharpAdbClient
     /// </code>
     /// </example>
     public partial class SyncService : ISyncService
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        , ISyncService.IWinRT
+#endif
     {
         /// <summary>
         /// The maximum length of a path on the remote device.
@@ -124,7 +127,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -187,7 +190,7 @@ namespace AdvancedSharpAdbClient
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 #endif
                 // Let the caller know about our progress, if requested
-                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             // create the DONE message
@@ -209,7 +212,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
+        public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
@@ -242,17 +245,7 @@ namespace AdvancedSharpAdbClient
                 byte[] reply = new byte[4];
                 _ = Socket.Read(reply);
 
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(reply);
-                }
-
-                int size =
-#if HAS_BUFFERS
-                    BitConverter.ToInt32(reply);
-#else
-                    BitConverter.ToInt32(reply, 0);
-#endif
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)
                 {
@@ -270,7 +263,7 @@ namespace AdvancedSharpAdbClient
                 totalBytesRead += size;
 
                 // Let the caller know about our progress, if requested
-                progress?.Report(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             finish: return;

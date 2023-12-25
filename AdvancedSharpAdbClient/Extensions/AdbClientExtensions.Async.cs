@@ -4,12 +4,14 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
-    public static partial class AdbClientExtensions
+    public partial class AdbClientExtensions
     {
         /// <summary>
         /// Asynchronously asks the ADB server to forward local connections from <paramref name="local"/>
@@ -265,6 +267,151 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
         public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default) =>
             client.ConnectAsync(Extensions.CreateDnsEndPoint(host, port), cancellationToken);
+
+#if !NETFRAMEWORK || NET40_OR_GREATER
+        /// <summary>
+        /// Asynchronously runs the event log service on a device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, params LogId[] logNames) =>
+            client.RunLogServiceAsync(device, messageSink.Report, default, logNames);
+
+        /// <summary>
+        /// Asynchronously runs the event log service on a device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames) =>
+            client.RunLogServiceAsync(device, messageSink.Report, cancellationToken, logNames);
+
+        /// <summary>
+        /// Asynchronously installs an Android application on an device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallAsync(this IAdbClient client, DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallAsync(device, apk, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallMultipleAsync(device, baseAPK, splitAPKs, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallMultipleAsync(device, splitAPKs, packageName, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously write an apk into the given install session.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallWriteAsync(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
+            client.InstallWriteAsync(device, apk, apkName, session, progress == null ? null : progress.Report, cancellationToken);
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Asynchronously installs an Android application on an device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallAsync(device, apk, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseAPK">A <see cref="IRandomAccessStream"/> which represents the base APK to install.</param>
+        /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallMultipleAsync(device, baseAPK, splitAPKs, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+            client.InstallMultipleAsync(device, splitAPKs, packageName, progress == null ? null : progress.Report, cancellationToken, arguments);
+
+        /// <summary>
+        /// Asynchronously write an apk into the given install session.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallWriteAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
+            client.InstallWriteAsync(device, apk, apkName, session, progress == null ? null : progress.Report, cancellationToken);
+#endif
+#endif
 
         /// <summary>
         /// Like "install", but starts an install session synchronously.

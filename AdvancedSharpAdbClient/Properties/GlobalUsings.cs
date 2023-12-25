@@ -17,6 +17,7 @@ global using System.Numerics;
 #endif
 
 #if WINDOWS_UWP
+global using System.Runtime.InteropServices.WindowsRuntime;
 global using Windows.ApplicationModel;
 global using Windows.Foundation;
 global using Windows.Foundation.Metadata;
@@ -37,7 +38,9 @@ global using Point = AdvancedSharpAdbClient.Polyfills.Point;
 #endif
 
 #if WINDOWS10_0_17763_0_OR_GREATER
+global using System.Runtime.InteropServices.WindowsRuntime;
 global using Windows.ApplicationModel;
+global using Windows.Storage.Streams;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
 global using Point = System.Drawing.Point;

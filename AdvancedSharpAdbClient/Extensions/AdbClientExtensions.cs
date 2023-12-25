@@ -3,6 +3,8 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace AdvancedSharpAdbClient
@@ -26,6 +28,33 @@ namespace AdvancedSharpAdbClient
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         public static int CreateForward(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
             client.CreateForward(device, local.ToString(), remote.ToString(), allowRebind);
+
+        /// <summary>
+        /// Creates a port forwarding between a local and a remote port.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="localPort">The local port to forward.</param>
+        /// <param name="remotePort">The remote port to forward to</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
+        /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
+        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort) =>
+            client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
+
+        /// <summary>
+        /// Forwards a remote Unix socket to a local TCP socket.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device to which to forward the connections.</param>
+        /// <param name="localPort">The local port to forward.</param>
+        /// <param name="remoteSocket">The remote Unix socket.</param>
+        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
+        /// which has been opened. In all other cases, <c>0</c>.</returns>
+        /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
+        /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
+        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket) =>
+            client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
 
         /// <summary>
         /// Asks the ADB server to reverse forward local connections from <paramref name="remote"/>
@@ -115,31 +144,14 @@ namespace AdvancedSharpAdbClient
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
         /// <summary>
-        /// Creates a port forwarding between a local and a remote port.
+        /// Runs the event log service on a device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device to which to forward the connections.</param>
-        /// <param name="localPort">The local port to forward.</param>
-        /// <param name="remotePort">The remote port to forward to</param>
-        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.</returns>
-        /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
-        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort) =>
-            client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
-
-        /// <summary>
-        /// Forwards a remote Unix socket to a local TCP socket.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="device">The device to which to forward the connections.</param>
-        /// <param name="localPort">The local port to forward.</param>
-        /// <param name="remoteSocket">The remote Unix socket.</param>
-        /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
-        /// which has been opened. In all other cases, <c>0</c>.</returns>
-        /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
-        /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
-        public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket) =>
-            client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        public static void RunLogService(this IAdbClient client, DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
+            client.RunLogService(device, messageSink, false, logNames);
 
         /// <summary>
         /// Reboots the specified adb socket address.
@@ -224,5 +236,79 @@ namespace AdvancedSharpAdbClient
         /// <returns>The results from adb.</returns>
         public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort) =>
             client.Connect(Extensions.CreateDnsEndPoint(host, port));
+
+#if !NETFRAMEWORK || NET40_OR_GREATER
+        /// <summary>
+        /// Runs the event log service on a device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, params LogId[] logNames) =>
+            client.RunLogService(device, messageSink, false, logNames);
+
+        /// <summary>
+        /// Runs the event log service on a device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames) =>
+            client.RunLogService(device, messageSink.Report, isCancelled, logNames);
+
+        /// <summary>
+        /// Installs an Android application on an device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        public static void Install(this IAdbClient client, DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            client.Install(device, apk, progress == null ? null : progress.Report, arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        public static void InstallMultiple(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            client.InstallMultiple(device, baseAPK, splitAPKs, progress == null ? null : progress.Report, arguments);
+
+        /// <summary>
+        /// Push multiple APKs to the device and install them.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
+        /// <param name="packageName">The package name of the base APK to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        public static void InstallMultiple(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            client.InstallMultiple(device, splitAPKs, packageName, progress == null ? null : progress.Report, arguments);
+
+        /// <summary>
+        /// Write an apk into the given install session.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        public static void InstallWrite(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress) =>
+            client.InstallWrite(device, apk, apkName, session, progress == null ? null : progress.Report);
+#endif
     }
 }

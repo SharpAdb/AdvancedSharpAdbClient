@@ -748,7 +748,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, IProgress{InstallProgressEventArgs}?, string[])"/> method.
+        /// Tests the <see cref="AdbClient.Install(DeviceData, Stream, Action{InstallProgressEventArgs}?, string[])"/> method.
         /// </summary>
         [Fact]
         public void InstallTest()
@@ -796,7 +796,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, IEnumerable{Stream}, string, IProgress{InstallProgressEventArgs}?, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, IEnumerable{Stream}, string, Action{InstallProgressEventArgs}?, string[])"/> method.
         /// </summary>
         [Fact]
         public void InstallMultipleTest()
@@ -871,7 +871,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, Stream, IEnumerable{Stream}, IProgress{InstallProgressEventArgs}?, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultiple(DeviceData, Stream, IEnumerable{Stream}, Action{InstallProgressEventArgs}?, string[])"/> method.
         /// </summary>
         [Fact]
         public void InstallMultipleWithBaseTest()
@@ -987,7 +987,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string, IProgress{double}?)"/> method.
+        /// Tests the <see cref="AdbClient.InstallWrite(DeviceData, Stream, string, string, Action{double}?)"/> method.
         /// </summary>
         [Fact]
         public void InstallWriteTest()
