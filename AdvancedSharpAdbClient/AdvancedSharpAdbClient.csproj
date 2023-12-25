@@ -58,6 +58,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
+    <InternalsVisibleTo Include="AdvancedSharpAdbClient.WinRT" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,7 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PolySharp" Version="1.14.0" PrivateAssets="all" />
+    <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net2.0-client'
