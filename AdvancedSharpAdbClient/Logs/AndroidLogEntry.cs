@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Represents a standard Android log entry (an entry in any Android log buffer except the Event buffer).
     /// </summary>
-    /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/liblog/logprint.c#442"/></remarks>
+    /// <remarks><seealso href="https://android.googlesource.com/platform/system/logging/+/refs/heads/main/liblog/logprint.cpp"/></remarks>
     public class AndroidLogEntry : LogEntry
     {
         /// <summary>
@@ -22,7 +22,8 @@ namespace AdvancedSharpAdbClient.Logs
             { Priority.Info, 'I' },
             { Priority.Warn, 'W' },
             { Priority.Error, 'E' },
-            { Priority.Assert, 'A' }
+            { Priority.Fatal, 'F' },
+            { Priority.Silent, 'S' }
         };
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace AdvancedSharpAdbClient.Logs
 
         /// <inheritdoc/>
         public override string ToString() =>
-            $"{TimeStamp:yy-MM HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";
+            $"{TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {FormatPriority(Priority)} {Tag,-8}: {Message}";
 
         /// <summary>
         /// Converts a <see cref="Priority"/> value to a char that represents that value in the system log.

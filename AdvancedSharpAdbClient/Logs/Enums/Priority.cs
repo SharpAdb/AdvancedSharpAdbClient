@@ -7,37 +7,57 @@ namespace AdvancedSharpAdbClient.Logs
     /// <summary>
     /// Represents a log priority.
     /// </summary>
-    /// <remarks><seealso href="https://developer.android.com/reference/android/util/Log.html#ASSERT"/></remarks>
+    /// <remarks><seealso href="https://android.googlesource.com/platform/system/logging/+/refs/heads/main/liblog/include/android/log.h#73"/></remarks>
     public enum Priority : byte
     {
         /// <summary>
+        /// For internal use only.
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
+        /// The default priority, for internal use only.
+        /// </summary>
+        Default,
+
+        /// <summary>
         /// Represents a verbose message.
         /// </summary>
-        Verbose = 2,
+        Verbose,
 
         /// <summary>
         /// Represents a debug message.
         /// </summary>
-        Debug = 3,
+        Debug,
 
         /// <summary>
         /// Represents an informational message.
         /// </summary>
-        Info = 4,
+        Info,
 
         /// <summary>
         /// Represents a warning.
         /// </summary>
-        Warn = 5,
+        Warn,
 
         /// <summary>
         /// Represents an error.
         /// </summary>
-        Error = 6,
+        Error,
 
         /// <summary>
         /// Represents an assertion which failed.
         /// </summary>
-        Assert = 7
+        Fatal,
+
+        /// <summary>
+        /// Represents an assertion which failed.
+        /// </summary>
+        Assert = Fatal,
+
+        /// <summary>
+        /// For internal use only.
+        /// </summary>
+        Silent
     }
 }

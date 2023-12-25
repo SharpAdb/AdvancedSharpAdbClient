@@ -21,8 +21,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.IsType<AndroidLogEntry>(log);
 
             Assert.Equal(707, log.ProcessId);
-            Assert.Equal(1254, log.ThreadId);
-            Assert.Equal(3u, log.Id);
+            Assert.Equal(1254u, log.ThreadId);
+            Assert.Equal((LogId)3, log.Id);
             Assert.NotNull(log.Data);
             Assert.Equal(179, log.Data.Length);
             Assert.Equal(new DateTime(2015, 11, 14, 23, 38, 20, DateTimeKind.Utc), log.TimeStamp);
@@ -50,8 +50,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.IsType<AndroidLogEntry>(log);
 
             Assert.Equal(707, log.ProcessId);
-            Assert.Equal(1254, log.ThreadId);
-            Assert.Equal(3u, log.Id);
+            Assert.Equal(1254u, log.ThreadId);
+            Assert.Equal((LogId)3, log.Id);
             Assert.NotNull(log.Data);
             Assert.Equal(179, log.Data.Length);
             Assert.Equal(new DateTime(2015, 11, 14, 23, 38, 20, DateTimeKind.Utc), log.TimeStamp);
@@ -76,8 +76,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 
             Assert.IsType<EventLogEntry>(entry);
             Assert.Equal(707, entry.ProcessId);
-            Assert.Equal(1291, entry.ThreadId);
-            Assert.Equal(2u, entry.Id);
+            Assert.Equal(1291u, entry.ThreadId);
+            Assert.Equal((LogId)2, entry.Id);
             Assert.NotNull(entry.Data);
             Assert.Equal(39, entry.Data.Length);
             Assert.Equal(new DateTime(2015, 11, 16, 1, 48, 40, DateTimeKind.Utc), entry.TimeStamp);
@@ -110,8 +110,8 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 
             Assert.IsType<EventLogEntry>(entry);
             Assert.Equal(707, entry.ProcessId);
-            Assert.Equal(1291, entry.ThreadId);
-            Assert.Equal(2u, entry.Id);
+            Assert.Equal(1291u, entry.ThreadId);
+            Assert.Equal((LogId)2, entry.Id);
             Assert.NotNull(entry.Data);
             Assert.Equal(39, entry.Data.Length);
             Assert.Equal(new DateTime(2015, 11, 16, 1, 48, 40, DateTimeKind.Utc), entry.TimeStamp);

@@ -401,9 +401,9 @@ namespace AdvancedSharpAdbClient
 
             string responseMessage =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
@@ -477,9 +477,9 @@ namespace AdvancedSharpAdbClient
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -677,9 +677,9 @@ namespace AdvancedSharpAdbClient
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -750,9 +750,9 @@ namespace AdvancedSharpAdbClient
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -832,9 +832,9 @@ namespace AdvancedSharpAdbClient
             int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -987,9 +987,9 @@ namespace AdvancedSharpAdbClient
             int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -1055,9 +1055,9 @@ namespace AdvancedSharpAdbClient
             int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))

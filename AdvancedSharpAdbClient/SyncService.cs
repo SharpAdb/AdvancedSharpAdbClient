@@ -245,17 +245,7 @@ namespace AdvancedSharpAdbClient
                 byte[] reply = new byte[4];
                 _ = Socket.Read(reply);
 
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(reply);
-                }
-
-                int size =
-#if HAS_BUFFERS
-                    BitConverter.ToInt32(reply);
-#else
-                    BitConverter.ToInt32(reply, 0);
-#endif
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)
                 {

@@ -1,4 +1,4 @@
-﻿#if HAS_TASK && !NETFRAMEWORK || NET40_OR_GREATER
+﻿#if (HAS_TASK && !NETFRAMEWORK) || NET40_OR_GREATER
 // <copyright file="SyncServiceExtensions.Async.cs" company="The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere">
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>

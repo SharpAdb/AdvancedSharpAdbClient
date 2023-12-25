@@ -152,17 +152,7 @@ namespace AdvancedSharpAdbClient
                 byte[] reply = new byte[4];
                 _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(reply);
-                }
-
-                int size =
-#if HAS_BUFFERS
-                    BitConverter.ToInt32(reply);
-#else
-                    BitConverter.ToInt32(reply, 0);
-#endif
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)
                 {
@@ -319,18 +309,8 @@ namespace AdvancedSharpAdbClient
                 // The first 4 bytes contain the length of the data packet
                 byte[] reply = new byte[4];
                 _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(reply);
-                }
-
-                int size =
-#if HAS_BUFFERS
-                    BitConverter.ToInt32(reply);
-#else
-                    BitConverter.ToInt32(reply, 0);
-#endif
+                
+                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)
                 {

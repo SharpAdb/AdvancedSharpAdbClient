@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -57,7 +56,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
             Arguments = arguments;
 
-            this.SyncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
+            SyncServiceFactory = syncServiceFactory ?? Factories.SyncServiceFactory;
 
             if (!skipInit)
             {

@@ -13,7 +13,12 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// The main log buffer
         /// </summary>
-        Main,
+        Main = 0,
+
+        /// <summary>
+        /// The minimum log id.
+        /// </summary>
+        Min = Main,
 
         /// <summary>
         /// The buffer that contains radio/telephony related messages.
@@ -36,8 +41,33 @@ namespace AdvancedSharpAdbClient.Logs
         Crash,
 
         /// <summary>
+        /// The Android statistics log buffer.
+        /// </summary>
+        Stats,
+
+        /// <summary>
+        /// The Android security log buffer.
+        /// </summary>
+        Security,
+
+        /// <summary>
         /// The Android kernel log buffer.
         /// </summary>
-        Kernel
+        Kernel,
+
+        /// <summary>
+        /// The maximum log id.
+        /// </summary>
+        Max = Kernel,
+
+        /// <summary>
+        /// Let the logging function choose the best log target.
+        /// </summary>
+        Default = 0x7FFFFFFF,
+
+        /// <summary>
+        /// All Android log buffers.
+        /// </summary>
+        All = 0xFFFFFFFF
     }
 }

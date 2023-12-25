@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient
             }
 
             EndPoint = endPoint;
-            this.AdbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
+            AdbSocketFactory = adbSocketFactory ?? throw new ArgumentNullException(nameof(adbSocketFactory));
         }
 
         /// <summary>
@@ -550,9 +550,9 @@ namespace AdvancedSharpAdbClient
 
             string responseMessage =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
@@ -630,9 +630,9 @@ namespace AdvancedSharpAdbClient
             read = socket.Read(buffer);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -835,9 +835,9 @@ namespace AdvancedSharpAdbClient
             read = socket.Read(buffer);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
@@ -905,9 +905,9 @@ namespace AdvancedSharpAdbClient
             read = socket.Read(buffer);
             string value =
 #if HAS_BUFFERS
-                Encoding.UTF8.GetString(buffer.AsSpan(0, read));
+                Encoding.GetString(buffer.AsSpan(0, read));
 #else
-                Encoding.UTF8.GetString(buffer, 0, read);
+                Encoding.GetString(buffer, 0, read);
 #endif
 
             if (!value.Contains("Success"))
