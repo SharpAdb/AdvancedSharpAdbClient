@@ -389,6 +389,64 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns the list of all features supported by the current device.</returns>
         Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken);
 
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Provides access to the WinRT specific methods of the <see cref="IAdbClient"/> interface.
+        /// </summary>
+        public interface IWinRT
+        {
+            /// <summary>
+            /// Asynchronously installs an Android application on an device.
+            /// </summary>
+            /// <param name="device">The device on which to install the application.</param>
+            /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+            /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task InstallAsync(DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+
+            /// <summary>
+            /// Asynchronously push multiple APKs to the device and install them.
+            /// </summary>
+            /// <param name="device">The device on which to install the application.</param>
+            /// <param name="baseAPK">A <see cref="IRandomAccessStream"/> which represents the base APK to install.</param>
+            /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+            /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+
+            /// <summary>
+            /// Asynchronously push multiple APKs to the device and install them.
+            /// </summary>
+            /// <param name="device">The device on which to install the application.</param>
+            /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
+            /// <param name="packageName">The package name of the base APK to install.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+            /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+
+            /// <summary>
+            /// Asynchronously write an apk into the given install session.
+            /// </summary>
+            /// <param name="device">The device on which to install the application.</param>
+            /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
+            /// <param name="apkName">The name of the application.</param>
+            /// <param name="session">The session ID of the install session.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress, CancellationToken cancellationToken);
+        }
+#endif
     }
 }
 #endif

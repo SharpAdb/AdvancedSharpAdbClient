@@ -80,6 +80,36 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ReopenAsync(CancellationToken cancellationToken = default);
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <summary>
+        /// Provides access to the WinRT specific methods of the <see cref="ISyncService"/> interface.
+        /// </summary>
+        public interface IWinRT
+        {
+            /// <summary>
+            /// Asynchronously pushes (uploads) a file to the remote device.
+            /// </summary>
+            /// <param name="stream">A <see cref="IInputStream"/> that contains the contents of the file.</param>
+            /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+            /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
+            /// <param name="timestamp">The time at which the file was last modified.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task PushAsync(IInputStream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress, CancellationToken cancellationToken);
+
+            /// <summary>
+            /// Asynchronously pulls (downloads) a file from the remote device.
+            /// </summary>
+            /// <param name="remotePath">The path, on the device, of the file to pull.</param>
+            /// <param name="stream">A <see cref="IOutputStream"/> that will receive the contents of the file.</param>
+            /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+            /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+            /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            Task PullAsync(string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress, CancellationToken cancellationToken);
+        }
+#endif
     }
 }
 #endif

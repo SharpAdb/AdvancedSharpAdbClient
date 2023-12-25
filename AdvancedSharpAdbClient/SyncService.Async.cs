@@ -190,16 +190,7 @@ namespace AdvancedSharpAdbClient
         }
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        /// <summary>
-        /// Asynchronously pushes (uploads) a file to the remote device.
-        /// </summary>
-        /// <param name="stream">A <see cref="IInputStream"/> that contains the contents of the file.</param>
-        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
-        /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
-        /// <param name="timestamp">The time at which the file was last modified.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <inheritdoc/>
         public virtual async Task PushAsync(IInputStream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
@@ -266,7 +257,7 @@ namespace AdvancedSharpAdbClient
 
                 // now send the data to the device
 #if HAS_BUFFERS
-                await Socket.SendAsync(buffer.AsMemory(startPosition, (int)read + dataBytes.Length + lengthBytes.Length), cancellationToken).ConfigureAwait(false);
+                await Socket.SendAsync(buffer.AsMemory(startPosition, (int)(read + dataBytes.Length + lengthBytes.Length)), cancellationToken).ConfigureAwait(false);
 #else
                 await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
 #endif
@@ -295,14 +286,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        /// <summary>
-        /// Asynchronously pulls (downloads) a file from the remote device.
-        /// </summary>
-        /// <param name="remotePath">The path, on the device, of the file to pull.</param>
-        /// <param name="stream">A <see cref="IOutputStream"/> that will receive the contents of the file.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <inheritdoc/>
         public virtual async Task PullAsync(string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remotePath);

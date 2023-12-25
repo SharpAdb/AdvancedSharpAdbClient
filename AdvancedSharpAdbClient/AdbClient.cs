@@ -29,6 +29,9 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
     public partial class AdbClient : IAdbClient
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        , IAdbClient.IWinRT
+#endif
     {
         /// <summary>
         /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
