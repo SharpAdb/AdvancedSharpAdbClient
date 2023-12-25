@@ -640,7 +640,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallAsyncTest()
@@ -688,7 +688,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{Stream}, string, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{Stream}, string, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallMultipleAsyncTest()
@@ -747,7 +747,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, Stream, IEnumerable{Stream}, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, Stream, IEnumerable{Stream}, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallMultipleWithBaseAsyncTest()
@@ -847,7 +847,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, IProgress{double}?, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, Action{double}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void InstallWriteAsyncTest()
@@ -922,7 +922,7 @@ namespace AdvancedSharpAdbClient.Tests
 
 #if WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, IRandomAccessStream, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, IRandomAccessStream, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallWinRTAsyncTest()
@@ -971,7 +971,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{IRandomAccessStream}, string, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{IRandomAccessStream}, string, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallMultipleWinRTAsyncTest()
@@ -1031,7 +1031,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IRandomAccessStream, IEnumerable{IRandomAccessStream}, IProgress{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
+        /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IRandomAccessStream, IEnumerable{IRandomAccessStream}, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
         public async void InstallMultipleWinRTWithBaseAsyncTest()
@@ -1108,7 +1108,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, IRandomAccessStream, string, string, IProgress{double}?, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, IRandomAccessStream, string, string, Action{double}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void InstallWriteWinRTAsyncTest()

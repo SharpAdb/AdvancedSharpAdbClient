@@ -274,7 +274,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames)
+        public virtual async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(messageSink);
@@ -421,9 +421,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallAsync(DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallAsync(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -469,11 +469,11 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
-                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
+                progress?.Invoke(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
-            progress?.Report(new InstallProgressEventArgs(1, 1, 100));
+            progress?.Invoke(new InstallProgressEventArgs(1, 1, 100));
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
@@ -486,13 +486,13 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(baseAPK);
@@ -508,12 +508,12 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
             }
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
             string session = await InstallCreateAsync(device, null, cancellationToken, arguments).ConfigureAwait(false);
 
             int splitAPKsCount = splitAPKs.Count();
             void OnMainSyncProgressChanged(string? sender, double args) =>
-                progress?.Report(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
+                progress?.Invoke(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
 
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged, cancellationToken).ConfigureAwait(false);
 
@@ -531,22 +531,22 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
+                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
                 }
             }
 
             int i = 0;
             await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(splitAPKs);
@@ -557,7 +557,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
             }
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
             string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
 
             int progressCount = 0;
@@ -575,20 +575,20 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
                 }
             }
 
             int i = 0;
             await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments)
+        public virtual async Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -628,9 +628,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, Action<double>? progress = null, CancellationToken cancellationToken = default)
         {
-            progress?.Report(0);
+            progress?.Invoke(0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -671,7 +671,7 @@ namespace AdvancedSharpAdbClient
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
-                progress?.Report(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+                progress?.Invoke(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
 
             read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
@@ -686,7 +686,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(100);
+            progress?.Invoke(100);
         }
 
         /// <summary>
@@ -781,9 +781,9 @@ namespace AdvancedSharpAdbClient
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
-        public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -824,11 +824,11 @@ namespace AdvancedSharpAdbClient
                 if (results.Length == 0) { break; }
                 await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
                 totalBytesRead += results.Length;
-                progress?.Report(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
+                progress?.Invoke(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
-            progress?.Report(new InstallProgressEventArgs(1, 1, 100));
+            progress?.Invoke(new InstallProgressEventArgs(1, 1, 100));
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
             string value =
 #if HAS_BUFFERS
@@ -841,13 +841,13 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(baseAPK);
@@ -863,12 +863,12 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable stream");
             }
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
             string session = await InstallCreateAsync(device, null, cancellationToken, arguments).ConfigureAwait(false);
 
             int splitAPKsCount = splitAPKs.Count();
             void OnMainSyncProgressChanged(string? sender, double args) =>
-                progress?.Report(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
+                progress?.Invoke(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
 
             await InstallWriteAsync(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged, cancellationToken).ConfigureAwait(false);
 
@@ -886,22 +886,22 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
+                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
                 }
             }
 
             int i = 0;
             await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(splitAPKs);
@@ -912,7 +912,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable stream");
             }
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
             string session = await InstallCreateAsync(device, packageName, cancellationToken, arguments).ConfigureAwait(false);
 
             int progressCount = 0;
@@ -930,22 +930,22 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Report(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
                 }
             }
 
             int i = 0;
             await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
-            progress?.Report(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? progress = null, CancellationToken cancellationToken = default)
         {
-            progress?.Report(0);
+            progress?.Invoke(0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -981,7 +981,7 @@ namespace AdvancedSharpAdbClient
                 if (results.Length == 0) { break; }
                 await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
                 totalBytesRead += results.Length;
-                progress?.Report(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+                progress?.Invoke(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
 
             int read = await socket.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
@@ -996,7 +996,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Report(100);
+            progress?.Invoke(100);
         }
 
         /// <summary>
@@ -1069,7 +1069,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments)
+        public virtual async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
 

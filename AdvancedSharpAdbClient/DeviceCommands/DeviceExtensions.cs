@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            Action<SyncProgressChangedEventArgs>? progress = null,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -224,7 +224,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            Action<SyncProgressChangedEventArgs>? progress = null,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -280,6 +280,92 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallPackage(packageFilePath, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress, arguments);
+        }
+
+        /// <summary>
+        /// Installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
+        }
+
+#if !NETFRAMEWORK || NET40_OR_GREATER
+        /// <summary>
+        /// Pulls (downloads) a file from the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to pull the file.</param>
+        /// <param name="remotePath">The path, on the device, of the file to pull.</param>
+        /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        public static void Pull(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream,
+            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            in bool isCancelled = false)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            service.Pull(remotePath, stream, progress == null ? null : progress.Report, in isCancelled);
+        }
+
+        /// <summary>
+        /// Pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        public static void Push(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
+            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            in bool isCancelled = false)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            service.Push(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, in isCancelled);
+        }
+
+        /// <summary>
+        /// Installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -317,6 +403,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             PackageManager manager = new(client, device, skipInit: true);
             manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
         }
+#endif
 
         /// <summary>
         /// Uninstalls a package from the device.

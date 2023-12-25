@@ -142,7 +142,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, Stream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, Stream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PullAsyncTest()
@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PushAsync(Stream, string, int, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PushAsyncTest()
@@ -211,7 +211,7 @@ namespace AdvancedSharpAdbClient.Tests
 
 #if WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PullWinRTAsyncTest()
@@ -247,7 +247,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, IProgress{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PushWinRTAsyncTest()

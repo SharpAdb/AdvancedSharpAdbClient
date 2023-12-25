@@ -226,7 +226,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+            Action<SyncProgressChangedEventArgs>? progress = null,
+            CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             await service.PullAsync(remotePath, stream, progress, cancellationToken).ConfigureAwait(false);
@@ -246,7 +247,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+            Action<SyncProgressChangedEventArgs>? progress = null,
+            CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             await service.PushAsync(stream, remotePath, permissions, timestamp, progress, cancellationToken).ConfigureAwait(false);
@@ -306,6 +308,100 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallPackageAsync(this IAdbClient client, DeviceData device, string packageFilePath, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallPackageAsync(packageFilePath, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(basePackageFilePath, splitPackageFilePaths, progress, cancellationToken, arguments);
+        }
+
+        /// <summary>
+        /// Asynchronously installs Android multiple application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task InstallMultiplePackageAsync(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            PackageManager manager = new(client, device, skipInit: true);
+            return manager.InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress, cancellationToken, arguments);
+        }
+
+#if !NETFRAMEWORK || NET40_OR_GREATER
+        /// <summary>
+        /// Asynchronously pulls (downloads) a file from the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to pull the file.</param>
+        /// <param name="remotePath">The path, on the device, of the file to pull.</param>
+        /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PullAsync(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream,
+            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await service.PullAsync(remotePath, stream, progress == null ? null : progress.Report, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PushAsync(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
+            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await service.PushAsync(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously installs an Android application on device.
+        /// </summary>
+        /// <param name="client">The connection to the adb server.</param>
+        /// <param name="device">The device on which to uninstall the package.</param>
+        /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task InstallPackageAsync(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -347,6 +443,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             PackageManager manager = new(client, device, skipInit: true);
             return manager.InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress, cancellationToken, arguments);
         }
+#endif
 
         /// <summary>
         /// Asynchronously uninstalls a package from the device.
