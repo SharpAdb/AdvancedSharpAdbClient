@@ -249,7 +249,7 @@ namespace AdvancedSharpAdbClient
 #if HAS_BUFFERS
                 await Socket.SendAsync(buffer.AsMemory(startPosition, (int)(read + dataBytes.Length + lengthBytes.Length)), cancellationToken).ConfigureAwait(false);
 #else
-                await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
+                await Socket.SendAsync(buffer, startPosition, (int)(read + dataBytes.Length + lengthBytes.Length), cancellationToken).ConfigureAwait(false);
 #endif
                 // Let the caller know about our progress, if requested
                 progress?.Invoke(new SyncProgressChangedEventArgs((long)totalBytesRead, (long)totalBytesToProcess));

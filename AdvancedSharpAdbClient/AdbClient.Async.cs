@@ -5,7 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -822,7 +821,11 @@ namespace AdvancedSharpAdbClient
             {
                 IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
                 if (results.Length == 0) { break; }
+#if HAS_BUFFERS
                 await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+#else
+                await socket.SendAsync(buffer, (int)results.Length, cancellationToken).ConfigureAwait(false);
+#endif
                 totalBytesRead += results.Length;
                 progress?.Invoke(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
@@ -979,7 +982,11 @@ namespace AdvancedSharpAdbClient
             {
                 IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
                 if (results.Length == 0) { break; }
+#if HAS_BUFFERS
                 await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+#else
+                await socket.SendAsync(buffer, (int)results.Length, cancellationToken).ConfigureAwait(false);
+#endif
                 totalBytesRead += results.Length;
                 progress?.Invoke(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
@@ -1046,7 +1053,11 @@ namespace AdvancedSharpAdbClient
             {
                 IBuffer results = await apk.ReadAsync(buffer.AsBuffer(), (uint)buffer.Length, InputStreamOptions.None).AsTask(cancellationToken).ConfigureAwait(false);
                 if (results.Length == 0) { break; }
+#if HAS_BUFFERS
                 await socket.SendAsync(buffer.AsMemory(0, (int)results.Length), cancellationToken).ConfigureAwait(false);
+#else
+                await socket.SendAsync(buffer, (int)results.Length, cancellationToken).ConfigureAwait(false);
+#endif
                 totalBytesRead += results.Length;
                 progress?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
