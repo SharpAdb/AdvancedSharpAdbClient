@@ -48,6 +48,8 @@ jobs:
     name: pack-and-publish
     needs: build-and-test
     runs-on: windows-latest
+    env:
+      Solution_Name: AdvancedSharpAdbClient/AdvancedSharpAdbClient.csproj
 
     steps:
       - name: Checkout
@@ -60,11 +62,19 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v1
+        with:
+          msbuild-architecture: x64
+
+      - name: Setup NuGet.exe
+        uses: NuGet/setup-nuget@v1
+        
       - name: Install Dependencies
-        run: dotnet restore -p:FullTargets=true
+        run: msbuild $env:Solution_Name /t:Restore /p:FullTargets=true /p:GITHUB_ACTIONS=false
 
       - name: Pack
-        run: dotnet pack --no-restore --version-suffix build.${{ github.run_number }}.${{ github.run_attempt }} -o "nugets" -p:FullTargets=true
+        run: msbuild $env:Solution_Name /t:Pack /p:FullTargets=true /p:GITHUB_ACTIONS=false /p:Configuration=Release /p:PackageOutputPath=../nugets /p:VersionSuffix=build.${{ github.run_number }}.${{ github.run_attempt }}
 
       - name: Publish
         if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
