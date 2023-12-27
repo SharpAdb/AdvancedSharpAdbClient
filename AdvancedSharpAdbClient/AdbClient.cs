@@ -410,7 +410,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Framebuffer CreateRefreshableFramebuffer(DeviceData device)
+        public Framebuffer CreateFramebuffer(DeviceData device)
         {
             EnsureDevice(device);
             return new Framebuffer(device, this, AdbSocketFactory);
@@ -421,7 +421,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            Framebuffer framebuffer = CreateRefreshableFramebuffer(device);
+            Framebuffer framebuffer = CreateFramebuffer(device);
             framebuffer.Refresh(true);
 
             // Convert the framebuffer to an image, and return that.

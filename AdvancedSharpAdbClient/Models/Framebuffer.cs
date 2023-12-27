@@ -230,10 +230,10 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmap(CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmapAsync(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, cancellationToken);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, cancellationToken);
         }
 
         /// <summary>
@@ -242,10 +242,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmap(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmapAsync(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, dispatcher, cancellationToken);
         }
 
         /// <summary>
@@ -254,10 +254,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmap(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public virtual Task<WriteableBitmap?> ToBitmapAsync(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
-            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmap(Data, dispatcher, cancellationToken);
+            return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, dispatcher, cancellationToken);
         }
 #endif
 

@@ -431,7 +431,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateRefreshableFramebufferTest()
         {
-            Framebuffer framebuffer = TestClient.CreateRefreshableFramebuffer(Device);
+            Framebuffer framebuffer = TestClient.CreateFramebuffer(Device);
             Assert.NotNull(framebuffer);
             Assert.Equal(Device, framebuffer.Device);
         }

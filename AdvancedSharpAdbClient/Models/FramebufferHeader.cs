@@ -342,7 +342,7 @@ namespace AdvancedSharpAdbClient.Models
 
             // By far, the most common format is a 32-bit pixel format, which is either
             // RGB or RGBA, where each color has 1 byte.
-            if (Bpp == 32)
+            if (Bpp == 8 * 4)
             {
                 // Require at least RGB to be present; and require them to be exactly one byte (8 bits) long.
                 if (Red.Length != 8 || Blue.Length != 8 || Green.Length != 8)
@@ -391,7 +391,7 @@ namespace AdvancedSharpAdbClient.Models
                 // Returns RGB or RGBA, function of the presence of an alpha channel.
                 return Alpha.Length == 0 ? PixelFormat.Format32bppRgb : PixelFormat.Format32bppArgb;
             }
-            else if (Bpp == 24)
+            else if (Bpp == 8 * 3)
             {
                 // For 24-bit image depths, we only support RGB.
                 if (Red.Offset == 0
@@ -406,7 +406,7 @@ namespace AdvancedSharpAdbClient.Models
                     return PixelFormat.Format24bppRgb;
                 }
             }
-            else if (Bpp == 16
+            else if (Bpp == 5 + 6 + 5
                      && Red.Offset == 11
                      && Red.Length == 5
                      && Green.Offset == 5
@@ -434,11 +434,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public Task<WriteableBitmap?> ToBitmap(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             if (dispatcher.HasThreadAccess)
             {
-                return ToBitmap(buffer, cancellationToken);
+                return ToBitmapAsync(buffer, cancellationToken);
             }
             else
             {
@@ -450,7 +450,7 @@ namespace AdvancedSharpAdbClient.Models
                 {
                     try
                     {
-                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        WriteableBitmap? result = await self.ToBitmapAsync(buffer, cancellationToken).ConfigureAwait(false);
                         taskCompletionSource.SetResult(result);
                     }
                     catch (Exception e)
@@ -472,11 +472,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
         [ContractVersion(typeof(UniversalApiContract), 327680u)]
-        public Task<WriteableBitmap?> ToBitmap(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
             {
-                return ToBitmap(buffer, cancellationToken);
+                return ToBitmapAsync(buffer, cancellationToken);
             }
             else
             {
@@ -488,7 +488,7 @@ namespace AdvancedSharpAdbClient.Models
                 {
                     try
                     {
-                        WriteableBitmap? result = await self.ToBitmap(buffer, cancellationToken).ConfigureAwait(false);
+                        WriteableBitmap? result = await self.ToBitmapAsync(buffer, cancellationToken).ConfigureAwait(false);
                         taskCompletionSource.SetResult(result);
                     }
                     catch (Exception e)
@@ -511,7 +511,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        public async Task<WriteableBitmap?> ToBitmap(byte[] buffer, CancellationToken cancellationToken = default)
+        public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
             if (buffer == null)
             {
@@ -525,26 +525,67 @@ namespace AdvancedSharpAdbClient.Models
                 return null;
             }
 
-            using MemoryStream stream = new(buffer);
-            using IRandomAccessStream randomAccessStream = stream.AsRandomAccessStream();
-            BitmapDecoder decoder = await BitmapDecoder.CreateAsync(randomAccessStream).AsTask(cancellationToken);
-            SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync().AsTask(cancellationToken);
-            try
+            // The pixel format of the framebuffer may not be one that WinRT recognizes, so we need to fix that
+            BitmapPixelFormat bitmapPixelFormat = StandardizePixelFormat(buffer, out BitmapAlphaMode alphaMode);
+
+            using InMemoryRandomAccessStream random = new();
+            BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);
+            encoder.SetPixelData(bitmapPixelFormat, alphaMode, Width, Height, 960, 960, buffer);
+            await encoder.FlushAsync().AsTask(cancellationToken);
+            WriteableBitmap WriteableImage = new((int)Width, (int)Height);
+            await WriteableImage.SetSourceAsync(random).AsTask(cancellationToken).ConfigureAwait(false);
+
+            return WriteableImage;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="BitmapPixelFormat"/> that describes pixel format of an image that is stored according to the information
+        /// present in this <see cref="FramebufferHeader"/>. Because the <see cref="BitmapPixelFormat"/> enumeration does not allow for all
+        /// formats supported by Android, this method also takes a <paramref name="buffer"/> and reorganizes the bytes in the buffer to
+        /// match the return value of this function.
+        /// </summary>
+        /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
+        /// <param name="alphaMode">A <see cref="BitmapAlphaMode"/> which describes how the alpha channel is stored.</param>
+        /// <returns>A <see cref="BitmapPixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
+        private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
+        {
+            // Initial parameter validation.
+            ExceptionExtensions.ThrowIfNull(buffer);
+
+            if (buffer.Length < Width * Height * (Bpp / 8))
             {
-                WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                await WriteableImage.SetSourceAsync(randomAccessStream).AsTask(cancellationToken);
-                return WriteableImage;
+                throw new ArgumentOutOfRangeException(nameof(buffer), $"The buffer length {buffer.Length} is less than expected buffer " +
+                    $"length ({Width * Height * (Bpp / 8)}) for a picture of width {Width}, height {Height} and pixel depth {Bpp}");
             }
-            catch when (!cancellationToken.IsCancellationRequested)
+
+            if (Width == 0 || Height == 0 || Bpp == 0)
             {
-                using InMemoryRandomAccessStream random = new();
-                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);
-                encoder.SetSoftwareBitmap(softwareBitmap);
-                await encoder.FlushAsync().AsTask(cancellationToken);
-                WriteableBitmap WriteableImage = new((int)decoder.PixelWidth, (int)decoder.PixelHeight);
-                await WriteableImage.SetSourceAsync(random).AsTask(cancellationToken);
-                return WriteableImage;
+                throw new InvalidOperationException("Cannot cannulate the pixel format of an empty framebuffer");
             }
+
+            // By far, the most common format is a 32-bit pixel format, which is either
+            // RGB or RGBA, where each color has 1 byte.
+            if (Bpp == 8 * 4)
+            {
+                // Require at least RGB to be present; and require them to be exactly one byte (8 bits) long.
+                if (Red.Length != 8 || Blue.Length != 8 || Green.Length != 8)
+                {
+                    throw new ArgumentOutOfRangeException($"The pixel format with with RGB lengths of {Red.Length}:{Blue.Length}:{Green.Length} is not supported");
+                }
+
+                // Alpha can be present or absent, but must be 8 bytes long
+                alphaMode = Alpha.Length switch
+                {
+                    0 => BitmapAlphaMode.Premultiplied,
+                    8 => BitmapAlphaMode.Ignore,
+                    _ => throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported"),
+                };
+
+                return BitmapPixelFormat.Rgba8;
+            }
+
+            // If not caught by any of the statements before, the format is not supported.
+            throw new NotSupportedException($"Pixel depths of {Bpp} are not supported");
         }
 #endif
 

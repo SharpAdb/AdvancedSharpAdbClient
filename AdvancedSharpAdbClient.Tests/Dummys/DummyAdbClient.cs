@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task<int> IAdbClient.CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        Framebuffer IAdbClient.CreateRefreshableFramebuffer(DeviceData device) => throw new NotImplementedException();
+        Framebuffer IAdbClient.CreateFramebuffer(DeviceData device) => throw new NotImplementedException();
 
         int IAdbClient.CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind) => throw new NotImplementedException();
 

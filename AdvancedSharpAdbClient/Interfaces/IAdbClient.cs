@@ -243,12 +243,12 @@ namespace AdvancedSharpAdbClient
         void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 
         /// <summary>
-        /// Gets a <see cref="Framebuffer"/> which contains the framebuffer data for this device. The framebuffer data can be refreshed,
+        /// Gets a <see cref="Framebuffer"/> which contains the framebuffer data for this device. The framebuffer data is not refreshed,
         /// giving you high performance access to the device's framebuffer.
         /// </summary>
         /// <param name="device">The device for which to get the framebuffer.</param>
         /// <returns>A <see cref="Framebuffer"/> object which can be used to get the framebuffer of the device.</returns>
-        Framebuffer CreateRefreshableFramebuffer(DeviceData device);
+        Framebuffer CreateFramebuffer(DeviceData device);
 
         /// <summary>
         /// Gets the frame buffer from the specified end point.
