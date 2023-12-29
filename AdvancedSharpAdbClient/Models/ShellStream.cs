@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="inner">The inner stream that contains the raw data retrieved from the shell. This stream must be readable.</param>
         /// <param name="closeStream"><see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/> stream when closed; otherwise, <see langword="false"/>.</param>
-        public ShellStream(Stream inner, bool closeStream)
+        public ShellStream(Stream inner, bool closeStream = false)
         {
             ExceptionExtensions.ThrowIfNull(inner);
 

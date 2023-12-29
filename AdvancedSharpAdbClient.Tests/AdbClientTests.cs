@@ -41,6 +41,9 @@ namespace AdvancedSharpAdbClient.Tests
         public void ConstructorInvalidEndPointTest() =>
             _ = Assert.Throws<NotSupportedException>(() => new AdbClient(new CustomEndPoint(), Factories.AdbSocketFactory));
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient()"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -61,8 +64,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void FormAdbRequestTest()
         {
-            Assert.Equal(Encoding.ASCII.GetBytes("0009host:kill"), AdbClient.FormAdbRequest("host:kill"));
-            Assert.Equal(Encoding.ASCII.GetBytes("000Chost:version"), AdbClient.FormAdbRequest("host:version"));
+            Assert.Equal("0009host:kill"u8, AdbClient.FormAdbRequest("host:kill"));
+            Assert.Equal("000Chost:version"u8, AdbClient.FormAdbRequest("host:version"));
         }
 
         /// <summary>
@@ -71,8 +74,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateAdbForwardRequestTest()
         {
-            Assert.Equal(Encoding.ASCII.GetBytes("0008tcp:1984"), AdbClient.CreateAdbForwardRequest(null, 1984));
-            Assert.Equal(Encoding.ASCII.GetBytes("0012tcp:1981:127.0.0.1"), AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
+            Assert.Equal("0008tcp:1984"u8, AdbClient.CreateAdbForwardRequest(null, 1984));
+            Assert.Equal("0012tcp:1981:127.0.0.1"u8, AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
         }
 
         /// <summary>
@@ -354,14 +357,14 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.ExecuteServerCommand(IAdbClient, string, string, IShellOutputReceiver)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteServerCommand(string, string, IAdbSocket, IShellOutputReceiver, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteServerCommandTest()
         {
             string[] requests = ["host:version"];
 
-            byte[] streamData = Encoding.ASCII.GetBytes("0020");
+            byte[] streamData = "0020"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             ConsoleOutputReceiver receiver = new();
@@ -371,7 +374,7 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.ExecuteServerCommand("host", "version", receiver));
+                () => TestClient.ExecuteServerCommand("host", "version", receiver, AdbClient.Encoding));
 
             string version = receiver.ToString();
             Assert.Equal("0020\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
@@ -379,7 +382,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommand(IAdbClient, string, DeviceData, IShellOutputReceiver)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteRemoteCommandTest()
@@ -390,7 +393,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "shell:echo Hello, World"
             ];
 
-            byte[] streamData = Encoding.ASCII.GetBytes("Hello, World\r\n");
+            byte[] streamData = "Hello, World\r\n"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             ConsoleOutputReceiver receiver = new();
@@ -400,13 +403,13 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 requests,
                 [shellStream],
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver));
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver, AdbClient.Encoding));
 
             Assert.Equal("Hello, World\r\n", receiver.ToString(), ignoreLineEndingDifferences: true);
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.ExecuteRemoteCommand(IAdbClient, string, DeviceData, IShellOutputReceiver)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()
@@ -425,17 +428,25 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponseMessages,
                 requests,
                 null,
-                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver)));
+                () => TestClient.ExecuteRemoteCommand("echo Hello, World", Device, receiver, AdbClient.Encoding)));
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateFramebuffer(DeviceData)"/> method.
+        /// </summary>
         [Fact]
-        public void CreateRefreshableFramebufferTest()
+        public void CreateFramebufferTest()
         {
             Framebuffer framebuffer = TestClient.CreateFramebuffer(Device);
             Assert.NotNull(framebuffer);
             Assert.Equal(Device, framebuffer.Device);
+            Assert.Equal(default, framebuffer.Header);
+            Assert.Null(framebuffer.Data);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.GetFrameBuffer(DeviceData)"/> method.
+        /// </summary>
         [Fact]
 #if WINDOWS
         [SupportedOSPlatform("windows")]
@@ -500,6 +511,9 @@ namespace AdvancedSharpAdbClient.Tests
             framebuffer.Dispose();
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.RunLogService(DeviceData, Action{LogEntry}, in bool, LogId[])"/> method.
+        /// </summary>
         [Fact]
         public void RunLogServiceTest()
         {
@@ -845,11 +859,11 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[][] responses =
             [
-                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
-                Encoding.ASCII.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
+                AdbClient.Encoding.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
+                AdbClient.Encoding.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
             ];
 
-            using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            using MemoryStream sessionStream = new("Success: created install session [936013062]\r\n"u8.ToArray());
             using MemoryStream commitStream = new("Success\n"u8.ToArray());
 
             RunTest(
@@ -935,12 +949,12 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[][] responses =
             [
-                Encoding.ASCII.GetBytes($"Success: streamed {baseStream.Length} bytes\n"),
-                Encoding.ASCII.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
-                Encoding.ASCII.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
+                AdbClient.Encoding.GetBytes($"Success: streamed {baseStream.Length} bytes\n"),
+                AdbClient.Encoding.GetBytes($"Success: streamed {abiStream.Length} bytes\n"),
+                AdbClient.Encoding.GetBytes($"Success: streamed {dpiStream.Length} bytes\n")
             ];
 
-            using MemoryStream sessionStream = new(Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n"));
+            using MemoryStream sessionStream = new("Success: created install session [936013062]\r\n"u8.ToArray());
             using MemoryStream commitStream = new("Success\n"u8.ToArray());
 
             RunTest(
@@ -973,7 +987,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "exec:cmd package 'install-create' -p com.google.android.gms"
             ];
 
-            byte[] streamData = Encoding.ASCII.GetBytes("Success: created install session [936013062]\r\n");
+            byte[] streamData = "Success: created install session [936013062]\r\n"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             string session = RunTest(
@@ -1015,7 +1029,7 @@ namespace AdvancedSharpAdbClient.Tests
                     $"exec:cmd package 'install-write' -S {stream.Length} 936013062 base.apk"
                 ];
 
-                byte[] response = Encoding.ASCII.GetBytes($"Success: streamed {stream.Length} bytes\n");
+                byte[] response = AdbClient.Encoding.GetBytes($"Success: streamed {stream.Length} bytes\n");
 
                 RunTest(
                     OkResponses(2),
@@ -1041,7 +1055,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "exec:cmd package 'install-commit' 936013062"
             ];
 
-            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            byte[] streamData = "Success\r\n"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             RunTest(
@@ -1064,7 +1078,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "exec:cmd package 'uninstall' com.android.gallery3d"
             ];
 
-            byte[] streamData = Encoding.ASCII.GetBytes("Success\r\n");
+            byte[] streamData = "Success\r\n"u8.ToArray();
             using MemoryStream shellStream = new(streamData);
 
             RunTest(

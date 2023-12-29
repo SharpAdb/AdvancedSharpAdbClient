@@ -87,7 +87,6 @@ namespace AdvancedSharpAdbClient
         {
             Socket = socket;
             Device = device;
-
             Open();
         }
 
@@ -110,6 +109,9 @@ namespace AdvancedSharpAdbClient
         public bool IsOpen => Socket != null && Socket.Connected;
 
         /// <inheritdoc/>
+        /// <remarks>This method has been invoked by the constructor.
+        /// Do not use it unless you have closed the connection.
+        /// Use <see cref="Reopen"/> to reopen the connection.</remarks>
         public virtual void Open()
         {
             // target a specific device
@@ -127,7 +129,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -190,7 +192,7 @@ namespace AdvancedSharpAdbClient
                 Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 #endif
                 // Let the caller know about our progress, if requested
-                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             // create the DONE message
@@ -212,7 +214,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false)
+        public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
@@ -263,7 +265,7 @@ namespace AdvancedSharpAdbClient
                 totalBytesRead += size;
 
                 // Let the caller know about our progress, if requested
-                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
             }
 
             finish: return;

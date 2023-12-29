@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ReopenAsync(CancellationToken cancellationToken = default);
+        Task ReopenAsync(CancellationToken cancellationToken);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>

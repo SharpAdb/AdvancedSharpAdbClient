@@ -21,12 +21,14 @@ namespace AdvancedSharpAdbClient
     /// II Protocol Details, section 1. Client &lt;-&gt;Server protocol at
     /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.</para>
     /// </summary>
-    public partial class AdbSocket : IAdbSocket
+    /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
+    /// <param name="logger">The logger to use when logging.</param>
+    public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket
     {
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
-        private readonly ILogger<AdbSocket> logger;
+        private readonly ILogger<AdbSocket> logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.
@@ -34,11 +36,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public AdbSocket(EndPoint endPoint, ILogger<AdbSocket>? logger = null)
+            : this(CreateTcpSocket(endPoint), logger)
         {
-            Socket = new TcpSocket();
-            Socket.Connect(endPoint);
-            Socket.ReceiveBufferSize = ReceiveBufferSize;
-            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
         /// <summary>
@@ -50,17 +49,6 @@ namespace AdvancedSharpAdbClient
         public AdbSocket(string host, int port, ILogger<AdbSocket>? logger = null)
             : this(Extensions.CreateDnsEndPoint(host, port), logger)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbSocket"/> class.
-        /// </summary>
-        /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
-        /// <param name="logger">The logger to use when logging.</param>
-        public AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null)
-        {
-            Socket = socket;
-            this.logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
         }
 
         /// <summary>
@@ -76,7 +64,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        public ITcpSocket Socket { get; init; }
+        public ITcpSocket Socket { get; init; } = socket ?? throw new ArgumentNullException(nameof(socket));
 
         /// <summary>
         /// Determines whether the specified reply is okay.
@@ -124,7 +112,6 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = Socket.Send(data, length != -1 ? length : data.Length, SocketFlags.None);
-
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -143,7 +130,6 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = Socket.Send(data, offset, length != -1 ? length : data.Length, SocketFlags.None);
-
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -164,7 +150,6 @@ namespace AdvancedSharpAdbClient
         public virtual void SendSyncRequest(SyncCommand command, string path)
         {
             ExceptionExtensions.ThrowIfNull(path);
-
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             SendSyncRequest(command, pathBytes.Length);
             _ = Write(pathBytes);
@@ -195,7 +180,6 @@ namespace AdvancedSharpAdbClient
         public virtual void SendAdbRequest(string request)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
-
             if (!Write(data))
             {
                 throw new IOException($"Failed sending the request '{request}' to ADB");
@@ -292,8 +276,15 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            _ = Read(reply);
+            int read = Read(reply);
 
+            if (read == 0)
+            {
+                // There is no data to read
+                return string.Empty;
+            }
+
+            // Get the length of the string
             int len = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
             // And get the string
@@ -546,5 +537,18 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual void Close() => Socket.Dispose();
+
+        /// <summary>
+        /// Creates a new <see cref="TcpSocket"/> instance based on the specified <see cref="EndPoint"/>.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the Android Debug Bridge is listening for clients.</param>
+        /// <returns>The new <see cref="TcpSocket"/> instance.</returns>
+        private static TcpSocket CreateTcpSocket(EndPoint endPoint)
+        {
+            TcpSocket socket = new TcpSocket();
+            socket.Connect(endPoint);
+            socket.ReceiveBufferSize = ReceiveBufferSize;
+            return socket;
+        }
     }
 }

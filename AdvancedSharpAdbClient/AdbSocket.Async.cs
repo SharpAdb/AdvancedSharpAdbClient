@@ -30,7 +30,6 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = await Socket.SendAsync(data, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -49,7 +48,6 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = await Socket.SendAsync(data, length != -1 ? length : data.Length, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -68,7 +66,6 @@ namespace AdvancedSharpAdbClient
             try
             {
                 int count = await Socket.SendAsync(data, offset, length != -1 ? length : data.Length - offset, SocketFlags.None, cancellationToken).ConfigureAwait(false);
-
                 if (count < 0)
                 {
                     throw new AdbException("channel EOF");
@@ -89,7 +86,6 @@ namespace AdvancedSharpAdbClient
         public virtual async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(path);
-
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken).ConfigureAwait(false);
             _ = await WriteAsync(pathBytes, cancellationToken).ConfigureAwait(false);
@@ -120,7 +116,6 @@ namespace AdvancedSharpAdbClient
         public virtual async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
-
             if (!await WriteAsync(data, cancellationToken).ConfigureAwait(false))
             {
                 throw new IOException($"Failed sending the request '{request}' to ADB");
@@ -219,8 +214,15 @@ namespace AdvancedSharpAdbClient
         {
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
-            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
+            int read = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
+            if (read == 0)
+            {
+                // There is no data to read
+                return string.Empty;
+            }
+
+            // Get the length of the string
             int len = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
             // And get the string

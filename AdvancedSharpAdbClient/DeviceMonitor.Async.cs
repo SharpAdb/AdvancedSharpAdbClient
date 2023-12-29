@@ -247,8 +247,13 @@ namespace AdvancedSharpAdbClient
         /// A helper type for switch thread by <see cref="Task"/>. This type is not intended to be used directly from your code.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        private readonly struct ThreadSwitcher() : INotifyCompletion
+        private readonly struct ThreadSwitcher : INotifyCompletion
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ThreadSwitcher"/> struct.
+            /// </summary>
+            public ThreadSwitcher() { }
+
             /// <summary>
             /// Gets a value that indicates whether the asynchronous operation has completed.
             /// </summary>

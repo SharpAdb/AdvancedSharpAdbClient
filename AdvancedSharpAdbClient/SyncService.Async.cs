@@ -14,6 +14,9 @@ namespace AdvancedSharpAdbClient
     public partial class SyncService
     {
         /// <inheritdoc/>
+        /// <remarks>This method has been invoked by the constructor.
+        /// Do not use it unless you have closed the connection.
+        /// Use <see cref="ReopenAsync(CancellationToken)"/> to reopen the connection.</remarks>
         public virtual async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
@@ -31,7 +34,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -94,7 +97,7 @@ namespace AdvancedSharpAdbClient
                 await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
 #endif
                 // Let the caller know about our progress, if requested
-                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();
@@ -119,7 +122,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(remotePath);
             ExceptionExtensions.ThrowIfNull(stream);
@@ -170,7 +173,7 @@ namespace AdvancedSharpAdbClient
                 totalBytesRead += size;
 
                 // Let the caller know about our progress, if requested
-                progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                 // check if we're canceled
                 cancellationToken.ThrowIfCancellationRequested();

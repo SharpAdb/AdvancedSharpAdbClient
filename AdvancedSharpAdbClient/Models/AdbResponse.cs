@@ -10,18 +10,13 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// The response returned by ADB server.
     /// </summary>
-    public readonly struct AdbResponse : IEquatable<AdbResponse>
+    /// <param name="message">the message of <see cref="AdbResponse"/>.</param>
+    public readonly struct AdbResponse(string message) : IEquatable<AdbResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbResponse"/> struct.
         /// </summary>
-        public AdbResponse() => Message = string.Empty;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AdbResponse"/> struct.
-        /// </summary>
-        /// <param name="message">the message of <see cref="AdbResponse"/>.</param>
-        public AdbResponse(string message) => Message = message;
+        public AdbResponse() : this(string.Empty) { }
 
         /// <summary>
         /// Gets a <see cref="AdbResponse"/> that represents the OK response sent by ADB.
@@ -55,7 +50,7 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets or sets the message.
         /// </summary>
         /// <value>The message.</value>
-        public string Message { get; init; }
+        public string Message { get; init; } = message;
 
         /// <summary>
         /// Throw <see cref="AdbException"/> if <see cref="IOSuccess"/> or <see cref="Okay"/> is <see langword="false"/>.

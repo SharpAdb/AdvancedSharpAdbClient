@@ -71,16 +71,37 @@ namespace AdvancedSharpAdbClient.Tests
             using DummyTcpSocket tcpSocket = new();
             using AdbSocket socket = new(tcpSocket);
 
-            await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
+            await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
             {
-                writer.Write(Encoding.ASCII.GetBytes(5.ToString("X4")));
-                writer.Write(Encoding.ASCII.GetBytes("Hello"));
+                writer.Write(Encoding.UTF8.GetBytes(5.ToString("X4")));
+                writer.Write("Hello"u8);
                 writer.Flush();
             }
 
             tcpSocket.InputStream.Position = 0;
 
             Assert.Equal("Hello", await socket.ReadStringAsync());
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadSyncStringAsync(CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async void ReadSyncStringAsyncTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
+            {
+                writer.Write(5);
+                writer.Write("Hello"u8);
+                writer.Flush();
+            }
+
+            tcpSocket.InputStream.Position = 0;
+
+            Assert.Equal("Hello", await socket.ReadSyncStringAsync());
         }
 
         /// <summary>
@@ -198,7 +219,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async void SendAdbRequestAsyncTest() =>
             await RunTestAsync(
                 (socket) => socket.SendAdbRequestAsync("Test", default),
-                Encoding.ASCII.GetBytes("0004Test"));
+                "0004Test"u8.ToArray());
 
         private static async Task RunTestAsync(Func<IAdbSocket, Task> test, byte[] expectedDataSent)
         {

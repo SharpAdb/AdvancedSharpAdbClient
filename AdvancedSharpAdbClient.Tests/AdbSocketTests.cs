@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -46,8 +47,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void IsOkayTest()
         {
-            byte[] okay = Encoding.ASCII.GetBytes("OKAY");
-            byte[] fail = Encoding.ASCII.GetBytes("FAIL");
+            byte[] okay = "OKAY"u8.ToArray();
+            byte[] fail = "FAIL"u8.ToArray();
 
             Assert.True(AdbSocket.IsOkay(okay));
             Assert.False(AdbSocket.IsOkay(fail));
@@ -107,6 +108,27 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadString"/> method.
+        /// </summary>
+        [Fact]
+        public void ReadStringTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
+            {
+                writer.Write(Encoding.UTF8.GetBytes(5.ToString("X4")));
+                writer.Write("Hello"u8);
+                writer.Flush();
+            }
+
+            tcpSocket.InputStream.Position = 0;
+
+            Assert.Equal("Hello", socket.ReadString());
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbSocket.ReadSyncString"/> method.
         /// </summary>
         [Fact]
@@ -115,10 +137,10 @@ namespace AdvancedSharpAdbClient.Tests
             using DummyTcpSocket tcpSocket = new();
             using AdbSocket socket = new(tcpSocket);
 
-            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.ASCII, true))
+            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
             {
                 writer.Write(5);
-                writer.Write(Encoding.ASCII.GetBytes("Hello"));
+                writer.Write("Hello"u8);
                 writer.Flush();
             }
 
@@ -242,7 +264,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void SendAdbRequestTest() =>
             RunTest(
                 (socket) => socket.SendAdbRequest("Test"),
-                Encoding.ASCII.GetBytes("0004Test"));
+                "0004Test"u8.ToArray());
 
         /// <summary>
         /// Tests the <see cref="AdbSocket.GetShellStream"/> method.

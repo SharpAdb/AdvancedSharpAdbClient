@@ -49,13 +49,6 @@ namespace AdvancedSharpAdbClient
         public const int DefaultAdbServerPort = 5037;
 
         /// <summary>
-        /// Gets a new instance of the <see cref="AdbClient"/> class.
-        /// </summary>
-        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IAdbClient Instance => new AdbClient();
-
-        /// <summary>
         /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
         protected readonly Func<EndPoint, IAdbSocket> AdbSocketFactory;
@@ -124,6 +117,13 @@ namespace AdvancedSharpAdbClient
             : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), adbSocketFactory)
         {
         }
+
+        /// <summary>
+        /// Gets a new instance of the <see cref="AdbClient"/> class.
+        /// </summary>
+        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static IAdbClient Instance => new AdbClient();
 
         /// <summary>
         /// Gets or sets default encoding.
@@ -286,7 +286,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<ForwardData> ListForward(DeviceData device)
+        public virtual IEnumerable<ForwardData> ListForward(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -300,7 +300,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
+        public virtual IEnumerable<ForwardData> ListReverseForward(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -316,18 +316,15 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteServerCommand(string target, string command, Encoding encoding)
+        public virtual void ExecuteServerCommand(string target, string command)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            ExecuteServerCommand(target, command, socket, encoding);
+            ExecuteServerCommand(target, command, socket);
         }
 
         /// <inheritdoc/>
-        public void ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding)
+        public virtual void ExecuteServerCommand(string target, string command, IAdbSocket socket)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
-
             StringBuilder request = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
@@ -340,15 +337,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
+        public virtual void ExecuteRemoteCommand(string command, DeviceData device)
         {
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(encoding);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             socket.SetDevice(device);
 
-            ExecuteServerCommand("shell", command, socket, encoding);
+            ExecuteServerCommand("shell", command, socket);
         }
 
         /// <inheritdoc/>
@@ -360,7 +356,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding)
+        public virtual void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -410,14 +406,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Framebuffer CreateFramebuffer(DeviceData device)
+        public virtual Framebuffer CreateFramebuffer(DeviceData device)
         {
             EnsureDevice(device);
             return new Framebuffer(device, this, AdbSocketFactory);
         }
 
         /// <inheritdoc/>
-        public Framebuffer GetFrameBuffer(DeviceData device)
+        public virtual Framebuffer GetFrameBuffer(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -489,7 +485,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string Pair(DnsEndPoint endpoint, string code)
+        public virtual string Pair(DnsEndPoint endpoint, string code)
         {
             ExceptionExtensions.ThrowIfNull(endpoint);
 
@@ -501,7 +497,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string Connect(DnsEndPoint endpoint)
+        public virtual string Connect(DnsEndPoint endpoint)
         {
             ExceptionExtensions.ThrowIfNull(endpoint);
 
@@ -513,7 +509,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public string Disconnect(DnsEndPoint endpoint)
+        public virtual string Disconnect(DnsEndPoint endpoint)
         {
             ExceptionExtensions.ThrowIfNull(endpoint);
 
@@ -525,17 +521,17 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Root(DeviceData device) => Root("root:", device);
+        public virtual void Root(DeviceData device) => Root("root:", device);
 
         /// <inheritdoc/>
-        public void Unroot(DeviceData device) => Root("unroot:", device);
+        public virtual void Unroot(DeviceData device) => Root("unroot:", device);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with or without root privileges.
         /// </summary>
         /// <param name="request">The command of root or unroot.</param>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
-        protected void Root(string request, DeviceData device)
+        protected virtual void Root(string request, DeviceData device)
         {
             EnsureDevice(device);
 
@@ -574,9 +570,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void Install(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void Install(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -622,11 +618,11 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Invoke(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
+                callback?.Invoke(new InstallProgressEventArgs(0, 1, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess));
             }
-            progress?.Invoke(new InstallProgressEventArgs(1, 1, 100));
+            callback?.Invoke(new InstallProgressEventArgs(1, 1, 100));
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             read = socket.Read(buffer);
             string value =
 #if HAS_BUFFERS
@@ -639,13 +635,13 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(baseAPK);
@@ -661,12 +657,12 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
-            string session = InstallCreate(device, null, arguments);
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            string session = InstallCreate(device, arguments);
 
             int splitAPKsCount = splitAPKs.Count();
             void OnMainSyncProgressChanged(string? sender, double args) =>
-                progress?.Invoke(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
+                callback?.Invoke(new InstallProgressEventArgs(sender == null ? 1 : 0, splitAPKsCount + 1, args / 2));
 
             InstallWrite(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged);
 
@@ -684,7 +680,7 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
+                    callback?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount + 1, (status.Values.Select(x => x / splitAPKsCount).Sum() + 100) / 2));
                 }
             }
 
@@ -694,15 +690,15 @@ namespace AdvancedSharpAdbClient
                 InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged);
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             InstallCommit(device, session);
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(splitAPKs);
@@ -713,7 +709,7 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(splitAPKs), "The apk stream must be a readable and seekable stream");
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
             string session = InstallCreate(device, packageName, arguments);
 
             int progressCount = 0;
@@ -731,7 +727,7 @@ namespace AdvancedSharpAdbClient
                     {
                         status[path] = args;
                     }
-                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
+                    callback?.Invoke(new InstallProgressEventArgs(progressCount, splitAPKsCount, status.Values.Select(x => x / splitAPKsCount).Sum()));
                 }
             }
 
@@ -741,22 +737,17 @@ namespace AdvancedSharpAdbClient
                 InstallWrite(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged);
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             InstallCommit(device, session);
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <inheritdoc/>
-        public string InstallCreate(DeviceData device, string? packageName = null, params string[] arguments)
+        public virtual string InstallCreate(DeviceData device, params string[] arguments)
         {
             EnsureDevice(device);
 
             StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install-create'");
-
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
-            {
-                requestBuilder.AppendFormat(" -p {0}", packageName);
-            }
 
             if (arguments != null)
             {
@@ -786,9 +777,46 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<double>? progress = null)
+        public virtual string InstallCreate(DeviceData device, string packageName, params string[] arguments)
         {
-            progress?.Invoke(0);
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(packageName);
+
+            StringBuilder requestBuilder =
+                new StringBuilder().Append("exec:cmd package 'install-create'")
+                                   .AppendFormat(" -p {0}", packageName);
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            socket.SendAdbRequest(requestBuilder.ToString());
+            _ = socket.ReadAdbResponse();
+
+            using StreamReader reader = new(socket.GetShellStream(), Encoding);
+            string result = reader.ReadLine() ?? throw new AdbException($"The {nameof(result)} of {nameof(InstallCreate)} is null.");
+
+            if (!result.Contains("Success"))
+            {
+                throw new AdbException(reader.ReadToEnd());
+            }
+
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
+            return session;
+        }
+
+        /// <inheritdoc/>
+        public virtual void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<double>? callback = null)
+        {
+            callback?.Invoke(0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -829,7 +857,7 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Invoke(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+                callback?.Invoke(totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
 
             read = socket.Read(buffer);
@@ -844,7 +872,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Invoke(100);
+            callback?.Invoke(100);
         }
 
         /// <summary>
@@ -854,10 +882,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
         /// <param name="apkName">The name of the application.</param>
         /// <param name="session">The session ID of the install session.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
-        protected virtual void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<string?, double>? progress)
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        protected virtual void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<string?, double>? callback)
         {
-            progress?.Invoke(apkName, 0);
+            callback?.Invoke(apkName, 0);
 
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(apk);
@@ -898,9 +926,9 @@ namespace AdvancedSharpAdbClient
                 socket.Send(buffer, read);
 #endif
                 totalBytesRead += read;
-                progress?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
+                callback?.Invoke(apkName, totalBytesToProcess == 0 ? 0 : totalBytesRead * 100d / totalBytesToProcess);
             }
-            progress?.Invoke(apkName, 100);
+            callback?.Invoke(apkName, 100);
 
             read = socket.Read(buffer);
             string value =
@@ -914,7 +942,7 @@ namespace AdvancedSharpAdbClient
             {
                 throw new AdbException(value);
             }
-            progress?.Invoke(null, 100);
+            callback?.Invoke(null, 100);
         }
 
         /// <inheritdoc/>

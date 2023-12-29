@@ -18,6 +18,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     public readonly record struct VersionInfo(int VersionCode, string VersionName) : IComparer, IComparer<VersionInfo>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="VersionInfo"/> struct.
+        /// </summary>
+        public VersionInfo() : this(0, "Unknown") { }
+
+        /// <summary>
         /// Gets or sets the version code of an Android application.
         /// </summary>
         public int VersionCode { get; init; } = VersionCode;

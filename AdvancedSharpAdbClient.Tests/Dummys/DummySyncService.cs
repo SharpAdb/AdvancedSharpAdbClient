@@ -25,24 +25,24 @@ namespace AdvancedSharpAdbClient.Tests
             IsOpen = true;
         }
 
-        public void Pull(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs> progress = null, in bool isCancelled = false)
+        public void Pull(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs> callback = null, in bool isCancelled = false)
         {
             for (int i = 0; i <= 100; i++)
             {
-                progress?.Invoke(new SyncProgressChangedEventArgs(i, 100));
+                callback?.Invoke(new SyncProgressChangedEventArgs(i, 100));
             }
         }
 
-        public async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs> progress, CancellationToken cancellationToken = default)
+        public async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs> callback = null, CancellationToken cancellationToken = default)
         {
             for (int i = 0; i <= 100; i++)
             {
                 await Task.Yield();
-                progress?.Invoke(new SyncProgressChangedEventArgs(i, 100));
+                callback?.Invoke(new SyncProgressChangedEventArgs(i, 100));
             }
         }
 
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> progress = null, in bool isCancelled = false)
+        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, in bool isCancelled = false)
         {
             for (int i = 0; i <= 100; i++)
             {
@@ -50,11 +50,11 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     UploadedFiles[remotePath] = stream;
                 }
-                progress?.Invoke(new SyncProgressChangedEventArgs(i, 100));
+                callback?.Invoke(new SyncProgressChangedEventArgs(i, 100));
             }
         }
 
-        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> progress, CancellationToken cancellationToken = default)
+        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, CancellationToken cancellationToken = default)
         {
             for (int i = 0; i <= 100; i++)
             {
@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     UploadedFiles[remotePath] = stream;
                 }
-                progress?.Invoke(new SyncProgressChangedEventArgs(i, 100));
+                callback?.Invoke(new SyncProgressChangedEventArgs(i, 100));
             }
         }
 

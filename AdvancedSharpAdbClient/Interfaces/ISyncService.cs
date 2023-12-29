@@ -28,18 +28,18 @@ namespace AdvancedSharpAdbClient
         /// <param name="remotePath">The path, on the device, to which to push the file.</param>
         /// <param name="permissions">The permission octet that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress, in bool isCancelled);
+        void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, in bool isCancelled);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        void Pull(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? progress, in bool isCancelled);
+        void Pull(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback, in bool isCancelled);
 
         /// <summary>
         /// Returns information about a file on the device.

@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient.Models
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
-        public DeviceData(string data)
+        public DeviceData(string data) : this()
         {
             Match match = Regex.Match(data);
             if (match.Success)

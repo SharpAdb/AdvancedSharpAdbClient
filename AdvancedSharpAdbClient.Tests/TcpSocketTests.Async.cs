@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Tests
             await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80));
             Assert.True(socket.Connected);
 
-            byte[] data = Encoding.ASCII.GetBytes("GET / HTTP/1.1\n\n");
+            byte[] data = "GET / HTTP/1.1\n\n"u8.ToArray();
             await socket.SendAsync(data, data.Length, SocketFlags.None);
 
             byte[] responseData = new byte[128];
@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Tests
             await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80));
             Assert.True(socket.Connected);
 
-            ReadOnlyMemory<byte> data = Encoding.ASCII.GetBytes("GET / HTTP/1.1\n\n");
+            ReadOnlyMemory<byte> data = "GET / HTTP/1.1\n\n"u8.ToArray();
             await socket.SendAsync(data, SocketFlags.None);
 
             byte[] responseData = new byte[128];

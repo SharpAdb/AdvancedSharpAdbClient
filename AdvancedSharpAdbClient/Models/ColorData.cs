@@ -25,6 +25,11 @@ namespace AdvancedSharpAdbClient.Models
     public readonly record struct ColorData(uint Offset, uint Length) : IReadOnlyList<byte>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ColorData"/> struct.
+        /// </summary>
+        public ColorData() : this(0, 0) { }
+
+        /// <summary>
         /// Gets or sets the offset, in bits, within the byte array for a pixel, at which the
         /// bytes that contain information for this color are stored.
         /// </summary>

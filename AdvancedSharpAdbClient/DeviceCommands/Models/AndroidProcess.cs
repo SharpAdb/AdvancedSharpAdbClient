@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <param name="line">A <see cref="string"/> which represents a <see cref="AndroidProcess"/>.</param>
         /// <param name="cmdLinePrefix">A value indicating whether the output of <c>/proc/{pid}/stat</c> is prefixed with <c>/proc/{pid}/cmdline</c> or not.
         /// Because <c>stat</c> does not contain the full process name, this can be useful.</param>
-        public AndroidProcess(string line, bool cmdLinePrefix = false)
+        public AndroidProcess(string line, bool cmdLinePrefix = false) : this()
         {
             ExceptionExtensions.ThrowIfNull(line);
 

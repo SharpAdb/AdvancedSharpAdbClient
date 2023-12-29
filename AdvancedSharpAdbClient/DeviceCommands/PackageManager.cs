@@ -138,39 +138,39 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Installs an Android application on device.
         /// </summary>
         /// <param name="packageFilePath">The absolute file system path to file on local host to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             ValidateDevice();
 
             void OnSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
-                progress?.Invoke(new InstallProgressEventArgs(sender is null ? 1 : 0, 1, args.ProgressPercentage));
+                callback?.Invoke(new InstallProgressEventArgs(sender is null ? 1 : 0, 1, args.ProgressPercentage));
 
             string remoteFilePath = SyncPackageToDevice(packageFilePath, OnSyncProgressChanged);
 
-            InstallRemotePackage(remoteFilePath, progress, arguments);
+            InstallRemotePackage(remoteFilePath, callback, arguments);
 
-            progress?.Invoke(new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
+            callback?.Invoke(new InstallProgressEventArgs(0, 1, PackageInstallProgressState.PostInstall));
             RemoveRemotePackage(remoteFilePath);
-            progress?.Invoke(new InstallProgressEventArgs(1, 1, PackageInstallProgressState.PostInstall));
+            callback?.Invoke(new InstallProgressEventArgs(1, 1, PackageInstallProgressState.PostInstall));
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <summary>
         /// Installs the application package that was pushed to a temporary location on the device.
         /// </summary>
         /// <param name="remoteFilePath">absolute file path to package file on device.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallRemotePackage(string remoteFilePath, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallRemotePackage(string remoteFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             ValidateDevice();
 
@@ -201,19 +201,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="basePackageFilePath">The absolute base app file system path to file on local host to install.</param>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             ValidateDevice();
 
             int splitPackageFileCount = splitPackageFilePaths.Count();
 
             void OnMainSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args) =>
-                progress?.Invoke(new InstallProgressEventArgs(sender is null ? 1 : 0, splitPackageFileCount + 1, args.ProgressPercentage / 2));
+                callback?.Invoke(new InstallProgressEventArgs(sender is null ? 1 : 0, splitPackageFileCount + 1, args.ProgressPercentage / 2));
 
             string baseRemoteFilePath = SyncPackageToDevice(basePackageFilePath, OnMainSyncProgressChanged);
 
@@ -231,7 +231,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         status[path] = args.ProgressPercentage;
                     }
-                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitPackageFileCount + 1, (status.Values.Select(x => x / splitPackageFileCount).Sum() + 100) / 2));
+                    callback?.Invoke(new InstallProgressEventArgs(progressCount, splitPackageFileCount + 1, (status.Values.Select(x => x / splitPackageFileCount).Sum() + 100) / 2));
                 }
             }
 
@@ -242,20 +242,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSplitSyncProgressChanged);
             }
 
-            InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, progress, arguments);
+            InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, callback, arguments);
 
             int count = 0;
-            progress?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
+            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 RemoveRemotePackage(splitRemoteFilePath);
-                progress?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
+                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             }
 
             RemoveRemotePackage(baseRemoteFilePath);
-            progress?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
+            callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <summary>
@@ -263,12 +263,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="splitPackageFilePaths">The absolute split app file system paths to file on local host to install.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             ValidateDevice();
 
@@ -288,7 +288,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     {
                         status[path] = args.ProgressPercentage;
                     }
-                    progress?.Invoke(new InstallProgressEventArgs(progressCount, splitPackageFileCount, status.Values.Select(x => x / splitPackageFileCount).Sum()));
+                    callback?.Invoke(new InstallProgressEventArgs(progressCount, splitPackageFileCount, status.Values.Select(x => x / splitPackageFileCount).Sum()));
                 }
             }
 
@@ -299,17 +299,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 splitRemoteFilePaths[i++] = SyncPackageToDevice(splitPackageFilePath, OnSyncProgressChanged);
             }
 
-            InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, progress, arguments);
+            InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, callback, arguments);
 
-            progress?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
+            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             int count = 0;
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 RemoveRemotePackage(splitRemoteFilePath);
-                progress?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
+                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Finished));
         }
 
         /// <summary>
@@ -317,12 +317,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="baseRemoteFilePath">The absolute base app file path to package file on device.</param>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
             ValidateDevice();
 
@@ -330,20 +330,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             int splitRemoteFileCount = splitRemoteFilePaths.Count();
 
-            progress?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
+            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
 
             WriteInstallSession(session, "base", baseRemoteFilePath);
 
-            progress?.Invoke(new InstallProgressEventArgs(1, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
+            callback?.Invoke(new InstallProgressEventArgs(1, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
 
             int count = 0;
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 WriteInstallSession(session, $"split{count++}", splitRemoteFilePath);
-                progress?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
+                callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
@@ -359,12 +359,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="splitRemoteFilePaths">The absolute split app file paths to package file on device.</param>
         /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? progress = null, params string[] arguments)
+        public virtual void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
             ValidateDevice();
 
@@ -372,16 +372,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             int splitRemoteFileCount = splitRemoteFilePaths.Count();
 
-            progress?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
+            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
 
             int count = 0;
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 WriteInstallSession(session, $"split{count++}", splitRemoteFilePath);
-                progress?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
+                callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
             }
 
-            progress?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
+            callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, $"pm install-commit {session}", receiver);
@@ -529,12 +529,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Pushes a file to device
         /// </summary>
         /// <param name="localFilePath">The absolute path to file on local host.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.</param>
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-        protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? progress)
+        protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? callback)
         {
-            progress?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));
+            callback?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));
 
             ValidateDevice();
 
@@ -555,10 +555,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                     logger.LogDebug("Uploading file onto device '{0}'", Device.Serial);
 
-                    Action<SyncProgressChangedEventArgs>? syncProgress = progress == null ? null : args => progress.Invoke(localFilePath, args);
+                    Action<SyncProgressChangedEventArgs>? progress = callback == null ? null : args => callback.Invoke(localFilePath, args);
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), syncProgress, false);
+                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), progress, false);
                 }
 
                 return remoteFilePath;
@@ -570,7 +570,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             finally
             {
-                progress?.Invoke(null, new SyncProgressChangedEventArgs(100, 100));
+                callback?.Invoke(null, new SyncProgressChangedEventArgs(100, 100));
             }
         }
 

@@ -14,6 +14,11 @@ namespace AdvancedSharpAdbClient.Models
     public readonly record struct AdbServerStatus(bool IsRunning, Version? Version)
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AdbServerStatus"/> struct.
+        /// </summary>
+        public AdbServerStatus() : this(false, null) { }
+
+        /// <summary>
         /// Gets a value indicating whether the server is currently running.
         /// </summary>
         public bool IsRunning { get; init; } = IsRunning;

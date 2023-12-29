@@ -110,42 +110,6 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, CancellationToken cancellationToken = default) =>
-            client.ExecuteServerCommandAsync(target, command, socket, AdbClient.Encoding, cancellationToken);
-
-        /// <summary>
-        /// Asynchronously executes a command on the device.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="device">The device on which to run the command.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, CancellationToken cancellationToken = default) =>
-            client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
-
-        /// <summary>
-        /// Asynchronously executes a command on the adb server.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
-        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, CancellationToken cancellationToken = default) =>
-            client.ExecuteServerCommandAsync(target, command, AdbClient.Encoding, cancellationToken);
-
-        /// <summary>
-        /// Asynchronously executes a command on the adb server.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
-        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -274,23 +238,23 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, params LogId[] logNames) =>
-            client.RunLogServiceAsync(device, messageSink.Report, default, logNames);
+        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, params LogId[] logNames) =>
+            client.RunLogServiceAsync(device, progress.Report, default, logNames);
 
         /// <summary>
         /// Asynchronously runs the event log service on a device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames) =>
-            client.RunLogServiceAsync(device, messageSink.Report, cancellationToken, logNames);
+        public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, CancellationToken cancellationToken, params LogId[] logNames) =>
+            client.RunLogServiceAsync(device, progress.Report, cancellationToken, logNames);
 
         /// <summary>
         /// Asynchronously installs an Android application on an device.
@@ -415,13 +379,25 @@ namespace AdvancedSharpAdbClient
 
         /// <summary>
         /// Like "install", but starts an install session synchronously.
+        /// Use <see cref="InstallCreateAsync(IAdbClient, DeviceData, string, string[])"/> if installation dose not have a base APK.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
+        public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, params string[] arguments) =>
+            client.InstallCreateAsync(device, default, arguments);
+
+        /// <summary>
+        /// Like "install", but starts an install session synchronously.
+        /// Use <see cref="InstallCreateAsync(IAdbClient, DeviceData, string[])"/> if installation has a base APK.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
-        public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, string? packageName = null, params string[] arguments) =>
+        public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
             client.InstallCreateAsync(device, packageName, default, arguments);
 
         /// <summary>

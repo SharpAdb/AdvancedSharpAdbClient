@@ -191,8 +191,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteServerCommand(string target, string command, Encoding encoding);
+        void ExecuteServerCommand(string target, string command);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -201,16 +200,14 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding);
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket);
 
         /// <summary>
         /// Executes a shell command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding);
+        void ExecuteRemoteCommand(string command, DeviceData device);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -314,10 +311,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        void Install(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? progress, params string[] arguments);
+        void Install(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? callback, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -325,10 +322,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? progress, params string[] arguments);
+        void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback, params string[] arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -336,19 +333,29 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
-        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress, params string[] arguments);
+        void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session.
+        /// Use <see cref="InstallCreate(DeviceData, string, string[])"/> if installation dose not have a base APK.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>The session ID of this install session.</returns>
+        string InstallCreate(DeviceData device, params string[] arguments);
+
+        /// <summary>
+        /// Like "install", but starts an install session.
+        /// Use <see cref="InstallCreate(DeviceData, string[])"/> if installation has a base APK.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>The session ID of this install session.</returns>
-        string InstallCreate(DeviceData device, string? packageName = null, params string[] arguments);
+        string InstallCreate(DeviceData device, string packageName, params string[] arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
@@ -357,9 +364,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
         /// <param name="apkName">The name of the application.</param>
         /// <param name="session">The session ID of the install session.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
-        void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<double>? progress);
+        void InstallWrite(DeviceData device, Stream apk, string apkName, string session, Action<double>? callback);
 
         /// <summary>
         /// Commit the given active install session, installing the app.

@@ -168,10 +168,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken);
+        Task ExecuteServerCommandAsync(string target, string command, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously executes a command on the adb server.
@@ -180,20 +179,18 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken);
+        Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously executes a command on the device.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken);
+        Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously executes a command on the adb server.
@@ -306,12 +303,12 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallAsync(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+        Task InstallAsync(DeviceData device, Stream apk, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Asynchronously push multiple APKs to the device and install them.
@@ -319,12 +316,12 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="baseAPK">A <see cref="Stream"/> which represents the base APK to install.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Asynchronously push multiple APKs to the device and install them.
@@ -332,22 +329,33 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="splitAPKs"><see cref="Stream"/>s which represents the split APKs to install.</param>
         /// <param name="packageName">The package name of the base APK to install.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+        Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Like "install", but starts an install session asynchronously.
+        /// Use <see cref="InstallCreateAsync(DeviceData, string, CancellationToken, string[])"/> if installation dose not have a base APK.
+        /// </summary>
+        /// <param name="device">The device on which to install the application.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
+        Task<string> InstallCreateAsync(DeviceData device, CancellationToken cancellationToken, params string[] arguments);
+
+        /// <summary>
+        /// Like "install", but starts an install session asynchronously.
+        /// Use <see cref="InstallCreateAsync(DeviceData, CancellationToken, string[])"/> if installation has a base APK.
         /// </summary>
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
-        Task<string> InstallCreateAsync(DeviceData device, string? packageName, CancellationToken cancellationToken, params string[] arguments);
+        Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken, params string[] arguments);
 
         /// <summary>
         /// Asynchronously write an apk into the given install session.
@@ -356,11 +364,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="apk">A <see cref="Stream"/> which represents the application to install.</param>
         /// <param name="apkName">The name of the application.</param>
         /// <param name="session">The session ID of the install session.</param>
-        /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, Action<double>? progress, CancellationToken cancellationToken);
+        Task InstallWriteAsync(DeviceData device, Stream apk, string apkName, string session, Action<double>? callback, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously commit the given active install session, installing the app.
@@ -400,12 +408,12 @@ namespace AdvancedSharpAdbClient
             /// </summary>
             /// <param name="device">The device on which to install the application.</param>
             /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
-            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
             /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+            Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
             /// Asynchronously push multiple APKs to the device and install them.
@@ -413,12 +421,12 @@ namespace AdvancedSharpAdbClient
             /// <param name="device">The device on which to install the application.</param>
             /// <param name="baseAPK">A <see cref="IRandomAccessStream"/> which represents the base APK to install.</param>
             /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
-            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
             /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+            Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
             /// Asynchronously push multiple APKs to the device and install them.
@@ -426,12 +434,12 @@ namespace AdvancedSharpAdbClient
             /// <param name="device">The device on which to install the application.</param>
             /// <param name="splitAPKs"><see cref="IRandomAccessStream"/>s which represents the split APKs to install.</param>
             /// <param name="packageName">The package name of the base APK to install.</param>
-            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
             /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? progress, CancellationToken cancellationToken, params string[] arguments);
+            Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
             /// Asynchronously write an apk into the given install session.
@@ -440,11 +448,11 @@ namespace AdvancedSharpAdbClient
             /// <param name="apk">A <see cref="IRandomAccessStream"/> which represents the application to install.</param>
             /// <param name="apkName">The name of the application.</param>
             /// <param name="session">The session ID of the install session.</param>
-            /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
+            /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
             /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? progress, CancellationToken cancellationToken);
+            Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? callback, CancellationToken cancellationToken);
         }
 #endif
     }

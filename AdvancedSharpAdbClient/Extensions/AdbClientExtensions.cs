@@ -87,36 +87,6 @@ namespace AdvancedSharpAdbClient
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
-        public static void ExecuteServerCommand(this IAdbClient client, string target, string command) =>
-            client.ExecuteServerCommand(target, command, AdbClient.Encoding);
-
-        /// <summary>
-        /// Executes a command on the adb server.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
-        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
-        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket) =>
-            client.ExecuteServerCommand(target, command, socket, AdbClient.Encoding);
-
-        /// <summary>
-        /// Executes a shell command on the device.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="command">The command to execute.</param>
-        /// <param name="device">The device on which to run the command.</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device) =>
-            client.ExecuteRemoteCommand(command, device, AdbClient.Encoding);
-
-        /// <summary>
-        /// Executes a command on the adb server.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
-        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
-        /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IShellOutputReceiver receiver) =>
             client.ExecuteServerCommand(target, command, receiver, AdbClient.Encoding);
@@ -243,21 +213,21 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, params LogId[] logNames) =>
-            client.RunLogService(device, messageSink, false, logNames);
+        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, params LogId[] logNames) =>
+            client.RunLogService(device, progress, false, logNames);
 
         /// <summary>
         /// Runs the event log service on a device.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames) =>
-            client.RunLogService(device, messageSink.Report, isCancelled, logNames);
+        public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, in bool isCancelled, params LogId[] logNames) =>
+            client.RunLogService(device, progress.Report, isCancelled, logNames);
 
         /// <summary>
         /// Installs an Android application on an device.
