@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -228,15 +229,77 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken);
 
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <summary>
-        /// Asynchronously gets the frame buffer from the specified end point.
+        /// Asynchronously executes a command on the adb server and returns the output.
         /// </summary>
-        /// <param name="device">The device for which to get the framebuffer.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.</param>
-        /// <returns>A <see cref="Task{Framebuffer}"/> which returns the raw frame buffer.</returns>
-        /// <exception cref="AdbException">failed asking for frame buffer</exception>
-        /// <exception cref="AdbException">failed nudging</exception>
-        Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (string line in ExecuteServerCommand(target, command, encoding))
+            {
+                await Task.Yield();
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously executes a command on the adb server and returns the output.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (string line in ExecuteServerCommand(target, command, socket, encoding))
+            {
+                await Task.Yield();
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously executes a command on the device and returns the output.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            foreach (string line in ExecuteRemoteCommand(command, device, encoding))
+            {
+                await Task.Yield();
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously runs the event log service on a device and returns it.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this to stop reading from the event log.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{LogEntry}"/> which contains the log entries.</returns>
+        async IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, [EnumeratorCancellation] CancellationToken cancellationToken, params LogId[] logNames)
+        {
+            foreach (LogEntry entry in RunLogService(device, logNames))
+            {
+                await Task.Yield();
+                yield return entry;
+            }
+        }
+#endif
 
         /// <summary>
         /// Asynchronously runs the event log service on a device.
@@ -247,6 +310,16 @@ namespace AdvancedSharpAdbClient
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames);
+
+        /// <summary>
+        /// Asynchronously gets the frame buffer from the specified end point.
+        /// </summary>
+        /// <param name="device">The device for which to get the framebuffer.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the asynchronous task.</param>
+        /// <returns>A <see cref="Task{Framebuffer}"/> which returns the raw frame buffer.</returns>
+        /// <exception cref="AdbException">failed asking for frame buffer</exception>
+        /// <exception cref="AdbException">failed nudging</exception>
+        Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously reboots the specified device in to the specified mode.

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Xml;
@@ -187,34 +188,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteShellCommandAsync(device, $"am force-stop {packageName}", cancellationToken);
 
         /// <summary>
-        /// Asynchronously gets the file statistics of a given file.
-        /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
-        /// <param name="device">The device on which to look for the file.</param>
-        /// <param name="path">The path to the file.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
-        public static async Task<FileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
-        {
-            using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return await service.StatAsync(path, cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Asynchronously lists the contents of a directory on the device.
-        /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
-        /// <param name="device">The device on which to list the directory.</param>
-        /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static async Task<List<FileStatistics>> ListAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
-        {
-            using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);
-        }
-
-        /// <summary>
         /// Asynchronously pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
@@ -253,6 +226,53 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             await service.PushAsync(stream, remotePath, permissions, timestamp, callback, cancellationToken).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Asynchronously gets the file statistics of a given file.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
+        public static async Task<FileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return await service.StatAsync(path, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        public static async Task<List<FileStatistics>> GetDirectoryListingAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);
+        }
+
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        public static async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(this IAdbClient client, DeviceData device, string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await foreach (FileStatistics file in service.GetDirectoryAsyncListing(remotePath, cancellationToken).ConfigureAwait(false))
+            {
+                yield return file;
+            }
+        }
+#endif
 
         /// <summary>
         /// Asynchronously gets the property of a device.
@@ -496,7 +516,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns the an <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
         /// that are currently running on the device.</returns>
-        public static async Task<IEnumerable<AndroidProcess>> ListProcessesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
+        public static async Task<List<AndroidProcess>> ListProcessesAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
@@ -510,7 +530,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs

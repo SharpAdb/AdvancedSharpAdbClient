@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         public static async ValueTask<List<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source)
         {
             List<TSource> list = [];
-            await foreach (TSource item in source)
+            await foreach (TSource item in source.ConfigureAwait(false))
             {
                 list.Add(item);
             }

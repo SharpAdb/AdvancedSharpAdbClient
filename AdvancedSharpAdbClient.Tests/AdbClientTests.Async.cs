@@ -419,6 +419,33 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, CancellationToken, LogId[])"/> method.
+        /// </summary>
+        [Fact]
+        public async void RunLogServiceEnumerableAsyncTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:logcat -B -b system"
+            ];
+
+            ConsoleOutputReceiver receiver = new();
+
+            await using FileStream stream = File.OpenRead("Assets/Logcat.bin");
+            await using ShellStream shellStream = new(stream, false);
+
+            List<LogEntry> logs = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                async () => await TestClient.RunLogServiceAsync(Device, default, LogId.System).ToListAsync());
+
+            Assert.Equal(3, logs.Count);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.RebootAsync(string, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]

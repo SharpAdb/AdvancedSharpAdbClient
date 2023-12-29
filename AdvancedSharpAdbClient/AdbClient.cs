@@ -406,22 +406,104 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Framebuffer CreateFramebuffer(DeviceData device)
+        public virtual IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
         {
-            EnsureDevice(device);
-            return new Framebuffer(device, this, AdbSocketFactory);
+            ExceptionExtensions.ThrowIfNull(encoding);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            return ExecuteServerCommand(target, command, socket, encoding);
         }
 
         /// <inheritdoc/>
-        public virtual Framebuffer GetFrameBuffer(DeviceData device)
+        public virtual IEnumerable<string> ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            socket.SendAdbRequest(request.ToString());
+            _ = socket.ReadAdbResponse();
+
+            using StreamReader reader = new(socket.GetShellStream(), encoding);
+            // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+            // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+            // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+            // -- one of the integration test fetches output 1000 times and found no truncations.
+            while (true)
+            {
+                string? line;
+                try
+                {
+                    line = reader.ReadLine();
+                }
+                catch (Exception e)
+                {
+                    throw new ShellCommandUnresponsiveException(e);
+                }
+                if (line == null) { yield break; }
+                yield return line;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
         {
             EnsureDevice(device);
 
-            Framebuffer framebuffer = CreateFramebuffer(device);
-            framebuffer.Refresh(true);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            socket.SetDevice(device);
 
-            // Convert the framebuffer to an image, and return that.
-            return framebuffer;
+            return ExecuteServerCommand("shell", command, socket, encoding);
+        }
+
+        /// <inheritdoc/>
+        public virtual IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
+        {
+            EnsureDevice(device);
+
+            // The 'log' service has been deprecated, see
+            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            socket.SetDevice(device);
+
+            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
+
+            foreach (LogId logName in logNames)
+            {
+                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
+            }
+
+            socket.SendAdbRequest(request.ToString());
+            _ = socket.ReadAdbResponse();
+
+            using Stream stream = socket.GetShellStream();
+            LogReader reader = new(stream);
+
+            LogEntry? entry = null;
+            while (true)
+            {
+                try
+                {
+                    entry = reader.ReadEntry();
+                }
+                catch (EndOfStreamException)
+                {
+                    // This indicates the end of the stream; the entry will remain null.
+                }
+
+                if (entry != null)
+                {
+                    yield return entry;
+                }
+                else
+                {
+                    yield break;
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -448,10 +530,9 @@ namespace AdvancedSharpAdbClient
             using Stream stream = socket.GetShellStream();
             LogReader reader = new(stream);
 
+            LogEntry? entry = null;
             while (!isCancelled)
             {
-                LogEntry? entry = null;
-
                 try
                 {
                     entry = reader.ReadEntry();
@@ -470,6 +551,25 @@ namespace AdvancedSharpAdbClient
                     break;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public virtual Framebuffer CreateFramebuffer(DeviceData device)
+        {
+            EnsureDevice(device);
+            return new Framebuffer(device, this, AdbSocketFactory);
+        }
+
+        /// <inheritdoc/>
+        public virtual Framebuffer GetFrameBuffer(DeviceData device)
+        {
+            EnsureDevice(device);
+
+            Framebuffer framebuffer = CreateFramebuffer(device);
+            framebuffer.Refresh(true);
+
+            // Convert the framebuffer to an image, and return that.
+            return framebuffer;
         }
 
         /// <inheritdoc/>

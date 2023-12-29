@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -256,17 +257,125 @@ namespace AdvancedSharpAdbClient
             await ExecuteServerCommandAsync("shell", command, socket, receiver, encoding, cancellationToken);
         }
 
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
-        public virtual async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public virtual async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await foreach (string? line in ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            {
+                yield return line;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            StringBuilder request = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = request.AppendFormat("{0}:", target);
+            }
+            _ = request.Append(command);
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            using StreamReader reader = new(socket.GetShellStream(), encoding);
+            // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+            // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+            // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+            // -- one of the integration test fetches output 1000 times and found no truncations.
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                string? line = null;
+                try
+                {
+                    line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    // If a cancellation was requested, this main loop is interrupted with an exception
+                    // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                    // In all other cases, something went wrong, and we want to report it to the user.
+                    if (!cancellationToken.IsCancellationRequested)
+                    {
+                        throw new ShellCommandUnresponsiveException(e);
+                    }
+                }
+                if (line == null) { yield break; }
+                yield return line;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+            ExceptionExtensions.ThrowIfNull(encoding);
+
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken);
+
+            await foreach (string? line in ExecuteServerCommandAsync("shell", command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            {
+                yield return line;
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual async IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, [EnumeratorCancellation] CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             EnsureDevice(device);
 
-            Framebuffer framebuffer = CreateFramebuffer(device);
-            await framebuffer.RefreshAsync(true, cancellationToken).ConfigureAwait(false);
+            // The 'log' service has been deprecated, see
+            // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
+            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            // Convert the framebuffer to an image, and return that.
-            return framebuffer;
+            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
+
+            foreach (LogId logName in logNames)
+            {
+                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
+            }
+
+            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
+            _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+#if NETCOREAPP3_0_OR_GREATER
+            await
+#endif
+            using Stream stream = socket.GetShellStream();
+            LogReader reader = new(stream);
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                LogEntry? entry = null;
+
+                try
+                {
+                    entry = await reader.ReadEntryAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (EndOfStreamException)
+                {
+                    // This indicates the end of the stream; the entry will remain null.
+                }
+
+                if (entry != null)
+                {
+                    yield return entry;
+                }
+                else
+                {
+                    yield break;
+                }
+            }
         }
+#endif
 
         /// <inheritdoc/>
         public virtual async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
@@ -317,6 +426,18 @@ namespace AdvancedSharpAdbClient
                     break;
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public virtual async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
+        {
+            EnsureDevice(device);
+
+            Framebuffer framebuffer = CreateFramebuffer(device);
+            await framebuffer.RefreshAsync(true, cancellationToken).ConfigureAwait(false);
+
+            // Convert the framebuffer to an image, and return that.
+            return framebuffer;
         }
 
         /// <inheritdoc/>

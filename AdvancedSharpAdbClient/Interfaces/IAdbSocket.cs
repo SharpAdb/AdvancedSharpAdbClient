@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     public partial interface IAdbSocket : IDisposable
     {
         /// <summary>
-        /// Gets a value indicating whether the<see cref="AdbSocket"/> is connected to a remote
+        /// Gets a value indicating whether the <see cref="AdbSocket"/> is connected to a remote
         /// host as of the latest send or receive operation.
         /// </summary>
         bool Connected { get; }

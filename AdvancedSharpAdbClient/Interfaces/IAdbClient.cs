@@ -240,6 +240,53 @@ namespace AdvancedSharpAdbClient
         void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
 
         /// <summary>
+        /// Executes a command on the adb server and returns the output.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server and returns the output.
+        /// </summary>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        IEnumerable<string> ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device and returns the output.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding);
+
+        /// <summary>
+        /// Runs the event log service on a device and returns it.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="IEnumerable{LogEntry}"/> which contains the log entries.</returns>
+        IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames);
+
+        /// <summary>
+        /// Runs the event log service on a device.
+        /// </summary>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        void RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames);
+
+        /// <summary>
         /// Gets a <see cref="Framebuffer"/> which contains the framebuffer data for this device. The framebuffer data is not refreshed,
         /// giving you high performance access to the device's framebuffer.
         /// </summary>
@@ -255,15 +302,6 @@ namespace AdvancedSharpAdbClient
         /// <exception cref="AdbException">failed asking for frame buffer</exception>
         /// <exception cref="AdbException">failed nudging</exception>
         Framebuffer GetFrameBuffer(DeviceData device);
-
-        /// <summary>
-        /// Runs the event log service on a device.
-        /// </summary>
-        /// <param name="device">The device on which to run the event log service.</param>
-        /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
-        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
-        void RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames);
 
         /// <summary>
         /// Reboots the specified device in to the specified mode.

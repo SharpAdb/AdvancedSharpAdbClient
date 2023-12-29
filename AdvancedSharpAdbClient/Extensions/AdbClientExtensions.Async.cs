@@ -128,6 +128,54 @@ namespace AdvancedSharpAdbClient
         public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        /// <summary>
+        /// Asynchronously executes a command on the adb server and returns the output.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        public static IAsyncEnumerable<string> ExecuteServerCommandAsync(this IAdbClient client, string target, string command, CancellationToken cancellationToken = default) =>
+            client.ExecuteServerCommandAsync(target, command, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously executes a command on the adb server and returns the output.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        public static IAsyncEnumerable<string> ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, CancellationToken cancellationToken = default) =>
+            client.ExecuteServerCommandAsync(target, command, socket, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously executes a command on the device and returns the output.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        public static IAsyncEnumerable<string> ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously runs the event log service on a device and returns it.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to run the event log service.</param>
+        /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        /// <returns>A <see cref="IAsyncEnumerable{LogEntry}"/> which contains the log entries.</returns>
+        public static IAsyncEnumerable<LogEntry> RunLogServiceAsync(this IAdbClient client, DeviceData device, params LogId[] logNames) =>
+            client.RunLogServiceAsync(device, default, logNames);
+#endif
+
         /// <summary>
         /// Asynchronously runs the event log service on a device.
         /// </summary>

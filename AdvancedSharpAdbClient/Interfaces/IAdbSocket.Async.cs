@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously reads a <see cref="string"/> from an <see cref="IAdbSocket"/> instance.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the<see cref="string"/> received from the <see cref = "IAdbSocket"/>.</returns>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The return value of the task is the <see cref="string"/> received from the <see cref = "IAdbSocket"/>.</returns>
         Task<string> ReadStringAsync(CancellationToken cancellationToken);
 
         /// <summary>

@@ -541,6 +541,33 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.RunLogService(DeviceData, LogId[])"/> method.
+        /// </summary>
+        [Fact]
+        public void RunLogServiceEnumerableTest()
+        {
+            string[] requests =
+            [
+                "host:transport:169.254.109.177:5555",
+                "shell:logcat -B -b system"
+            ];
+
+            ConsoleOutputReceiver receiver = new();
+
+            using FileStream stream = File.OpenRead("Assets/Logcat.bin");
+            using ShellStream shellStream = new(stream, false);
+
+            LogEntry[] logs = RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                requests,
+                [shellStream],
+                () => TestClient.RunLogService(Device, LogId.System).ToArray());
+
+            Assert.Equal(3, logs.Length);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClientExtensions.Reboot(IAdbClient, DeviceData)"/> method.
         /// </summary>
         [Fact]

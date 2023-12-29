@@ -165,35 +165,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client.ExecuteShellCommand(device, $"am force-stop {packageName}");
 
         /// <summary>
-        /// Gets the file statistics of a given file.
-        /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
-        /// <param name="device">The device on which to look for the file.</param>
-        /// <param name="path">The path to the file.</param>
-        /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
-        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
-        {
-            using ISyncService service = Factories.SyncServiceFactory(client, device);
-            return service.Stat(path);
-        }
-
-        /// <summary>
-        /// Lists the contents of a directory on the device.
-        /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
-        /// <param name="device">The device on which to list the directory.</param>
-        /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static IEnumerable<FileStatistics> List(this IAdbClient client, DeviceData device, string remotePath)
-        {
-            using ISyncService service = Factories.SyncServiceFactory(client, device);
-            foreach (FileStatistics fileStatistics in service.GetDirectoryListing(remotePath))
-            {
-                yield return fileStatistics;
-            }
-        }
-
-        /// <summary>
         /// Pulls (downloads) a file from the remote device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
@@ -229,6 +200,35 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             service.Push(stream, remotePath, permissions, timestamp, callback, in isCancelled);
+        }
+
+        /// <summary>
+        /// Gets the file statistics of a given file.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
+        public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return service.Stat(path);
+        }
+
+        /// <summary>
+        /// Lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <returns>For each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        public static IEnumerable<FileStatistics> GetDirectoryListing(this IAdbClient client, DeviceData device, string remotePath)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            foreach (FileStatistics fileStatistics in service.GetDirectoryListing(remotePath))
+            {
+                yield return fileStatistics;
+            }
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to list the processes that are running.</param>
         /// <returns>An <see cref="IEnumerable{AndroidProcess}"/> that will iterate over all processes
         /// that are currently running on the device.</returns>
-        public static IEnumerable<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
+        public static List<AndroidProcess> ListProcesses(this IAdbClient client, DeviceData device)
         {
             // There are a couple of gotcha's when listing processes on an Android device.
             // One way would be to run ps and parse the output. However, the output of
@@ -451,7 +451,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // The easiest way to do the directory listings would be to use the SyncService; unfortunately,
             // the sync service doesn't work very well with /proc/ so we're back to using ls and taking it
             // from there.
-            List<AndroidProcess> processes = [];
 
             // List all processes by doing ls /proc/.
             // All subfolders which are completely numeric are PIDs

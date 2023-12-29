@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,11 +26,17 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding) =>
             ExecuteServerCommand("shell", command, receiver, encoding);
 
+        public IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding) =>
+            ExecuteServerCommand("shell", command, encoding);
+
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken = default) =>
             ExecuteServerCommandAsync("shell", command, cancellationToken);
 
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default) =>
             ExecuteServerCommandAsync("shell", command, receiver, encoding, cancellationToken);
+
+        public IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerCommandAsync("shell", command, encoding, cancellationToken);
 
         public void ExecuteServerCommand(string target, string command)
         {
@@ -82,6 +89,35 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding) =>
             ExecuteServerCommand(target, command, receiver, encoding);
 
+        public IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
+        {
+            StringBuilder requestBuilder = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = requestBuilder.AppendFormat("{0}:", target);
+            }
+            _ = requestBuilder.Append(command);
+
+            string request = requestBuilder.ToString();
+            ReceivedCommands.Add(request);
+
+            if (Commands.TryGetValue(request, out string value))
+            {
+                using StringReader reader = new(value);
+                while (reader.Peek() != -1)
+                {
+                    yield return reader.ReadLine();
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{request}' was unexpected");
+            }
+        }
+
+        public IEnumerable<string> ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding) =>
+            ExecuteServerCommand(target, command, encoding);
+
         public async Task ExecuteServerCommandAsync(string target, string command, CancellationToken cancellationToken = default)
         {
             await Task.Yield();
@@ -116,7 +152,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 if (receiver != null)
                 {
-                    StringReader reader = new(value);
+                    using StringReader reader = new(value);
 
                     while (reader.Peek() != -1)
                     {
@@ -134,6 +170,35 @@ namespace AdvancedSharpAdbClient.Tests
 
         public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken) =>
             ExecuteServerCommandAsync(target, command, receiver, encoding, cancellationToken);
+
+        public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            StringBuilder requestBuilder = new();
+            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            {
+                _ = requestBuilder.AppendFormat("{0}:", target);
+            }
+            _ = requestBuilder.Append(command);
+
+            string request = requestBuilder.ToString();
+            ReceivedCommands.Add(request);
+
+            if (Commands.TryGetValue(request, out string value))
+            {
+                using StringReader reader = new(value);
+                while (reader.Peek() != -1)
+                {
+                    yield return await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(command), $"The command '{request}' was unexpected");
+            }
+        }
+
+        public IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken = default) =>
+            ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken);
 
         #region Not Implemented
 
@@ -240,6 +305,8 @@ namespace AdvancedSharpAdbClient.Tests
         Task IAdbClient.RootAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         void IAdbClient.RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled, params LogId[] logNames) => throw new NotImplementedException();
+
+        IEnumerable<LogEntry> IAdbClient.RunLogService(DeviceData device, params LogId[] logNames) => throw new NotImplementedException();
 
         Task IAdbClient.RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken, params LogId[] logNames) => throw new NotImplementedException();
 
