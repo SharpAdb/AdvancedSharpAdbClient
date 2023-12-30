@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
 
         [Fact]
         public void MessageConstructorTest() =>
-            ExceptionTester<PermissionDeniedException>.MessageConstructorTest((message) => new PermissionDeniedException(message));
+            ExceptionTester<PermissionDeniedException>.MessageConstructorTest(message => new PermissionDeniedException(message));
 
         [Fact]
         public void MessageAndInnerConstructorTest() =>

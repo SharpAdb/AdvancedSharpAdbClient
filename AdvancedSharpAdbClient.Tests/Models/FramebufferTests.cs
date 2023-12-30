@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/FramebufferHeader.bin"));
             socket.SyncDataReceived.Enqueue(File.ReadAllBytes("Assets/Framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device, (endPoint) => socket);
+            using Framebuffer framebuffer = new(device, endPoint => socket);
 
             framebuffer.Refresh();
 
@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin"));
             socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/Framebuffer.bin"));
 
-            using Framebuffer framebuffer = new(device, (endPoint) => socket);
+            using Framebuffer framebuffer = new(device, endPoint => socket);
 
             await framebuffer.RefreshAsync();
 

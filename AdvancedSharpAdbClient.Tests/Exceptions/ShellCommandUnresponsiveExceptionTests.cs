@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
 
         [Fact]
         public void MessageConstructorTest() =>
-            ExceptionTester<ShellCommandUnresponsiveException>.MessageConstructorTest((message) => new ShellCommandUnresponsiveException(message));
+            ExceptionTester<ShellCommandUnresponsiveException>.MessageConstructorTest(message => new ShellCommandUnresponsiveException(message));
 
         [Fact]
         public void MessageAndInnerConstructorTest() =>

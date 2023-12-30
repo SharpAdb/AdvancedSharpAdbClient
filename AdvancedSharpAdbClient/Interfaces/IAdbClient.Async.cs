@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -239,14 +238,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            foreach (string line in ExecuteServerCommand(target, command, encoding))
-            {
-                await Task.Yield();
-                yield return line;
-            }
-        }
+        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerCommand(target, command, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously executes a command on the adb server and returns the output.
@@ -258,14 +251,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            foreach (string line in ExecuteServerCommand(target, command, socket, encoding))
-            {
-                await Task.Yield();
-                yield return line;
-            }
-        }
+        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerCommand(target, command, socket, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously executes a command on the device and returns the output.
@@ -275,14 +262,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            foreach (string line in ExecuteRemoteCommand(command, device, encoding))
-            {
-                await Task.Yield();
-                yield return line;
-            }
-        }
+        IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteRemoteCommand(command, device, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously runs the event log service on a device and returns it.
@@ -291,14 +272,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the event log service. Use this to stop reading from the event log.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="IAsyncEnumerable{LogEntry}"/> which contains the log entries.</returns>
-        async IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, [EnumeratorCancellation] CancellationToken cancellationToken, params LogId[] logNames)
-        {
-            foreach (LogEntry entry in RunLogService(device, logNames))
-            {
-                await Task.Yield();
-                yield return entry;
-            }
-        }
+        IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames) =>
+            RunLogService(device, logNames).AsEnumerableAsync(cancellationToken);
 #endif
 
         /// <summary>

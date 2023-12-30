@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncDATARequestTest() =>
             RunTest(
-                (socket) => socket.SendSyncRequest(SyncCommand.DATA, 2),
+                socket => socket.SendSyncRequest(SyncCommand.DATA, 2),
                 [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncSENDRequestTest() =>
             RunTest(
-                (socket) => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
+                socket => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
                 [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendSyncDENTRequestTest() =>
             RunTest(
-                (socket) => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
+                socket => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
                 [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
         /// <summary>
@@ -86,7 +86,8 @@ namespace AdvancedSharpAdbClient.Tests
         /// </summary>
         [Fact]
         public void SendSyncNullRequestTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => RunTest((socket) => socket.SendSyncRequest(SyncCommand.DATA, null), []));
+            _ = Assert.Throws<ArgumentNullException>(() =>
+                RunTest(socket => socket.SendSyncRequest(SyncCommand.DATA, null), []));
 
         /// <summary>
         /// Tests the <see cref="AdbSocket.ReadSyncResponse"/> method.
@@ -263,7 +264,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void SendAdbRequestTest() =>
             RunTest(
-                (socket) => socket.SendAdbRequest("Test"),
+                socket => socket.SendAdbRequest("Test"),
                 "0004Test"u8.ToArray());
 
         /// <summary>

@@ -192,7 +192,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateForwardTest() =>
             RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
+                device => TestClient.CreateForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateReverseTest() =>
             RunCreateReverseTest(
-                (device) => TestClient.CreateReverseForward(device, "tcp:1", "tcp:2", true),
+                device => TestClient.CreateReverseForward(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateTcpForwardTest() =>
             RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, 3, 4),
+                device => TestClient.CreateForward(device, 3, 4),
                 "tcp:3;tcp:4");
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void CreateSocketForwardTest() =>
             RunCreateForwardTest(
-                (device) => TestClient.CreateForward(device, 5, "/socket/1"),
+                device => TestClient.CreateForward(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
         /// <summary>

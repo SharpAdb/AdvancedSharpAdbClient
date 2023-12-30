@@ -1,8 +1,10 @@
 ﻿using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -16,19 +18,21 @@ namespace AdvancedSharpAdbClient.Tests
             const string command = nameof(command);
             IAdbSocket socket = Substitute.For<IAdbSocket>();
             IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            List<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>()))
-                .Do(x =>
+            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
                     Assert.Equal(command, x.ArgAt<string>(1));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
                     Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(4));
+                    return Task.CompletedTask;
                 });
-            client.When(x => x.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>()))
-                .Do(x =>
+            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
                     Assert.Equal(command, x.ArgAt<string>(1));
@@ -36,10 +40,32 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(3));
                     Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(4));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(5));
+                    return Task.CompletedTask;
+                });
+            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(target, x.ArgAt<string>(0));
+                    Assert.Equal(command, x.ArgAt<string>(1));
+                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(2));
+                    Assert.Equal(default, x.ArgAt<CancellationToken>(3));
+                    return result.AsEnumerableAsync(x.ArgAt<CancellationToken>(3));
+                });
+            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(target, x.ArgAt<string>(0));
+                    Assert.Equal(command, x.ArgAt<string>(1));
+                    Assert.Equal(socket, x.ArgAt<IAdbSocket>(2));
+                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
+                    Assert.Equal(default, x.ArgAt<CancellationToken>(4));
+                    return result.AsEnumerableAsync(x.ArgAt<CancellationToken>(4));
                 });
 
             await client.ExecuteServerCommandAsync(target, command, receiver);
             await client.ExecuteServerCommandAsync(target, command, socket, receiver);
+            Assert.Equal(result, await AdbClientExtensions.ExecuteServerCommandAsync(client, target, command).ToListAsync());
+            Assert.Equal(result, await AdbClientExtensions.ExecuteServerCommandAsync(client, target, command, socket).ToListAsync());
         }
 
         [Fact]
@@ -48,19 +74,31 @@ namespace AdvancedSharpAdbClient.Tests
             const string command = nameof(command);
             DeviceData device = new();
             IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            List<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>()))
-                .Do(x =>
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
                     Assert.Equal(device, x.ArgAt<DeviceData>(1));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
                     Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(4));
+                    return Task.CompletedTask;
+                });
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(command, x.ArgAt<string>(0));
+                    Assert.Equal(device, x.ArgAt<DeviceData>(1));
+                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(2));
+                    Assert.Equal(default, x.ArgAt<CancellationToken>(3));
+                    return result.AsEnumerableAsync(x.ArgAt<CancellationToken>(3));
                 });
 
             await client.ExecuteRemoteCommandAsync(command, device, receiver);
+            Assert.Equal(result, await AdbClientExtensions.ExecuteRemoteCommandAsync(client, command, device).ToListAsync());
         }
 
         [Fact]
@@ -72,13 +110,14 @@ namespace AdvancedSharpAdbClient.Tests
             LogId[] logNames = Enumerable.Range((int)LogId.Min, (int)(LogId.Max - LogId.Min + 1)).Select(x => (LogId)x).ToArray();
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.RunLogServiceAsync(Arg.Any<DeviceData>(), Arg.Any<Action<LogEntry>>(), Arg.Any<CancellationToken>(), Arg.Any<LogId[]>()))
-                .Do(x =>
+            _ = client.RunLogServiceAsync(Arg.Any<DeviceData>(), Arg.Any<Action<LogEntry>>(), Arg.Any<CancellationToken>(), Arg.Any<LogId[]>())
+                .Returns(x =>
                 {
                     Assert.Equal(device, x.ArgAt<DeviceData>(0));
                     Assert.Equal(messageSink, x.ArgAt<Action<LogEntry>>(1));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(2));
                     Assert.Equal(logNames, x.ArgAt<LogId[]>(3));
+                    return Task.CompletedTask;
                 });
 
             await client.RunLogServiceAsync(device, messageSink, logNames);

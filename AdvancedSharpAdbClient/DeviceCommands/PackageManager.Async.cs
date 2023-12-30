@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             callback?.Invoke(new InstallProgressEventArgs(1, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
 
             int count = 0;
-            await splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
+            await splitRemoteFilePaths.Select(async splitRemoteFilePath =>
             {
                 await WriteInstallSessionAsync(session, $"split{count++}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
                 callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
@@ -320,7 +320,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
 
             int count = 0;
-            await splitRemoteFilePaths.Select(async (splitRemoteFilePath) =>
+            await splitRemoteFilePaths.Select(async splitRemoteFilePath =>
             {
                 await WriteInstallSessionAsync(session, $"split{count++}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
                 callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));

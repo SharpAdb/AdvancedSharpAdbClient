@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
 
         [Fact]
         public void MessageConstructorTest() =>
-            ExceptionTester<JavaException>.MessageConstructorTest((message) => new JavaException(string.Empty, message, string.Empty));
+            ExceptionTester<JavaException>.MessageConstructorTest(message => new JavaException(string.Empty, message, string.Empty));
 
         [Fact]
         public void MessageAndInnerConstructorTest() =>

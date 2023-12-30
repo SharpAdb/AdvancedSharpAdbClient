@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
 
         [Fact]
         public void MessageConstructorTest() =>
-            ExceptionTester<CommandAbortingException>.MessageConstructorTest((message) => new CommandAbortingException(message));
+            ExceptionTester<CommandAbortingException>.MessageConstructorTest(message => new CommandAbortingException(message));
 
         [Fact]
         public void MessageAndInnerConstructorTest() =>

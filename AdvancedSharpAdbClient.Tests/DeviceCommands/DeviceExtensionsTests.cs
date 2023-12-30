@@ -1,6 +1,6 @@
 ﻿using NSubstitute;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Tests
@@ -15,6 +15,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Serial = "169.254.109.177:5555",
             State = DeviceState.Online
         };
+
+        [Fact]
+        public void ExecuteServerCommandTest()
+        {
+            const string command = nameof(command);
+            IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>()))
+                .Do(x =>
+                {
+                    Assert.Equal(command, x.ArgAt<string>(0));
+                    Assert.Equal(Device, x.ArgAt<DeviceData>(1));
+                });
+            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
+                .Do(x =>
+                {
+                    Assert.Equal(command, x.ArgAt<string>(0));
+                    Assert.Equal(Device, x.ArgAt<DeviceData>(1));
+                    Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
+                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
+                });
+
+            client.ExecuteShellCommand(Device, command);
+            client.ExecuteShellCommand(Device, command, receiver);
+        }
 
         /// <summary>
         /// Tests the <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> method.
@@ -63,24 +89,65 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("shell:input keyevent KEYCODE_HOME", client.ReceivedCommands[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.Stat(IAdbClient, DeviceData, string)"/> method.
+        /// </summary>
         [Fact]
         public void StatTest()
         {
+            const string remotePath = "/test";
             FileStatistics stats = new();
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
-            mock.Stat("/test").Returns(stats);
+            mock.Stat(Arg.Any<string>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    return stats;
+                });
 
             Factories.SyncServiceFactory = (c, d) =>
             {
                 Factories.Reset();
+                Assert.Equal(d, Device);
                 return mock;
             };
 
-            Assert.Equal(stats, client.Stat(Device, "/test"));
+            Assert.Equal(stats, client.Stat(Device, remotePath));
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetDirectoryListing(IAdbClient, DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void GetDirectoryListingTest()
+        {
+            const string remotePath = "/test";
+            IEnumerable<FileStatistics> stats = [new()];
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.GetDirectoryListing(Arg.Any<string>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    return stats;
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Factories.Reset();
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, client.GetDirectoryListing(Device, remotePath));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetEnvironmentVariables(IAdbClient, DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void GetEnvironmentVariablesTest()
         {
@@ -95,6 +162,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("b", variables["a"]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.UninstallPackage(IAdbClient, DeviceData, string, string[])"/> method.
+        /// </summary>
         [Fact]
         public void UninstallPackageTests()
         {
@@ -108,6 +178,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetPackageVersion(IAdbClient, DeviceData, string)"/> method.
+        /// </summary>
         [Theory]
         [InlineData(@"Activity Resolver Table:
   Non-Data Actions:
@@ -350,6 +423,9 @@ Compiler stats:
             Assert.Equal($"shell:dumpsys package {packageName}", adbClient.ReceivedCommands[0]);
         }
 
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.ListProcesses(IAdbClient, DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ListProcessesTest()
         {

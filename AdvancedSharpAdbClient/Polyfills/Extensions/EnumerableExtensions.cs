@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient.Polyfills
 {
@@ -73,15 +75,50 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">The <see cref="IAsyncEnumerable{T}"/> to create a <see cref="List{T}"/> from.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{List}"/> which returns a <see cref="List{T}"/> that contains elements from the input sequence.</returns>
-        public static async ValueTask<List<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source)
+        public static async ValueTask<List<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source, CancellationToken cancellationToken = default)
         {
             List<TSource> list = [];
-            await foreach (TSource item in source.ConfigureAwait(false))
+            await foreach (TSource item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
             {
                 list.Add(item);
             }
             return list;
+        }
+
+        /// <summary>
+        /// Returns the input typed as <see cref="IAsyncEnumerable{TSource}"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
+        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this IEnumerable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using IEnumerator<TSource> enumerator = source.GetEnumerator();
+            while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())
+            {
+                await Task.Yield();
+                yield return enumerator.Current;
+            }
+        }
+
+        /// <summary>
+        /// Returns the input typed as <see cref="IAsyncEnumerable{TSource}"/>.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
+        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this Task<IEnumerable<TSource>> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using IEnumerator<TSource> enumerator = await source.ContinueWith(x => x.Result.GetEnumerator()).ConfigureAwait(false);
+            while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())
+            {
+                await Task.Yield();
+                yield return enumerator.Current;
+            }
         }
 #endif
 #endif

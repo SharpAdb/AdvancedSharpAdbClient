@@ -10,13 +10,5 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// Represents an exception with Element.
     /// </summary>
     [Serializable]
-    public class InvalidTextException : Exception
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidTextException"/> class.
-        /// </summary>
-        public InvalidTextException() : base("Text contains invalid symbols")
-        {
-        }
-    }
+    public class InvalidTextException() : Exception("Text contains invalid symbols");
 }

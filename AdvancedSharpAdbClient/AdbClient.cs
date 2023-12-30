@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the current port at which the Android Debug Bridge server listens.
         /// </summary>
-        public static int AdbServerPort => int.TryParse(Environment.GetEnvironmentVariable("ANDROID_ADB_SERVER_PORT"), out int result) ? result : DefaultAdbServerPort;
+        public static int AdbServerPort => int.TryParse(TryGetEnvironmentVariable("ANDROID_ADB_SERVER_PORT"), out int result) ? result : DefaultAdbServerPort;
 
         /// <summary>
         /// The Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.
@@ -1127,6 +1127,24 @@ namespace AdvancedSharpAdbClient
             if (string.IsNullOrEmpty(device.Serial))
             {
                 throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the value of an environment variable from the current process.
+        /// </summary>
+        /// <param name="variable">The name of the environment variable.</param>
+        /// <returns>The value of the environment variable specified by <paramref name="variable"/>,
+        /// or <see langword="null"/> if the environment variable is not found.</returns>
+        private static string? TryGetEnvironmentVariable(string variable)
+        {
+            try
+            {
+                return Environment.GetEnvironmentVariable(variable);
+            }
+            catch
+            {
+                return null;
             }
         }
     }

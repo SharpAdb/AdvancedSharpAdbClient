@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
-        public static async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(this IAdbClient client, DeviceData device, string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public static async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(this IAdbClient client, DeviceData device, string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             await foreach (FileStatistics file in service.GetDirectoryAsyncListing(remotePath, cancellationToken).ConfigureAwait(false))
@@ -471,12 +471,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default)
+        public static Task UninstallPackageAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
-            return manager.UninstallPackageAsync(packageName, cancellationToken);
+            return manager.UninstallPackageAsync(packageName, arguments);
         }
 
         /// <summary>

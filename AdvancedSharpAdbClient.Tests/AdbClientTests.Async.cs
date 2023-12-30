@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void CreateForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
-                (device) => TestClient.CreateForwardAsync(device, "tcp:1", "tcp:2", true),
+                device => TestClient.CreateForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void CreateReverseAsyncTest() =>
             await RunCreateReverseAsyncTest(
-                (device) => TestClient.CreateReverseForwardAsync(device, "tcp:1", "tcp:2", true),
+                device => TestClient.CreateReverseForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void CreateTcpForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
-                (device) => TestClient.CreateForwardAsync(device, 3, 4),
+                device => TestClient.CreateForwardAsync(device, 3, 4),
                 "tcp:3;tcp:4");
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void CreateSocketForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
-                (device) => TestClient.CreateForwardAsync(device, 5, "/socket/1"),
+                device => TestClient.CreateForwardAsync(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
 
         /// <summary>

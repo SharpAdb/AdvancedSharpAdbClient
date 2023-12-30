@@ -21,12 +21,12 @@ namespace AdvancedSharpAdbClient.Tests
             if (integrationTest)
             {
                 TracingAdbSocket tracingSocket = new(EndPoint) { DoDispose = doDispose };
-                AdbSocketFactory = (endPoint) => tracingSocket;
+                AdbSocketFactory = endPoint => tracingSocket;
             }
             else
             {
                 DummyAdbSocket socket = new();
-                AdbSocketFactory = (endPoint) => socket;
+                AdbSocketFactory = endPoint => socket;
             }
 
             IntegrationTest = integrationTest;
@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.Tests
             // In release mode (e.g. on the build server),
             // never run integration tests.
             DummyAdbSocket socket = new();
-            AdbSocketFactory = (endPoint) => socket;
+            AdbSocketFactory = endPoint => socket;
             IntegrationTest = false;
 #endif
             Socket = (IDummyAdbSocket)AdbSocketFactory(EndPoint);

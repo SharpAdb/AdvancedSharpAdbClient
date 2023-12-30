@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Exceptions.Tests
 
         [Fact]
         public void MessageConstructorTest() =>
-            ExceptionTester<UnknownOptionException>.MessageConstructorTest((message) => new UnknownOptionException(message));
+            ExceptionTester<UnknownOptionException>.MessageConstructorTest(message => new UnknownOptionException(message));
 
         [Fact]
         public void MessageAndInnerConstructorTest() =>
