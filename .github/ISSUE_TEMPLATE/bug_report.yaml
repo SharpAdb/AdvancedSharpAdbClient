@@ -32,6 +32,7 @@ body:
       description: Specify the version of AdvancedSharpAdbClient you're using.
       options:
         - "Latest Source"
+        - "3.0.9"
         - "2.5.8"
         - "2.5.7"
         - "2.5.6"
