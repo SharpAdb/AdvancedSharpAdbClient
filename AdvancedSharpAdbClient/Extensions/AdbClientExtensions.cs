@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IShellOutputReceiver receiver) =>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IShellOutputReceiver? receiver) =>
             client.ExecuteServerCommand(target, command, receiver, AdbClient.Encoding);
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver receiver) =>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver) =>
             client.ExecuteServerCommand(target, command, socket, receiver, AdbClient.Encoding);
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver) =>
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver? receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         public static void Install(this IAdbClient client, DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            client.Install(device, apk, progress == null ? null : progress.Report, arguments);
+            client.Install(device, apk, progress.AsAction(), arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -355,7 +355,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         public static void InstallMultiple(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            client.InstallMultiple(device, baseAPK, splitAPKs, progress == null ? null : progress.Report, arguments);
+            client.InstallMultiple(device, baseAPK, splitAPKs, progress.AsAction(), arguments);
 
         /// <summary>
         /// Push multiple APKs to the device and install them.
@@ -368,7 +368,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         public static void InstallMultiple(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            client.InstallMultiple(device, splitAPKs, packageName, progress == null ? null : progress.Report, arguments);
+            client.InstallMultiple(device, splitAPKs, packageName, progress.AsAction(), arguments);
 
         /// <summary>
         /// Write an apk into the given install session.
@@ -381,7 +381,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         public static void InstallWrite(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress) =>
-            client.InstallWrite(device, apk, apkName, session, progress == null ? null : progress.Report);
+            client.InstallWrite(device, apk, apkName, session, progress.AsAction());
 #endif
     }
 }

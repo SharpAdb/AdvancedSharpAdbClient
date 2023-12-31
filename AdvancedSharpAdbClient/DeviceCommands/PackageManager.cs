@@ -401,7 +401,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         public virtual void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallPackage(packageFilePath, progress == null ? null : progress.Report, arguments);
+            InstallPackage(packageFilePath, progress.AsAction(), arguments);
 
         /// <summary>
         /// Installs the application package that was pushed to a temporary location on the device.
@@ -411,7 +411,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         public virtual void InstallRemotePackage(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallRemotePackage(remoteFilePath, progress == null ? null : progress.Report, arguments);
+            InstallRemotePackage(remoteFilePath, progress.AsAction(), arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -422,7 +422,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress == null ? null : progress.Report, arguments);
+            InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -433,7 +433,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallMultiplePackage(splitPackageFilePaths, packageName, progress == null ? null : progress.Report, arguments);
+            InstallMultiplePackage(splitPackageFilePaths, packageName, progress.AsAction(), arguments);
 
         /// <summary>
         /// Installs the multiple application package that was pushed to a temporary location on the device.
@@ -444,7 +444,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, progress == null ? null : progress.Report, arguments);
+            InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, progress.AsAction(), arguments);
 
         /// <summary>
         /// Installs the multiple application package that was pushed to a temporary location on the device.
@@ -455,7 +455,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         public virtual void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
-            InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, progress == null ? null : progress.Report, arguments);
+            InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, progress.AsAction(), arguments);
 #endif
 
         /// <summary>

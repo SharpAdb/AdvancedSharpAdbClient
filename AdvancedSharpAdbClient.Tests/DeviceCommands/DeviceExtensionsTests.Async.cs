@@ -14,7 +14,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             const string command = nameof(command);
             IAdbSocket socket = Substitute.For<IAdbSocket>();
-            IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            static bool predicate(string x) => true;
+            IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
             List<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
@@ -39,6 +40,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             await client.ExecuteShellCommandAsync(Device, command);
             await client.ExecuteShellCommandAsync(Device, command, receiver);
+            await client.ExecuteShellCommandAsync(Device, command, predicate);
         }
 
         /// <summary>

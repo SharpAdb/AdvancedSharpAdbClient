@@ -135,6 +135,16 @@ namespace AdvancedSharpAdbClient
             waitHandle.Close();
             GC.SuppressFinalize(waitHandle);
         }
+#else
+        /// <summary>
+        /// Converts a <see cref="IProgress{T}"/> to a <see cref="Action{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of progress update value.</typeparam>
+        /// <param name="progress">The <see cref="IProgress{T}"/> to convert.</param>
+        /// <returns>The <see cref="Action{T}"/> created from the specified <see cref="IProgress{T}"/>.</returns>
+        [return: NotNullIfNotNull(nameof(progress))]
+        public static Action<T>? AsAction<T>(this IProgress<T>? progress) =>
+            progress == null ? null : progress.Report;
 #endif
 
         public static bool IsWindowsPlatform() =>

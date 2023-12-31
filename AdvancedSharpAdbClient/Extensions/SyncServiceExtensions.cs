@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Push(this ISyncService service, Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false) =>
-            service.Push(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, isCancelled);
+            service.Push(stream, remotePath, permissions, timestamp, progress.AsAction(), isCancelled);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         public static void Pull(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false) =>
-            service.Pull(remotePath, stream, progress == null ? null : progress.Report, isCancelled);
+            service.Pull(remotePath, stream, progress.AsAction(), isCancelled);
     }
 }
 #endif

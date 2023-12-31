@@ -33,8 +33,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
-        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver) =>
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver? receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, Func<string, bool>? predicate) =>
+            client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
 
         /// <summary>
         /// Gets the current device screen snapshot.
@@ -334,7 +344,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Pull(remotePath, stream, progress == null ? null : progress.Report, in isCancelled);
+            service.Pull(remotePath, stream, progress.AsAction(), in isCancelled);
         }
 
         /// <summary>
@@ -354,7 +364,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Push(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, in isCancelled);
+            service.Push(stream, remotePath, permissions, timestamp, progress.AsAction(), in isCancelled);
         }
 
         /// <summary>

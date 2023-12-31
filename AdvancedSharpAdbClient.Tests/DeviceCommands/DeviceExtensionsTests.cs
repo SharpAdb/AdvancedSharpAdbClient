@@ -20,7 +20,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void ExecuteServerCommandTest()
         {
             const string command = nameof(command);
-            IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            static bool predicate(string x) => true;
+            IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
 
             IAdbClient client = Substitute.For<IAdbClient>();
             client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>()))
@@ -40,6 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             client.ExecuteShellCommand(Device, command);
             client.ExecuteShellCommand(Device, command, receiver);
+            client.ExecuteShellCommand(Device, command, predicate);
         }
 
         /// <summary>

@@ -36,8 +36,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver receiver, CancellationToken cancellationToken = default) =>
+        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver? receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static Task ExecuteShellCommandAsync(this IAdbClient client, DeviceData device, string command, Func<string, bool>? predicate, CancellationToken cancellationToken = default) =>
+            client.ExecuteRemoteCommandAsync(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding, cancellationToken);
 
         /// <summary>
         /// Asynchronously gets the current device screen snapshot asynchronously.
@@ -387,7 +399,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PullAsync(remotePath, stream, progress == null ? null : progress.Report, cancellationToken).ConfigureAwait(false);
+            await service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -408,7 +420,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PushAsync(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, cancellationToken).ConfigureAwait(false);
+            await service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

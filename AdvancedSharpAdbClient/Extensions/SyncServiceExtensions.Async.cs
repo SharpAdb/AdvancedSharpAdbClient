@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task PushAsync(this ISyncService service, Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
-            service.PushAsync(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, cancellationToken);
+            service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), cancellationToken);
 
         /// <summary>
         /// Asynchronously pulls (downloads) a file from the remote device.
@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task PullAsync(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
-            service.PullAsync(remotePath, stream, progress == null ? null : progress.Report, cancellationToken);
+            service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task PushAsync(this ISyncService.IWinRT service, IInputStream stream, string remotePath, int permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
-            service.PushAsync(stream, remotePath, permissions, timestamp, progress == null ? null : progress.Report, cancellationToken);
+            service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), cancellationToken);
 
         /// <summary>
         /// Asynchronously pulls (downloads) a file from the remote device.
@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task PullAsync(this ISyncService.IWinRT service, string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
-            service.PullAsync(remotePath, stream, progress == null ? null : progress.Report, cancellationToken);
+            service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken);
 #endif
     }
 }
