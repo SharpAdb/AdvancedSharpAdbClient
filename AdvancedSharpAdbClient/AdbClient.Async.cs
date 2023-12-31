@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public virtual async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public virtual async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -226,7 +226,7 @@ namespace AdvancedSharpAdbClient
                 {
                     string? line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
                     if (line == null) { break; }
-                    if (receiver?.AddOutput(line) == false) { break; }
+                    if (receiver != null && await receiver.AddOutputAsync(line, cancellationToken) == false) { break; }
                 }
             }
             catch (Exception e)
@@ -246,7 +246,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public virtual async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(encoding);

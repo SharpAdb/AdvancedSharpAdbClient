@@ -348,7 +348,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding)
+        public virtual void ExecuteServerCommand(string target, string command, IShellOutputReceiver? receiver, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -356,7 +356,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding)
+        public virtual void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -395,7 +395,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding)
+        public virtual void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding)
         {
             EnsureDevice(device);
 

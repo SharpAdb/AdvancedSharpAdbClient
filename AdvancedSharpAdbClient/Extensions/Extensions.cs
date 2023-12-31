@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -42,6 +43,15 @@ namespace AdvancedSharpAdbClient
                 ? throw new ArgumentNullException(nameof(host))
                 : new DnsEndPoint(values[0], values.Length > 1 && int.TryParse(values[1], out int _port) ? _port : port);
         }
+
+        /// <summary>
+        /// Converts a <see cref="Func{String, Boolean}"/> to a <see cref="IShellOutputReceiver"/>.
+        /// </summary>
+        /// <param name="predicate">The function to call for each line of output</param>
+        /// <returns>The <see cref="IShellOutputReceiver"/> created from the specified function.</returns>
+        [return: NotNullIfNotNull(nameof(predicate))]
+        public static IShellOutputReceiver? AsShellOutputReceiver(this Func<string, bool>? predicate) =>
+            predicate == null ? null! : new FunctionOutputReceiver(predicate);
 
 #if HAS_TASK
 #if !NET7_0_OR_GREATER

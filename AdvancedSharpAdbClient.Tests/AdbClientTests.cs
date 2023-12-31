@@ -357,7 +357,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteServerCommand(string, string, IAdbSocket, IShellOutputReceiver, Encoding)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteServerCommand(string, string, IAdbSocket, IShellOutputReceiver?, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteServerCommandTest()
@@ -382,7 +382,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver?, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteRemoteCommandTest()
@@ -409,7 +409,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver?, Encoding)"/> method.
         /// </summary>
         [Fact]
         public void ExecuteRemoteCommandUnresponsiveTest()

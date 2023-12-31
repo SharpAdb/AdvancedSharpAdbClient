@@ -18,7 +18,9 @@ namespace AdvancedSharpAdbClient.Tests
             const string target = nameof(target);
             const string command = nameof(command);
             IAdbSocket socket = Substitute.For<IAdbSocket>();
-            IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            static bool predicate(string x) => true;
+            IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
+            Encoding encoding = AdbClient.Encoding;
             IEnumerable<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
@@ -28,7 +30,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(target, x.ArgAt<string>(0));
                     Assert.Equal(command, x.ArgAt<string>(1));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                 });
             client.When(x => x.ExecuteServerCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
                 .Do(x =>
@@ -37,14 +39,14 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(command, x.ArgAt<string>(1));
                     Assert.Equal(socket, x.ArgAt<IAdbSocket>(2));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(3));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(4));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(4));
                 });
             _ = client.ExecuteServerCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
                     Assert.Equal(command, x.ArgAt<string>(1));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(2));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(2));
                     return result;
                 });
             _ = client.ExecuteServerCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>())
@@ -53,12 +55,16 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(target, x.ArgAt<string>(0));
                     Assert.Equal(command, x.ArgAt<string>(1));
                     Assert.Equal(socket, x.ArgAt<IAdbSocket>(2));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                     return result;
                 });
 
             client.ExecuteServerCommand(target, command, receiver);
             client.ExecuteServerCommand(target, command, socket, receiver);
+            client.ExecuteServerCommand(target, command, predicate);
+            client.ExecuteServerCommand(target, command, socket, predicate);
+            client.ExecuteServerCommand(target, command, predicate, encoding);
+            client.ExecuteServerCommand(target, command, socket, predicate, encoding);
             Assert.Equal(result, AdbClientExtensions.ExecuteServerCommand(client, target, command));
             Assert.Equal(result, AdbClientExtensions.ExecuteServerCommand(client, target, command, socket));
         }
@@ -68,7 +74,9 @@ namespace AdvancedSharpAdbClient.Tests
         {
             const string command = nameof(command);
             DeviceData device = new();
-            IShellOutputReceiver receiver = Substitute.For<IShellOutputReceiver>();
+            static bool predicate(string x) => true;
+            IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
+            Encoding encoding = AdbClient.Encoding;
             IEnumerable<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
@@ -78,18 +86,20 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(command, x.ArgAt<string>(0));
                     Assert.Equal(device, x.ArgAt<DeviceData>(1));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                 });
             _ = client.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
                     Assert.Equal(device, x.ArgAt<DeviceData>(1));
-                    Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(2));
+                    Assert.Equal(encoding, x.ArgAt<Encoding>(2));
                     return result;
                 });
 
             client.ExecuteRemoteCommand(command, device, receiver);
+            client.ExecuteRemoteCommand(command, device, predicate);
+            client.ExecuteRemoteCommand(command, device, predicate, encoding);
             Assert.Equal(result, AdbClientExtensions.ExecuteRemoteCommand(client, command, device));
         }
 

@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding);
+        void ExecuteServerCommand(string target, string command, IShellOutputReceiver? receiver, Encoding encoding);
 
         /// <summary>
         /// Executes a command on the adb server.
@@ -228,7 +228,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding);
+        void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver, Encoding encoding);
 
         /// <summary>
         /// Executes a shell command on the device.
@@ -237,7 +237,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
-        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding);
+        void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding);
 
         /// <summary>
         /// Executes a command on the adb server and returns the output.

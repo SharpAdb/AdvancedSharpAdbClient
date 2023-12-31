@@ -248,7 +248,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteServerCommandAsync(string, string, IShellOutputReceiver, Encoding, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteServerCommandAsync(string, string, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteServerCommandAsyncTest()
@@ -273,7 +273,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, Encoding, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncTest()
@@ -300,7 +300,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver, Encoding, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ExecuteRemoteCommandAsyncUnresponsiveTest()

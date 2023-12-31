@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
@@ -112,6 +113,75 @@ namespace AdvancedSharpAdbClient
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, Func<string, bool>? predicate) =>
+            client.ExecuteServerCommand(target, command, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate) =>
+            client.ExecuteServerCommand(target, command, socket, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate) =>
+            client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, Func<string, bool>? predicate, Encoding encoding) =>
+            client.ExecuteServerCommand(target, command, predicate.AsShellOutputReceiver(), encoding);
+
+        /// <summary>
+        /// Executes a command on the adb server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
+        /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate, Encoding encoding) =>
+            client.ExecuteServerCommand(target, command, socket, predicate.AsShellOutputReceiver(), encoding);
+
+        /// <summary>
+        /// Executes a shell command on the device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="command">The command to execute.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate, Encoding encoding) =>
+            client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), encoding);
 
         /// <summary>
         /// Executes a command on the adb server and returns the output.

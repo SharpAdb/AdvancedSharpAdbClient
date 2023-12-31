@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient.Receivers
     /// <summary>
     /// A multiline receiver to receive and process shell output with multi lines.
     /// </summary>
-    public abstract class MultiLineReceiver : ShellOutputReceiver
+    public abstract partial class MultiLineReceiver : ShellOutputReceiver
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiLineReceiver"/> class.

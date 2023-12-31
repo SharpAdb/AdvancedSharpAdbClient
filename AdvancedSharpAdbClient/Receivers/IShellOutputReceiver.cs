@@ -11,13 +11,13 @@ namespace AdvancedSharpAdbClient.Receivers
     /// the receivers in combination with the <see cref="AdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/>
     /// method to capture the output of any Android command.
     /// </summary>
-    public interface IShellOutputReceiver
+    public partial interface IShellOutputReceiver
     {
         /// <summary>
         /// Adds a line to the output.
         /// </summary>
         /// <param name="line">The line to add to the output.</param>
-        /// <value><see langword="true"/> if continue receive messages; otherwise <see langword="false"/>.</value>
+        /// <returns><see langword="true"/> if continue receive messages; otherwise <see langword="false"/>.</returns>
         bool AddOutput(string line);
 
         /// <summary>
