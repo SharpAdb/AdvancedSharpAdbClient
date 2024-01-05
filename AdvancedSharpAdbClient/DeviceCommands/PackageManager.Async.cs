@@ -484,7 +484,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task{Stream}"/> which returns a read-only <see cref="Stream"/> on the specified path.</returns>
         protected virtual Task<Stream> GetFileStreamAsync(string path, CancellationToken cancellationToken = default) =>
 #if WINDOWS_UWP
-            StorageFile.GetFileFromPathAsync(path).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenReadAsync().AsTask(cancellationToken)).Unwrap().ContinueWith(x => x.Result.AsStream());
+            StorageFile.GetFileFromPathAsync(path).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenStreamForReadAsync()).Unwrap();
 #else
             TaskExExtensions.FromResult<Stream>(File.OpenRead(path));
 #endif

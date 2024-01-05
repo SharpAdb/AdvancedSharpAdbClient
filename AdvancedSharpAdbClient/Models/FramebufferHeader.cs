@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 #if WINDOWS_UWP
-using System.IO;
 using System.Threading;
 #endif
 
@@ -432,22 +431,19 @@ namespace AdvancedSharpAdbClient.Models
             else
             {
                 FramebufferHeader self = this;
-
                 TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
-
                 _ = dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
                     try
                     {
                         WriteableBitmap? result = await self.ToBitmapAsync(buffer, cancellationToken).ConfigureAwait(false);
-                        taskCompletionSource.SetResult(result);
+                        _ = taskCompletionSource.TrySetResult(result);
                     }
                     catch (Exception e)
                     {
-                        taskCompletionSource.SetException(e);
+                        _ = taskCompletionSource.TrySetException(e);
                     }
                 });
-
                 return taskCompletionSource.Task;
             }
         }
@@ -470,25 +466,22 @@ namespace AdvancedSharpAdbClient.Models
             else
             {
                 FramebufferHeader self = this;
-
                 TaskCompletionSource<WriteableBitmap?> taskCompletionSource = new();
-
                 if (!dispatcher.TryEnqueue(async () =>
                 {
                     try
                     {
                         WriteableBitmap? result = await self.ToBitmapAsync(buffer, cancellationToken).ConfigureAwait(false);
-                        taskCompletionSource.SetResult(result);
+                        _ = taskCompletionSource.TrySetResult(result);
                     }
                     catch (Exception e)
                     {
-                        taskCompletionSource.SetException(e);
+                        _ = taskCompletionSource.TrySetException(e);
                     }
                 }))
                 {
-                    taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
+                    _ = taskCompletionSource.TrySetException(new InvalidOperationException("Failed to enqueue the operation"));
                 }
-
                 return taskCompletionSource.Task;
             }
         }
@@ -519,7 +512,7 @@ namespace AdvancedSharpAdbClient.Models
 
             using InMemoryRandomAccessStream random = new();
             BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, random).AsTask(cancellationToken);
-            encoder.SetPixelData(bitmapPixelFormat, alphaMode, Width, Height, 960, 960, buffer);
+            encoder.SetPixelData(bitmapPixelFormat, alphaMode, Width, Height, 96, 96, buffer);
             await encoder.FlushAsync().AsTask(cancellationToken);
             WriteableBitmap WriteableImage = new((int)Width, (int)Height);
             await WriteableImage.SetSourceAsync(random).AsTask(cancellationToken).ConfigureAwait(false);

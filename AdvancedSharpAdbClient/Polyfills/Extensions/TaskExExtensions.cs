@@ -117,11 +117,11 @@ namespace AdvancedSharpAdbClient.Polyfills
                 try
                 {
                     TResult result = await function.AsTask(cancellationToken).ConfigureAwait(false);
-                    taskCompletionSource.SetResult(result);
+                    _ = taskCompletionSource.TrySetResult(result);
                 }
                 catch (Exception e)
                 {
-                    taskCompletionSource.SetException(e);
+                    _ = taskCompletionSource.TrySetException(e);
                 }
             }, cancellationToken);
             TResult taskResult = task.Result;
@@ -143,11 +143,11 @@ namespace AdvancedSharpAdbClient.Polyfills
                 try
                 {
                     await function.ConfigureAwait(false);
-                    taskCompletionSource.SetResult(null);
+                    _ = taskCompletionSource.TrySetResult(null);
                 }
                 catch (Exception e)
                 {
-                    taskCompletionSource.SetException(e);
+                    _ = taskCompletionSource.TrySetException(e);
                 }
             }, cancellationToken);
             _ = task.Result;
@@ -169,11 +169,11 @@ namespace AdvancedSharpAdbClient.Polyfills
                 try
                 {
                     TResult result = await function.ConfigureAwait(false);
-                    taskCompletionSource.SetResult(result);
+                    _ = taskCompletionSource.TrySetResult(result);
                 }
                 catch (Exception e)
                 {
-                    taskCompletionSource.SetException(e);
+                    _ = taskCompletionSource.TrySetException(e);
                 }
             }, cancellationToken);
             TResult taskResult = task.Result;

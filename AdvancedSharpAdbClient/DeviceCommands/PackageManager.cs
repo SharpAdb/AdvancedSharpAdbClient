@@ -520,7 +520,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
         protected virtual Stream GetFileStream(string path) =>
 #if WINDOWS_UWP
-            StorageFile.GetFileFromPathAsync(path).AwaitByTaskCompleteSource().OpenReadAsync().AwaitByTaskCompleteSource().AsStream();
+            StorageFile.GetFileFromPathAsync(path).AwaitByTaskCompleteSource().OpenStreamForReadAsync().AwaitByTaskCompleteSource();
 #else
             File.OpenRead(path);
 #endif
