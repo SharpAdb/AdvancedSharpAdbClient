@@ -87,13 +87,24 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         {
             CheckPackagesSection(line);
 
-            return !inPackagesSection ? null
-                : line != null && line.Trim().StartsWith("versionName=")
+            if (inPackagesSection && line != null)
+            {
 #if HAS_BUFFERS
-                ? line.Trim().AsSpan(12).ToString().Trim() : null;
+                ReadOnlySpan<char> span = line.AsSpan().Trim();
+                if (span.StartsWith("versionName="))
+                {
+                    return span[12..].Trim().ToString();
+                }
 #else
-                ? line.Trim()[12..].Trim() : null;
+                line = line.Trim();
+                if (line.StartsWith("versionName="))
+                {
+                    return line[12..].Trim();
+                }
 #endif
+            }
+
+            return null;
         }
 
         /// <summary>

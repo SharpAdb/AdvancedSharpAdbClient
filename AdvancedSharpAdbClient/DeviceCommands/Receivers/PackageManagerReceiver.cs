@@ -37,17 +37,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                     // package:mwc2015.be
 
                     // Remove the "package:" prefix
-                    string package =
-#if HAS_BUFFERS
-                        line.AsSpan(8).ToString();
-#else
-                        line[8..];
-#endif
-                    //// If there's a '=' included, use the last instance,
-                    //// to accommodate for values like
-                    //// "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
-                    //string[] parts = line.Split(':', '=');
+                    string package = line[8..];
 
+                    // If there's a '=' included, use the last instance,
+                    // to accommodate for values like
+                    // "package:/data/app/com.google.android.apps.plus-qQaDuXCpNqJuQSbIS6OxGA==/base.apk=com.google.android.apps.plus"
                     int separator = package.LastIndexOf('=');
 
                     if (separator == -1)
@@ -56,13 +50,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
                     }
                     else
                     {
-#if HAS_BUFFERS
-                        string path = package.AsSpan(0, separator).ToString();
-                        string name = package.AsSpan(separator + 1).ToString();
-#else
-                        string path = package[..separator];
-                        string name = package[(separator + 1)..];
-#endif
+                        string path = package[..separator++];
+                        string name = package[separator..];
                         PackageManager.Packages[name] = path;
                     }
                 }

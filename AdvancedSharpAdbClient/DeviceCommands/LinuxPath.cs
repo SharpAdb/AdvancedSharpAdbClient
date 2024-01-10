@@ -120,12 +120,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                         return tpath;
                     }
 
-                    tpath =
-#if HAS_BUFFERS
-                        tpath.AsSpan(0, tpath.LastIndexOf(DirectorySeparatorChar) + 1).ToString();
-#else
-                        tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
-#endif
+                    tpath = tpath[..(tpath.LastIndexOf(DirectorySeparatorChar) + 1)];
 
                     return FixupPath(tpath);
                 }

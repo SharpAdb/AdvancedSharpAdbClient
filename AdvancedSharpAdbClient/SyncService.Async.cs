@@ -312,7 +312,7 @@ namespace AdvancedSharpAdbClient
                 // The first 4 bytes contain the length of the data packet
                 byte[] reply = new byte[4];
                 _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-                
+
                 int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
                 if (size > MaxBufferSize)

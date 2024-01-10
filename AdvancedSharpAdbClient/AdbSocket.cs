@@ -545,7 +545,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The new <see cref="TcpSocket"/> instance.</returns>
         private static TcpSocket CreateTcpSocket(EndPoint endPoint)
         {
-            TcpSocket socket = new TcpSocket();
+            TcpSocket socket = new();
             socket.Connect(endPoint);
             socket.ReceiveBufferSize = ReceiveBufferSize;
             return socket;

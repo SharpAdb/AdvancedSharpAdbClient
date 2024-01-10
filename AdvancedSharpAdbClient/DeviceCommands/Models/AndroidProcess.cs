@@ -76,13 +76,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 Name = comm;
             }
 
-            string[] parts =
-#if HAS_BUFFERS
-                line.AsSpan(processNameEnd + 1).ToString()
-#else
-                line[(processNameEnd + 1)..]
-#endif
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = line[(processNameEnd + 1)..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length < 35)
             {
