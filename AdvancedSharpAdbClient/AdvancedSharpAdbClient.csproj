@@ -106,6 +106,10 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PublishAot>True</PublishAot>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' != 'net2.0-client'
                         and '$(TargetFramework)' != 'net3.0-client' and
                            ('$(ImportAsync)' == 'True'
