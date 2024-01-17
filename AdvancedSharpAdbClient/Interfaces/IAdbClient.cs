@@ -52,7 +52,6 @@ namespace AdvancedSharpAdbClient
         /// <para>The following example list all Android devices that are currently connected to this PC:</para>
         /// <code>
         /// var devices = new AdbClient().GetDevices();
-        /// 
         /// foreach (var device in devices)
         /// {
         ///     Console.WriteLine(device.Name);

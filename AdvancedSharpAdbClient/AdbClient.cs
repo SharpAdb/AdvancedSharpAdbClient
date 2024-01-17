@@ -136,7 +136,7 @@ namespace AdvancedSharpAdbClient
         public static int AdbServerPort => int.TryParse(TryGetEnvironmentVariable("ANDROID_ADB_SERVER_PORT"), out int result) ? result : DefaultAdbServerPort;
 
         /// <summary>
-        /// The Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.
+        /// Gets the Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
         public static EndPoint DefaultEndPoint => new IPEndPoint(IPAddress.Loopback, DefaultPort);
 
@@ -410,7 +410,10 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            return ExecuteServerCommand(target, command, socket, encoding);
+            foreach (string line in ExecuteServerCommand(target, command, socket, encoding))
+            {
+                yield return line;
+            }
         }
 
         /// <inheritdoc/>
@@ -457,7 +460,10 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             socket.SetDevice(device);
 
-            return ExecuteServerCommand("shell", command, socket, encoding);
+            foreach (string line in ExecuteServerCommand("shell", command, socket, encoding))
+            {
+                yield return line;
+            }
         }
 
         /// <inheritdoc/>
