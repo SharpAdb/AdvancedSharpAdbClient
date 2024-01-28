@@ -2,8 +2,6 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
-using System;
-
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -12,9 +10,10 @@ namespace AdvancedSharpAdbClient
     public partial interface IAdbCommandLineClient
     {
         /// <summary>
-        /// Queries adb for its version number and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
+        /// Queries adb for its version and path and checks it against <see cref="AdbServer.RequiredAdbVersion"/>.
         /// </summary>
-        Version GetVersion();
+        /// <returns>A <see cref="AdbCommandLineStatus"/> object that represents the version and path of the adb command line client.</returns>
+        AdbCommandLineStatus GetVersion();
 
         /// <summary>
         /// Starts the adb server by running the <c>adb start-server</c> command.
@@ -26,6 +25,6 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
         /// <returns><see langword="true"/> if the <c>adb.exe</c> file is exists, otherwise <see langword="false"/>.</returns>
-        bool CheckFileExists(string adbPath);
+        bool CheckAdbFileExists(string adbPath);
     }
 }

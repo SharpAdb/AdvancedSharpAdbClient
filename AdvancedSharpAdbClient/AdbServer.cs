@@ -175,10 +175,10 @@ namespace AdvancedSharpAdbClient
 
                 IAdbCommandLineClient commandLineClient = AdbCommandLineClientFactory(adbPath);
 
-                if (commandLineClient.CheckFileExists(adbPath))
+                if (commandLineClient.CheckAdbFileExists(adbPath))
                 {
                     CachedAdbPath = adbPath;
-                    commandLineVersion = commandLineClient.GetVersion();
+                    commandLineVersion = commandLineClient.GetVersion().AdbVersion;
                 }
 
                 // If the server is running, and no adb path is provided, check if we have the minimum version

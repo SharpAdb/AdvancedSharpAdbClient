@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void StartServerAsyncAlreadyRunningTest()
         {
-            commandLineClient.Version = new Version(1, 0, 20);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.20"]);
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0020");
 
@@ -98,7 +98,8 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0010");
 
-            _ = await Assert.ThrowsAsync<AdbException>(async () => await adbServer.StartServerAsync(null, false));
+            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(async () => await adbServer.StartServerAsync(null, false));
+            Assert.IsType<AdbException>(exception.InnerException);
         }
 
         /// <summary>
@@ -111,7 +112,8 @@ namespace AdvancedSharpAdbClient.Tests
 
             adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
-            _ = await Assert.ThrowsAsync<AdbException>(async () => await adbServer.StartServerAsync(null, false));
+            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(async () => await adbServer.StartServerAsync(null, false));
+            Assert.IsType<AdbException>(exception.InnerException);
         }
 
         /// <summary>
@@ -123,7 +125,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0010");
 
-            commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
             _ = await adbServer.StartServerAsync(ServerName, false);
@@ -145,7 +147,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
-            commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
 
@@ -163,7 +165,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("001f");
 
-            commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
             _ = await adbServer.StartServerAsync(ServerName, true);
@@ -184,7 +186,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("001f");
 
-            commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
             _ = await adbServer.StartServerAsync(ServerName, false);
@@ -204,7 +206,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("001f");
 
-            commandLineClient.Version = new Version(1, 0, 32);
+            commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
             _ = await adbServer.RestartServerAsync(ServerName);

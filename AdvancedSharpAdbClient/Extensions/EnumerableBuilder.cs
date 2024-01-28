@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 
 namespace AdvancedSharpAdbClient
@@ -17,6 +16,14 @@ namespace AdvancedSharpAdbClient
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class EnumerableBuilder
     {
+        /// <summary>
+        /// Build a <see cref="AdbCommandLineStatus"/> struct.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="AdbCommandLineStatus"/> struct.</param>
+        /// <returns>A new instance of <see cref="AdbCommandLineStatus"/> struct.</returns>
+        public static AdbCommandLineStatus AdbCommandLineStatusCreator(ReadOnlySpan<string> values) =>
+            AdbCommandLineStatus.GetVersionFromOutput(values);
+
         /// <summary>
         /// Build a <see cref="ColorData"/> struct.
         /// </summary>

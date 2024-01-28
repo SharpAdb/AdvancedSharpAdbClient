@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient
 {
@@ -17,15 +16,12 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public partial class AdbCommandLineClient : IAdbCommandLineClient
     {
-        /// <summary>
-        /// The regex pattern for getting the adb version from the <c>adb version</c> command.
-        /// </summary>
-        protected const string AdbVersionPattern = "^.*(\\d+)\\.(\\d+)\\.(\\d+)$";
-
+#if HAS_PROCESS
         /// <summary>
         /// The <see cref="Array"/> of <see cref="char"/>s that represent a new line.
         /// </summary>
         private static readonly char[] separator = Extensions.NewLineSeparator;
+#endif
 
         /// <summary>
         /// The logger to use when logging messages.
@@ -36,7 +32,7 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbCommandLineClient"/> class.
         /// </summary>
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
-        /// <param name="isForce">Don't check adb file name when <see langword="true"/>.</param>
+        /// <param name="isForce">Doesn't check adb file when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
@@ -48,11 +44,10 @@ namespace AdvancedSharpAdbClient
             if (!isForce)
             {
                 EnsureIsValidAdbFile(adbPath);
-            }
-
-            if (!CheckFileExists(adbPath))
-            {
-                throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
+                if (!CheckAdbFileExists(adbPath))
+                {
+                    throw new FileNotFoundException($"The adb.exe executable could not be found at {adbPath}");
+                }
             }
 
             AdbPath = adbPath;
@@ -65,15 +60,20 @@ namespace AdvancedSharpAdbClient
         public string AdbPath { get; protected set; }
 
         /// <inheritdoc/>
-        public virtual Version GetVersion()
+        public virtual AdbCommandLineStatus GetVersion()
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
             RunAdbProcess("version", null, standardOutput);
 
             // Parse the output to get the version.
-            Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-            if (version < AdbServer.RequiredAdbVersion)
+            AdbCommandLineStatus version = AdbCommandLineStatus.GetVersionFromOutput(standardOutput);
+
+            if (version.AdbVersion == null)
+            {
+                throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
+            }
+            else if (version.AdbVersion < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
                 logger.LogError(ex, ex.Message);
@@ -124,7 +124,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual bool CheckFileExists(string adbPath) =>
+        public virtual bool CheckAdbFileExists(string adbPath) => adbPath == "adb" ||
 #if WINDOWS_UWP
             StorageFile.GetFileFromPathAsync(adbPath).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File);
 #else
@@ -137,6 +137,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to validate.</param>
         protected virtual void EnsureIsValidAdbFile(string adbPath)
         {
+            if (adbPath == "adb") { return; }
+
             bool isWindows = Extensions.IsWindowsPlatform();
             bool isUnix = Extensions.IsUnixPlatform();
 
@@ -158,35 +160,6 @@ namespace AdvancedSharpAdbClient
             {
                 throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
             }
-        }
-
-        /// <summary>
-        /// Parses the output of the <c>adb.exe version</c> command and determines the adb version.
-        /// </summary>
-        /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
-        /// <returns>A <see cref="Version"/> object that represents the version of the adb command line client.</returns>
-        protected static Version? GetVersionFromOutput(IEnumerable<string> output)
-        {
-            Regex regex = AdbVersionRegex();
-            foreach (string line in output)
-            {
-                // Skip empty lines
-                if (string.IsNullOrEmpty(line))
-                {
-                    continue;
-                }
-
-                Match matcher = regex.Match(line);
-                if (matcher.Success)
-                {
-                    int majorVersion = int.Parse(matcher.Groups[1].Value);
-                    int minorVersion = int.Parse(matcher.Groups[2].Value);
-                    int microVersion = int.Parse(matcher.Groups[3].Value);
-
-                    return new Version(majorVersion, minorVersion, microVersion);
-                }
-            }
-            return null;
         }
 
         /// <summary>
@@ -263,16 +236,5 @@ namespace AdvancedSharpAdbClient
             throw new PlatformNotSupportedException("This platform is not support System.Diagnostics.Process. You can start adb server by running `adb start-server` manually.");
 #endif
         }
-
-#if NET7_0_OR_GREATER
-        [GeneratedRegex(AdbVersionPattern)]
-        private static partial Regex AdbVersionRegex();
-#else
-        /// <summary>
-        /// Gets a <see cref="Regex"/> for parsing the adb version.
-        /// </summary>
-        /// <returns>The <see cref="Regex"/> for parsing the adb version.</returns>
-        private static Regex AdbVersionRegex() => new(AdbVersionPattern);
-#endif
     }
 }

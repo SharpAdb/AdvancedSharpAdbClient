@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient
         public static int WriteBufferSize { get; set; } = 1024;
 
         /// <summary>
-        /// The underlying TCP socket that manages the connection with the ADB server.
+        /// Gets the underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
         public ITcpSocket Socket { get; init; } = socket ?? throw new ArgumentNullException(nameof(socket));
 

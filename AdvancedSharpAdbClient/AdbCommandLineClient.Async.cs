@@ -16,15 +16,20 @@ namespace AdvancedSharpAdbClient
     public partial class AdbCommandLineClient
     {
         /// <inheritdoc/>
-        public virtual async Task<Version> GetVersionAsync(CancellationToken cancellationToken = default)
+        public virtual async Task<AdbCommandLineStatus> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
             await RunAdbProcessAsync("version", null, standardOutput, cancellationToken).ConfigureAwait(false);
 
             // Parse the output to get the version.
-            Version version = GetVersionFromOutput(standardOutput) ?? throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
-            if (version < AdbServer.RequiredAdbVersion)
+            AdbCommandLineStatus version = AdbCommandLineStatus.GetVersionFromOutput(standardOutput);
+
+            if (version.AdbVersion == null)
+            {
+                throw new AdbException($"The version of the adb executable at {AdbPath} could not be determined.");
+            }
+            else if (version.AdbVersion < AdbServer.RequiredAdbVersion)
             {
                 AdbException ex = new($"Required minimum version of adb: {AdbServer.RequiredAdbVersion}. Current version is {version}");
                 logger.LogError(ex, ex.Message);
@@ -75,7 +80,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) =>
+        public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? TaskExExtensions.FromResult(true) :
 #if WINDOWS_UWP
             StorageFile.GetFileFromPathAsync(adbPath).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));
 #else

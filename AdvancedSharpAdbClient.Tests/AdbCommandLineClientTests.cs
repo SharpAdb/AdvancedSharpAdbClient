@@ -14,11 +14,17 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public void GetVersionTest()
         {
+            Version adbVersion = new(1, 0, 41);
+            string fileVersion = "34.0.4-android-tools";
+            string filePath = "/data/data/com.termux/files/usr/bin/adb";
             DummyAdbCommandLineClient commandLine = new()
             {
-                Version = new Version(1, 0, 32)
+                Version = new AdbCommandLineStatus(adbVersion, fileVersion, filePath)
             };
-            Assert.Equal(new Version(1, 0, 32), commandLine.GetVersion());
+            AdbCommandLineStatus status = commandLine.GetVersion();
+            Assert.Equal(adbVersion, status.AdbVersion);
+            Assert.Equal(fileVersion, status.FileVersion);
+            Assert.Equal(filePath, status.FilePath);
         }
 
         /// <summary>
@@ -29,9 +35,9 @@ namespace AdvancedSharpAdbClient.Tests
         {
             DummyAdbCommandLineClient commandLine = new()
             {
-                Version = null
+                Version = default
             };
-            _ = Assert.Throws<AdbException>(commandLine.GetVersion);
+            _ = Assert.Throws<AdbException>(() => commandLine.GetVersion());
         }
 
         /// <summary>
@@ -42,9 +48,9 @@ namespace AdvancedSharpAdbClient.Tests
         {
             DummyAdbCommandLineClient commandLine = new()
             {
-                Version = new Version(1, 0, 1)
+                Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.1"])
             };
-            _ = Assert.Throws<AdbException>(commandLine.GetVersion);
+            _ = Assert.Throws<AdbException>(() => commandLine.GetVersion());
         }
 
         /// <summary>

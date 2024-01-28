@@ -23,10 +23,10 @@ namespace AdvancedSharpAdbClient
 
                 IAdbCommandLineClient commandLineClient = AdbCommandLineClientFactory(adbPath);
 
-                if (await commandLineClient.CheckFileExistsAsync(adbPath, cancellationToken).ConfigureAwait(false))
+                if (await commandLineClient.CheckAdbFileExistsAsync(adbPath, cancellationToken).ConfigureAwait(false))
                 {
                     CachedAdbPath = adbPath;
-                    commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ConfigureAwait(false);
+                    commandLineVersion = await commandLineClient.GetVersionAsync(cancellationToken).ContinueWith(x => x.Result.AdbVersion).ConfigureAwait(false);
                 }
 
                 // If the server is running, and no adb path is provided, check if we have the minimum version

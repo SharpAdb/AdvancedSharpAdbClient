@@ -15,14 +15,14 @@ namespace AdvancedSharpAdbClient.Tests
         {
         }
 
-        public Version Version { get; set; }
+        public AdbCommandLineStatus Version { get; set; }
 
         public bool ServerStarted { get; private set; }
 
         // No validation done in the dummy adb client.
-        public override bool CheckFileExists(string adbPath) => true;
+        public override bool CheckAdbFileExists(string adbPath) => true;
 
-        public override Task<bool> CheckFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => Task.FromResult(true);
+        public override Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => Task.FromResult(true);
 
         protected override int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
         {
@@ -38,9 +38,9 @@ namespace AdvancedSharpAdbClient.Tests
                 }
                 else if (command == "version")
                 {
-                    if (standardOutput != null && Version != null)
+                    if (standardOutput != null && Version != default)
                     {
-                        standardOutput.Add($"Android Debug Bridge version {Version.ToString(3)}");
+                        standardOutput.AddRange([.. Version]);
                     }
                 }
                 else

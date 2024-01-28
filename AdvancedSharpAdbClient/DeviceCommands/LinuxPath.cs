@@ -178,7 +178,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 CheckInvalidPathChars(path);
                 int length = path.Length;
-                if ((length >= 1 && (path[0] == DirectorySeparatorChar)) ||
+                if ((length > 0 && (path[0] == DirectorySeparatorChar)) ||
                     length == 1)
                 {
                     return true;

@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public DeviceData Device { get; init; }
 
         /// <summary>
-        /// The <see cref="IAdbClient"/> to use when communicating with the device.
+        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
         public IAdbClient AdbClient { get; init; }
 
