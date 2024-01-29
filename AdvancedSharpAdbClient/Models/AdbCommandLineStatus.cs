@@ -147,8 +147,7 @@ namespace AdvancedSharpAdbClient.Models
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            StringExtensions.Join(Environment.NewLine, (IEnumerable<string?>)[.. this]);
+        public override string ToString() => string.Join(Environment.NewLine, [.. this]);
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex(VersionPattern)]
