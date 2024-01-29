@@ -2,6 +2,8 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
@@ -19,6 +21,13 @@ namespace AdvancedSharpAdbClient
         /// Starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
         void StartServer();
+
+        /// <summary>
+        /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>, and reads the standard output.
+        /// </summary>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
+        /// <return>A list in which to store the standard output. Each line is added as a new entry.</return>
+        List<string> ExecuteAdbCommand(string command);
 
         /// <summary>
         /// Determines whether the <c>adb.exe</c> file exists.

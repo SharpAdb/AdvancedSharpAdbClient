@@ -124,6 +124,21 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public virtual List<string> ExecuteAdbCommand(string command)
+        {
+            List<string> errorOutput = [];
+            List<string> standardOutput = [];
+            int status = RunAdbProcessInner(command, errorOutput, standardOutput);
+            if (errorOutput.Count > 0)
+            {
+                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
+            }
+            else if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
+            else { return standardOutput; }
+        }
+
+        /// <inheritdoc/>
         public virtual bool CheckAdbFileExists(string adbPath) => adbPath == "adb" ||
 #if WINDOWS_UWP
             StorageFile.GetFileFromPathAsync(adbPath).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File);
@@ -219,17 +234,17 @@ namespace AdvancedSharpAdbClient
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
-            string standardErrorString = process.StandardError.ReadToEnd();
-            string standardOutputString = process.StandardOutput.ReadToEnd();
-
-            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-
             // get the return code from the process
             if (!process.WaitForExit(5000))
             {
                 process.Kill();
             }
+
+            string standardErrorString = process.StandardError.ReadToEnd();
+            string standardOutputString = process.StandardOutput.ReadToEnd();
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
             return process.ExitCode;
 #else

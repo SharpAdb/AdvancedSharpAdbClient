@@ -3,6 +3,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -22,6 +23,14 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task StartServerAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Asynchronously runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>, and reads the standard output.
+        /// </summary>
+        /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which return a list in which to store the standard output. Each line is added as a new entry.</returns>
+        Task<List<string>> ExecuteAdbCommandAsync(string command, CancellationToken cancellationToken);
 
         /// <summary>
         /// Determines whether the <c>adb.exe</c> file exists.

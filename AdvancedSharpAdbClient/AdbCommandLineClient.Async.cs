@@ -40,6 +40,21 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public virtual async Task<List<string>> ExecuteAdbCommandAsync(string command, CancellationToken cancellationToken = default)
+        {
+            List<string> errorOutput = [];
+            List<string> standardOutput = [];
+            int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
+            if (errorOutput.Count > 0)
+            {
+                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
+            }
+            else if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
+            else { return standardOutput; }
+        }
+
+        /// <inheritdoc/>
         public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
@@ -147,12 +162,6 @@ namespace AdvancedSharpAdbClient
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
-            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-
-            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-
 #if NET5_0_OR_GREATER
             using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
             {
@@ -174,6 +183,13 @@ namespace AdvancedSharpAdbClient
                 process.Kill();
             }
 #endif
+
+            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
+            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+
             // get the return code from the process
             return process.ExitCode;
 #else
