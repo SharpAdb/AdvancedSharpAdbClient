@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
-    public partial class DeviceData : IEquatable<DeviceData>
+    public sealed partial class DeviceData : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.

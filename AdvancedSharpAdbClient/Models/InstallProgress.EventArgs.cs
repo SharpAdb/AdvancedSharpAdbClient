@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents the state of apk installation.
     /// </summary>
     /// <param name="state">The state of the installation.</param>
-    public class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
+    public sealed class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>
         /// Gets the state of the installation.

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Contains information about port forwarding configured by the Android Debug Bridge.
     /// </summary>
-    public class ForwardData : IEquatable<ForwardData>
+    public sealed class ForwardData : IEquatable<ForwardData>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardData"/> class.
