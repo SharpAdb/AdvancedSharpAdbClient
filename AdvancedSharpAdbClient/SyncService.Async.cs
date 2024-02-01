@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>This method has been invoked by the constructor.
         /// Do not use it unless you have closed the connection.
         /// Use <see cref="ReopenAsync(CancellationToken)"/> to reopen the connection.</remarks>
-        public virtual async Task OpenAsync(CancellationToken cancellationToken = default)
+        public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             // target a specific device
             await Socket.SetDeviceAsync(Device, cancellationToken).ConfigureAwait(false);
@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ReopenAsync(CancellationToken cancellationToken = default)
+        public async Task ReopenAsync(CancellationToken cancellationToken = default)
         {
             await Socket.ReconnectAsync(true, cancellationToken).ConfigureAwait(false);
             await OpenAsync(cancellationToken).ConfigureAwait(false);
@@ -341,7 +341,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)
+        public async Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             // create the stat request message.
             await Socket.SendSyncRequestAsync(SyncCommand.STAT, remotePath, cancellationToken).ConfigureAwait(false);
@@ -361,7 +361,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
+        public async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             bool isLocked = false;
 
@@ -401,7 +401,7 @@ namespace AdvancedSharpAdbClient
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             bool isLocked = false;
 

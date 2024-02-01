@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient
             nameof(MonitorThread)
 #endif
             )]
-        public virtual void Start()
+        public void Start()
         {
 #if HAS_TASK
             if (MonitorTask == null)

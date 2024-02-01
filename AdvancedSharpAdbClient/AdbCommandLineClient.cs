@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient
         public string AdbPath { get; protected set; }
 
         /// <inheritdoc/>
-        public virtual AdbCommandLineStatus GetVersion()
+        public AdbCommandLineStatus GetVersion()
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
@@ -84,40 +84,16 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void StartServer()
+        public void StartServer()
         {
             int status = RunAdbProcessInner("start-server", null, null);
             if (status == 0) { return; }
-#if HAS_PROCESS && !WINDOWS_UWP
-            try
-            {
-                // Starting the adb server failed for whatever reason. This can happen if adb.exe
-                // is running but is not accepting requests. In that case, try to kill it & start again.
-                // It kills all processes named "adb", so let's hope nobody else named their process that way.
-                foreach (Process adbProcess in Process.GetProcessesByName("adb"))
-                {
-                    try
-                    {
-                        adbProcess.Kill();
-                    }
-                    catch (Win32Exception)
-                    {
-                        // The associated process could not be terminated
-                        // or
-                        // The process is terminating.
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // The process has already exited.
-                        // There is no process associated with this Process object.
-                    }
-                }
-            }
-            catch (NotSupportedException)
-            {
-                // This platform does not support getting a list of processes.
-            }
-#endif
+
+            // Starting the adb server failed for whatever reason. This can happen if adb.exe
+            // is running but is not accepting requests. In that case, try to kill it & start again.
+            // It kills all processes named "adb", so let's hope nobody else named their process that way.
+            KillProcess("adb");
+
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
             RunAdbProcess("start-server", null, null);
@@ -189,7 +165,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
+        protected void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             int status = RunAdbProcessInner(command, errorOutput, standardOutput);
             if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
@@ -207,10 +183,45 @@ namespace AdvancedSharpAdbClient
         /// <returns>The return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
+        protected int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
         {
             ExceptionExtensions.ThrowIfNull(command);
             return RunProcess(AdbPath, command, errorOutput, standardOutput);
+        }
+
+        /// <summary>
+        /// Kills all processes with the specified name.
+        /// </summary>
+        /// <param name="processName">The name of the process to kill. </param>
+        protected virtual void KillProcess(string processName)
+        {
+#if HAS_PROCESS && !WINDOWS_UWP
+            try
+            {
+                foreach (Process adbProcess in Process.GetProcessesByName(processName))
+                {
+                    try
+                    {
+                        adbProcess.Kill();
+                    }
+                    catch (Win32Exception)
+                    {
+                        // The associated process could not be terminated
+                        // or
+                        // The process is terminating.
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // The process has already exited.
+                        // There is no process associated with this Process object.
+                    }
+                }
+            }
+            catch (NotSupportedException)
+            {
+                // This platform does not support getting a list of processes.
+            }
+#endif
         }
 
         /// <summary>

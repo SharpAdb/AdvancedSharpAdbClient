@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Implements the <see cref="ITcpSocket"/> interface using the standard <see cref="System.Net.Sockets.Socket"/> class.
     /// </summary>
-    public partial class TcpSocket : ITcpSocket
+    public sealed partial class TcpSocket : ITcpSocket
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
@@ -23,12 +23,12 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The underlying socket that manages the connection.
         /// </summary>
-        public Socket Socket { get; protected set; }
+        public Socket Socket { get; private set; }
 
         /// <summary>
         /// The <see cref="System.Net.EndPoint"/> at which the socket is listening.
         /// </summary>
-        public EndPoint? EndPoint { get; protected set; }
+        public EndPoint? EndPoint { get; private set; }
 
         /// <inheritdoc/>
         public bool Connected => Socket.Connected;
@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         [MemberNotNull(nameof(EndPoint))]
-        public virtual void Connect(EndPoint endPoint)
+        public void Connect(EndPoint endPoint)
         {
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Reconnect(bool isForce = false)
+        public void Reconnect(bool isForce = false)
         {
             if (isForce || !Socket.Connected)
             {
@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -87,43 +87,43 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Close() => Socket.Close();
+        public void Close() => Socket.Close();
 
         /// <inheritdoc/>
-        public virtual int Send(byte[] buffer, SocketFlags socketFlags) =>
+        public int Send(byte[] buffer, SocketFlags socketFlags) =>
             Socket.Send(buffer, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Send(byte[] buffer, int size, SocketFlags socketFlags) =>
+        public int Send(byte[] buffer, int size, SocketFlags socketFlags) =>
             Socket.Send(buffer, size, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+        public int Send(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
             Socket.Send(buffer, offset, size, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Receive(byte[] buffer, SocketFlags socketFlags) =>
+        public int Receive(byte[] buffer, SocketFlags socketFlags) =>
             Socket.Receive(buffer, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Receive(byte[] buffer, int size, SocketFlags socketFlags) =>
+        public int Receive(byte[] buffer, int size, SocketFlags socketFlags) =>
             Socket.Receive(buffer, size, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
+        public int Receive(byte[] buffer, int offset, int size, SocketFlags socketFlags) =>
             Socket.Receive(buffer, offset, size, socketFlags);
 
 #if HAS_BUFFERS
         /// <inheritdoc/>
-        public virtual int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags) =>
+        public int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags) =>
             Socket.Send(buffer, socketFlags);
 
         /// <inheritdoc/>
-        public virtual int Receive(Span<byte> buffer, SocketFlags socketFlags) =>
+        public int Receive(Span<byte> buffer, SocketFlags socketFlags) =>
             Socket.Receive(buffer, socketFlags);
 #endif
 
         /// <inheritdoc/>
-        public virtual Stream GetStream() => new NetworkStream(Socket);
+        public Stream GetStream() => new NetworkStream(Socket);
     }
 }

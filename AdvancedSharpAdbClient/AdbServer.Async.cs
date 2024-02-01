@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbServer
     {
         /// <inheritdoc/>
-        public virtual async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer = false, CancellationToken cancellationToken = default)
+        public async Task<StartServerResult> StartServerAsync(string adbPath, bool restartServerIfNewer = false, CancellationToken cancellationToken = default)
         {
             if (IsStarting) { return StartServerResult.Starting; }
             try
@@ -70,11 +70,11 @@ namespace AdvancedSharpAdbClient
             StartServerAsync(CachedAdbPath!, true, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default) =>
+        public Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default) =>
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual async Task StopServerAsync(CancellationToken cancellationToken = default)
+        public async Task StopServerAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
+        public async Task<AdbServerStatus> GetStatusAsync(CancellationToken cancellationToken = default)
         {
             // Try to connect to a running instance of the adb server
             try

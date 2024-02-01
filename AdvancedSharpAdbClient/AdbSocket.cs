@@ -86,7 +86,7 @@ namespace AdvancedSharpAdbClient
         public bool Connected => Socket.Connected;
 
         /// <inheritdoc/>
-        public virtual void Reconnect(bool isForce = false) => Socket.Reconnect(isForce);
+        public void Reconnect(bool isForce = false) => Socket.Reconnect(isForce);
 
         /// <inheritdoc/>
         public virtual void Send(byte[] data)
@@ -147,7 +147,7 @@ namespace AdvancedSharpAdbClient
             SendSyncRequest(command, $"{path},{permissions}");
 
         /// <inheritdoc/>
-        public virtual void SendSyncRequest(SyncCommand command, string path)
+        public void SendSyncRequest(SyncCommand command, string path)
         {
             ExceptionExtensions.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
@@ -156,7 +156,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void SendSyncRequest(SyncCommand command, int length)
+        public void SendSyncRequest(SyncCommand command, int length)
         {
             // The message structure is:
             // First four bytes: command
@@ -177,7 +177,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void SendAdbRequest(string request)
+        public void SendAdbRequest(string request)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
             if (!Write(data))
@@ -296,7 +296,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual SyncCommand ReadSyncResponse()
+        public SyncCommand ReadSyncResponse()
         {
             byte[] data = new byte[4];
             _ = Read(data);
@@ -304,7 +304,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual AdbResponse ReadAdbResponse()
+        public AdbResponse ReadAdbResponse()
         {
             AdbResponse response = ReadAdbResponseInner();
 
@@ -480,7 +480,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
         /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
-        protected virtual string ReplyToString(byte[] reply)
+        protected string ReplyToString(byte[] reply)
         {
             string result;
             try
@@ -501,7 +501,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reply">A <see cref="byte"/> array that represents the ADB reply.</param>
         /// <returns>A <see cref="string"/> that represents the ADB reply.</returns>
-        protected virtual string ReplyToString(ReadOnlySpan<byte> reply)
+        protected string ReplyToString(ReadOnlySpan<byte> reply)
         {
             string result;
             try
@@ -536,7 +536,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Close() => Socket.Dispose();
+        public void Close() => Socket.Dispose();
 
         /// <summary>
         /// Creates a new <see cref="TcpSocket"/> instance based on the specified <see cref="EndPoint"/>.

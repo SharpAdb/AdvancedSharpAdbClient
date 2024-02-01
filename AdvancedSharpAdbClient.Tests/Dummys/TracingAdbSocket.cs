@@ -82,14 +82,14 @@ namespace AdvancedSharpAdbClient.Tests
             return read;
         }
 
-        public override AdbResponse ReadAdbResponse()
+        AdbResponse IAdbSocket.ReadAdbResponse()
         {
             Exception exception = null;
             AdbResponse response;
 
             try
             {
-                response = base.ReadAdbResponse();
+                response = ReadAdbResponse();
             }
             catch (AdbException ex)
             {
@@ -137,19 +137,22 @@ namespace AdvancedSharpAdbClient.Tests
             return value;
         }
 
-        public override void SendAdbRequest(string request)
+        void IAdbSocket.SendAdbRequest(string request) => SendAdbRequest(request);
+        public new void SendAdbRequest(string request)
         {
             Requests.Add(request);
-            base.SendAdbRequest(request);
+            SendAdbRequest(request);
         }
 
-        public override void SendSyncRequest(SyncCommand command, string path)
+        void IAdbSocket.SendSyncRequest(SyncCommand command, string path) => SendSyncRequest(command, path);
+        public new void SendSyncRequest(SyncCommand command, string path)
         {
             SyncRequests.Add((command, path));
-            base.SendSyncRequest(command, path);
+            SendSyncRequest(command, path);
         }
 
-        public override void SendSyncRequest(SyncCommand command, int length)
+        void IAdbSocket.SendSyncRequest(SyncCommand command, int length) => SendSyncRequest(command, length);
+        public new void SendSyncRequest(SyncCommand command, int length)
         {
             StackTrace trace = new();
 
@@ -158,19 +161,21 @@ namespace AdvancedSharpAdbClient.Tests
                 SyncRequests.Add((command, length.ToString()));
             }
 
-            base.SendSyncRequest(command, length);
+            SendSyncRequest(command, length);
         }
 
-        public override SyncCommand ReadSyncResponse()
+        SyncCommand IAdbSocket.ReadSyncResponse() => ReadSyncResponse();
+        public new SyncCommand ReadSyncResponse()
         {
-            SyncCommand response = base.ReadSyncResponse();
+            SyncCommand response = ReadSyncResponse();
             SyncResponses.Enqueue(response);
             return response;
         }
 
-        public override void Reconnect(bool isForce = false)
+        void IAdbSocket.Reconnect(bool isForce) => Reconnect(isForce);
+        public new void Reconnect(bool isForce)
         {
-            base.Reconnect();
+            Reconnect(isForce);
             DidReconnect = true;
         }
     }

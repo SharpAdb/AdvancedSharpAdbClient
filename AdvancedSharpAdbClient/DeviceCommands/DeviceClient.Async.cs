@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns a <see cref="string"/> containing current hierarchy.
         /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
-        public virtual async Task<string> DumpScreenStringAsync(CancellationToken cancellationToken = default)
+        public async Task<string> DumpScreenStringAsync(CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, "uiautomator dump /dev/tty", receiver, cancellationToken).ConfigureAwait(false);
@@ -46,7 +46,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{XmlDocument}"/> which returns a <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        public virtual async Task<XmlDocument?> DumpScreenAsync(CancellationToken cancellationToken = default)
+        public async Task<XmlDocument?> DumpScreenAsync(CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(cancellationToken).ConfigureAwait(false);
             XmlDocument doc = new();
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{XmlDocument}"/> which returns a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        public virtual async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(CancellationToken cancellationToken = default)
+        public async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(cancellationToken).ConfigureAwait(false);
             Windows.Data.Xml.Dom.XmlDocument doc = new();
@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cords">The <see cref="Point"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task ClickAsync(Point cords, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(Point cords, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input tap {cords.X} {cords.Y}", receiver, cancellationToken).ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="y">The Y co-ordinate to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task ClickAsync(int x, int y, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(int x, int y, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input tap {x} {y}", receiver, cancellationToken).ConfigureAwait(false);
@@ -132,7 +132,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task SwipeAsync(Element first, Element second, long speed, CancellationToken cancellationToken = default)
+        public async Task SwipeAsync(Element first, Element second, long speed, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input swipe {first.Center.X} {first.Center.Y} {second.Center.X} {second.Center.Y} {speed}", receiver, cancellationToken).ConfigureAwait(false);
@@ -157,7 +157,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task SwipeAsync(Point first, Point second, long speed, CancellationToken cancellationToken = default)
+        public async Task SwipeAsync(Point first, Point second, long speed, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver, cancellationToken).ConfigureAwait(false);
@@ -184,7 +184,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task SwipeAsync(int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken = default)
+        public async Task SwipeAsync(int x1, int y1, int x2, int y2, long speed, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input swipe {x1} {y1} {x2} {y2} {speed}", receiver, cancellationToken).ConfigureAwait(false);
@@ -207,7 +207,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{Boolean}"/> which returns the result. <see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        public virtual async Task<bool> IsAppRunningAsync(string packageName, CancellationToken cancellationToken = default)
+        public async Task<bool> IsAppRunningAsync(string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"pidof {packageName}", receiver, cancellationToken).ConfigureAwait(false);
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{Boolean}"/> which returns the result. <see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
-        public virtual async Task<bool> IsAppInForegroundAsync(string packageName, CancellationToken cancellationToken = default)
+        public async Task<bool> IsAppInForegroundAsync(string packageName, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"dumpsys activity activities | grep mResumedActivity", receiver, cancellationToken).ConfigureAwait(false);
@@ -238,7 +238,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The package name of the app to check.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{AppStatus}"/> which returns the <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
-        public virtual async Task<AppStatus> GetAppStatusAsync(string packageName, CancellationToken cancellationToken = default)
+        public async Task<AppStatus> GetAppStatusAsync(string packageName, CancellationToken cancellationToken = default)
         {
             // Check if the app is in foreground
             bool currentApp = await IsAppInForegroundAsync(packageName, cancellationToken).ConfigureAwait(false);
@@ -259,7 +259,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task{Element}"/> which returns the <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        public virtual async Task<Element?> FindElementAsync(string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<Element?> FindElementAsync(string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -308,7 +308,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
-        public virtual async Task<IEnumerable<Element>> FindElementsAsync(string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<Element>> FindElementsAsync(string xpath = "hierarchy/node", CancellationToken cancellationToken = default)
         {
             try
             {
@@ -365,7 +365,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
         /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
         /// <returns>The <see cref="IAsyncEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
-        public virtual async IAsyncEnumerable<Element> FindAsyncElements(string xpath = "hierarchy/node", [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<Element> FindAsyncElements(string xpath = "hierarchy/node", [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -418,7 +418,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="key">The key event to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task SendKeyEventAsync(string key, CancellationToken cancellationToken = default)
+        public async Task SendKeyEventAsync(string key, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input keyevent {key}", receiver, cancellationToken).ConfigureAwait(false);
@@ -441,7 +441,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="text">The text to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
+        public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input text {text}", receiver, cancellationToken).ConfigureAwait(false);
@@ -464,7 +464,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The package name of the application to start.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual Task StartAppAsync(string packageName, CancellationToken cancellationToken = default) => AdbClient.ExecuteShellCommandAsync(Device, $"monkey -p {packageName} 1", cancellationToken);
+        public Task StartAppAsync(string packageName, CancellationToken cancellationToken = default) => AdbClient.ExecuteShellCommandAsync(Device, $"monkey -p {packageName} 1", cancellationToken);
 
         /// <summary>
         /// Stop an Android application on device asynchronously.
@@ -472,7 +472,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The package name of the application to stop.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual Task StopAppAsync(string packageName, CancellationToken cancellationToken = default) => AdbClient.ExecuteShellCommandAsync(Device, $"am force-stop {packageName}", cancellationToken);
+        public Task StopAppAsync(string packageName, CancellationToken cancellationToken = default) => AdbClient.ExecuteShellCommandAsync(Device, $"am force-stop {packageName}", cancellationToken);
     }
 }
 #endif

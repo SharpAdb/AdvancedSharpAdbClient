@@ -115,7 +115,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Refreshes the packages.
         /// </summary>
-        public virtual void RefreshPackages()
+        public void RefreshPackages()
         {
             ValidateDevice();
 
@@ -141,7 +141,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -168,7 +168,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallRemotePackage(string remoteFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallRemotePackage(string remoteFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -320,7 +320,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -362,7 +362,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -400,7 +400,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallPackage(packageFilePath, progress.AsAction(), arguments);
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public virtual void InstallRemotePackage(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallRemotePackage(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallRemotePackage(remoteFilePath, progress.AsAction(), arguments);
 
         /// <summary>
@@ -421,7 +421,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), arguments);
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(splitPackageFilePaths, packageName, progress.AsAction(), arguments);
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, progress.AsAction(), arguments);
 
         /// <summary>
@@ -454,7 +454,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public virtual void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+        public void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, progress.AsAction(), arguments);
 #endif
 
@@ -463,7 +463,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
-        public virtual void UninstallPackage(string packageName, params string[] arguments)
+        public void UninstallPackage(string packageName, params string[] arguments)
         {
             ValidateDevice();
 
@@ -493,7 +493,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <returns>The <see cref="VersionInfo"/> of target application.</returns>
-        public virtual VersionInfo GetVersionInfo(string packageName)
+        public VersionInfo GetVersionInfo(string packageName)
         {
             ValidateDevice();
 
@@ -503,13 +503,62 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Validates the device is online.
+        /// Like "install", but starts an install session.
         /// </summary>
-        protected void ValidateDevice()
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>Session ID.</returns>
+        protected string CreateInstallSession(string? packageName = null, params string[] arguments)
         {
-            if (Device.State != DeviceState.Online)
+            ValidateDevice();
+
+            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
             {
-                throw new AdbException("Device is offline");
+                _ = requestBuilder.AppendFormat(" -p {0}", packageName);
+            }
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            string cmd = requestBuilder.ToString();
+            InstallOutputReceiver receiver = new();
+            AdbClient.ExecuteShellCommand(Device, cmd, receiver);
+
+            if (string.IsNullOrEmpty(receiver.SuccessMessage))
+            {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
+
+            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSession)} is null.");
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
+
+            return session;
+        }
+
+        /// <summary>
+        /// Write an apk into the given install session.
+        /// </summary>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="path">The absolute file path to package file on device.</param>
+        protected void WriteInstallSession(string session, string apkName, string path)
+        {
+            ValidateDevice();
+
+            InstallOutputReceiver receiver = new();
+            AdbClient.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
+
+            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            {
+                throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
 
@@ -579,7 +628,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="remoteFilePath">Path on device of file to remove.</param>
         /// <exception cref="IOException">If file removal failed.</exception>
-        protected virtual void RemoveRemotePackage(string remoteFilePath)
+        protected void RemoveRemotePackage(string remoteFilePath)
         {
             // now we delete the app we synced
             try
@@ -594,62 +643,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Like "install", but starts an install session.
+        /// Validates the device is online.
         /// </summary>
-        /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        /// <returns>Session ID.</returns>
-        protected virtual string CreateInstallSession(string? packageName = null, params string[] arguments)
+        protected void ValidateDevice()
         {
-            ValidateDevice();
-
-            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
-
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            if (Device.State != DeviceState.Online)
             {
-                _ = requestBuilder.AppendFormat(" -p {0}", packageName);
-            }
-
-            if (arguments != null)
-            {
-                foreach (string argument in arguments)
-                {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
-                }
-            }
-
-            string cmd = requestBuilder.ToString();
-            InstallOutputReceiver receiver = new();
-            AdbClient.ExecuteShellCommand(Device, cmd, receiver);
-
-            if (string.IsNullOrEmpty(receiver.SuccessMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
-            }
-
-            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSession)} is null.");
-            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
-            string session = result.Substring(result.IndexOf('[') + 1, arr);
-
-            return session;
-        }
-
-        /// <summary>
-        /// Write an apk into the given install session.
-        /// </summary>
-        /// <param name="session">The session ID of the install session.</param>
-        /// <param name="apkName">The name of the application.</param>
-        /// <param name="path">The absolute file path to package file on device.</param>
-        protected virtual void WriteInstallSession(string session, string apkName, string path)
-        {
-            ValidateDevice();
-
-            InstallOutputReceiver receiver = new();
-            AdbClient.ExecuteShellCommand(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver);
-
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
+                throw new AdbException("Device is offline");
             }
         }
     }
