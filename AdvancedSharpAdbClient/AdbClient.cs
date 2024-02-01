@@ -591,36 +591,39 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual string Pair(DnsEndPoint endpoint, string code)
+        public virtual string Pair(string host, int port, string code)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:pair:{address}:{port}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();
         }
 
         /// <inheritdoc/>
-        public virtual string Connect(DnsEndPoint endpoint)
+        public virtual string Connect(string host, int port = DefaultPort)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:connect:{address}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();
         }
 
         /// <inheritdoc/>
-        public virtual string Disconnect(DnsEndPoint endpoint)
+        public virtual string Disconnect(string host, int port = DefaultPort)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:disconnect:{address}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();

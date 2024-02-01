@@ -118,6 +118,12 @@
     <DefineConstants>$(DefineConstants);HAS_TASK</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore5.0'
+                        and '$(TargetFramework)' != 'netstandard1.3'
+                        and '$(TargetFramework)' != 'uap10.0'">
+    <DefineConstants>$(DefineConstants);HAS_DRAWING</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(TargetFramework)' == 'net2.0-client'
                          or '$(TargetFramework)' == 'net3.0-client'
                          or '$(TargetFramework)' == 'net3.5-client'
@@ -178,7 +184,7 @@
                         and '$(TargetFramework)' != 'netcoreapp1.1'
                         and '$(TargetFramework)' != 'netstandard1.3'
                         and '$(TargetFramework)' != 'uap10.0'">
-    <DefineConstants>$(DefineConstants);HAS_PROCESS;HAS_DRAWING;HAS_SERIALIZATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);HAS_PROCESS;HAS_SERIALIZATION</DefineConstants>
   </PropertyGroup>
 
 </Project>

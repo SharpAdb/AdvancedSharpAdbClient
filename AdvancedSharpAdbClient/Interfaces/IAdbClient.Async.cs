@@ -308,27 +308,30 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously pair with a device for secure TCP/IP communication
         /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
-        Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken);
+        Task<string> PairAsync(string host, int port, string code, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
-        Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
+        Task<string> ConnectAsync(string host, int port, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously disconnects a remote device from this local ADB server.
         /// </summary>
-        /// <param name="endpoint">The endpoint of the remote device to disconnect.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
-        Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken);
+        Task<string> DisconnectAsync(string host, int port, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously restarts the ADB daemon running on the device with root privileges.

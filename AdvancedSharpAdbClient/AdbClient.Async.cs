@@ -453,36 +453,39 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default)
+        public virtual async Task<string> PairAsync(string host, int port, string code, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:pair:{code}:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
+        public virtual async Task<string> ConnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:connect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:connect:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
+        public virtual async Task<string> DisconnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:disconnect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(":") ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:disconnect:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);

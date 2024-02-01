@@ -289,7 +289,7 @@ namespace AdvancedSharpAdbClient
         public static Task<string> PairAsync(this IAdbClient client, IPAddress address, string code, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
-                : client.PairAsync(new IPEndPoint(address, AdbClient.DefaultPort), code, cancellationToken);
+                : client.PairAsync(address.ToString(), AdbClient.DefaultPort, code, cancellationToken);
 
         /// <summary>
         /// Asynchronously pair with a device for secure TCP/IP communication.
@@ -302,7 +302,7 @@ namespace AdvancedSharpAdbClient
         public static Task<string> PairAsync(this IAdbClient client, IPEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
-                : client.PairAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), code, cancellationToken);
+                : client.PairAsync(endpoint.Address.ToString(), endpoint.Port, code, cancellationToken);
 
         /// <summary>
         /// Asynchronously pair with a device for secure TCP/IP communication.
@@ -313,19 +313,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
         public static Task<string> PairAsync(this IAdbClient client, string host, string code, CancellationToken cancellationToken = default) =>
-            client.PairAsync(Extensions.CreateDnsEndPoint(host, AdbClient.DefaultPort), code, cancellationToken);
-
-        /// <summary>
-        /// Asynchronously pair with a device for secure TCP/IP communication.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="host">The host address of the remote device.</param>
-        /// <param name="port">The port of the remote device.</param>
-        /// <param name="code">The pairing code.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>The results from adb.</returns>
-        public static Task<string> PairAsync(this IAdbClient client, string host, int port, string code, CancellationToken cancellationToken = default) =>
-            client.PairAsync(Extensions.CreateDnsEndPoint(host, port), code, cancellationToken);
+            client.PairAsync(host, AdbClient.DefaultPort, code, cancellationToken);
 
         /// <summary>
         /// Asynchronously connect to a device via TCP/IP.
@@ -337,7 +325,7 @@ namespace AdvancedSharpAdbClient
         public static Task<string> ConnectAsync(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
-                : client.ConnectAsync(new IPEndPoint(address, AdbClient.DefaultPort), cancellationToken);
+                : client.ConnectAsync(address.ToString(), AdbClient.DefaultPort, cancellationToken);
 
         /// <summary>
         /// Asynchronously connect to a device via TCP/IP.
@@ -349,18 +337,51 @@ namespace AdvancedSharpAdbClient
         public static Task<string> ConnectAsync(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
-                : client.ConnectAsync(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), cancellationToken);
+                : client.ConnectAsync(endpoint.Address.ToString(), endpoint.Port, cancellationToken);
 
         /// <summary>
         /// Asynchronously connect to a device via TCP/IP.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
-        /// <param name="port">The port of the remote device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The results from adb.</returns>
+        public static Task<string> ConnectAsync(this IAdbClient client, string host, CancellationToken cancellationToken = default) =>
+            client.ConnectAsync(host, AdbClient.DefaultPort, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="address">The IP address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
-        public static Task<string> ConnectAsync(this IAdbClient client, string host, int port = AdbClient.DefaultPort, CancellationToken cancellationToken = default) =>
-            client.ConnectAsync(Extensions.CreateDnsEndPoint(host, port), cancellationToken);
+        public static Task<string> DisconnectAsync(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default) =>
+            address == null
+                ? throw new ArgumentNullException(nameof(address))
+                : client.DisconnectAsync(address.ToString(), AdbClient.DefaultPort, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        public static Task<string> DisconnectAsync(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.DisconnectAsync(endpoint.Address.ToString(), endpoint.Port, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The results from adb.</returns>
+        public static Task<string> DisconnectAsync(this IAdbClient client, string host, CancellationToken cancellationToken = default) =>
+            client.DisconnectAsync(host, AdbClient.DefaultPort, cancellationToken);
 
 #if !NETFRAMEWORK || NET40_OR_GREATER
         /// <summary>
@@ -444,6 +465,43 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task InstallWriteAsync(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
             client.InstallWriteAsync(device, apk, apkName, session, progress.AsAction(), cancellationToken);
+            
+        /// <summary>
+        /// Asynchronously pair with a device for secure TCP/IP communication.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>The results from adb.</returns>
+        public static Task<string> PairAsync(this IAdbClient client, DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.PairAsync(endpoint.Host, endpoint.Port, code, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        public static Task<string> ConnectAsync(this IAdbClient client, DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.ConnectAsync(endpoint.Host, endpoint.Port, cancellationToken);
+
+        /// <summary>
+        /// Asynchronously disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        public static Task<string> DisconnectAsync(this IAdbClient client, DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.DisconnectAsync(endpoint.Host, endpoint.Port, cancellationToken);
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>

@@ -475,7 +475,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "114514");
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.PairAsync(DnsEndPoint, string, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, DnsEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PairAsyncDnsEndpointTest() =>
@@ -512,11 +512,11 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.PairAsync(DnsEndPoint, string, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, DnsEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void PairAsyncDnsEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync(null, "114514"));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((DnsEndPoint)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPEndPoint, string, CancellationToken)"/> method.
@@ -542,7 +542,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:5555");
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ConnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ConnectAsyncDnsEndpointTest() =>
@@ -560,7 +560,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:4321");
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, string, int, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ConnectAsync(string, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ConnectAsyncHostEndpointTest() =>
@@ -576,11 +576,11 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPAddress)null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.ConnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ConnectAsyncDnsEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((DnsEndPoint)null));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPEndPoint, CancellationToken)"/> method.
@@ -590,14 +590,14 @@ namespace AdvancedSharpAdbClient.Tests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPEndPoint)null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, string, int, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClient.ConnectAsync(string, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ConnectAsyncHostEndpointNullTest() =>
-            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((string)null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.DisconnectAsync(DnsEndPoint, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.DisconnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void DisconnectAsyncTest()

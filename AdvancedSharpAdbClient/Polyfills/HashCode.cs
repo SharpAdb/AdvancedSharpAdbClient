@@ -41,13 +41,12 @@ https://raw.githubusercontent.com/Cyan4973/xxHash/5c174cfa4e45a42f94082dc0d4539b
 
 */
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace AdvancedSharpAdbClient.Polyfills
+namespace System
 {
     // xxHash32 is used for the hash code.
     // https://github.com/Cyan4973/xxHash
@@ -56,7 +55,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Combines the hash code for multiple values into a single hash code.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct HashCode
+    internal struct HashCode
     {
         private static readonly uint s_seed = GenerateGlobalSeed();
 
@@ -572,4 +571,6 @@ namespace AdvancedSharpAdbClient.Polyfills
 #pragma warning restore CS0809
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.HashCode))]
 #endif
