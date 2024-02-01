@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// </summary>
     /// <typeparam name="T">The type of elements in the read-only list.</typeparam>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IReadOnlyList<T> : IReadOnlyCollection<T>
+    internal interface IReadOnlyList<T> : IReadOnlyCollection<T>
     {
         /// <summary>
         /// Gets the element at the specified index in the read-only list.

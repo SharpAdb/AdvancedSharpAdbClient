@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="Exception"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class ExceptionExtensions
+    internal static class ExceptionExtensions
     {
         /// <summary>
         /// Throws an <see cref="ArgumentNullException"/> if <paramref name="argument"/> is null.

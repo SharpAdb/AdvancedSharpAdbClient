@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public interface IReadOnlyCollection<T> : IEnumerable<T>
+    internal interface IReadOnlyCollection<T> : IEnumerable<T>
     {
         /// <summary>
         /// Gets the number of elements in the collection.

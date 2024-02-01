@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="Socket"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class SocketExtensions
+    internal static class SocketExtensions
     {
         /// <summary>
         /// Asynchronously receives data from a connected socket.
