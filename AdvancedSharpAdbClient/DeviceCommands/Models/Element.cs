@@ -26,13 +26,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// </summary>
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
-        /// <param name="rectangle">The coordinates and size of the element.</param>
+        /// <param name="area">The coordinates and size of the element.</param>
         /// <param name="attributes">Gets or sets element attributes.</param>
-        public Element(IAdbClient client, DeviceData device, Rectangle rectangle, Dictionary<string, string?>? attributes = null)
+        public Element(IAdbClient client, DeviceData device, Area area, Dictionary<string, string?>? attributes = null)
         {
             Client = client;
             Device = device;
-            Bounds = rectangle;
+            Bounds = area;
             Attributes = attributes;
         }
 
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 if (xmlNode.Attributes["bounds"]?.Value is string bounds)
                 {
                     string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
-                    Bounds = Rectangle.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                    Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
                 }
 
                 Attributes = new(xmlNode.Attributes.Count);
@@ -103,7 +103,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                 if (xmlNode.Attributes.GetNamedItem("bounds")?.NodeValue?.ToString() is string bounds)
                 {
                     string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
-                    Bounds = Rectangle.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                    Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
                 }
 
                 Attributes = new(xmlNode.Attributes.Count);
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <summary>
         /// Gets the coordinates and size of the element.
         /// </summary>
-        public Rectangle Bounds { get; init; }
+        public Area Bounds { get; init; }
 
         /// <summary>
         /// Gets the children of this element.
@@ -165,7 +165,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <summary>
         /// Gets the coordinates of the the center of the element.
         /// </summary>
-        public Point Center => unchecked(new(Bounds.X + (Bounds.Width / 2), Bounds.Y + (Bounds.Height / 2)));
+        public Cords Center => unchecked(new(Bounds.X + (Bounds.Width / 2), Bounds.Y + (Bounds.Height / 2)));
 
         /// <summary>
         /// Gets the text of the element.

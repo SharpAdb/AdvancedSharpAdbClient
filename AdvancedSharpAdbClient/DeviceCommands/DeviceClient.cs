@@ -106,8 +106,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="cords">The <see cref="Point"/> to click.</param>
-        public void Click(Point cords)
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        public void Click(Cords cords)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input tap {cords.X} {cords.Y}", receiver);
@@ -172,10 +172,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
         /// </summary>
-        /// <param name="first">The start <see cref="Point"/>.</param>
-        /// <param name="second">The end <see cref="Point"/>.</param>
+        /// <param name="first">The start <see cref="Cords"/>.</param>
+        /// <param name="second">The end <see cref="Cords"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
-        public void Swipe(Point first, Point second, long speed)
+        public void Swipe(Cords first, Cords second, long speed)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver);

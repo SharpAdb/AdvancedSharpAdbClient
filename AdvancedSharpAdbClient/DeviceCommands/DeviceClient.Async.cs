@@ -80,10 +80,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Clicks on the specified coordinates asynchronously.
         /// </summary>
-        /// <param name="cords">The <see cref="Point"/> to click.</param>
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task ClickAsync(Point cords, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(Cords cords, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input tap {cords.X} {cords.Y}", receiver, cancellationToken).ConfigureAwait(false);
@@ -157,7 +157,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task SwipeAsync(Point first, Point second, long speed, CancellationToken cancellationToken = default)
+        public async Task SwipeAsync(Cords first, Cords second, long speed, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver, cancellationToken).ConfigureAwait(false);
@@ -354,7 +354,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     throw new ShellCommandUnresponsiveException(e);
                 }
             }
-            return Enumerable.Empty<Element>();
+            return [];
         }
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER

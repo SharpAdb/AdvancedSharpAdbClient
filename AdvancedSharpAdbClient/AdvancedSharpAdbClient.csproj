@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <FullTargets>True</FullTargets>
+    <FullTargets>False</FullTargets>
     <ImportAsync>True</ImportAsync>
     <Nullable>Enable</Nullable>
   </PropertyGroup>
@@ -11,7 +11,7 @@
       <PropertyGroup>
         <PackageId>$(AssemblyName).Standard</PackageId>
         <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client</TargetFrameworks>
+        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0-client;net4.5</TargetFrameworks>
       </PropertyGroup>
     </When>
     <When Condition="'$(FullTargets)' == 'True'">
