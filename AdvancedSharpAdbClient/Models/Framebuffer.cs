@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Net;
 using System.Threading;
 
@@ -15,7 +16,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device for which to fetch the frame buffer.</param>
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
-    public class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
+    public sealed class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
         /// <summary>
         /// The <see cref="Array"/> of <see cref="byte"/>s which contains the framebuffer header.
@@ -35,7 +36,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.
         /// </summary>
-        protected readonly Func<EndPoint, IAdbSocket> AdbSocketFactory = adbSocketFactory;
+        private readonly Func<EndPoint, IAdbSocket> AdbSocketFactory = adbSocketFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Framebuffer"/> class.
@@ -100,7 +101,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
         [MemberNotNull(nameof(Data))]
-        public virtual void Refresh(bool reset = false)
+        public void Refresh(bool reset = false)
         {
             EnsureNotDisposed();
 
@@ -152,7 +153,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="reset">Refreshes the header of framebuffer when <see langword="true"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task RefreshAsync(bool reset = false, CancellationToken cancellationToken = default)
+        public async Task RefreshAsync(bool reset = false, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
 
@@ -205,7 +206,7 @@ namespace AdvancedSharpAdbClient.Models
 #if NET
         [SupportedOSPlatform("windows")]
 #endif
-        public virtual Bitmap? ToImage()
+        public Bitmap? ToImage()
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(Refresh)} first") : Header.ToImage(Data);
@@ -230,7 +231,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmapAsync(CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmapAsync(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, cancellationToken);
@@ -242,7 +243,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmapAsync(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmapAsync(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, dispatcher, cancellationToken);
@@ -254,7 +255,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        public virtual Task<WriteableBitmap?> ToBitmapAsync(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
+        public Task<WriteableBitmap?> ToBitmapAsync(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, dispatcher, cancellationToken);
@@ -262,7 +263,7 @@ namespace AdvancedSharpAdbClient.Models
 #endif
 
         /// <inheritdoc/>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed && disposing)
             {
@@ -288,6 +289,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
         /// </summary>
-        protected virtual void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
+        private void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
     }
 }

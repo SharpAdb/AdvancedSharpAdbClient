@@ -1,17 +1,18 @@
 ﻿#if NETFRAMEWORK && !NET40_OR_GREATER
-using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Net.Sockets;
 
-namespace AdvancedSharpAdbClient.Polyfills
+namespace System.Net
 {
     /// <summary>
     /// Represents a network endpoint as a host name or a string representation of an IP address and a port number.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public class DnsEndPoint : EndPoint
+    internal class DnsEndPoint : EndPoint
     {
         private readonly AddressFamily _family;
 
@@ -98,4 +99,6 @@ namespace AdvancedSharpAdbClient.Polyfills
         public int Port { get; }
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Net.EndPoint))]
 #endif

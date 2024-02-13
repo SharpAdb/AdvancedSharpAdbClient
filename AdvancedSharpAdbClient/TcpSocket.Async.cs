@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     {
         /// <inheritdoc/>
         [MemberNotNull(nameof(EndPoint))]
-        public virtual async Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
+        public async Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
         {
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
+        public Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default)
         {
             if (isForce || !Socket.Connected)
             {
@@ -56,7 +56,7 @@ namespace AdvancedSharpAdbClient
         public Task ReconnectAsync(CancellationToken cancellationToken = default) => ReconnectAsync(false, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if NET6_0_OR_GREATER
             Socket.SendAsync(buffer, socketFlags, cancellationToken).AsTask();
 #else
@@ -64,15 +64,15 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> SendAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             Socket.SendAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> SendAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             Socket.SendAsync(buffer, offset, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
 #if NET6_0_OR_GREATER
             Socket.ReceiveAsync(buffer, socketFlags, cancellationToken).AsTask();
 #else
@@ -80,11 +80,11 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> ReceiveAsync(byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             Socket.ReceiveAsync(buffer, size, socketFlags, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
+        public Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             Socket.ReceiveAsync(buffer, offset, size, socketFlags, cancellationToken);
 
 #if HAS_BUFFERS

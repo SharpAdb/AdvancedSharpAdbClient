@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Provides data for the <see cref="ISyncService"/> interface.
     /// </summary>
-    public class SyncProgressChangedEventArgs(long current, long total) : EventArgs
+    public sealed class SyncProgressChangedEventArgs(long current, long total) : EventArgs
     {
         /// <summary>
         /// Gets the number of bytes sync to the local computer.

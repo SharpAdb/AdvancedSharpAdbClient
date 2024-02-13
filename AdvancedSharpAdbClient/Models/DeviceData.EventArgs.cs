@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="device">The device.</param>
-    public class DeviceDataEventArgs(DeviceData device) : EventArgs
+    public abstract class DeviceDataEventArgs(DeviceData device) : EventArgs
     {
         /// <summary>
         /// Gets the device where the change occurred.
@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="devices">The list of device.</param>
-    public class DeviceDataNotifyEventArgs(IEnumerable<DeviceData> devices) : EventArgs
+    public sealed class DeviceDataNotifyEventArgs(IEnumerable<DeviceData> devices) : EventArgs
     {
         /// <summary>
         /// Gets the list of device where the change occurred.
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="device">The device.</param>
     /// <param name="isConnect">The device after the reported change.</param>
-    public class DeviceDataConnectEventArgs(DeviceData device, bool isConnect) : DeviceDataEventArgs(device)
+    public sealed class DeviceDataConnectEventArgs(DeviceData device, bool isConnect) : DeviceDataEventArgs(device)
     {
         /// <summary>
         /// Gets the connect state of the device after the reported change.
@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device.</param>
     /// <param name="newState">The state of the device after the reported change.</param>
     /// <param name="oldState">The state of the device before the reported change.</param>
-    public class DeviceDataChangeEventArgs(DeviceData device, DeviceState newState, DeviceState oldState) : DeviceDataEventArgs(device)
+    public sealed class DeviceDataChangeEventArgs(DeviceData device, DeviceState newState, DeviceState oldState) : DeviceDataEventArgs(device)
     {
         /// <summary>
         /// Gets the state of the device after the reported change.

@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbClient
     {
         /// <inheritdoc/>
-        public virtual async Task<int> GetAdbVersionAsync(CancellationToken cancellationToken = default)
+        public async Task<int> GetAdbVersionAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
 
@@ -30,7 +30,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task KillAdbAsync(CancellationToken cancellationToken = default)
+        public async Task KillAdbAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
@@ -40,7 +40,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<DeviceData>> GetDevicesAsync(CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
 
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken = default)
+        public async Task<int> CreateForwardAsync(DeviceData device, string local, string remote, bool allowRebind, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken = default)
+        public async Task<int> CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -87,7 +87,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RemoveReverseForwardAsync(DeviceData device, string remote, CancellationToken cancellationToken = default)
+        public async Task RemoveReverseForwardAsync(DeviceData device, string remote, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RemoveAllReverseForwardsAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task RemoveAllReverseForwardsAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RemoveForwardAsync(DeviceData device, int localPort, CancellationToken cancellationToken = default)
+        public async Task RemoveForwardAsync(DeviceData device, int localPort, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -121,7 +121,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RemoveAllForwardsAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task RemoveAllForwardsAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<ForwardData>> ListForwardAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -145,7 +145,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<ForwardData>> ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -161,7 +161,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteServerCommandAsync(string target, string command, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             await ExecuteServerCommandAsync(target, command, socket, cancellationToken);
@@ -182,7 +182,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken = default)
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -246,7 +246,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
+        public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(encoding);
@@ -259,7 +259,7 @@ namespace AdvancedSharpAdbClient
 
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -312,7 +312,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(encoding);
@@ -327,7 +327,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, [EnumeratorCancellation] CancellationToken cancellationToken = default, params LogId[] logNames)
+        public async IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, [EnumeratorCancellation] CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             EnsureDevice(device);
 
@@ -378,7 +378,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
+        public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(messageSink);
@@ -429,7 +429,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<Framebuffer> GetFrameBufferAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -441,7 +441,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task RebootAsync(string into, DeviceData device, CancellationToken cancellationToken = default)
+        public async Task RebootAsync(string into, DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 
@@ -453,46 +453,49 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default)
+        public async Task<string> PairAsync(string host, int port, string code, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:pair:{code}:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
+        public async Task<string> ConnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:connect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:connect:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken = default)
+        public async Task<string> DisconnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            await socket.SendAdbRequestAsync($"host:disconnect:{endpoint.Host}:{endpoint.Port}", cancellationToken).ConfigureAwait(false);
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            await socket.SendAdbRequestAsync($"host:disconnect:{address}", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             return await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        public virtual Task RootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("root:", device, cancellationToken);
+        public Task RootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("root:", device, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task UnrootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("unroot:", device, cancellationToken);
+        public Task UnrootAsync(DeviceData device, CancellationToken cancellationToken = default) => RootAsync("unroot:", device, cancellationToken);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with or without root privileges.
@@ -606,7 +609,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -660,7 +663,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -704,7 +707,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> InstallCreateAsync(DeviceData device, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task<string> InstallCreateAsync(DeviceData device, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -739,7 +742,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(packageName);
@@ -912,7 +915,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallCommitAsync(DeviceData device, string session, CancellationToken cancellationToken = default)
+        public async Task InstallCommitAsync(DeviceData device, string session, CancellationToken cancellationToken = default)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
@@ -998,7 +1001,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -1052,7 +1055,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -1230,7 +1233,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public virtual async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task UninstallAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -1261,7 +1264,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
 

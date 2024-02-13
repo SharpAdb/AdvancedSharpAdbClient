@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         [MemberNotNull(nameof(MonitorTask))]
-        public virtual async Task StartAsync(CancellationToken cancellationToken = default)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             if (MonitorTask == null)
             {

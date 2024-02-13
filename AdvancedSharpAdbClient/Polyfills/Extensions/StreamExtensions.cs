@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="Stream"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class StreamExtensions
+    internal static class StreamExtensions
     {
         /// <summary>
         /// Asynchronously reads a sequence of bytes from the current stream, advances the position

@@ -2,11 +2,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedSharpAdbClient.Polyfills
+namespace System.Drawing
 {
     /// <summary>
     /// Stores the location and size of a rectangular region.
@@ -16,7 +15,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <param name="width">The width of the rectangle.</param>
     /// <param name="height">The height of the rectangle.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Rectangle(int x, int y, int width, int height) : IEquatable<Rectangle>
+    internal struct Rectangle(int x, int y, int width, int height) : IEquatable<Rectangle>
     {
         /// <summary>
         /// Represents a <see cref="Rectangle"/> structure with its properties left uninitialized.
@@ -282,4 +281,6 @@ namespace AdvancedSharpAdbClient.Polyfills
         public override readonly string ToString() => $"{{X={X},Y={Y},Width={Width},Height={Height}}}";
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Rectangle))]
 #endif

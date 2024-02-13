@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient
             nameof(MonitorThread)
 #endif
             )]
-        public virtual void Start()
+        public void Start()
         {
 #if HAS_TASK
             if (MonitorTask == null)
@@ -316,7 +316,7 @@ namespace AdvancedSharpAdbClient
                 MonitorLoopFinished.Set();
             }
         }
-        
+
         /// <summary>
         /// Initializes the <see cref="Socket"/> and sends the <c>host:track-devices</c> command to the adb server.
         /// </summary>

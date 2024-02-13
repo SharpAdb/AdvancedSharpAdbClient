@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>This method has been invoked by the constructor.
         /// Do not use it unless you have closed the connection.
         /// Use <see cref="Reopen"/> to reopen the connection.</remarks>
-        public virtual void Open()
+        public void Open()
         {
             // target a specific device
             Socket.SetDevice(Device);
@@ -122,7 +122,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Reopen()
+        public void Reopen()
         {
             Socket.Reconnect(true);
             Open();
@@ -272,7 +272,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual FileStatistics Stat(string remotePath)
+        public FileStatistics Stat(string remotePath)
         {
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.STAT, remotePath);
@@ -292,7 +292,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
+        public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
             bool isLocked = false;
 

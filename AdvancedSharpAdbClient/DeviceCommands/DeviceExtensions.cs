@@ -60,8 +60,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="cords">The <see cref="Point"/> to click.</param>
-        public static void Click(this IAdbClient client, DeviceData device, Point cords) =>
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        public static void Click(this IAdbClient client, DeviceData device, Cords cords) =>
             new DeviceClient(client, device).Click(cords);
 
         /// <summary>
@@ -69,10 +69,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
-        /// <param name="first">The start <see cref="Point"/>.</param>
-        /// <param name="second">The end <see cref="Point"/>.</param>
+        /// <param name="first">The start <see cref="Cords"/>.</param>
+        /// <param name="second">The end <see cref="Cords"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
-        public static void Swipe(this IAdbClient client, DeviceData device, Point first, Point second, long speed) =>
+        public static void Swipe(this IAdbClient client, DeviceData device, Cords first, Cords second, long speed) =>
             new DeviceClient(client, device).Swipe(first, second, speed);
 
         /// <summary>

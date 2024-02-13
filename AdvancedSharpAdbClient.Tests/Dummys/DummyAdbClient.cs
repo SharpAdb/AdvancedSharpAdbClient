@@ -202,9 +202,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         #region Not Implemented
 
-        string IAdbClient.Connect(DnsEndPoint endpoint) => throw new NotImplementedException();
+        string IAdbClient.Connect(string host, int port) => throw new NotImplementedException();
 
-        Task<string> IAdbClient.ConnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task<string> IAdbClient.ConnectAsync(string host, int port, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         int IAdbClient.CreateForward(DeviceData device, string local, string remote, bool allowRebind) => throw new NotImplementedException();
 
@@ -216,9 +216,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task<int> IAdbClient.CreateReverseForwardAsync(DeviceData device, string remote, string local, bool allowRebind, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        string IAdbClient.Disconnect(DnsEndPoint endpoint) => throw new NotImplementedException();
+        string IAdbClient.Disconnect(string host, int port) => throw new NotImplementedException();
 
-        Task<string> IAdbClient.DisconnectAsync(DnsEndPoint endpoint, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task<string> IAdbClient.DisconnectAsync(string host, int port, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         int IAdbClient.GetAdbVersion() => throw new NotImplementedException();
 
@@ -276,9 +276,9 @@ namespace AdvancedSharpAdbClient.Tests
 
         Task<IEnumerable<ForwardData>> IAdbClient.ListReverseForwardAsync(DeviceData device, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        string IAdbClient.Pair(DnsEndPoint endpoint, string code) => throw new NotImplementedException();
+        string IAdbClient.Pair(string host, int port, string code) => throw new NotImplementedException();
 
-        Task<string> IAdbClient.PairAsync(DnsEndPoint endpoint, string code, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task<string> IAdbClient.PairAsync(string host, int port, string code, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         void IAdbClient.Reboot(string into, DeviceData device) => throw new NotImplementedException();
 

@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     public partial class AdbCommandLineClient
     {
         /// <inheritdoc/>
-        public virtual async Task<AdbCommandLineStatus> GetVersionAsync(CancellationToken cancellationToken = default)
+        public async Task<AdbCommandLineStatus> GetVersionAsync(CancellationToken cancellationToken = default)
         {
             // Run the adb.exe version command and capture the output.
             List<string> standardOutput = [];
@@ -55,40 +55,16 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task StartServerAsync(CancellationToken cancellationToken = default)
+        public async Task StartServerAsync(CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
             if (status == 0) { return; }
-#if HAS_PROCESS && !WINDOWS_UWP
-            try
-            {
-                // Starting the adb server failed for whatever reason. This can happen if adb.exe
-                // is running but is not accepting requests. In that case, try to kill it & start again.
-                // It kills all processes named "adb", so let's hope nobody else named their process that way.
-                foreach (Process adbProcess in Process.GetProcessesByName("adb"))
-                {
-                    try
-                    {
-                        adbProcess.Kill();
-                    }
-                    catch (Win32Exception)
-                    {
-                        // The associated process could not be terminated
-                        // or
-                        // The process is terminating.
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // The process has already exited.
-                        // There is no process associated with this Process object.
-                    }
-                }
-            }
-            catch (NotSupportedException)
-            {
-                // This platform does not support getting a list of processes.
-            }
-#endif
+
+            // Starting the adb server failed for whatever reason. This can happen if adb.exe
+            // is running but is not accepting requests. In that case, try to kill it & start again.
+            // It kills all processes named "adb", so let's hope nobody else named their process that way.
+            KillProcess("adb");
+
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
             await RunAdbProcessAsync("start-server", null, null, cancellationToken).ConfigureAwait(false);
@@ -116,7 +92,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected virtual async Task RunAdbProcessAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
+        protected async Task RunAdbProcessAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
             int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
             if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
@@ -135,7 +111,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{Int32}"/> which returns the return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
         /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected virtual async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
+        protected async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(command);
             return await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);

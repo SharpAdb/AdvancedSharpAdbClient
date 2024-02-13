@@ -173,7 +173,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual int GetAdbVersion()
+        public int GetAdbVersion()
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
 
@@ -185,7 +185,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void KillAdb()
+        public void KillAdb()
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             socket.SendAdbRequest("host:kill");
@@ -195,7 +195,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<DeviceData> GetDevices()
+        public IEnumerable<DeviceData> GetDevices()
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
 
@@ -208,7 +208,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
+        public int CreateForward(DeviceData device, string local, string remote, bool allowRebind)
         {
             EnsureDevice(device);
 
@@ -224,7 +224,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
+        public int CreateReverseForward(DeviceData device, string remote, string local, bool allowRebind)
         {
             EnsureDevice(device);
 
@@ -242,7 +242,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void RemoveReverseForward(DeviceData device, string remote)
+        public void RemoveReverseForward(DeviceData device, string remote)
         {
             EnsureDevice(device);
 
@@ -254,7 +254,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void RemoveAllReverseForwards(DeviceData device)
+        public void RemoveAllReverseForwards(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -266,7 +266,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void RemoveForward(DeviceData device, int localPort)
+        public void RemoveForward(DeviceData device, int localPort)
         {
             EnsureDevice(device);
 
@@ -276,7 +276,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void RemoveAllForwards(DeviceData device)
+        public void RemoveAllForwards(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -286,7 +286,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<ForwardData> ListForward(DeviceData device)
+        public IEnumerable<ForwardData> ListForward(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -300,7 +300,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<ForwardData> ListReverseForward(DeviceData device)
+        public IEnumerable<ForwardData> ListReverseForward(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -316,7 +316,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteServerCommand(string target, string command)
+        public void ExecuteServerCommand(string target, string command)
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             ExecuteServerCommand(target, command, socket);
@@ -337,7 +337,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteRemoteCommand(string command, DeviceData device)
+        public void ExecuteRemoteCommand(string command, DeviceData device)
         {
             EnsureDevice(device);
 
@@ -348,7 +348,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteServerCommand(string target, string command, IShellOutputReceiver? receiver, Encoding encoding)
+        public void ExecuteServerCommand(string target, string command, IShellOutputReceiver? receiver, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -395,7 +395,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding)
+        public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding)
         {
             EnsureDevice(device);
 
@@ -406,7 +406,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
+        public IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
@@ -453,7 +453,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
+        public IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
         {
             EnsureDevice(device);
 
@@ -467,7 +467,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
+        public IEnumerable<LogEntry> RunLogService(DeviceData device, params LogId[] logNames)
         {
             EnsureDevice(device);
 
@@ -513,7 +513,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled = false, params LogId[] logNames)
+        public void RunLogService(DeviceData device, Action<LogEntry> messageSink, in bool isCancelled = false, params LogId[] logNames)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(messageSink);
@@ -560,14 +560,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual Framebuffer CreateFramebuffer(DeviceData device)
+        public Framebuffer CreateFramebuffer(DeviceData device)
         {
             EnsureDevice(device);
             return new Framebuffer(device, this, AdbSocketFactory);
         }
 
         /// <inheritdoc/>
-        public virtual Framebuffer GetFrameBuffer(DeviceData device)
+        public Framebuffer GetFrameBuffer(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -579,7 +579,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Reboot(string into, DeviceData device)
+        public void Reboot(string into, DeviceData device)
         {
             EnsureDevice(device);
 
@@ -591,53 +591,56 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual string Pair(DnsEndPoint endpoint, string code)
+        public string Pair(string host, int port, string code)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:pair:{code}:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:pair:{code}:{address}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();
         }
 
         /// <inheritdoc/>
-        public virtual string Connect(DnsEndPoint endpoint)
+        public string Connect(string host, int port = DefaultPort)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:connect:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:connect:{address}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();
         }
 
         /// <inheritdoc/>
-        public virtual string Disconnect(DnsEndPoint endpoint)
+        public string Disconnect(string host, int port = DefaultPort)
         {
-            ExceptionExtensions.ThrowIfNull(endpoint);
+            ExceptionExtensions.ThrowIfNull(host);
 
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
-            socket.SendAdbRequest($"host:disconnect:{endpoint.Host}:{endpoint.Port}");
+            string address = host.Contains(':') ? host : $"{host}:{port}";
+            socket.SendAdbRequest($"host:disconnect:{address}");
             _ = socket.ReadAdbResponse();
 
             return socket.ReadString();
         }
 
         /// <inheritdoc/>
-        public virtual void Root(DeviceData device) => Root("root:", device);
+        public void Root(DeviceData device) => Root("root:", device);
 
         /// <inheritdoc/>
-        public virtual void Unroot(DeviceData device) => Root("unroot:", device);
+        public void Unroot(DeviceData device) => Root("unroot:", device);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with or without root privileges.
         /// </summary>
         /// <param name="request">The command of root or unroot.</param>
         /// <param name="device">The device on which to restart ADB with root privileges.</param>
-        protected virtual void Root(string request, DeviceData device)
+        protected void Root(string request, DeviceData device)
         {
             EnsureDevice(device);
 
@@ -745,7 +748,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultiple(DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -802,7 +805,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
+        public void InstallMultiple(DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -849,7 +852,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual string InstallCreate(DeviceData device, params string[] arguments)
+        public string InstallCreate(DeviceData device, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -883,7 +886,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual string InstallCreate(DeviceData device, string packageName, params string[] arguments)
+        public string InstallCreate(DeviceData device, string packageName, params string[] arguments)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(packageName);
@@ -1052,7 +1055,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void InstallCommit(DeviceData device, string session)
+        public void InstallCommit(DeviceData device, string session)
         {
             EnsureDevice(device);
 
@@ -1071,7 +1074,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Uninstall(DeviceData device, string packageName, params string[] arguments)
+        public void Uninstall(DeviceData device, string packageName, params string[] arguments)
         {
             EnsureDevice(device);
 
@@ -1102,7 +1105,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<string> GetFeatureSet(DeviceData device)
+        public IEnumerable<string> GetFeatureSet(DeviceData device)
         {
             EnsureDevice(device);
 
@@ -1130,7 +1133,7 @@ namespace AdvancedSharpAdbClient
         protected static void EnsureDevice([NotNull] DeviceData? device)
         {
             ExceptionExtensions.ThrowIfNull(device);
-            if (string.IsNullOrEmpty(device.Serial))
+            if (device.IsEmpty)
             {
                 throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
             }

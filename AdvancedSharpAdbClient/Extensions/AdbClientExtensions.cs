@@ -243,7 +243,7 @@ namespace AdvancedSharpAdbClient
         public static string Pair(this IAdbClient client, IPAddress address, string code) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
-                : client.Pair(new IPEndPoint(address, AdbClient.DefaultPort), code);
+                : client.Pair(address.ToString(), AdbClient.DefaultPort, code);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.
@@ -255,7 +255,7 @@ namespace AdvancedSharpAdbClient
         public static string Pair(this IAdbClient client, IPEndPoint endpoint, string code) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
-                : client.Pair(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port), code);
+                : client.Pair(endpoint.Address.ToString(), endpoint.Port, code);
 
         /// <summary>
         /// Pair with a device for secure TCP/IP communication.
@@ -265,18 +265,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
         public static string Pair(this IAdbClient client, string host, string code) =>
-            client.Pair(Extensions.CreateDnsEndPoint(host, AdbClient.DefaultPort), code);
-
-        /// <summary>
-        /// Pair with a device for secure TCP/IP communication.
-        /// </summary>
-        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
-        /// <param name="host">The host address of the remote device.</param>
-        /// <param name="port">The port of the remote device.</param>
-        /// <param name="code">The pairing code.</param>
-        /// <returns>The results from adb.</returns>
-        public static string Pair(this IAdbClient client, string host, int port, string code) =>
-            client.Pair(Extensions.CreateDnsEndPoint(host, port), code);
+            client.Pair(host, AdbClient.DefaultPort, code);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
@@ -287,7 +276,7 @@ namespace AdvancedSharpAdbClient
         public static string Connect(this IAdbClient client, IPAddress address) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
-                : client.Connect(new IPEndPoint(address, AdbClient.DefaultPort));
+                : client.Connect(address.ToString(), AdbClient.DefaultPort);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
@@ -298,17 +287,55 @@ namespace AdvancedSharpAdbClient
         public static string Connect(this IAdbClient client, IPEndPoint endpoint) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
-                : client.Connect(new DnsEndPoint(endpoint.Address.ToString(), endpoint.Port));
+                : client.Connect(endpoint.Address.ToString(), endpoint.Port);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
-        /// <param name="port">The port of the remote device.</param>
         /// <returns>The results from adb.</returns>
-        public static string Connect(this IAdbClient client, string host, int port = AdbClient.DefaultPort) =>
-            client.Connect(Extensions.CreateDnsEndPoint(host, port));
+        public static string Connect(this IAdbClient client, string host) =>
+            client.Connect(host, AdbClient.DefaultPort);
+
+        /// <summary>
+        /// Disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="address">The IP address of the remote device.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Disconnect(this IAdbClient client, IPAddress address) =>
+            address == null
+                ? throw new ArgumentNullException(nameof(address))
+                : client.Disconnect(address.ToString(), AdbClient.DefaultPort);
+
+        /// <summary>
+        /// Disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Disconnect(this IAdbClient client, IPEndPoint endpoint) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.Disconnect(endpoint.Address.ToString(), endpoint.Port);
+
+        /// <summary>
+        /// Disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Disconnect(this IAdbClient client, string host) =>
+            client.Disconnect(host, AdbClient.DefaultPort);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with a device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> instance to use to interact with the device.</param>
+        /// <param name="device">The device to interact with.</param>
+        /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
+        public static DeviceClient CreateDeviceClient(this IAdbClient client, DeviceData device) => new(client, device);
 
 #if !NETFRAMEWORK || NET40_OR_GREATER
         /// <summary>
@@ -382,6 +409,40 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         public static void InstallWrite(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress) =>
             client.InstallWrite(device, apk, apkName, session, progress.AsAction());
+
+        /// <summary>
+        /// Pair with a device for secure TCP/IP communication.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="code">The pairing code.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Pair(this IAdbClient client, DnsEndPoint endpoint, string code) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.Pair(endpoint.Host, endpoint.Port, code);
+
+        /// <summary>
+        /// Connect to a device via TCP/IP.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Connect(this IAdbClient client, DnsEndPoint endpoint) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.Connect(endpoint.Host, endpoint.Port);
+
+        /// <summary>
+        /// Disconnects a remote device from this local ADB server.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <returns>The results from adb.</returns>
+        public static string Disconnect(this IAdbClient client, DnsEndPoint endpoint) =>
+            endpoint == null
+                ? throw new ArgumentNullException(nameof(endpoint))
+                : client.Disconnect(endpoint.Host, endpoint.Port);
 #endif
     }
 }

@@ -2,20 +2,19 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AdvancedSharpAdbClient.Polyfills
+namespace System.Drawing
 {
     /// <summary>
     /// Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Point : IEquatable<Point>
+    internal struct Point : IEquatable<Point>
     {
         /// <summary>
-        /// Creates a new instance of the <see cref='Point'/> class with member data left uninitialized.
+        /// Creates a new instance of the <see cref='Point'/> struct with member data left uninitialized.
         /// </summary>
         public static readonly Point Empty;
 
@@ -151,4 +150,6 @@ namespace AdvancedSharpAdbClient.Polyfills
         private static short LowInt16(int n) => unchecked((short)(n & 0xffff));
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Point))]
 #endif

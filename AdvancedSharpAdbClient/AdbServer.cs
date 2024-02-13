@@ -165,7 +165,7 @@ namespace AdvancedSharpAdbClient
         public EndPoint EndPoint { get; protected set; }
 
         /// <inheritdoc/>
-        public virtual StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
+        public StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
         {
             if (IsStarting) { return StartServerResult.Starting; }
             try
@@ -218,14 +218,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual StartServerResult RestartServer() => StartServer(CachedAdbPath!, true);
+        public StartServerResult RestartServer() => StartServer(CachedAdbPath!, true);
 
         /// <inheritdoc/>
-        public virtual StartServerResult RestartServer(string adbPath) =>
+        public StartServerResult RestartServer(string adbPath) =>
             StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
 
         /// <inheritdoc/>
-        public virtual void StopServer()
+        public void StopServer()
         {
             using IAdbSocket socket = AdbSocketFactory(EndPoint);
             socket.SendAdbRequest("host:kill");
@@ -235,7 +235,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual AdbServerStatus GetStatus()
+        public AdbServerStatus GetStatus()
         {
             // Try to connect to a running instance of the adb server
             try

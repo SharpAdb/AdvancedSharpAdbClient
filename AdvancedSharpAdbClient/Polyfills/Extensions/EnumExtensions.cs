@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="Enum"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class EnumExtensions
+    internal static class EnumExtensions
     {
         /// <summary>
         /// Converts the string representation of the name or numeric value of one or more

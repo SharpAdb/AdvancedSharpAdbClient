@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient
         public Task ReconnectAsync(CancellationToken cancellationToken = default) => ReconnectAsync(false, cancellationToken);
 
         /// <inheritdoc/>
-        public virtual Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default) => Socket.ReconnectAsync(isForce, cancellationToken);
+        public Task ReconnectAsync(bool isForce, CancellationToken cancellationToken = default) => Socket.ReconnectAsync(isForce, cancellationToken);
 
         /// <inheritdoc/>
         public virtual async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient
             SendSyncRequestAsync(command, $"{path},{permissions}", cancellationToken);
 
         /// <inheritdoc/>
-        public virtual async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
         {
             // The message structure is:
             // First four bytes: command
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
+        public async Task SendAdbRequestAsync(string request, CancellationToken cancellationToken = default)
         {
             byte[] data = AdbClient.FormAdbRequest(request);
             if (!await WriteAsync(data, cancellationToken).ConfigureAwait(false))
@@ -234,7 +234,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
+        public async Task<SyncCommand> ReadSyncResponseAsync(CancellationToken cancellationToken = default)
         {
             byte[] data = new byte[4];
             _ = await ReadAsync(data, cancellationToken).ConfigureAwait(false);
@@ -242,7 +242,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
+        public async Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken = default)
         {
             AdbResponse response = await ReadAdbResponseInnerAsync(cancellationToken).ConfigureAwait(false);
 
@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
+        public async Task SetDeviceAsync(DeviceData device, CancellationToken cancellationToken = default)
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device

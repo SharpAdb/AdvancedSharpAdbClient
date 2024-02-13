@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="StringBuilder"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class StringBuilderExtensions
+    internal static class StringBuilderExtensions
     {
         /// <summary>
         /// Removes all characters from the current <see cref="StringBuilder"/> instance.

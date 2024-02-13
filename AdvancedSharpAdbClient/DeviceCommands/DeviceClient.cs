@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,41 +16,26 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// A class which contains methods for interacting with an Android device by <see cref="IAdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/>
     /// </summary>
-    public partial class DeviceClient
+    /// <param name="AdbClient">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
+    /// <param name="Device">The device on which to process command.</param>
+    public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device)
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceClient"/> class.
+        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
-        /// <param name="device">The device on which to process command.</param>
-        public DeviceClient(IAdbClient client, DeviceData device)
-        {
-            ExceptionExtensions.ThrowIfNull(client);
-            ExceptionExtensions.ThrowIfNull(device);
-            if (string.IsNullOrEmpty(device.Serial))
-            {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
-            }
-            Device = device;
-            AdbClient = client;
-        }
+        public IAdbClient AdbClient { get; init; } = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
 
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; init; }
-
-        /// <summary>
-        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
-        /// </summary>
-        public IAdbClient AdbClient { get; init; }
+        public DeviceData Device { get; init; } = EnsureDevice(Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <returns>A <see cref="string"/> containing current hierarchy.
         /// Failed if start with <c>ERROR</c> or <c>java.lang.Exception</c>.</returns>
-        public virtual string DumpScreenString()
+        public string DumpScreenString()
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, "uiautomator dump /dev/tty", receiver);
@@ -73,7 +59,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
-        public virtual XmlDocument? DumpScreen()
+        public XmlDocument? DumpScreen()
         {
             XmlDocument doc = new();
             string xmlString = DumpScreenString();
@@ -90,7 +76,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-        public virtual Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT()
+        public Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT()
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             string xmlString = DumpScreenString();
@@ -106,8 +92,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Clicks on the specified coordinates.
         /// </summary>
-        /// <param name="cords">The <see cref="Point"/> to click.</param>
-        public virtual void Click(Point cords)
+        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        public void Click(Cords cords)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input tap {cords.X} {cords.Y}", receiver);
@@ -129,7 +115,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="x">The X co-ordinate to click.</param>
         /// <param name="y">The Y co-ordinate to click.</param>
-        public virtual void Click(int x, int y)
+        public void Click(int x, int y)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input tap {x} {y}", receiver);
@@ -152,7 +138,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="first">The start element.</param>
         /// <param name="second">The end element.</param>
         /// <param name="speed">The time spent in swiping.</param>
-        public virtual void Swipe(Element first, Element second, long speed)
+        public void Swipe(Element first, Element second, long speed)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input swipe {first.Center.X} {first.Center.Y} {second.Center.X} {second.Center.Y} {speed}", receiver);
@@ -172,10 +158,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
         /// </summary>
-        /// <param name="first">The start <see cref="Point"/>.</param>
-        /// <param name="second">The end <see cref="Point"/>.</param>
+        /// <param name="first">The start <see cref="Cords"/>.</param>
+        /// <param name="second">The end <see cref="Cords"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
-        public virtual void Swipe(Point first, Point second, long speed)
+        public void Swipe(Cords first, Cords second, long speed)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver);
@@ -200,7 +186,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="x2">The end X co-ordinate.</param>
         /// <param name="y2">The end Y co-ordinate.</param>
         /// <param name="speed">The time spent in swiping.</param>
-        public virtual void Swipe(int x1, int y1, int x2, int y2, long speed)
+        public void Swipe(int x1, int y1, int x2, int y2, long speed)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input swipe {x1} {y1} {x2} {y2} {speed}", receiver);
@@ -222,7 +208,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns><see langword="true"/> if the app is running in foreground; otherwise, <see langword="false"/>.</returns>
-        public virtual bool IsAppRunning(string packageName)
+        public bool IsAppRunning(string packageName)
         {
             ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"pidof {packageName}", receiver);
@@ -237,7 +223,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns><see langword="true"/> if the app is running in background; otherwise, <see langword="false"/>.</returns>
-        public virtual bool IsAppInForeground(string packageName)
+        public bool IsAppInForeground(string packageName)
         {
             ConsoleOutputReceiver receiver = new() { TrimLines = true, ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"dumpsys activity activities | grep mResumedActivity", receiver);
@@ -251,7 +237,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
-        public virtual AppStatus GetAppStatus(string packageName)
+        public AppStatus GetAppStatus(string packageName)
         {
             // Check if the app is in foreground
             bool currentApp = IsAppInForeground(packageName);
@@ -272,7 +258,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timeout">The timeout for waiting the element.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
-        public virtual Element? FindElement(string xpath = "hierarchy/node", TimeSpan timeout = default)
+        public Element? FindElement(string xpath = "hierarchy/node", TimeSpan timeout = default)
         {
             Stopwatch stopwatch = new();
             stopwatch.Start();
@@ -311,7 +297,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timeout">The timeout for waiting the elements.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
-        public virtual IEnumerable<Element> FindElements(string xpath = "hierarchy/node", TimeSpan timeout = default)
+        public IEnumerable<Element> FindElements(string xpath = "hierarchy/node", TimeSpan timeout = default)
         {
             Stopwatch stopwatch = new();
             stopwatch.Start();
@@ -354,7 +340,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
         /// </summary>
         /// <param name="key">The key event to send.</param>
-        public virtual void SendKeyEvent(string key)
+        public void SendKeyEvent(string key)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input keyevent {key}", receiver);
@@ -375,7 +361,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Send text to device. Doesn't support Russian.
         /// </summary>
         /// <param name="text">The text to send.</param>
-        public virtual void SendText(string text)
+        public void SendText(string text)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             AdbClient.ExecuteShellCommand(Device, $"input text {text}", receiver);
@@ -396,24 +382,52 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Start an Android application on device.
         /// </summary>
         /// <param name="packageName">The package name of the application to start.</param>
-        public virtual void StartApp(string packageName) => AdbClient.ExecuteShellCommand(Device, $"monkey -p {packageName} 1");
+        public void StartApp(string packageName) => AdbClient.ExecuteShellCommand(Device, $"monkey -p {packageName} 1");
 
         /// <summary>
         /// Stop an Android application on device.
         /// </summary>
         /// <param name="packageName">The package name of the application to stop.</param>
-        public virtual void StopApp(string packageName) => AdbClient.ExecuteShellCommand(Device, $"am force-stop {packageName}");
+        public void StopApp(string packageName) => AdbClient.ExecuteShellCommand(Device, $"am force-stop {packageName}");
 
         /// <summary>
         /// Deconstruct the <see cref="DeviceClient"/> class.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
         /// <param name="device">The device on which to process command.</param>
-        public virtual void Deconstruct(out IAdbClient client, out DeviceData device)
+        public void Deconstruct(out IAdbClient client, out DeviceData device)
         {
             client = AdbClient;
             device = Device;
         }
+
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
+        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
+        /// if <paramref name="device"/> does not have a valid serial number.
+        /// </summary>
+        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
+        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
+        protected static DeviceData EnsureDevice([NotNull] DeviceData? device)
+        {
+            ExceptionExtensions.ThrowIfNull(device);
+            return device.IsEmpty
+                ? throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device")
+                : device;
+        }
+
+#if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(EqualityContract, AdbClient, Device);
+
+        /// <inheritdoc/>
+        public virtual bool Equals(DeviceClient? other) =>
+            (object?)this == other ||
+                (other != (object?)null
+                && EqualityComparer<Type>.Default.Equals(EqualityContract, other.EqualityContract)
+                && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
+                && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));
+#endif
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]

@@ -16,6 +16,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             State = DeviceState.Online
         };
 
+        /// <summary>
+        /// Tests the <see cref="DeviceClient(IAdbClient, DeviceData)"/> method.
+        /// </summary>
         [Fact]
         public void ConstructorNullTest()
         {
@@ -23,6 +26,77 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(null, new DeviceData()));
             _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(Substitute.For<IAdbClient>(), null));
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => new DeviceClient(Substitute.For<IAdbClient>(), new DeviceData()));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceClient.Deconstruct(out IAdbClient, out DeviceData)"/> method.
+        /// </summary>
+        [Fact]
+        public void DeconstructTest()
+        {
+            IAdbClient client = Substitute.For<IAdbClient>();
+            DeviceClient deviceClient = new(client, Device);
+            (IAdbClient adbClient, DeviceData device) = deviceClient;
+            Assert.Equal(client, adbClient);
+            Assert.Equal(Device, device);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceClient.Equals(DeviceClient?)"/> method.
+        /// </summary>
+        [Fact]
+        public void EqualityTest()
+        {
+            IAdbClient c1 = Substitute.For<IAdbClient>();
+            IAdbClient c2 = Substitute.For<IAdbClient>();
+            DeviceData d1 = new() { Serial = "1" };
+            DeviceData d2 = new() { Serial = "2" };
+
+            DeviceClient p1 = new(c1, d1);
+            DeviceClient p2 = new(c2, d2);
+            DeviceClient p3 = new(c1, d1);
+
+            Assert.True(p1 == p3);
+            Assert.True(p1 != p2);
+            Assert.True(p2 != p3);
+
+            Assert.True(p1.Equals(p3));
+            Assert.False(p1.Equals(p2));
+            Assert.False(p2.Equals(p3));
+
+            Assert.True(p1.Equals((object)p3));
+            Assert.False(p1.Equals((object)p2));
+            Assert.False(p2.Equals((object)p3));
+
+            Assert.Equal(p1.GetHashCode(), p3.GetHashCode());
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceClient(DeviceClient)"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            IAdbClient client = Substitute.For<IAdbClient>();
+            IAdbClient newClient = Substitute.For<IAdbClient>();
+            DeviceData device = new() { Serial = "1" };
+            DeviceData newDevice = new() { Serial = "2" };
+
+            DeviceClient deviceClient = new(client, device);
+            Assert.Equal(client, deviceClient.AdbClient);
+            Assert.Equal(device, deviceClient.Device);
+
+            deviceClient = deviceClient with { };
+            Assert.Equal(client, deviceClient.AdbClient);
+            Assert.Equal(device, deviceClient.Device);
+
+            deviceClient = deviceClient with { AdbClient = newClient };
+            Assert.Equal(newClient, deviceClient.AdbClient);
+            Assert.Equal(device, deviceClient.Device);
+
+            deviceClient = deviceClient with { Device = newDevice };
+            Assert.Equal(newClient, deviceClient.AdbClient);
+            Assert.Equal(newDevice, deviceClient.Device);
         }
 
         /// <summary>
@@ -203,7 +277,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="DeviceClient.Click(Point)"/> method.
+        /// Tests the <see cref="DeviceClient.Click(Cords)"/> method.
         /// </summary>
         [Fact]
         public void ClickCordsTest()
@@ -233,7 +307,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="DeviceClient.Swipe(Point, Point, long)"/> method.
+        /// Tests the <see cref="DeviceClient.Swipe(Cords, Cords, long)"/> method.
         /// </summary>
         [Fact]
         public void SwipePointTest()
@@ -369,7 +443,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal("android.widget.TextView", child.Class);
             Assert.Equal("com.bilibili.app.in", child.Package);
             Assert.Equal("com.bilibili.app.in:id/header_info_name", child.ResourceID);
-            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), child.Bounds);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), child.Bounds);
             Assert.Equal(child, element.FindDescendantOrSelf(x => x.Text == "where-where"));
             Assert.Equal(2, element.FindDescendants().Where(x => x.Text == "where-where").Count());
         }
@@ -393,7 +467,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);
-            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
+            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Bounds);
         }
 
         /// <summary>

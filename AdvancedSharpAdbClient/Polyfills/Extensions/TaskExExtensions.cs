@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides extension methods for the <see cref="Task"/> class.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class TaskExExtensions
+    internal static class TaskExExtensions
     {
 #if NETFRAMEWORK && !NET46_OR_GREATER
         /// <summary>

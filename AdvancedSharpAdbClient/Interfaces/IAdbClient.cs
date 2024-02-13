@@ -312,24 +312,27 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Pair with a device for secure TCP/IP communication
         /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
-        string Pair(DnsEndPoint endpoint, string code);
+        string Pair(string host, int port, string code);
 
         /// <summary>
         /// Connect to a device via TCP/IP.
         /// </summary>
-        /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <returns>The results from adb.</returns>
-        string Connect(DnsEndPoint endpoint);
+        string Connect(string host, int port);
 
         /// <summary>
         /// Disconnects a remote device from this local ADB server.
         /// </summary>
-        /// <param name="endpoint">The endpoint of the remote device to disconnect.</param>
+        /// <param name="host">The host address of the remote device.</param>
+        /// <param name="port">The port of the remote device.</param>
         /// <returns>The results from adb.</returns>
-        string Disconnect(DnsEndPoint endpoint);
+        string Disconnect(string host, int port);
 
         /// <summary>
         /// Restarts the ADB daemon running on the device with root privileges.

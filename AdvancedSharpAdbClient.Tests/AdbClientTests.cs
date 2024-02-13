@@ -597,7 +597,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "114514");
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, DnsEndPoint, string)"/> method.
         /// </summary>
         [Fact]
         public void PairDnsEndpointTest() =>
@@ -634,11 +634,11 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((IPAddress)null, "114514"));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Pair(DnsEndPoint, string)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, DnsEndPoint, string)"/> method.
         /// </summary>
         [Fact]
         public void PairDnsEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair(null, "114514"));
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Pair((DnsEndPoint)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.Pair(IAdbClient, IPEndPoint, string)"/> method.
@@ -664,7 +664,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:5555");
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, DnsEndPoint)"/> method.
         /// </summary>
         [Fact]
         public void ConnectDnsEndpointTest() =>
@@ -682,7 +682,7 @@ namespace AdvancedSharpAdbClient.Tests
                 "127.0.0.1:4321");
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// Tests the <see cref="AdbClient.Connect(string, int)"/> method.
         /// </summary>
         [Fact]
         public void ConnectHostEndpointTest() =>
@@ -698,11 +698,11 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPAddress)null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Connect(DnsEndPoint)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, DnsEndPoint)"/> method.
         /// </summary>
         [Fact]
         public void ConnectDnsEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((DnsEndPoint)null));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, IPEndPoint)"/> method.
@@ -712,14 +712,14 @@ namespace AdvancedSharpAdbClient.Tests
             _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((IPEndPoint)null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClientExtensions.Connect(IAdbClient, string, int)"/> method.
+        /// Tests the <see cref="AdbClient.Connect(string, int)"/> method.
         /// </summary>
         [Fact]
         public void ConnectHostEndpointNullTest() =>
-            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect((string)null));
+            _ = Assert.Throws<ArgumentNullException>(() => TestClient.Connect(null));
 
         /// <summary>
-        /// Tests the <see cref="AdbClient.Disconnect(DnsEndPoint)"/> method.
+        /// Tests the <see cref="AdbClientExtensions.Disconnect(IAdbClient, DnsEndPoint)"/> method.
         /// </summary>
         [Fact]
         public void DisconnectTest()

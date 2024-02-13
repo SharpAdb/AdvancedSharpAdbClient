@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// Provides helper methods for working with Unix-based date formats.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class DateTimeExtensions
+    internal static class DateTimeExtensions
     {
 #if NETFRAMEWORK && !NET46_OR_GREATER
         // Number of 100ns ticks per time unit
@@ -102,19 +102,5 @@ namespace AdvancedSharpAdbClient.Polyfills
             return seconds - UnixEpochSeconds;
         }
 #endif
-
-        /// <summary>
-        /// Converts a Unix equivalent to the <see cref="DateTime"/>.
-        /// </summary>
-        /// <param name="time">The Unix equivalent to convert to the date.</param>
-        /// <returns>A <see cref="DateTime"/> that represents the date.</returns>
-        public static DateTime FromUnixEpoch(long time) => Epoch.Add(new TimeSpan(time * 1000_0000));
-
-        /// <summary>
-        /// Converts a <see cref="DateTime"/> to the Unix equivalent.
-        /// </summary>
-        /// <param name="date">The date to convert to the Unix format.</param>
-        /// <returns>A <see cref="long"/> that represents the date, in Unix format.</returns>
-        public static long ToUnixEpoch(this DateTime date) => (long)Math.Round(date.ToUniversalTime().Subtract(Epoch).TotalSeconds);
     }
 }

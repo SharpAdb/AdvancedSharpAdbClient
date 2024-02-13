@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual Task RefreshPackagesAsync(CancellationToken cancellationToken = default)
+        public Task RefreshPackagesAsync(CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallPackageAsync(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallPackageAsync(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallRemotePackageAsync(string remoteFilePath, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallRemotePackageAsync(string remoteFilePath, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
 
@@ -114,7 +114,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -190,7 +190,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
@@ -258,7 +258,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -307,7 +307,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultipleRemotePackageAsync(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
+        public async Task InstallMultipleRemotePackageAsync(IEnumerable<string> splitRemoteFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.CreateSession));
 
@@ -352,7 +352,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallPackageAsync(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallPackageAsync(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallPackageAsync(packageFilePath, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallRemotePackageAsync(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallRemotePackageAsync(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallRemotePackageAsync(remoteFilePath, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
         /// <summary>
@@ -377,7 +377,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultiplePackageAsync(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallMultipleRemotePackageAsync(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultipleRemotePackageAsync(baseRemoteFilePath, splitRemoteFilePaths, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task InstallMultipleRemotePackageAsync(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
+        public async Task InstallMultipleRemotePackageAsync(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultipleRemotePackageAsync(splitRemoteFilePaths, packageName, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 #endif
 
@@ -436,7 +436,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public virtual async Task UninstallPackageAsync(string packageName, CancellationToken cancellationToken, params string[] arguments)
+        public async Task UninstallPackageAsync(string packageName, CancellationToken cancellationToken, params string[] arguments)
         {
             ValidateDevice();
 
@@ -467,13 +467,76 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="packageName">The name of the package from which to get the application version.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{VersionInfo}"/> which returns the <see cref="VersionInfo"/> of target application.</returns>
-        public virtual async Task<VersionInfo> GetVersionInfoAsync(string packageName, CancellationToken cancellationToken = default)
+        public async Task<VersionInfo> GetVersionInfoAsync(string packageName, CancellationToken cancellationToken = default)
         {
             ValidateDevice();
 
             VersionInfoReceiver receiver = new();
             await AdbClient.ExecuteShellCommandAsync(Device, $"dumpsys package {packageName}", receiver, cancellationToken).ConfigureAwait(false);
             return receiver.VersionInfo;
+        }
+
+        /// <summary>
+        /// Like "install", but starts an install session asynchronously.
+        /// </summary>
+        /// <param name="packageName">The absolute package name of the base app.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        /// <returns>A <see cref="Task{String}"/> which returns the session ID.</returns>
+        protected async Task<string> CreateInstallSessionAsync(string? packageName = null, CancellationToken cancellationToken = default, params string[] arguments)
+        {
+            ValidateDevice();
+
+            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
+
+            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            {
+                _ = requestBuilder.AppendFormat(" -p {0}", packageName);
+            }
+
+            if (arguments != null)
+            {
+                foreach (string argument in arguments)
+                {
+                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                }
+            }
+
+            string cmd = requestBuilder.ToString();
+            InstallOutputReceiver receiver = new();
+            await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
+
+            if (string.IsNullOrEmpty(receiver.SuccessMessage))
+            {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
+
+            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSessionAsync)} is null.");
+            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
+            string session = result.Substring(result.IndexOf('[') + 1, arr);
+
+            return session;
+        }
+
+        /// <summary>
+        /// Asynchronously write an apk into the given install session.
+        /// </summary>
+        /// <param name="session">The session ID of the install session.</param>
+        /// <param name="apkName">The name of the application.</param>
+        /// <param name="path">The absolute file path to package file on device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        protected async Task WriteInstallSessionAsync(string session, string apkName, string path, CancellationToken cancellationToken = default)
+        {
+            ValidateDevice();
+
+            InstallOutputReceiver receiver = new();
+            await AdbClient.ExecuteShellCommandAsync(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver, cancellationToken).ConfigureAwait(false);
+
+            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
+            {
+                throw new PackageInstallationException(receiver.ErrorMessage);
+            }
         }
 
         /// <summary>
@@ -549,7 +612,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <exception cref="IOException">If file removal failed.</exception>
-        protected virtual async Task RemoveRemotePackageAsync(string remoteFilePath, CancellationToken cancellationToken = default)
+        protected async Task RemoveRemotePackageAsync(string remoteFilePath, CancellationToken cancellationToken = default)
         {
             // now we delete the app we synced
             try
@@ -560,69 +623,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             {
                 logger.LogError(e, "Failed to delete temporary package: {0}", e.Message);
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// Like "install", but starts an install session asynchronously.
-        /// </summary>
-        /// <param name="packageName">The absolute package name of the base app.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        /// <returns>A <see cref="Task{String}"/> which returns the session ID.</returns>
-        protected virtual async Task<string> CreateInstallSessionAsync(string? packageName = null, CancellationToken cancellationToken = default, params string[] arguments)
-        {
-            ValidateDevice();
-
-            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
-
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
-            {
-                _ = requestBuilder.AppendFormat(" -p {0}", packageName);
-            }
-
-            if (arguments != null)
-            {
-                foreach (string argument in arguments)
-                {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
-                }
-            }
-
-            string cmd = requestBuilder.ToString();
-            InstallOutputReceiver receiver = new();
-            await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
-
-            if (string.IsNullOrEmpty(receiver.SuccessMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
-            }
-
-            string result = receiver.SuccessMessage ?? throw new AdbException($"The {nameof(result)} of {nameof(CreateInstallSessionAsync)} is null.");
-            int arr = result.IndexOf(']') - 1 - result.IndexOf('[');
-            string session = result.Substring(result.IndexOf('[') + 1, arr);
-
-            return session;
-        }
-
-        /// <summary>
-        /// Asynchronously write an apk into the given install session.
-        /// </summary>
-        /// <param name="session">The session ID of the install session.</param>
-        /// <param name="apkName">The name of the application.</param>
-        /// <param name="path">The absolute file path to package file on device.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        protected virtual async Task WriteInstallSessionAsync(string session, string apkName, string path, CancellationToken cancellationToken = default)
-        {
-            ValidateDevice();
-
-            InstallOutputReceiver receiver = new();
-            await AdbClient.ExecuteShellCommandAsync(Device, $"pm install-write {session} {apkName}.apk \"{path}\"", receiver, cancellationToken).ConfigureAwait(false);
-
-            if (!string.IsNullOrEmpty(receiver.ErrorMessage))
-            {
-                throw new PackageInstallationException(receiver.ErrorMessage);
             }
         }
     }
