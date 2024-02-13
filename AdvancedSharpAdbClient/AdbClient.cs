@@ -1133,7 +1133,7 @@ namespace AdvancedSharpAdbClient
         protected static void EnsureDevice([NotNull] DeviceData? device)
         {
             ExceptionExtensions.ThrowIfNull(device);
-            if (string.IsNullOrEmpty(device.Serial))
+            if (device.IsEmpty)
             {
                 throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
             }

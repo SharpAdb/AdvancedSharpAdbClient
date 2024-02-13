@@ -135,14 +135,11 @@ namespace AdvancedSharpAdbClient.Models
         }
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
-
-        /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is ForwardSpec other && Equals(other);
 
         /// <inheritdoc/>
         public bool Equals(ForwardSpec other) =>
-            other.Protocol == Protocol
+            Protocol == other.Protocol
             && Protocol switch
             {
                 ForwardProtocol.JavaDebugWireProtocol => ProcessId == other.ProcessId,
@@ -153,6 +150,9 @@ namespace AdvancedSharpAdbClient.Models
                 or ForwardProtocol.Device => string.Equals(SocketName, other.SocketName),
                 _ => false,
             };
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
 
         /// <summary>
         /// Tests whether two <see cref='ForwardSpec'/> objects are equally.

@@ -50,15 +50,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
             if (xmlNode?.Attributes != null)
             {
-                if (xmlNode.Attributes["bounds"]?.Value is string bounds)
-                {
-                    string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
-                    Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
-                }
-
+                bool foundBounds = false;
                 Attributes = new(xmlNode.Attributes.Count);
                 foreach (XmlAttribute at in xmlNode.Attributes.OfType<XmlAttribute>())
                 {
+                    if (!foundBounds && at.Name == "bounds" && at.Value is string bounds)
+                    {
+                        string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
+                        Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                        foundBounds = true;
+                    }
                     Attributes[at.Name] = at.Value;
                 }
             }
@@ -100,15 +101,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 
             if (xmlNode.Attributes != null)
             {
-                if (xmlNode.Attributes.GetNamedItem("bounds")?.NodeValue?.ToString() is string bounds)
-                {
-                    string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
-                    Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
-                }
-
+                bool foundBounds = false;
                 Attributes = new(xmlNode.Attributes.Count);
                 foreach (Windows.Data.Xml.Dom.IXmlNode at in xmlNode.Attributes)
                 {
+                    if (!foundBounds && at.NodeName == "bounds" && at.NodeValue is string bounds)
+                    {
+                        string[] cords = bounds.Split(separator, StringSplitOptions.RemoveEmptyEntries); // x1, y1, x2, y2
+                        Bounds = Area.FromLTRB(int.Parse(cords[0]), int.Parse(cords[1]), int.Parse(cords[2]), int.Parse(cords[3]));
+                        foundBounds = true;
+                    }
                     Attributes[at.NodeName] = at.NodeValue.ToString();
                 }
             }
@@ -416,18 +418,38 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <returns>An enumerator that can be used to iterate through the <see cref="Element"/>.</returns>
         public IEnumerator<Element> GetEnumerator() => FindDescendants().GetEnumerator();
 
+        /// <summary>
+        /// Tests whether two <see cref='Element'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='Element'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='Element'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(Element? left, Element? right) => (object?)left == right || (left?.Equals(right) ?? false);
+
+        /// <summary>
+        /// Tests whether two <see cref='Element'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='Element'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='Element'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(Element? left, Element? right) => !(left == right);
+
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as Element);
 
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] Element? other) =>
-            other != null
-                && Client == other.Client
-                && Device == other.Device
+            (object?)this == other ||
+                (other != (object?)null
+                && EqualityComparer<IAdbClient>.Default.Equals(Client, other.Client)
+                && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device)
                 && (Node == null
                     ? Bounds == other.Bounds
-                        && Attributes == other.Attributes
-                    : Node == other.Node);
+                        && other.Attributes == null
+                            ? Attributes == null
+                            : Attributes?.SequenceEqual(other.Attributes!) == true
+                    : other.Node != null
+                        && Node.OuterXml == other.Node.OuterXml));
 
         /// <inheritdoc/>
         public override int GetHashCode() =>

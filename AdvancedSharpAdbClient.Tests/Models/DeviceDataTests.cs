@@ -205,5 +205,28 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(DeviceState.Unknown, device.State);
             Assert.Equal(string.Empty, device.Usb);
         }
+
+        [Theory]
+        [InlineData("R32D102SZAE            device transport_id:6", "R32D102SZAE", "", "", "", "6")]
+        [InlineData("emulator-5554          device product:sdk_google_phone_x86 model:Android_SDK_built_for_x86 device:generic_x86 transport_id:1", "emulator-5554", "sdk_google_phone_x86", "Android_SDK_built_for_x86", "generic_x86", "1")]
+        [InlineData("00bc13bcf4bacc62 device product:bullhead model:Nexus_5X device:bullhead transport_id:1", "00bc13bcf4bacc62", "bullhead", "Nexus_5X", "bullhead", "1")]
+        public void EqualityTest(string data, string serial, string product, string model, string name, string transportId)
+        {
+            DeviceData d1 = DeviceData.CreateFromAdbData(data);
+            DeviceData d2 = new()
+            {
+                Serial = serial,
+                Product = product,
+                Model = model,
+                Name = name,
+                TransportId = transportId,
+                State = DeviceState.Online
+            };
+
+            Assert.True(d1 == d2);
+
+            Assert.True(d1.Equals(d2));
+            Assert.Equal(d1.GetHashCode(), d2.GetHashCode());
+        }
     }
 }

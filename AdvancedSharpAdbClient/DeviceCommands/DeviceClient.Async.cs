@@ -13,7 +13,7 @@ using System.Xml;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
-    public partial class DeviceClient
+    public partial record class DeviceClient
     {
         /// <summary>
         /// Gets the current device screen snapshot asynchronously.

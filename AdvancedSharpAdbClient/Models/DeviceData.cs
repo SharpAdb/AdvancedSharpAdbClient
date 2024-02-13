@@ -62,7 +62,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the device state.
         /// </summary>
-        public DeviceState State { get; set; }
+        public DeviceState State { get; set; } = DeviceState.Unknown;
 
         /// <summary>
         /// Gets or sets the device model name.
@@ -100,6 +100,11 @@ namespace AdvancedSharpAdbClient.Models
         public string Message { get; init; } = string.Empty;
 
         /// <summary>
+        /// <see langword="false"/> if <see cref="DeviceData"/> does not have a valid serial number; otherwise, <see langword="true"/>.
+        /// </summary>
+        public bool IsEmpty => string.IsNullOrEmpty(Serial);
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
@@ -107,12 +112,42 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="DeviceData"/> object that represents the device.</returns>
         public static DeviceData CreateFromAdbData(string data) => new(data);
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with this device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> instance to use to interact with the device.</param>
+        /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
+        public DeviceClient CreateDeviceClient(IAdbClient client) => new(client, this);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with this device.
+        /// </summary>
+        /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
+        public DeviceClient CreateDeviceClient() => new(new AdbClient(), this);
+
+        /// <summary>
+        /// Tests whether two <see cref='DeviceData'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(DeviceData? left, DeviceData? right) => (object?)left == right || (left?.Equals(right) ?? false);
+
+        /// <summary>
+        /// Tests whether two <see cref='DeviceData'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(DeviceData? left, DeviceData? right) => !(left == right);
+
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as DeviceData);
 
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] DeviceData? other) =>
-            other != null
+            (object?)this == other ||
+                (other != (object?)null
                 && Serial == other.Serial
                 && State == other.State
                 && Model == other.Model
@@ -121,7 +156,7 @@ namespace AdvancedSharpAdbClient.Models
                 && Features == other.Features
                 && Usb == other.Usb
                 && TransportId == other.TransportId
-                && Message == other.Message;
+                && Message == other.Message);
 
         /// <inheritdoc/>
         public override int GetHashCode()

@@ -81,10 +81,10 @@ namespace AdvancedSharpAdbClient.Models
 
         /// <inheritdoc/>
         public bool Equals(AdbResponse other) =>
-            other.IOSuccess == IOSuccess
-            && string.Equals(other.Message, Message, StringComparison.OrdinalIgnoreCase)
-            && other.Okay == Okay
-            && other.Timeout == Timeout;
+            IOSuccess == other.IOSuccess
+            && string.Equals(Message, other.Message, StringComparison.OrdinalIgnoreCase)
+            && Okay == other.Okay
+            && Timeout == other.Timeout;
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);

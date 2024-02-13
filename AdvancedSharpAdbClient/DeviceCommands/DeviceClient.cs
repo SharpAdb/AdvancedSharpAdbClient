@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,34 +16,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// A class which contains methods for interacting with an Android device by <see cref="IAdbClient.ExecuteRemoteCommand(string, DeviceData, IShellOutputReceiver, Encoding)"/>
     /// </summary>
-    public partial class DeviceClient
+    /// <param name="AdbClient">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
+    /// <param name="Device">The device on which to process command.</param>
+    public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device)
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceClient"/> class.
+        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
-        /// <param name="device">The device on which to process command.</param>
-        public DeviceClient(IAdbClient client, DeviceData device)
-        {
-            ExceptionExtensions.ThrowIfNull(client);
-            ExceptionExtensions.ThrowIfNull(device);
-            if (string.IsNullOrEmpty(device.Serial))
-            {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
-            }
-            Device = device;
-            AdbClient = client;
-        }
+        public IAdbClient AdbClient { get; init; } = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
 
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; init; }
-
-        /// <summary>
-        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
-        /// </summary>
-        public IAdbClient AdbClient { get; init; }
+        public DeviceData Device { get; init; } = EnsureDevice(Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.
@@ -414,6 +400,34 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client = AdbClient;
             device = Device;
         }
+
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
+        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
+        /// if <paramref name="device"/> does not have a valid serial number.
+        /// </summary>
+        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
+        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
+        protected static DeviceData EnsureDevice([NotNull] DeviceData? device)
+        {
+            ExceptionExtensions.ThrowIfNull(device);
+            return device.IsEmpty
+                ? throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device")
+                : device;
+        }
+
+#if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(EqualityContract, AdbClient, Device);
+
+        /// <inheritdoc/>
+        public virtual bool Equals(DeviceClient? other) =>
+            (object?)this == other ||
+                (other != (object?)null
+                && EqualityComparer<Type>.Default.Equals(EqualityContract, other.EqualityContract)
+                && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
+                && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));
+#endif
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]

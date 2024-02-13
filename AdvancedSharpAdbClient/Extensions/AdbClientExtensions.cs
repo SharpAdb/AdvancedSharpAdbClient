@@ -329,6 +329,14 @@ namespace AdvancedSharpAdbClient
         public static string Disconnect(this IAdbClient client, string host) =>
             client.Disconnect(host, AdbClient.DefaultPort);
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with a device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> instance to use to interact with the device.</param>
+        /// <param name="device">The device to interact with.</param>
+        /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
+        public static DeviceClient CreateDeviceClient(this IAdbClient client, DeviceData device) => new(client, device);
+
 #if !NETFRAMEWORK || NET40_OR_GREATER
         /// <summary>
         /// Runs the event log service on a device.

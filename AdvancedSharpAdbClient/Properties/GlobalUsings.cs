@@ -1,4 +1,5 @@
 ﻿#region AdvancedSharpAdbClient
+global using AdvancedSharpAdbClient.DeviceCommands;
 global using AdvancedSharpAdbClient.DeviceCommands.Models;
 global using AdvancedSharpAdbClient.DeviceCommands.Receivers;
 global using AdvancedSharpAdbClient.Exceptions;
