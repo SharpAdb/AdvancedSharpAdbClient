@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the path to the <c>adb.exe</c> executable.
         /// </summary>
-        public string AdbPath { get; protected set; }
+        public string AdbPath { get; init; }
 
         /// <inheritdoc/>
         public AdbCommandLineStatus GetVersion()

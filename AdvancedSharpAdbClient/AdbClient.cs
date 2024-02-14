@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
-    public partial class AdbClient : IAdbClient
+    public partial class AdbClient : IAdbClient, ICloneable<IAdbClient>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         , IAdbClient.IWinRT
 #endif
@@ -143,7 +143,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; protected set; }
+        public EndPoint EndPoint { get; init; }
 
         /// <summary>
         /// Create an ASCII string preceded by four hex digits. The opening "####"
@@ -1117,6 +1117,19 @@ namespace AdvancedSharpAdbClient
             IEnumerable<string> featureList = features.Trim().Split('\n', ',');
             return featureList;
         }
+
+        /// <summary>
+        /// Creates a new <see cref="AdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
+        /// </summary>
+        /// <param name="endPoint">The new <see cref="EndPoint"/> to use.</param>
+        /// <returns>A new <see cref="AdbClient"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
+        public AdbClient Clone(EndPoint endPoint) => new(endPoint, AdbSocketFactory);
+
+        /// <inheritdoc/>
+        public IAdbClient Clone() => new AdbClient(EndPoint, AdbSocketFactory);
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
 
         /// <summary>
         /// Sets default encoding (default - UTF8).

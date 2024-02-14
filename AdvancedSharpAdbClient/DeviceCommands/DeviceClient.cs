@@ -401,21 +401,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             device = Device;
         }
 
-        /// <summary>
-        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
-        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
-        /// if <paramref name="device"/> does not have a valid serial number.
-        /// </summary>
-        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
-        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
-        protected static DeviceData EnsureDevice([NotNull] DeviceData? device)
-        {
-            ExceptionExtensions.ThrowIfNull(device);
-            return device.IsEmpty
-                ? throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device")
-                : device;
-        }
-
 #if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(EqualityContract, AdbClient, Device);
@@ -428,6 +413,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));
 #endif
+
+        /// <summary>
+        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
+        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
+        /// if <paramref name="device"/> does not have a valid serial number.
+        /// </summary>
+        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
+        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
+        private static DeviceData EnsureDevice([NotNull] DeviceData? device)
+        {
+            ExceptionExtensions.ThrowIfNull(device);
+            return device.IsEmpty
+                ? throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device")
+                : device;
+        }
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]

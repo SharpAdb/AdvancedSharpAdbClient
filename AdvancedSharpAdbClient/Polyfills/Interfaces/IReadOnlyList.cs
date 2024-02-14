@@ -4,7 +4,7 @@
 
 using System.ComponentModel;
 
-namespace AdvancedSharpAdbClient.Polyfills
+namespace System.Collections.Generic
 {
     /// <summary>
     /// Represents a read-only collection of elements that can be accessed by index.

@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
-    public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket
+    public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<IAdbSocket>, ICloneable
     {
         /// <summary>
         /// The logger to use when logging messages.
@@ -537,6 +537,20 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public void Close() => Socket.Dispose();
+
+        /// <inheritdoc/>
+        public IAdbSocket Clone()
+        {
+            if (Socket is not ICloneable<ITcpSocket> cloneable)
+            {
+                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
+            }
+            ITcpSocket socket = cloneable.Clone();
+            return new AdbSocket(socket, logger);
+        }
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
 
         /// <summary>
         /// Creates a new <see cref="TcpSocket"/> instance based on the specified <see cref="EndPoint"/>.

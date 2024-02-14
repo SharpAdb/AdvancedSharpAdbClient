@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Implements the <see cref="ITcpSocket"/> interface using the standard <see cref="System.Net.Sockets.Socket"/> class.
     /// </summary>
-    public sealed partial class TcpSocket : ITcpSocket
+    public sealed partial class TcpSocket : ITcpSocket, ICloneable<ITcpSocket>, ICloneable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.
@@ -125,5 +125,17 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Stream GetStream() => new NetworkStream(Socket);
+
+        /// <inheritdoc/>
+        public ITcpSocket Clone()
+        {
+            TcpSocket socket = new();
+            socket.Connect(EndPoint!);
+            socket.ReceiveBufferSize = ReceiveBufferSize;
+            return socket;
+        }
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
     }
 }

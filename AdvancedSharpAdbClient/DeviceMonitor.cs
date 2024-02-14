@@ -33,7 +33,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    public partial class DeviceMonitor : IDeviceMonitor
+    public partial class DeviceMonitor : IDeviceMonitor, ICloneable<IDeviceMonitor>, ICloneable
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         , IAsyncDisposable
 #endif
@@ -399,5 +399,18 @@ namespace AdvancedSharpAdbClient
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public IDeviceMonitor Clone()
+        {
+            if (Socket is not ICloneable<IAdbSocket> cloneable)
+            {
+                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
+            }
+            return new DeviceMonitor(cloneable.Clone(), logger);
+        }
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
     }
 }

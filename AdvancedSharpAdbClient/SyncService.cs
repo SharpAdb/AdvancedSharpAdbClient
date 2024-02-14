@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    public partial class SyncService : ISyncService
+    public partial class SyncService : ISyncService, ICloneable<ISyncService>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         , ISyncService.IWinRT
 #endif
@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket Socket { get; protected set; }
 
         /// <inheritdoc/>
-        public bool IsOpen => Socket != null && Socket.Connected;
+        public bool IsOpen => Socket?.Connected == true;
 
         /// <inheritdoc/>
         /// <remarks>This method has been invoked by the constructor.
@@ -350,6 +350,33 @@ namespace AdvancedSharpAdbClient
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="Device"/>.
+        /// </summary>
+        /// <param name="device">The new <see cref="Device"/> to use.</param>
+        /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
+        public SyncService Clone(DeviceData device)
+        {
+            if (Socket is not ICloneable<IAdbSocket> cloneable)
+            {
+                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
+            }
+            return new SyncService(cloneable.Clone(), device);
+        }
+
+        /// <inheritdoc/>
+        public ISyncService Clone()
+        {
+            if (Socket is not ICloneable<IAdbSocket> cloneable)
+            {
+                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
+            }
+            return new SyncService(cloneable.Clone(), Device);
+        }
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
 
         /// <summary>
         /// Reads the statistics of a file from the socket.

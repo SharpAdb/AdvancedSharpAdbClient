@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
-    public partial class AdbServer : IAdbServer
+    public partial class AdbServer : IAdbServer, ICloneable<IAdbServer>, ICloneable
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -162,7 +162,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; protected set; }
+        public EndPoint EndPoint { get; init; }
 
         /// <inheritdoc/>
         public StartServerResult StartServer(string adbPath, bool restartServerIfNewer = false)
@@ -261,5 +261,18 @@ namespace AdvancedSharpAdbClient
                 }
             }
         }
+
+        /// <summary>
+        /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
+        /// </summary>
+        /// <param name="endPoint">The new <see cref="EndPoint"/> to use.</param>
+        /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
+        public AdbServer Clone(EndPoint endPoint) => new(endPoint, AdbSocketFactory, AdbCommandLineClientFactory);
+
+        /// <inheritdoc/>
+        public IAdbServer Clone() => new AdbServer(EndPoint, AdbSocketFactory, AdbCommandLineClientFactory);
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
     }
 }
