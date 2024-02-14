@@ -332,10 +332,19 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with a device.
         /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> instance to use to interact with the device.</param>
-        /// <param name="device">The device to interact with.</param>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to process command.</param>
         /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
         public static DeviceClient CreateDeviceClient(this IAdbClient client, DeviceData device) => new(client, device);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to get information about packages that are installed on a device.
+        /// </summary>
+        /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
+        /// <param name="device">The device on which to look for packages.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm list packages</c>.</param>
+        /// <returns>A new instance of the <see cref="PackageManager"/> class.</returns>
+        public static PackageManager CreatePackageManager(this IAdbClient client, DeviceData device, params string[] arguments) => new(client, device, arguments);
 
 #if !NETFRAMEWORK || NET40_OR_GREATER
         /// <summary>

@@ -536,6 +536,16 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public override string ToString() =>
+            new StringBuilder(nameof(AdbSocket))
+                .Append(" { ")
+                .Append(nameof(Socket))
+                .Append(" = ")
+                .Append(Socket)
+                .Append(" }")
+                .ToString();
+
+        /// <inheritdoc/>
         public void Close() => Socket.Dispose();
 
         /// <inheritdoc/>

@@ -227,7 +227,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void StopServer()
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest("host:kill");
 
             // The host will immediately close the connection after the kill
@@ -240,7 +240,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                using IAdbSocket socket = AdbSocketFactory(EndPoint);
+                using IAdbSocket socket = CreateAdbSocket();
                 socket.SendAdbRequest("host:version");
                 AdbResponse response = socket.ReadAdbResponse();
                 string version = socket.ReadString();
@@ -261,6 +261,15 @@ namespace AdvancedSharpAdbClient
                 }
             }
         }
+
+        /// <summary>
+        /// Creates a new <see cref="AdbClient"/> object with the specified <see cref="EndPoint"/>.
+        /// </summary>
+        /// <returns>A new <see cref="AdbClient"/> object with the specified <see cref="EndPoint"/>.</returns>
+        public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
+
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType()} communicate with adb at {EndPoint}";
 
         /// <summary>
         /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.

@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -399,6 +400,20 @@ namespace AdvancedSharpAdbClient
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            new StringBuilder(nameof(SyncService))
+                .Append(" { ")
+                .Append(nameof(Socket))
+                .Append(" = ")
+                .Append(Socket)
+                .Append(", ")
+                .Append(nameof(IsRunning))
+                .Append(" = ")
+                .Append(IsRunning)
+                .Append(" }")
+                .ToString();
 
         /// <inheritdoc/>
         public IDeviceMonitor Clone()

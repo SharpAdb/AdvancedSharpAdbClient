@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
@@ -350,6 +351,20 @@ namespace AdvancedSharpAdbClient
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            new StringBuilder(nameof(SyncService))
+                .Append(" { ")
+                .Append(nameof(Socket))
+                .Append(" = ")
+                .Append(Socket)
+                .Append(", ")
+                .Append(nameof(Device))
+                .Append(" = ")
+                .Append(Device)
+                .Append(" }")
+                .ToString();
 
         /// <summary>
         /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="Device"/>.

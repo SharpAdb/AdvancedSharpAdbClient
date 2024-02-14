@@ -4,6 +4,8 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.Models
@@ -16,7 +18,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
         /// </summary>
-        private const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
+        private const string DeviceDataRegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|sideload|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
 
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -46,7 +48,7 @@ namespace AdvancedSharpAdbClient.Models
                 Features = match.Groups["features"].Value;
                 Usb = match.Groups["usb"].Value;
                 TransportId = match.Groups["transport_id"].Value;
-                Message = match.Groups["message"].Value;
+                Message = match.Groups["message"].Value.TrimStart();
             }
             else
             {
@@ -113,9 +115,22 @@ namespace AdvancedSharpAdbClient.Models
         public static DeviceData CreateFromAdbData(string data) => new(data);
 
         /// <summary>
+        /// Creates a new instance of the <see cref="SyncService"/> class, which provides access to the sync service running on the Android device.
+        /// </summary>
+        /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
+        /// <returns>A new instance of the <see cref="SyncService"/> class.</returns>
+        public SyncService CreateSyncService(EndPoint endPoint) => new(endPoint, this);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="SyncService"/> class, which provides access to the sync service running on the Android device.
+        /// </summary>
+        /// <returns>A new instance of the <see cref="SyncService"/> class.</returns>
+        public SyncService CreateSyncService() => new(this);
+
+        /// <summary>
         /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with this device.
         /// </summary>
-        /// <param name="client">The <see cref="IAdbClient"/> instance to use to interact with the device.</param>
+        /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
         /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
         public DeviceClient CreateDeviceClient(IAdbClient client) => new(client, this);
 
@@ -123,7 +138,22 @@ namespace AdvancedSharpAdbClient.Models
         /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to interact with this device.
         /// </summary>
         /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
-        public DeviceClient CreateDeviceClient() => new(new AdbClient(), this);
+        public DeviceClient CreateDeviceClient() => new(AdbClient.Instance, this);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to get information about packages that are installed on a device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
+        /// <param name="arguments">The arguments to pass to <c>pm list packages</c>.</param>
+        /// <returns>A new instance of the <see cref="PackageManager"/> class.</returns>
+        public PackageManager CreatePackageManager(IAdbClient client, params string[] arguments) => new(client, this, arguments);
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="DeviceClient"/> class, which can be used to get information about packages that are installed on a device.
+        /// </summary>
+        /// <param name="arguments">The arguments to pass to <c>pm list packages</c>.</param>
+        /// <returns>A new instance of the <see cref="PackageManager"/> class.</returns>
+        public PackageManager CreatePackageManager(params string[] arguments) => new(AdbClient.Instance, this, arguments);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are equally.
@@ -175,7 +205,75 @@ namespace AdvancedSharpAdbClient.Models
         }
 
         /// <inheritdoc/>
-        public override string ToString() => Serial;
+        public override string ToString()
+        {
+            StringBuilder builder = new();
+
+            if (string.IsNullOrEmpty(Serial))
+            {
+                return $"An empty {GetType()} without {nameof(Serial)}";
+            }
+            else
+            {
+                _ = builder.Append(Serial);
+            }
+
+            _ = builder.Append('\t');
+
+            _ = State switch
+            {
+                DeviceState.Online => builder.Append("device"),
+                DeviceState.NoPermissions => builder.Append("no permissions"),
+                DeviceState.Connecting
+                or DeviceState.Offline
+                or DeviceState.BootLoader
+                or DeviceState.Host
+                or DeviceState.Recovery
+                or DeviceState.Download
+                or DeviceState.Sideload
+                or DeviceState.Unauthorized
+                or DeviceState.Authorizing
+                or DeviceState.Unknown => builder.Append(State.ToString().ToLowerInvariant()),
+                _ => builder.AppendFormat("unknown({0:X})", (int)State),
+            };
+
+            if (!string.IsNullOrEmpty(Message))
+            {
+                _ = builder.Append(' ').Append(Message);
+            }
+
+            if (!string.IsNullOrEmpty(Usb))
+            {
+                _ = builder.Append(" usb:").Append(Usb);
+            }
+
+            if (!string.IsNullOrEmpty(Product))
+            {
+                _ = builder.Append(" product:").Append(Product);
+            }
+
+            if (!string.IsNullOrEmpty(Model))
+            {
+                _ = builder.Append(" model:").Append(Model);
+            }
+
+            if (!string.IsNullOrEmpty(Name))
+            {
+                _ = builder.Append(" device:").Append(Name);
+            }
+
+            if (!string.IsNullOrEmpty(Features))
+            {
+                _ = builder.Append(" features:").Append(Features);
+            }
+
+            if (!string.IsNullOrEmpty(TransportId))
+            {
+                _ = builder.Append(" transport_id:").Append(TransportId);
+            }
+
+            return builder.ToString();
+        }
 
         /// <summary>
         /// Gets the device state from the string value.
@@ -184,29 +282,24 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>The device state.</returns>
         public static DeviceState GetStateFromString(string state)
         {
-            // Default to the unknown state
-            DeviceState value;
-
             if (string.Equals(state, "device", StringComparison.OrdinalIgnoreCase))
             {
                 // As a special case, the "device" state in ADB is translated to the
                 // "Online" state in Managed.Adb
-                value = DeviceState.Online;
+                return DeviceState.Online;
             }
             else if (string.Equals(state, "no permissions", StringComparison.OrdinalIgnoreCase))
             {
-                value = DeviceState.NoPermissions;
+                return DeviceState.NoPermissions;
             }
-            else
+            // Else, we try to match a value of the DeviceState enumeration.
+            else if (EnumExtensions.TryParse(state, true, out DeviceState value))
             {
-                // Else, we try to match a value of the DeviceState enumeration.
-                if (!EnumExtensions.TryParse(state, true, out value))
-                {
-                    value = DeviceState.Unknown;
-                }
+                return value;
             }
 
-            return value;
+            // Default to the unknown state
+            return DeviceState.Unknown;
         }
 
 #if NET7_0_OR_GREATER

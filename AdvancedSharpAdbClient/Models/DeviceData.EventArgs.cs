@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -44,6 +45,26 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets the connect state of the device after the reported change.
         /// </summary>
         public bool IsConnect { get; } = isConnect;
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder("Device ")
+                .Append(IsConnect ? "connected" : "disconnected");
+            if (Device.IsEmpty)
+            {
+                return builder.ToString();
+            }
+            else
+            {
+                builder.Append(": ").Append(Device.Serial);
+                if (!string.IsNullOrEmpty(Device.Name))
+                {
+                    builder.AppendFormat("({0})", Device.Name);
+                }
+                return builder.ToString();
+            }
+        }
     }
 
     /// <summary>
@@ -63,5 +84,21 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets the state of the device before the reported change.
         /// </summary>
         public DeviceState OldState { get; } = oldState;
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            StringBuilder builder = new("Device state changed:");
+            if (!Device.IsEmpty)
+            {
+                builder.Append(' ').Append(Device.Serial);
+                if (!string.IsNullOrEmpty(Device.Name))
+                {
+                    builder.AppendFormat("({0})", Device.Name);
+                }
+            }
+            builder.Append($" {OldState} -> {NewState}");
+            return builder.ToString();
+        }
     }
 }

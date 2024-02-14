@@ -126,6 +126,9 @@ namespace AdvancedSharpAdbClient
             File.Exists(adbPath);
 #endif
 
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType()} process with adb command line at {AdbPath}";
+
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>

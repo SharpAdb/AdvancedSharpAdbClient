@@ -23,13 +23,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new StringBuilder().Append(ListFull);
+            StringBuilder requestBuilder = new(ListFull);
 
             if (Arguments != null)
             {
                 foreach (string argument in Arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
@@ -82,13 +82,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             ValidateDevice();
 
-            StringBuilder requestBuilder = new StringBuilder().Append("pm install");
+            StringBuilder requestBuilder = new("pm install");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
@@ -440,17 +440,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new StringBuilder().Append("pm uninstall");
+            StringBuilder requestBuilder = new("pm uninstall");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
-            _ = requestBuilder.AppendFormat(" {0}", packageName);
+            _ = requestBuilder.Append(' ').Append(packageName);
 
             string cmd = requestBuilder.ToString();
             InstallOutputReceiver receiver = new();
@@ -487,18 +487,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new StringBuilder().Append("pm install-create");
+            StringBuilder requestBuilder = new("pm install-create");
 
             if (!StringExtensions.IsNullOrWhiteSpace(packageName))
             {
-                _ = requestBuilder.AppendFormat(" -p {0}", packageName);
+                _ = requestBuilder.Append(" -p ").Append(packageName);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 

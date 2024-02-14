@@ -76,7 +76,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task StopServerAsync(CancellationToken cancellationToken = default)
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             await socket.SendAdbRequestAsync("host:kill", cancellationToken).ConfigureAwait(false);
 
             // The host will immediately close the connection after the kill
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
             // Try to connect to a running instance of the adb server
             try
             {
-                using IAdbSocket socket = AdbSocketFactory(EndPoint);
+                using IAdbSocket socket = CreateAdbSocket();
                 await socket.SendAdbRequestAsync("host:version", cancellationToken).ConfigureAwait(false);
                 AdbResponse response = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
                 string version = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);

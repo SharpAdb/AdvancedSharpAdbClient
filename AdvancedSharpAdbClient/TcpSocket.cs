@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
@@ -125,6 +126,20 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Stream GetStream() => new NetworkStream(Socket);
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            StringBuilder builder = new(GetType().ToString());
+            _ = Connected
+                ? builder.Append(" connect with ")
+                         .Append(EndPoint)
+                : EndPoint == null
+                    ? builder.Append(" without initialized")
+                    : builder.Append(" disconnect with ")
+                             .Append(EndPoint);
+            return builder.ToString();
+        }
 
         /// <inheritdoc/>
         public ITcpSocket Clone()

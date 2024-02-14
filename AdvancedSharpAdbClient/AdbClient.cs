@@ -121,9 +121,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        [Obsolete("This function has been removed since SharpAdbClient. Here is a placeholder which function is gets a new instance instead of gets or sets the default instance.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IAdbClient Instance => new AdbClient();
+        public static IAdbClient Instance => Factories.AdbClientFactory(new IPEndPoint(IPAddress.Loopback, AdbServerPort));
 
         /// <summary>
         /// Gets or sets default encoding.
@@ -175,7 +173,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public int GetAdbVersion()
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
 
             socket.SendAdbRequest("host:version");
             _ = socket.ReadAdbResponse();
@@ -187,7 +185,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void KillAdb()
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest("host:kill");
 
             // The host will immediately close the connection after the kill
@@ -197,7 +195,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<DeviceData> GetDevices()
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
 
             socket.SendAdbRequest("host:devices-l");
             _ = socket.ReadAdbResponse();
@@ -212,7 +210,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             string rebind = allowRebind ? string.Empty : "norebind:";
 
             socket.SendAdbRequest($"host-serial:{device.Serial}:forward:{rebind}{local};{remote}");
@@ -228,7 +226,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
 
             socket.SetDevice(device);
             string rebind = allowRebind ? string.Empty : "norebind:";
@@ -246,7 +244,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"reverse:killforward:{remote}");
@@ -258,7 +256,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"reverse:killforward-all");
@@ -270,7 +268,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest($"host-serial:{device.Serial}:killforward:tcp:{localPort}");
             _ = socket.ReadAdbResponse();
         }
@@ -280,7 +278,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest($"host-serial:{device.Serial}:killforward-all");
             _ = socket.ReadAdbResponse();
         }
@@ -290,7 +288,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest($"host-serial:{device.Serial}:list-forward");
             _ = socket.ReadAdbResponse();
             string data = socket.ReadString();
@@ -304,7 +302,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"reverse:list-forward");
@@ -318,7 +316,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void ExecuteServerCommand(string target, string command)
         {
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             ExecuteServerCommand(target, command, socket);
         }
 
@@ -328,7 +326,7 @@ namespace AdvancedSharpAdbClient
             StringBuilder request = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = request.AppendFormat("{0}:", target);
+                _ = request.Append(target).Append(':');
             }
             _ = request.Append(command);
 
@@ -341,7 +339,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             ExecuteServerCommand("shell", command, socket);
@@ -351,7 +349,7 @@ namespace AdvancedSharpAdbClient
         public void ExecuteServerCommand(string target, string command, IShellOutputReceiver? receiver, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             ExecuteServerCommand(target, command, socket, receiver, encoding);
         }
 
@@ -363,7 +361,7 @@ namespace AdvancedSharpAdbClient
             StringBuilder request = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = request.AppendFormat("{0}:", target);
+                _ = request.Append(target).Append(':');
             }
             _ = request.Append(command);
 
@@ -399,7 +397,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             ExecuteServerCommand("shell", command, socket, receiver, encoding);
@@ -409,7 +407,7 @@ namespace AdvancedSharpAdbClient
         public IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             foreach (string line in ExecuteServerCommand(target, command, socket, encoding))
             {
                 yield return line;
@@ -424,7 +422,7 @@ namespace AdvancedSharpAdbClient
             StringBuilder request = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = request.AppendFormat("{0}:", target);
+                _ = request.Append(target).Append(':');
             }
             _ = request.Append(command);
 
@@ -457,7 +455,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             foreach (string line in ExecuteServerCommand("shell", command, socket, encoding))
@@ -473,14 +471,14 @@ namespace AdvancedSharpAdbClient
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
-            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
+            StringBuilder request = new("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
+                _ = request.Append(" -b ").Append(logName.ToString().ToLowerInvariant());
             }
 
             socket.SendAdbRequest(request.ToString());
@@ -520,14 +518,14 @@ namespace AdvancedSharpAdbClient
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
-            StringBuilder request = new StringBuilder().Append("shell:logcat -B");
+            StringBuilder request = new("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                _ = request.AppendFormat(" -b {0}", logName.ToString().ToLowerInvariant());
+                _ = request.Append(" -b ").Append(logName.ToString().ToLowerInvariant());
             }
 
             socket.SendAdbRequest(request.ToString());
@@ -583,7 +581,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"reboot:{into}");
@@ -595,7 +593,7 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(host);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
             socket.SendAdbRequest($"host:pair:{code}:{address}");
             _ = socket.ReadAdbResponse();
@@ -608,7 +606,7 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(host);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
             socket.SendAdbRequest($"host:connect:{address}");
             _ = socket.ReadAdbResponse();
@@ -621,7 +619,7 @@ namespace AdvancedSharpAdbClient
         {
             ExceptionExtensions.ThrowIfNull(host);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
             socket.SendAdbRequest($"host:disconnect:{address}");
             _ = socket.ReadAdbResponse();
@@ -644,7 +642,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
             socket.SendAdbRequest(request);
             _ = socket.ReadAdbResponse();
@@ -691,21 +689,21 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install'");
+            StringBuilder requestBuilder = new("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
-            _ = requestBuilder.AppendFormat(" -S {0}", apk.Length);
+            _ = requestBuilder.Append(" -S ").Append(apk.Length);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -856,17 +854,17 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'install-create'");
+            StringBuilder requestBuilder = new("exec:cmd package 'install-create'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -892,18 +890,18 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(packageName);
 
             StringBuilder requestBuilder =
-                new StringBuilder().Append("exec:cmd package 'install-create'")
-                                   .AppendFormat(" -p {0}", packageName);
+                new StringBuilder("exec:cmd package 'install-create'")
+                    .Append(" -p ").Append(packageName);
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -938,13 +936,13 @@ namespace AdvancedSharpAdbClient
             }
 
             StringBuilder requestBuilder =
-                new StringBuilder().Append($"exec:cmd package 'install-write'")
-                                   // add size parameter [required for streaming installs]
-                                   // do last to override any user specified value
-                                   .AppendFormat(" -S {0}", apk.Length)
-                                   .AppendFormat(" {0} {1}.apk", session, apkName);
+                new StringBuilder($"exec:cmd package 'install-write'")
+                    // add size parameter [required for streaming installs]
+                    // do last to override any user specified value
+                    .Append(" -S ").Append(apk.Length)
+                    .AppendFormat(" {0} {1}.apk", session, apkName);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -1007,13 +1005,13 @@ namespace AdvancedSharpAdbClient
             }
 
             StringBuilder requestBuilder =
-                new StringBuilder().Append($"exec:cmd package 'install-write'")
-                                   // add size parameter [required for streaming installs]
-                                   // do last to override any user specified value
-                                   .AppendFormat(" -S {0}", apk.Length)
-                                   .AppendFormat(" {0} {1}.apk", session, apkName);
+                new StringBuilder($"exec:cmd package 'install-write'")
+                    // add size parameter [required for streaming installs]
+                    // do last to override any user specified value
+                    .Append(" -S ").Append(apk.Length)
+                    .AppendFormat(" {0} {1}.apk", session, apkName);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -1059,7 +1057,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest($"exec:cmd package 'install-commit' {session}");
@@ -1078,19 +1076,19 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new StringBuilder().Append("exec:cmd package 'uninstall'");
+            StringBuilder requestBuilder = new("exec:cmd package 'uninstall'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.AppendFormat(" {0}", argument);
+                    _ = requestBuilder.Append(' ').Append(argument);
                 }
             }
 
-            _ = requestBuilder.AppendFormat(" {0}", packageName);
+            _ = requestBuilder.Append(' ').Append(packageName);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
             socket.SendAdbRequest(requestBuilder.ToString());
@@ -1109,7 +1107,7 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            using IAdbSocket socket = AdbSocketFactory(EndPoint);
+            using IAdbSocket socket = CreateAdbSocket();
             socket.SendAdbRequest($"host-serial:{device.Serial}:features");
             _ = socket.ReadAdbResponse();
             string features = socket.ReadString();
@@ -1117,6 +1115,15 @@ namespace AdvancedSharpAdbClient
             IEnumerable<string> featureList = features.Trim().Split('\n', ',');
             return featureList;
         }
+
+        /// <summary>
+        /// Creates a new <see cref="AdbClient"/> object with the specified <see cref="EndPoint"/>.
+        /// </summary>
+        /// <returns>A new <see cref="AdbClient"/> object with the specified <see cref="EndPoint"/>.</returns>
+        public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
+
+        /// <inheritdoc/>
+        public override string ToString() => $"{GetType()} communicate with adb server at {EndPoint}";
 
         /// <summary>
         /// Creates a new <see cref="AdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
