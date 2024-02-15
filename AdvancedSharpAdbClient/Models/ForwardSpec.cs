@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -12,6 +13,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
+    [DebuggerDisplay($"{nameof(ForwardSpec)} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
     public readonly struct ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>
@@ -151,9 +153,6 @@ namespace AdvancedSharpAdbClient.Models
                 _ => false,
             };
 
-        /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
-
         /// <summary>
         /// Tests whether two <see cref='ForwardSpec'/> objects are equally.
         /// </summary>
@@ -169,5 +168,8 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="right">The <see cref='ForwardSpec'/> structure that is to the right of the inequality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="ForwardSpec"/> structures are unequally; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(ForwardSpec left, ForwardSpec right) => !left.Equals(right);
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(Protocol, Port, ProcessId, SocketName);
     }
 }

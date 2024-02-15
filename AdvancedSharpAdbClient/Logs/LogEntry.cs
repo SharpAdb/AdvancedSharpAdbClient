@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Logs
@@ -17,6 +18,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.LogEntryCreator))]
 #endif
+    [DebuggerDisplay($"{nameof(AndroidLogEntry)} \\{{ {nameof(PayloadLength)} = {{{nameof(PayloadLength)}}}, {nameof(HeaderSize)} = {{{nameof(HeaderSize)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(ThreadId)} = {{{nameof(ThreadId)}}}, {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(NanoSeconds)} = {{{nameof(NanoSeconds)}}}, {nameof(Id)} = {{{nameof(Id)}}}, {nameof(Uid)} = {{{nameof(Uid)}}}, {nameof(Data)} = {{{nameof(Data)}}} }}")]
     public class LogEntry
     {
         /// <summary>
@@ -70,6 +72,10 @@ namespace AdvancedSharpAdbClient.Logs
         /// Gets or sets the entry's payload.
         /// </summary>
         public byte[] Data { get; set; } = [];
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            $"{TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff} {ProcessId,5} {ProcessId,5}";
 
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="LogEntry"/>.

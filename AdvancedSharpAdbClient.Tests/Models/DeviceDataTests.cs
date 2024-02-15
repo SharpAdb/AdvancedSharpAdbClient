@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(string.Empty, device.Product);
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);
-            Assert.Equal(string.Empty, device.Features);
+            Assert.Empty(device.Features);
             Assert.Equal(DeviceState.NoPermissions, device.State);
             Assert.Equal("(user in plugdev group; are your udev rules wrong?); see [http://developer.android.com/tools/device.html]", device.Message);
             Assert.Equal(string.Empty, device.Usb);
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(string.Empty, device.Product);
             Assert.Equal(string.Empty, device.Model);
             Assert.Equal(string.Empty, device.Name);
-            Assert.Equal(string.Empty, device.Features);
+            Assert.Empty(device.Features);
             Assert.Equal(DeviceState.Authorizing, device.State);
             Assert.Equal("9-1.4.1", device.Usb);
             Assert.Equal("8149", device.TransportId);
@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             DeviceData device = DeviceData.CreateFromAdbData(data);
             Assert.Equal("emulator-5586", device.Serial);
             Assert.Equal(DeviceState.Host, device.State);
-            Assert.Equal("shell_2", device.Features);
+            Assert.Equal<string[]>(["shell_2"], device.Features);
             Assert.Equal(string.Empty, device.Usb);
         }
 
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal("Nexus_5X", device.Model);
             Assert.Equal("bullhead", device.Product);
             Assert.Equal("bullhead", device.Name);
-            Assert.Equal("shell_v2,cmd", device.Features);
+            Assert.Equal<string[]>(["shell_v2", "cmd"], device.Features);
             Assert.Equal(string.Empty, device.Usb);
         }
 

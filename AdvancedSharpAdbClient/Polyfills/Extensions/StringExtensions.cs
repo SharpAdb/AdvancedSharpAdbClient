@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -97,6 +98,36 @@ namespace AdvancedSharpAdbClient.Polyfills
 #endif
 
         /// <summary>
+        /// Concatenates the string representations of an array of objects, using the specified separator between each member.
+        /// </summary>
+        /// <param name="separator">The string to use as a separator. <paramref name="separator"/> is included
+        /// in the returned string only if <paramref name="values"/> has more than one element.</param>
+        /// <param name="values">An array of objects whose string representations will be concatenated.</param>
+        /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
+        /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
+        public static string Join(char separator, params object?[] values) =>
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UAP10_0_15138_0
+            string.Join(separator, values);
+#else
+            Join(new string([separator]), values);
+#endif
+
+        /// <summary>
+        /// Concatenates an array of strings, using the specified separator between each member.
+        /// </summary>
+        /// <param name="separator">The string to use as a separator. <paramref name="separator"/> is included
+        /// in the returned string only if <paramref name="value"/> has more than one element.</param>
+        /// <param name="value">An array of strings to concatenate.</param>
+        /// <returns>A string that consists of the elements of <paramref name="value"/> delimited by the
+        /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
+        public static string Join(char separator, params string?[] value) =>
+#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UAP10_0_15138_0
+            string.Join(separator, value);
+#else
+            string.Join(new string([separator]), value);
+#endif
+
+        /// <summary>
         /// Concatenates the elements of an object array, using the specified separator between each element.
         /// </summary>
         /// <param name="separator">The string to use as a separator. <paramref name="separator"/> is included
@@ -132,6 +163,59 @@ namespace AdvancedSharpAdbClient.Polyfills
                     if (text != null)
                     {
                         _ = stringBuilder.Append(text);
+                    }
+                }
+            }
+
+            return stringBuilder.ToString();
+#else
+            return string.Join(separator, values);
+#endif
+        }
+
+        /// <summary>
+        /// Concatenates the members of a collection, using the specified separator between each member.
+        /// </summary>
+        /// <typeparam name="T">The type of the members of values.</typeparam>
+        /// <param name="separator">The string to use as a separator. <paramref name="separator"/> is included
+        /// in the returned string only if <paramref name="values"/> has more than one element.</param>
+        /// <param name="values">A collection that contains the objects to concatenate.</param>
+        /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
+        /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
+        public static string Join<T>(string? separator, IEnumerable<T> values)
+        {
+#if NETFRAMEWORK && !NET40_OR_GREATER
+            ExceptionExtensions.ThrowIfNull(values);
+
+            separator ??= string.Empty;
+
+            using IEnumerator<T> enumerator = values.GetEnumerator();
+
+            if (!enumerator.MoveNext())
+            {
+                return string.Empty;
+            }
+
+            StringBuilder stringBuilder = new();
+            if (enumerator.Current != null)
+            {
+                string? text = enumerator.Current.ToString();
+                if (text != null)
+                {
+                    stringBuilder.Append(text);
+                }
+
+            }
+
+            while (enumerator.MoveNext())
+            {
+                stringBuilder.Append(separator);
+                if (enumerator.Current != null)
+                {
+                    string? text = enumerator.Current.ToString();
+                    if (text != null)
+                    {
+                        stringBuilder.Append(text);
                     }
                 }
             }

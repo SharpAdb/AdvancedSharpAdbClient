@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -23,12 +24,22 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
+    [DebuggerDisplay($"{nameof(AdbSocket)} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<IAdbSocket>, ICloneable
     {
         /// <summary>
         /// The logger to use when logging messages.
         /// </summary>
         private readonly ILogger<AdbSocket> logger = logger ?? LoggerProvider.CreateLogger<AdbSocket>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AdbSocket"/> class.
+        /// </summary>
+        /// <param name="logger">The logger to use when logging.</param>
+        public AdbSocket(ILogger<AdbSocket>? logger = null)
+            : this(AdbClient.AdbServerEndPoint, logger)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbSocket"/> class.

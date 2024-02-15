@@ -3,8 +3,11 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,7 +16,8 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
-    public sealed partial class DeviceData : IEquatable<DeviceData>
+    [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
+    public readonly partial struct DeviceData : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -26,12 +30,12 @@ namespace AdvancedSharpAdbClient.Models
         private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceData"/> class.
+        /// Initializes a new instance of the <see cref="DeviceData"/> struct.
         /// </summary>
         public DeviceData() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceData"/> class based on
+        /// Initializes a new instance of the <see cref="DeviceData"/> struct based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
@@ -45,7 +49,7 @@ namespace AdvancedSharpAdbClient.Models
                 Model = match.Groups["model"].Value;
                 Product = match.Groups["product"].Value;
                 Name = match.Groups["device"].Value;
-                Features = match.Groups["features"].Value;
+                Features = match.Groups["features"].Value.Split(',', StringSplitOptions.RemoveEmptyEntries);
                 Usb = match.Groups["usb"].Value;
                 TransportId = match.Groups["transport_id"].Value;
                 Message = match.Groups["message"].Value.TrimStart();
@@ -64,7 +68,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the device state.
         /// </summary>
-        public DeviceState State { get; set; } = DeviceState.Unknown;
+        public DeviceState State { get; init; } = DeviceState.Unknown;
 
         /// <summary>
         /// Gets or sets the device model name.
@@ -84,7 +88,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the features available on the device.
         /// </summary>
-        public string Features { get; init; } = string.Empty;
+        public string[] Features { get; init; } = [];
 
         /// <summary>
         /// Gets or sets the USB port to which this device is connected. Usually available on Linux only.
@@ -155,30 +159,12 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A new instance of the <see cref="PackageManager"/> class.</returns>
         public PackageManager CreatePackageManager(params string[] arguments) => new(AdbClient.Instance, this, arguments);
 
-        /// <summary>
-        /// Tests whether two <see cref='DeviceData'/> objects are equally.
-        /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(DeviceData? left, DeviceData? right) => (object?)left == right || (left?.Equals(right) ?? false);
-
-        /// <summary>
-        /// Tests whether two <see cref='DeviceData'/> objects are different.
-        /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(DeviceData? left, DeviceData? right) => !(left == right);
+        /// <inheritdoc/>
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is DeviceData other && Equals(other);
 
         /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as DeviceData);
-
-        /// <inheritdoc/>
-        public bool Equals([NotNullWhen(true)] DeviceData? other) =>
-            (object?)this == other ||
-                (other != (object?)null
-                && Serial == other.Serial
+        public bool Equals(DeviceData other) =>
+            Serial == other.Serial
                 && State == other.State
                 && Model == other.Model
                 && Product == other.Product
@@ -186,7 +172,23 @@ namespace AdvancedSharpAdbClient.Models
                 && Features == other.Features
                 && Usb == other.Usb
                 && TransportId == other.TransportId
-                && Message == other.Message);
+                && Message == other.Message;
+
+        /// <summary>
+        /// Tests whether two <see cref='DeviceData'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(DeviceData? left, DeviceData? right) => left.Equals(right);
+
+        /// <summary>
+        /// Tests whether two <see cref='DeviceData'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(DeviceData? left, DeviceData? right) => !left.Equals(right);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -207,18 +209,14 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new();
-
             if (string.IsNullOrEmpty(Serial))
             {
                 return $"An empty {GetType()} without {nameof(Serial)}";
             }
-            else
-            {
-                _ = builder.Append(Serial);
-            }
 
-            _ = builder.Append('\t');
+            StringBuilder builder =
+                new StringBuilder(Serial)
+                    .Append('\t');
 
             _ = State switch
             {
@@ -262,9 +260,9 @@ namespace AdvancedSharpAdbClient.Models
                 _ = builder.Append(" device:").Append(Name);
             }
 
-            if (!string.IsNullOrEmpty(Features))
+            if (Features?.Length > 0)
             {
-                _ = builder.Append(" features:").Append(Features);
+                _ = builder.Append(" features:").Append(StringExtensions.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
@@ -273,6 +271,22 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             return builder.ToString();
+        }
+
+        /// <summary>
+        /// Throws an <see cref="ArgumentOutOfRangeException"/> if <paramref name="device"/> does not have a valid serial number.
+        /// </summary>
+        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
+        /// <param name="paramName">The name of the parameter with which <paramref name="device"/> corresponds.</param>
+        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="device"/> does not have a valid serial number.</exception>
+        public static ref DeviceData EnsureDevice(ref DeviceData device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
+        {
+            if (device.IsEmpty)
+            {
+                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
+            }
+            return ref device;
         }
 
         /// <summary>
@@ -300,6 +314,89 @@ namespace AdvancedSharpAdbClient.Models
 
             // Default to the unknown state
             return DeviceState.Unknown;
+        }
+
+        /// <summary>
+        /// Get the value of the <see cref="DebuggerDisplayAttribute"/> for this instance.
+        /// </summary>
+        /// <returns>The value of the <see cref="DebuggerDisplayAttribute"/> for this instance.</returns>
+        private string GetDebuggerDisplay()
+        {
+            StringBuilder builder =
+                new StringBuilder(nameof(DeviceData))
+                    .Append(" { ");
+
+            if (!string.IsNullOrEmpty(Serial))
+            {
+                _ = builder
+                    .Append(nameof(Serial))
+                    .Append(" = ")
+                    .Append(Serial)
+                    .Append(", ");
+            }
+
+            _ = builder
+                .Append(nameof(State))
+                .Append(" = ")
+                .Append(State);
+
+            if (!string.IsNullOrEmpty(Message))
+            {
+                _ = builder
+                    .Append(nameof(Message))
+                    .Append(" = ")
+                    .Append(Message);
+            }
+
+            if (!string.IsNullOrEmpty(Usb))
+            {
+                _ = builder
+                    .Append(nameof(Usb))
+                    .Append(" = ")
+                    .Append(Usb);
+            }
+
+            if (!string.IsNullOrEmpty(Product))
+            {
+                _ = builder
+                    .Append(nameof(Product))
+                    .Append(" = ")
+                    .Append(Product);
+            }
+
+            if (!string.IsNullOrEmpty(Model))
+            {
+                _ = builder
+                    .Append(nameof(Model))
+                    .Append(" = ")
+                    .Append(Model);
+            }
+
+            if (!string.IsNullOrEmpty(Name))
+            {
+                _ = builder
+                    .Append(nameof(Name))
+                    .Append(" = ")
+                    .Append(Name);
+            }
+
+            if (Features?.Length > 0)
+            {
+                _ = builder
+                    .Append(nameof(Features))
+                    .Append(" = ")
+                    .Append(Features);
+            }
+
+            if (!string.IsNullOrEmpty(TransportId))
+            {
+                _ = builder
+                    .Append(nameof(TransportId))
+                    .Append(" = ")
+                    .Append(TransportId);
+            }
+
+            return builder.Append(" }").ToString();
         }
 
 #if NET7_0_OR_GREATER

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <summary>
     /// Allows you to get information about packages that are installed on a device.
     /// </summary>
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public partial class PackageManager
     {
         /// <summary>
@@ -61,8 +63,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="arguments">The arguments to pass to <c>pm list packages</c>.</param>
         public PackageManager(IAdbClient client, DeviceData device, Func<IAdbClient, DeviceData, ISyncService>? syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager>? logger = null, params string[] arguments)
         {
-            Device = device ?? throw new ArgumentNullException(nameof(device));
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
+            Device = DeviceData.EnsureDevice(ref device);
             Packages = [];
             Arguments = arguments;
 

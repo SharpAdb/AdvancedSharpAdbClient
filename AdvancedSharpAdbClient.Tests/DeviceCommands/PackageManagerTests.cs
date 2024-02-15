@@ -7,12 +7,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 {
     public partial class PackageManagerTests
     {
+        protected static DeviceData Device { get; } = new()
+        {
+            Serial = "169.254.109.177:5555",
+            State = DeviceState.Online
+        };
+
         [Fact]
         public void ConstructorNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, null));
-            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData()));
-            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Substitute.For<IAdbClient>(), null));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, default));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData { Serial = "169.254.109.177:5555" }));
+            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new PackageManager(Substitute.For<IAdbClient>(), default));
         }
 
         [Theory]
@@ -20,14 +26,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [InlineData("package:mwc2015.be", "mwc2015.be", "")]
         public void PackagesPropertyTest(string command, string packageName, string path)
         {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
             DummyAdbClient client = new();
             client.Commands["shell:pm list packages -f"] = command;
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, Device);
 
             Assert.True(manager.Packages.ContainsKey(packageName));
             Assert.Equal(path, manager.Packages[packageName]);
@@ -42,12 +43,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install \"/data/base.apk\""] = "Success";
             adbClient.Commands["shell:pm install -r -t \"/data/base.apk\""] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, Device);
 
             manager.InstallRemotePackage("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing));
 
@@ -73,12 +69,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install \"/data/local/tmp/base.apk\""] = "Success";
             adbClient.Commands["shell:rm \"/data/local/tmp/base.apk\""] = string.Empty;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device, (c, d) => syncService);
+            PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
             manager.InstallPackage("Assets/TestApp/base.apk",
                 new InstallProgress(
@@ -111,12 +102,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install-write 936013062 split1.apk \"/data/split_config.xxhdpi.apk\""] = "Success";
             adbClient.Commands["shell:pm install-commit 936013062"] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, Device);
 
             manager.InstallMultipleRemotePackage("/data/base.apk", ["/data/split_config.arm64_v8a.apk", "/data/split_config.xxhdpi.apk"],
                 new InstallProgress(
@@ -193,12 +179,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\""] = string.Empty;
             adbClient.Commands["shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\""] = string.Empty;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device, (c, d) => syncService);
+            PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
             manager.InstallMultiplePackage("Assets/TestApp/base.apk", ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
                 new InstallProgress(
@@ -254,15 +235,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void UninstallPackageTest()
         {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
             DummyAdbClient client = new();
             client.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             client.Commands["shell:pm uninstall com.android.gallery3d"] = "Success";
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, Device);
 
             // Command should execute correctly; if the wrong command is passed an exception
             // would be thrown.
@@ -272,14 +248,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void GetPackageVersionInfoTest()
         {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys package com.google.android.gms"] = File.ReadAllText("Assets/DumpSys.GApps.txt");
-            PackageManager manager = new(client, device, skipInit: true);
+            PackageManager manager = new(client, Device, skipInit: true);
 
             VersionInfo versionInfo = manager.GetVersionInfo("com.google.android.gms");
             Assert.Equal(11062448, versionInfo.VersionCode);

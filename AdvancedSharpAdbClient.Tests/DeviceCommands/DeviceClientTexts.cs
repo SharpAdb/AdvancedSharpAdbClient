@@ -22,9 +22,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void ConstructorNullTest()
         {
-            _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(null, null));
-            _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(null, new DeviceData()));
-            _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(Substitute.For<IAdbClient>(), null));
+            _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(null, default));
+            _ = Assert.Throws<ArgumentNullException>(() => new DeviceClient(null, new DeviceData { Serial = "169.254.109.177:5555" }));
             _ = Assert.Throws<ArgumentOutOfRangeException>(() => new DeviceClient(Substitute.For<IAdbClient>(), new DeviceData()));
         }
 

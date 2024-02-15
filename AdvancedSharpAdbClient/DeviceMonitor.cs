@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
@@ -34,6 +35,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
+    [DebuggerDisplay($"{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class DeviceMonitor : IDeviceMonitor, ICloneable<IDeviceMonitor>, ICloneable
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         , IAsyncDisposable
@@ -104,7 +106,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="logger">The logger to use when logging.</param>
         public DeviceMonitor(ILogger<DeviceMonitor>? logger = null)
-            : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), logger)
+            : this(Factories.AdbSocketFactory(AdbClient.AdbServerEndPoint), logger)
         {
         }
 
@@ -418,11 +420,9 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IDeviceMonitor Clone()
         {
-            if (Socket is not ICloneable<IAdbSocket> cloneable)
-            {
-                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
-            }
-            return new DeviceMonitor(cloneable.Clone(), logger);
+            return Socket is not ICloneable<IAdbSocket> cloneable
+                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
+                : (IDeviceMonitor)new DeviceMonitor(cloneable.Clone(), logger);
         }
 
         /// <inheritdoc/>

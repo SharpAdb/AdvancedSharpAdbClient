@@ -24,13 +24,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>()))
+            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Device))
                 .Do(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
                     Assert.Equal(Device, x.ArgAt<DeviceData>(1));
                 });
-            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
+            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Device, Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
                 .Do(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));

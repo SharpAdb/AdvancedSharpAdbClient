@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -40,6 +41,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
+    [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
     public partial class SyncService : ISyncService, ICloneable<ISyncService>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         , ISyncService.IWinRT
@@ -55,7 +57,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(DeviceData device)
-            : this(Factories.AdbSocketFactory(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), device)
+            : this(Factories.AdbSocketFactory(AdbClient.AdbServerEndPoint), device)
         {
         }
 
@@ -86,8 +88,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
-            Socket = socket;
-            Device = device;
+            Device = DeviceData.EnsureDevice(ref device);
+            Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             Open();
         }
 
@@ -373,21 +375,17 @@ namespace AdvancedSharpAdbClient
         /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
         public SyncService Clone(DeviceData device)
         {
-            if (Socket is not ICloneable<IAdbSocket> cloneable)
-            {
-                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
-            }
-            return new SyncService(cloneable.Clone(), device);
+            return Socket is not ICloneable<IAdbSocket> cloneable
+                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
+                : new SyncService(cloneable.Clone(), device);
         }
 
         /// <inheritdoc/>
         public ISyncService Clone()
         {
-            if (Socket is not ICloneable<IAdbSocket> cloneable)
-            {
-                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
-            }
-            return new SyncService(cloneable.Clone(), Device);
+            return Socket is not ICloneable<IAdbSocket> cloneable
+                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
+                : (ISyncService)new SyncService(cloneable.Clone(), Device);
         }
 
         /// <inheritdoc/>
@@ -409,11 +407,11 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(in statResult),
-                Size = ReadInt32(in statResult),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult))
+                FileType = (UnixFileType)ReadInt32(statResult),
+                Size = ReadInt32(statResult),
+                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
             };
-            int ReadInt32(in byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
+            int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
 #endif
         }
     }

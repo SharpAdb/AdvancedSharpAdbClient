@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
@@ -13,6 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     /// <remarks>This is a host of type <see cref="System.Drawing.Rectangle"/>.
     /// Using <see cref="Rectangle"/> to get the <see cref="System.Drawing.Rectangle"/> value.</remarks>
+    [DebuggerDisplay($"{nameof(Area)} \\{{ {nameof(X)} = {{{nameof(X)}}}, {nameof(Y)} = {{{nameof(Y)}}}, {nameof(Width)} = {{{nameof(Width)}}}, {nameof(Height)} = {{{nameof(Height)}}} }}")]
     public struct Area : IEquatable<Area>, IEquatable<Rectangle>
     {
         /// <summary>
@@ -39,13 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 #else
         internal
 #endif
-            Area(Rectangle rectangle) : this(in rectangle) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref='Area'/> struct.
-        /// </summary>
-        /// <param name="rectangle">A <see cref='Rectangle'/> that specifies the location and size for the new <see cref='Area'/>.</param>
-        internal Area(in Rectangle rectangle) => this.rectangle = rectangle;
+            Area(in Rectangle rectangle) => this.rectangle = rectangle;
 
         ///<summary>
         /// Initializes a new instance of the <see cref="Area"/> struct with the specified location and size.
@@ -315,7 +311,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// </summary>
         /// <param name="rect">The <see cref='Rectangle'/> to convert.</param>
         /// <returns>The <see cref='Area'/> that results from the conversion.</returns>
-        public static implicit operator Area(Rectangle rect) => new(in rect);
+        public static implicit operator Area(Rectangle rect) => new(rect);
 #else
         /// <inheritdoc/>
         readonly bool IEquatable<Rectangle>.Equals(Rectangle other) => Equals(other);

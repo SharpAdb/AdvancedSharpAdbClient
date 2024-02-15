@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Models
@@ -10,15 +11,16 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Contains information about port forwarding configured by the Android Debug Bridge.
     /// </summary>
-    public sealed class ForwardData : IEquatable<ForwardData>
+    [DebuggerDisplay($"{nameof(AdbServerStatus)} \\{{ {nameof(SerialNumber)} = {{{nameof(SerialNumber)}}}, {nameof(LocalSpec)} = {{{nameof(LocalSpec)}}}, {nameof(RemoteSpec)} = {{{nameof(RemoteSpec)}}} }}")]
+    public readonly struct ForwardData : IEquatable<ForwardData>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardData"/> class.
+        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
         /// </summary>
         public ForwardData() { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardData"/> class.
+        /// Initializes a new instance of the <see cref="ForwardData"/> struct.
         /// </summary>
         /// <param name="serialNumber">The serial number of the device for which the port forwarding is configured.</param>
         /// <param name="local">The <see cref="string"/> that represents the local (PC) endpoint.</param>
@@ -75,13 +77,22 @@ namespace AdvancedSharpAdbClient.Models
         [return: NotNullIfNotNull(nameof(value))]
         public static ForwardData? FromString(string? value) => value == null ? null : new ForwardData(value);
 
+        /// <inheritdoc/>
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is ForwardData other && Equals(other);
+
+        /// <inheritdoc/>
+        public bool Equals(ForwardData other) =>
+            SerialNumber == other.SerialNumber
+                && Local == other.Local
+                && Remote == other.Remote;
+
         /// <summary>
         /// Tests whether two <see cref='ForwardData'/> objects are equally.
         /// </summary>
         /// <param name="left">The <see cref='ForwardData'/> structure that is to the left of the equality operator.</param>
         /// <param name="right">The <see cref='ForwardData'/> structure that is to the right of the equality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="ForwardData"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(ForwardData? left, ForwardData? right) => (object?)left == right || (left?.Equals(right) ?? false);
+        public static bool operator ==(ForwardData left, ForwardData right) => left.Equals(right);
 
         /// <summary>
         /// Tests whether two <see cref='ForwardData'/> objects are different.
@@ -89,18 +100,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="left">The <see cref='ForwardData'/> structure that is to the left of the inequality operator.</param>
         /// <param name="right">The <see cref='ForwardData'/> structure that is to the right of the inequality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="ForwardData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(ForwardData? left, ForwardData? right) => !(left == right);
-
-        /// <inheritdoc/>
-        public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as ForwardData);
-
-        /// <inheritdoc/>
-        public bool Equals([NotNullWhen(true)] ForwardData? other) =>
-            (object?)this == other ||
-                (other != (object?)null
-                && SerialNumber == other.SerialNumber
-                && Local == other.Local
-                && Remote == other.Remote);
+        public static bool operator !=(ForwardData left, ForwardData right) => !left.Equals(right);
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(SerialNumber, Local, Remote);

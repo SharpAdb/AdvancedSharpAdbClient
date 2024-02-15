@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
@@ -10,6 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
+    [DebuggerDisplay($"{nameof(VersionInfoReceiver)} \\{{ {nameof(VersionInfo)} = {{{nameof(VersionInfo)}}} }}")]
     public partial class VersionInfoReceiver : InfoOutputReceiver
     {
         /// <summary>

@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.Tests
             IEnumerable<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
+            client.When(x => x.ExecuteRemoteCommand(Arg.Any<string>(), device, Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>()))
                 .Do(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                 });
-            _ = client.ExecuteRemoteCommand(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<Encoding>())
+            _ = client.ExecuteRemoteCommand(Arg.Any<string>(), device, Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.Tests
             LogId[] logNames = Enumerable.Range((int)LogId.Min, (int)(LogId.Max - LogId.Min + 1)).Select(x => (LogId)x).ToArray();
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            client.When(x => x.RunLogService(Arg.Any<DeviceData>(), Arg.Any<Action<LogEntry>>(), Arg.Any<bool>(), Arg.Any<LogId[]>()))
+            client.When(x => x.RunLogService(device, Arg.Any<Action<LogEntry>>(), Arg.Any<bool>(), Arg.Any<LogId[]>()))
                 .Do(x =>
                 {
                     Assert.Equal(device, x.ArgAt<DeviceData>(0));

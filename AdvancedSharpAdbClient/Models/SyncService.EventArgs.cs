@@ -3,12 +3,14 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 
 namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Provides data for the <see cref="ISyncService"/> interface.
     /// </summary>
+    [DebuggerDisplay($"{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(ReceivedBytesSize)} = {{{nameof(ReceivedBytesSize)}}}, {nameof(TotalBytesToReceive)} = {{{nameof(TotalBytesToReceive)}}}, {nameof(ProgressPercentage)} = {{{nameof(ProgressPercentage)}}} }}")]
     public sealed class SyncProgressChangedEventArgs(long current, long total) : EventArgs
     {
         /// <summary>
@@ -27,5 +29,8 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets the number of progress percentage (from <see langword="0"/> to <see langword="100"/>) for the sync operation.
         /// </summary>
         public double ProgressPercentage => TotalBytesToReceive == 0 ? 0 : ReceivedBytesSize * 100d / TotalBytesToReceive;
+
+        /// <inheritdoc/>
+        public override string ToString() => $"Sync Progress: {ReceivedBytesSize}/{TotalBytesToReceive} ({ProgressPercentage}%)";
     }
 }

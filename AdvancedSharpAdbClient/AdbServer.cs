@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
@@ -18,6 +19,7 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
+    [DebuggerDisplay($"{nameof(AdbServer)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(CachedAdbPath)} = {{{nameof(CachedAdbPath)}}} }}")]
     public partial class AdbServer : IAdbServer, ICloneable<IAdbServer>, ICloneable
     {
         /// <summary>
@@ -58,7 +60,7 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbServer"/> class.
         /// </summary>
         public AdbServer()
-            : this(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort), Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
+            : this(AdbClient.AdbServerEndPoint, Factories.AdbSocketFactory, Factories.AdbCommandLineClientFactory)
         {
         }
 
@@ -139,15 +141,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
         public AdbServer(Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
-            : this(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort), adbSocketFactory, adbCommandLineClientFactory)
+            : this(AdbClient.AdbServerEndPoint, adbSocketFactory, adbCommandLineClientFactory)
         {
         }
-
-        /// <summary>
-        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
-        /// the server to figure out where adb is located.
-        /// </summary>
-        protected static string? CachedAdbPath { get; set; }
 
         /// <summary>
         /// Gets or sets the default instance of the <see cref="IAdbServer"/> interface.
@@ -158,6 +154,12 @@ namespace AdvancedSharpAdbClient
         /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
         /// </summary>
         protected static bool IsStarting { get; set; } = false;
+
+        /// <summary>
+        /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting
+        /// the server to figure out where adb is located.
+        /// </summary>
+        protected string? CachedAdbPath { get; set; }
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
@@ -269,7 +271,7 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
 
         /// <inheritdoc/>
-        public override string ToString() => $"{GetType()} communicate with adb at {EndPoint}";
+        public override string ToString() => $"The {nameof(AdbServer)} communicate with adb at {EndPoint}";
 
         /// <summary>
         /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.

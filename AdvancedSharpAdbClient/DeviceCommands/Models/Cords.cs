@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
@@ -13,6 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     /// <remarks>This is a host of type <see cref="System.Drawing.Point"/>.
     /// Using <see cref="Point"/> to get the <see cref="System.Drawing.Point"/> value.</remarks>
+    [DebuggerDisplay($"{nameof(Cords)} \\{{ {nameof(X)} = {{{nameof(X)}}}, {nameof(Y)} = {{{nameof(Y)}}} }}")]
     public struct Cords : IEquatable<Cords>, IEquatable<Point>
     {
         /// <summary>
@@ -39,13 +41,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 #else
         internal
 #endif
-            Cords(Point point) : this(in point) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref='Cords'/> struct.
-        /// </summary>
-        /// <param name="point">A <see cref='System.Drawing.Point'/> that specifies the coordinates for the new <see cref='Cords'/>.</param>
-        internal Cords(in Point point) => this.point = point;
+            Cords(in Point point) => this.point = point;
 
         /// <summary>
         /// Initializes a new instance of the <see cref='Cords'/> struct with the specified coordinates.
@@ -173,7 +169,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// </summary>
         /// <param name="p">The <see cref='System.Drawing.Point'/> to convert.</param>
         /// <returns>The <see cref='Cords'/> that results from the conversion.</returns>
-        public static implicit operator Cords(Point p) => new(in p);
+        public static implicit operator Cords(Point p) => new(p);
 #else
         /// <summary>
         /// Specifies whether this <see cref='System.Drawing.Point'/> contains the same coordinates as the specified

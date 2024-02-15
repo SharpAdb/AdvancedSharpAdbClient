@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Models
@@ -22,6 +23,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.ColorDataCreator))]
 #endif
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public readonly record struct ColorData(uint Offset, uint Length) : IReadOnlyList<byte>
     {
         /// <summary>

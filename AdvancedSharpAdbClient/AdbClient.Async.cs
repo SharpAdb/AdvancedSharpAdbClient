@@ -140,7 +140,7 @@ namespace AdvancedSharpAdbClient
             string data = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => ForwardData.FromString(x));
+            return parts.Select(ForwardData.FromString).OfType<ForwardData>();
         }
 
         /// <inheritdoc/>
@@ -156,7 +156,7 @@ namespace AdvancedSharpAdbClient
             string data = await socket.ReadStringAsync(cancellationToken).ConfigureAwait(false);
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => ForwardData.FromString(x));
+            return parts.Select(ForwardData.FromString).OfType<ForwardData>();
         }
 
         /// <inheritdoc/>

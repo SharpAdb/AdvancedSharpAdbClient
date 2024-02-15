@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             List<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Device, Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -27,7 +27,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     Assert.Equal(default, x.ArgAt<CancellationToken>(2));
                     return Task.CompletedTask;
                 });
-            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Device, Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -187,9 +187,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.Commands[$"shell:{EnvironmentVariablesReceiver.PrintEnvCommand}"] = "a=b";
 
-            DeviceData device = new();
-
-            Dictionary<string, string> variables = await adbClient.GetEnvironmentVariablesAsync(device);
+            Dictionary<string, string> variables = await adbClient.GetEnvironmentVariablesAsync(Device);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
@@ -206,11 +204,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.Commands["shell:pm uninstall com.example"] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            await adbClient.UninstallPackageAsync(device, "com.example");
+            await adbClient.UninstallPackageAsync(Device, "com.example");
 
             Assert.Single(adbClient.ReceivedCommands);
             Assert.Equal("shell:pm uninstall com.example", adbClient.ReceivedCommands[0]);
@@ -452,11 +446,7 @@ Compiler stats:
 
             adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-            VersionInfo version = await adbClient.GetPackageVersionAsync(device, packageName);
+            VersionInfo version = await adbClient.GetPackageVersionAsync(Device, packageName);
 
             Assert.Equal(versionCode, version.VersionCode);
             Assert.Equal(versionName, version.VersionName);
@@ -497,8 +487,7 @@ asound";
 
 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
 
-            DeviceData device = new();
-            List<AndroidProcess> processes = await adbClient.ListProcessesAsync(device);
+            List<AndroidProcess> processes = await adbClient.ListProcessesAsync(Device);
 
             Assert.Equal(3, processes.Count);
             Assert.Equal("init", processes[0].Name);

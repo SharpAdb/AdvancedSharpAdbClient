@@ -5,11 +5,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -28,6 +29,7 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
+    [DebuggerDisplay($"{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public partial class AdbClient : IAdbClient, ICloneable<IAdbClient>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         , IAdbClient.IWinRT
@@ -57,7 +59,7 @@ namespace AdvancedSharpAdbClient
         /// Initializes a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
         public AdbClient()
-            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), Factories.AdbSocketFactory)
+            : this(AdbServerEndPoint, Factories.AdbSocketFactory)
         {
         }
 
@@ -114,14 +116,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
         public AdbClient(Func<EndPoint, IAdbSocket> adbSocketFactory)
-            : this(new IPEndPoint(IPAddress.Loopback, AdbServerPort), adbSocketFactory)
+            : this(AdbServerEndPoint, adbSocketFactory)
         {
         }
 
         /// <summary>
         /// Gets a new instance of the <see cref="AdbClient"/> class.
         /// </summary>
-        public static IAdbClient Instance => Factories.AdbClientFactory(new IPEndPoint(IPAddress.Loopback, AdbServerPort));
+        public static IAdbClient Instance => Factories.AdbClientFactory(AdbServerEndPoint);
 
         /// <summary>
         /// Gets or sets default encoding.
@@ -134,9 +136,14 @@ namespace AdvancedSharpAdbClient
         public static int AdbServerPort => int.TryParse(TryGetEnvironmentVariable("ANDROID_ADB_SERVER_PORT"), out int result) ? result : DefaultAdbServerPort;
 
         /// <summary>
-        /// Gets the Default <see cref="System.Net.EndPoint"/> at which the adb server is listening.
+        /// Gets the default <see cref="IPEndPoint"/> which to use when connecting to a device over TCP/IP.
         /// </summary>
-        public static EndPoint DefaultEndPoint => new IPEndPoint(IPAddress.Loopback, DefaultPort);
+        public static IPEndPoint DefaultEndPoint => new(IPAddress.Loopback, DefaultPort);
+
+        /// <summary>
+        /// Gets the <see cref="IPEndPoint"/> at which the Android Debug Bridge server listens by default.
+        /// </summary>
+        public static IPEndPoint AdbServerEndPoint => new(IPAddress.Loopback, AdbServerPort);
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
@@ -294,7 +301,7 @@ namespace AdvancedSharpAdbClient
             string data = socket.ReadString();
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => ForwardData.FromString(x));
+            return parts.Select(ForwardData.FromString).OfType<ForwardData>();
         }
 
         /// <inheritdoc/>
@@ -310,7 +317,7 @@ namespace AdvancedSharpAdbClient
             string data = socket.ReadString();
 
             string[] parts = data.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Select(x => ForwardData.FromString(x));
+            return parts.Select(ForwardData.FromString).OfType<ForwardData>();
         }
 
         /// <inheritdoc/>
@@ -1123,7 +1130,7 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
 
         /// <inheritdoc/>
-        public override string ToString() => $"{GetType()} communicate with adb server at {EndPoint}";
+        public override string ToString() => $"The {nameof(AdbClient)} communicate with adb server at {EndPoint}";
 
         /// <summary>
         /// Creates a new <see cref="AdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
@@ -1145,17 +1152,16 @@ namespace AdvancedSharpAdbClient
         public static void SetEncoding(Encoding encoding) => Encoding = encoding;
 
         /// <summary>
-        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
-        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
-        /// if <paramref name="device"/> does not have a valid serial number.
+        /// Throws an <see cref="ArgumentOutOfRangeException"/> if <paramref name="device"/> does not have a valid serial number.
         /// </summary>
         /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
-        protected static void EnsureDevice([NotNull] DeviceData? device)
+        /// <param name="paramName">The name of the parameter with which <paramref name="device"/> corresponds.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="device"/> does not have a valid serial number.</exception>
+        protected static void EnsureDevice(in DeviceData device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
         {
-            ExceptionExtensions.ThrowIfNull(device);
             if (device.IsEmpty)
             {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
+                throw new ArgumentOutOfRangeException(paramName, "You must specific a serial number for the device");
             }
         }
 

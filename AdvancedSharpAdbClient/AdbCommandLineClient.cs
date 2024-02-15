@@ -14,6 +14,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
+    [DebuggerDisplay($"{nameof(AdbCommandLineClient)} \\{{ {nameof(AdbPath)} = {{{nameof(AdbPath)}}} }}")]
     public partial class AdbCommandLineClient : IAdbCommandLineClient
     {
 #if HAS_PROCESS
@@ -127,7 +128,7 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public override string ToString() => $"{GetType()} process with adb command line at {AdbPath}";
+        public override string ToString() => $"The {nameof(AdbCommandLineClient)} process with adb command line at {AdbPath}";
 
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.

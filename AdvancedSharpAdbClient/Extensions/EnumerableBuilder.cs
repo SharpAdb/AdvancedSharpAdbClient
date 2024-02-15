@@ -50,9 +50,9 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(in values),
-                Size = ReadInt32(in values),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in values))
+                FileType = (UnixFileType)ReadInt32(values),
+                Size = ReadInt32(values),
+                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(values))
             };
             int ReadInt32(in ReadOnlySpan<byte> data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
         }
@@ -69,12 +69,12 @@ namespace AdvancedSharpAdbClient
 
             // Read the log data in binary format. This format is defined at
             // https://android.googlesource.com/platform/system/logging/+/refs/heads/main/liblog/include/log/log_read.h#39
-            ushort? payloadLengthValue = ReadUInt16(in values);
-            ushort? headerSizeValue = payloadLengthValue == null ? null : ReadUInt16(in values);
-            int? pidValue = headerSizeValue == null ? null : ReadInt32(in values);
-            uint? tidValue = pidValue == null ? null : ReadUInt32(in values);
-            uint? secValue = tidValue == null ? null : ReadUInt32(in values);
-            uint? nsecValue = secValue == null ? null : ReadUInt32(in values);
+            ushort? payloadLengthValue = ReadUInt16(values);
+            ushort? headerSizeValue = payloadLengthValue == null ? null : ReadUInt16(values);
+            int? pidValue = headerSizeValue == null ? null : ReadInt32(values);
+            uint? tidValue = pidValue == null ? null : ReadUInt32(values);
+            uint? secValue = tidValue == null ? null : ReadUInt32(values);
+            uint? nsecValue = secValue == null ? null : ReadUInt32(values);
 
             if (nsecValue == null)
             {
@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient
             {
                 if (headerSize >= 0x18)
                 {
-                    uint? idValue = ReadUInt32(in values);
+                    uint? idValue = ReadUInt32(values);
 
                     if (idValue == null)
                     {
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
 
                 if (headerSize >= 0x1c)
                 {
-                    uint? uidValue = ReadUInt32(in values);
+                    uint? uidValue = ReadUInt32(values);
 
                     if (uidValue == null)
                     {
@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient
                     if (headerSize == 0x20)
                     {
                         // Not sure what this is.
-                        _ = ReadUInt32(in values);
+                        _ = ReadUInt32(values);
                     }
                     else
                     {
@@ -136,7 +136,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            ReadOnlySpan<byte> data = ReadBytesSafe(in values, payloadLength);
+            ReadOnlySpan<byte> data = ReadBytesSafe(values, payloadLength);
 
             if (data.IsEmpty)
             {

@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -15,6 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     /// <param name="VersionCode">The version code of the application.</param>
     /// <param name="VersionName">The version name of the application.</param>
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public readonly record struct VersionInfo(int VersionCode, string VersionName) : IComparer, IComparer<VersionInfo>
     {
         /// <summary>

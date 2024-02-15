@@ -14,12 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install \"/data/base.apk\""] = "Success";
             adbClient.Commands["shell:pm install -r -t \"/data/base.apk\""] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, Device);
 
             await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing));
 
@@ -45,12 +40,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install \"/data/local/tmp/base.apk\""] = "Success";
             adbClient.Commands["shell:rm \"/data/local/tmp/base.apk\""] = string.Empty;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device, (c, d) => syncService);
+            PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
             await manager.InstallPackageAsync("Assets/TestApp/base.apk",
                 new InstallProgress(
@@ -83,12 +73,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:pm install-write 936013062 split1.apk \"/data/split_config.xxhdpi.apk\""] = "Success";
             adbClient.Commands["shell:pm install-commit 936013062"] = "Success";
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device);
+            PackageManager manager = new(adbClient, Device);
 
             await manager.InstallMultipleRemotePackageAsync("/data/base.apk", ["/data/split_config.arm64_v8a.apk", "/data/split_config.xxhdpi.apk"],
                 new InstallProgress(
@@ -165,12 +150,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             adbClient.Commands["shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\""] = string.Empty;
             adbClient.Commands["shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\""] = string.Empty;
 
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
-            PackageManager manager = new(adbClient, device, (c, d) => syncService);
+            PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
             await manager.InstallMultiplePackageAsync("Assets/TestApp/base.apk", ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
                  new InstallProgress(
@@ -226,15 +206,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async void UninstallPackageAsyncTest()
         {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
             DummyAdbClient client = new();
             client.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
             client.Commands["shell:pm uninstall com.android.gallery3d"] = "Success";
-            PackageManager manager = new(client, device);
+            PackageManager manager = new(client, Device);
 
             // Command should execute correctly; if the wrong command is passed an exception
             // would be thrown.
@@ -244,14 +219,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async void GetPackageVersionInfoAsyncTest()
         {
-            DeviceData device = new()
-            {
-                State = DeviceState.Online
-            };
-
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys package com.google.android.gms"] = File.ReadAllText("Assets/DumpSys.GApps.txt");
-            PackageManager manager = new(client, device, skipInit: true);
+            PackageManager manager = new(client, Device, skipInit: true);
 
             VersionInfo versionInfo = await manager.GetVersionInfoAsync("com.google.android.gms");
             Assert.Equal(11062448, versionInfo.VersionCode);

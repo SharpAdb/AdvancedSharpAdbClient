@@ -50,8 +50,12 @@ namespace AdvancedSharpAdbClient
                 string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
                 throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
             }
-            else if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
-            else { return standardOutput; }
+            else
+            {
+                return status != 0
+                ? throw new AdbException($"The adb process returned error code {status} when running command {command}")
+                : standardOutput;
+            }
         }
 
         /// <inheritdoc/>

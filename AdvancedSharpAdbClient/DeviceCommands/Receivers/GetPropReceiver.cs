@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Parses the output of the <c>getprop</c> command, which lists all properties of an Android device.
     /// </summary>
+    [DebuggerDisplay($"{nameof(GetPropReceiver)} \\{{ {nameof(Properties)} = {{{nameof(Properties)}}} }}")]
     public sealed partial class GetPropReceiver : ShellOutputReceiver
     {
         /// <summary>

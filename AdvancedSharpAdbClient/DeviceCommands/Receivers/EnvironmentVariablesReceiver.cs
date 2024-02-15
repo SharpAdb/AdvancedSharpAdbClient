@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.
     /// </summary>
+    [DebuggerDisplay($"{nameof(EnvironmentVariablesReceiver)} \\{{ {nameof(EnvironmentVariables)} = {{{nameof(EnvironmentVariables)}}} }}")]
     public sealed partial class EnvironmentVariablesReceiver : ShellOutputReceiver
     {
         /// <summary>

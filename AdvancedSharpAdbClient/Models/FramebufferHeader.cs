@@ -5,9 +5,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 #if WINDOWS_UWP
 using System.Threading;
@@ -23,6 +25,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreator))]
 #endif
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
         /// <summary>
@@ -54,7 +57,7 @@ namespace AdvancedSharpAdbClient.Models
 
             int index = 0;
 
-            Version = ReadUInt32(in data);
+            Version = ReadUInt32(data);
 
             if (Version > 2)
             {
@@ -63,34 +66,34 @@ namespace AdvancedSharpAdbClient.Models
                 throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
             }
 
-            Bpp = ReadUInt32(in data);
+            Bpp = ReadUInt32(data);
 
             if (Version >= 2)
             {
-                ColorSpace = ReadUInt32(in data);
+                ColorSpace = ReadUInt32(data);
             }
 
-            Size = ReadUInt32(in data);
-            Width = ReadUInt32(in data);
-            Height = ReadUInt32(in data);
+            Size = ReadUInt32(data);
+            Width = ReadUInt32(data);
+            Height = ReadUInt32(data);
 
             Red = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Blue = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Green = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Alpha = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
-            uint ReadUInt32(in byte[] data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
+            uint ReadUInt32(byte[] data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
 
 #if HAS_BUFFERS
@@ -108,7 +111,7 @@ namespace AdvancedSharpAdbClient.Models
 
             int index = 0;
 
-            Version = ReadUInt32(in data);
+            Version = ReadUInt32(data);
 
             if (Version > 2)
             {
@@ -117,32 +120,32 @@ namespace AdvancedSharpAdbClient.Models
                 throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
             }
 
-            Bpp = ReadUInt32(in data);
+            Bpp = ReadUInt32(data);
 
             if (Version >= 2)
             {
-                ColorSpace = ReadUInt32(in data);
+                ColorSpace = ReadUInt32(data);
             }
 
-            Size = ReadUInt32(in data);
-            Width = ReadUInt32(in data);
-            Height = ReadUInt32(in data);
+            Size = ReadUInt32(data);
+            Width = ReadUInt32(data);
+            Height = ReadUInt32(data);
 
             Red = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Blue = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Green = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             Alpha = new ColorData(
-                ReadUInt32(in data),
-                ReadUInt32(in data));
+                ReadUInt32(data),
+                ReadUInt32(data));
 
             uint ReadUInt32(in ReadOnlySpan<byte> data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
@@ -571,6 +574,62 @@ namespace AdvancedSharpAdbClient.Models
             throw new NotSupportedException($"Pixel depths of {Bpp} are not supported");
         }
 #endif
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            StringBuilder builder =
+                new StringBuilder(nameof(FramebufferHeader))
+                    .Append(" { ")
+                    .Append(nameof(Version))
+                    .Append(" = ")
+                    .Append(Version)
+                    .Append(", ")
+                    .Append(nameof(Bpp))
+                    .Append(" = ")
+                    .Append(Bpp);
+
+            if (Version >= 2)
+            {
+                _ = builder
+                    .Append(", ")
+                    .Append(nameof(ColorSpace))
+                    .Append(" = ")
+                    .Append(ColorSpace);
+            }
+
+            return builder
+                .Append(", ")
+                .Append(nameof(Size))
+                .Append(" = ")
+                .Append(Size)
+                .Append(", ")
+                .Append(nameof(Width))
+                .Append(" = ")
+                .Append(Width)
+                .Append(", ")
+                .Append(nameof(Height))
+                .Append(" = ")
+                .Append(Height)
+                .Append(", ")
+                .Append(nameof(Red))
+                .Append(" = ")
+                .Append(Red)
+                .Append(", ")
+                .Append(nameof(Blue))
+                .Append(" = ")
+                .Append(Blue)
+                .Append(", ")
+                .Append(nameof(Green))
+                .Append(" = ")
+                .Append(Green)
+                .Append(", ")
+                .Append(nameof(Alpha))
+                .Append(" = ")
+                .Append(Alpha)
+                .Append(" }")
+                .ToString();
+        }
 
         /// <inheritdoc/>
         public IEnumerator<byte> GetEnumerator()

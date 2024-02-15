@@ -418,22 +418,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <returns>An enumerator that can be used to iterate through the <see cref="Element"/>.</returns>
         public IEnumerator<Element> GetEnumerator() => FindDescendants().GetEnumerator();
 
-        /// <summary>
-        /// Tests whether two <see cref='Element'/> objects are equally.
-        /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(Element? left, Element? right) => (object?)left == right || (left?.Equals(right) ?? false);
-
-        /// <summary>
-        /// Tests whether two <see cref='Element'/> objects are different.
-        /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are unequally; otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(Element? left, Element? right) => !(left == right);
-
         /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object? obj) => Equals(obj as Element);
 
@@ -450,6 +434,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
                             : Attributes?.SequenceEqual(other.Attributes!) == true
                     : other.Node != null
                         && Node.OuterXml == other.Node.OuterXml));
+
+        /// <summary>
+        /// Tests whether two <see cref='Element'/> objects are equally.
+        /// </summary>
+        /// <param name="left">The <see cref='Element'/> structure that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='Element'/> structure that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(Element? left, Element? right) => (object?)left == right || (left?.Equals(right) ?? false);
+
+        /// <summary>
+        /// Tests whether two <see cref='Element'/> objects are different.
+        /// </summary>
+        /// <param name="left">The <see cref='Element'/> structure that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='Element'/> structure that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(Element? left, Element? right) => !(left == right);
 
         /// <inheritdoc/>
         public override int GetHashCode() =>

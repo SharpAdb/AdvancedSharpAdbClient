@@ -17,6 +17,8 @@ namespace AdvancedSharpAdbClient
         [MemberNotNull(nameof(EndPoint))]
         public async Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
         {
+            ExceptionExtensions.ThrowIfNull(endPoint);
+
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
                 throw new NotSupportedException("Only TCP endpoints are supported");

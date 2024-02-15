@@ -78,14 +78,14 @@ namespace AdvancedSharpAdbClient.Tests
         public async void ExecuteRemoteCommandAsyncTest()
         {
             const string command = nameof(command);
-            DeviceData device = new();
+            DeviceData device = new() { Serial = "169.254.109.177:5555" };
             static bool predicate(string x) => true;
             IShellOutputReceiver receiver = new FunctionOutputReceiver(predicate);
             Encoding encoding = AdbClient.Encoding;
             List<string> result = ["Hello", "World", "!"];
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), device, Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -95,7 +95,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(default, x.ArgAt<CancellationToken>(4));
                     return Task.CompletedTask;
                 });
-            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Arg.Any<DeviceData>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), device, Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -114,13 +114,13 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async void RunLogServiceAsyncTest()
         {
-            DeviceData device = new();
+            DeviceData device = new() { Serial = "169.254.109.177:5555" };
             IProgress<LogEntry> progress = Substitute.For<IProgress<LogEntry>>();
             Action<LogEntry> messageSink = progress.Report;
             LogId[] logNames = Enumerable.Range((int)LogId.Min, (int)(LogId.Max - LogId.Min + 1)).Select(x => (LogId)x).ToArray();
 
             IAdbClient client = Substitute.For<IAdbClient>();
-            _ = client.RunLogServiceAsync(Arg.Any<DeviceData>(), Arg.Any<Action<LogEntry>>(), Arg.Any<CancellationToken>(), Arg.Any<LogId[]>())
+            _ = client.RunLogServiceAsync(device, Arg.Any<Action<LogEntry>>(), Arg.Any<CancellationToken>(), Arg.Any<LogId[]>())
                 .Returns(x =>
                 {
                     Assert.Equal(device, x.ArgAt<DeviceData>(0));

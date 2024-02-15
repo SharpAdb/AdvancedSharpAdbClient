@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
@@ -10,6 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// Parses the output of the various <c>pm</c> commands.
     /// </summary>
     /// <param name="packageManager">The parent package manager.</param>
+    [DebuggerDisplay($"{nameof(PackageManagerReceiver)} \\{{ {nameof(PackageManager)} = {{{nameof(PackageManager)}}} }}")]
     public class PackageManagerReceiver(PackageManager packageManager) : MultiLineReceiver
     {
         /// <summary>

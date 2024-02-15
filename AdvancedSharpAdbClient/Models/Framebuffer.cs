@@ -3,9 +3,11 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -16,6 +18,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device for which to fetch the frame buffer.</param>
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
+    [DebuggerDisplay($"{nameof(Framebuffer)} \\{{ {nameof(Header)} = {{{nameof(Header)}}}, {nameof(Data)} = {{{nameof(Data)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public sealed class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
     {
         /// <summary>
@@ -76,7 +79,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; } = device ?? throw new ArgumentNullException(nameof(device));
+        public DeviceData Device { get; } = DeviceData.EnsureDevice(ref device);
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
@@ -261,6 +264,20 @@ namespace AdvancedSharpAdbClient.Models
             return Data == null ? throw new InvalidOperationException($"Call {nameof(RefreshAsync)} first") : Header.ToBitmapAsync(Data, dispatcher, cancellationToken);
         }
 #endif
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            new StringBuilder(nameof(Framebuffer))
+                .Append(" { ")
+                .Append(nameof(Header))
+                .Append(" = ")
+                .Append(Header)
+                .Append(", ")
+                .Append(nameof(Data))
+                .Append(" = ")
+                .Append(Data)
+                .Append(" }")
+                .ToString();
 
         /// <inheritdoc/>
         private void Dispose(bool disposing)

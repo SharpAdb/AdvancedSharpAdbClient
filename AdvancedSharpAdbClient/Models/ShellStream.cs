@@ -3,8 +3,10 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -13,6 +15,7 @@ namespace AdvancedSharpAdbClient.Models
     /// output from an Android shell command. In the shell output, the LF character is replaced by a
     /// CR LF character. This stream undoes that change.</summary>
     /// <remarks><seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/></remarks>
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public class ShellStream : Stream
     {
         /// <summary>
@@ -472,6 +475,16 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         [DoesNotReturn]
         public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
+
+        /// <inheritdoc/>
+        public override string ToString() =>
+            new StringBuilder(nameof(ShellStream))
+                .Append(" { ")
+                .Append(nameof(Inner))
+                .Append(" = ")
+                .Append(Inner)
+                .Append(" }")
+                .ToString();
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)

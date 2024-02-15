@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -16,6 +17,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.AdbCommandLineStatusCreator))]
 #endif
+    [DebuggerDisplay($"{nameof(AdbServerStatus)} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
     public readonly partial record struct AdbCommandLineStatus(Version? AdbVersion, string? FileVersion, string? FilePath)
     {
         /// <summary>

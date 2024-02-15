@@ -3,12 +3,14 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
     /// </summary>
+    [DebuggerDisplay($"{nameof(ProcessOutputReceiver)} \\{{ {nameof(Processes)} = {{{nameof(Processes)}}} }}")]
     public class ProcessOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

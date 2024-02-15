@@ -3,6 +3,9 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -10,35 +13,9 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents the state of apk installation.
     /// </summary>
     /// <param name="state">The state of the installation.</param>
+    [DebuggerDisplay($"{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
     public sealed class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
-        /// <summary>
-        /// Gets the state of the installation.
-        /// </summary>
-        public PackageInstallProgressState State { get; } = state;
-
-        /// <summary>
-        /// Gets the number of packages which is finished operation.
-        /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
-        /// <see cref="PackageInstallProgressState.WriteSession"/> and
-        /// <see cref="PackageInstallProgressState.PostInstall"/> state.
-        /// </summary>
-        public int PackageFinished { get; init; }
-
-        /// <summary>
-        /// Gets the number of packages required for this operation.
-        /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
-        /// <see cref="PackageInstallProgressState.WriteSession"/> and
-        /// <see cref="PackageInstallProgressState.PostInstall"/> state.
-        /// </summary>
-        public int PackageRequired { get; init; }
-
-        /// <summary>
-        /// Gets the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.
-        /// Used only in <see cref="PackageInstallProgressState.Uploading"/> state.
-        /// </summary>
-        public double UploadProgress { get; init; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="InstallProgressEventArgs"/> class.
         /// Which is used for <see cref="PackageInstallProgressState.Uploading"/> state.
@@ -66,6 +43,63 @@ namespace AdvancedSharpAdbClient.Models
         {
             PackageFinished = packageFinished;
             PackageRequired = packageRequired;
+        }
+
+        /// <summary>
+        /// Gets the state of the installation.
+        /// </summary>
+        public PackageInstallProgressState State { get; } = state;
+
+        /// <summary>
+        /// Gets the number of packages which is finished operation.
+        /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
+        /// <see cref="PackageInstallProgressState.WriteSession"/> and
+        /// <see cref="PackageInstallProgressState.PostInstall"/> state.
+        /// </summary>
+        public int PackageFinished { get; init; }
+
+        /// <summary>
+        /// Gets the number of packages required for this operation.
+        /// Used only in <see cref="PackageInstallProgressState.Uploading"/>,
+        /// <see cref="PackageInstallProgressState.WriteSession"/> and
+        /// <see cref="PackageInstallProgressState.PostInstall"/> state.
+        /// </summary>
+        public int PackageRequired { get; init; }
+
+        /// <summary>
+        /// Gets the upload percentage (from <see langword="0"/> to <see langword="100"/>) completed.
+        /// Used only in <see cref="PackageInstallProgressState.Uploading"/> state.
+        /// </summary>
+        public double UploadProgress { get; init; }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            List<char> split = [];
+            string state = State.ToString();
+            for (int i = 0; i < state.Length; i++)
+            {
+                char c = state[i];
+                if (i != 0 && c is >= 'A' and <= 'Z')
+                {
+                    split.Add(' ');
+                }
+                split.Add(c);
+            }
+
+            StringBuilder builder = new(new string(split.ToArray()));
+
+            if (PackageRequired > 0)
+            {
+                _ = builder.AppendFormat(" {0}/{1}", PackageFinished, PackageRequired);
+            }
+
+            if (UploadProgress > 0)
+            {
+                _ = builder.AppendFormat(" {0}%", UploadProgress);
+            }
+
+            return builder.ToString();
         }
     }
 }

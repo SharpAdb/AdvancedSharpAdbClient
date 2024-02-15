@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -14,6 +15,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Implements the <see cref="ITcpSocket"/> interface using the standard <see cref="System.Net.Sockets.Socket"/> class.
     /// </summary>
+    [DebuggerDisplay($"{nameof(TcpSocket)} \\{{ {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(ReceiveBufferSize)} = {{{nameof(ReceiveBufferSize)}}} }}")]
     public sealed partial class TcpSocket : ITcpSocket, ICloneable<ITcpSocket>, ICloneable
     {
         /// <summary>
@@ -45,6 +47,8 @@ namespace AdvancedSharpAdbClient
         [MemberNotNull(nameof(EndPoint))]
         public void Connect(EndPoint endPoint)
         {
+            ExceptionExtensions.ThrowIfNull(endPoint);
+
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
                 throw new NotSupportedException("Only TCP endpoints are supported");
@@ -130,15 +134,16 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new(GetType().ToString());
-            _ = Connected
+            StringBuilder builder =
+                new StringBuilder("The ")
+                    .Append(nameof(TcpSocket));
+            return (Connected
                 ? builder.Append(" connect with ")
                          .Append(EndPoint)
                 : EndPoint == null
                     ? builder.Append(" without initialized")
                     : builder.Append(" disconnect with ")
-                             .Append(EndPoint);
-            return builder.ToString();
+                             .Append(EndPoint)).ToString();
         }
 
         /// <inheritdoc/>

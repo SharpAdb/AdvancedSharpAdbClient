@@ -456,11 +456,11 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(in statResult),
-                Size = ReadInt32(in statResult),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(in statResult))
+                FileType = (UnixFileType)ReadInt32(statResult),
+                Size = ReadInt32(statResult),
+                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
             };
-            int ReadInt32(in byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
+            int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
 #endif
         }
     }

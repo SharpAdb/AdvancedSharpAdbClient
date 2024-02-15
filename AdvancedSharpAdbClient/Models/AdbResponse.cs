@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Models
@@ -11,6 +12,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The response returned by ADB server.
     /// </summary>
     /// <param name="message">the message of <see cref="AdbResponse"/>.</param>
+    [DebuggerDisplay($"{nameof(AdbResponse)} \\{{ {nameof(IOSuccess)} = {{{nameof(IOSuccess)}}}, {nameof(Okay)} = {{{nameof(Okay)}}}, {nameof(Timeout)} = {{{nameof(Timeout)}}}, {nameof(Message)} = {{{nameof(Message)}}} }}")]
     public readonly struct AdbResponse(string message) : IEquatable<AdbResponse>
     {
         /// <summary>
@@ -82,18 +84,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public bool Equals(AdbResponse other) =>
             IOSuccess == other.IOSuccess
-            && string.Equals(Message, other.Message, StringComparison.OrdinalIgnoreCase)
-            && Okay == other.Okay
-            && Timeout == other.Timeout;
-
-        /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);
-
-        /// <summary>
-        /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
-        /// </summary>
-        /// <returns><c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the response indicates an error.</returns>
-        public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
+                && string.Equals(Message, other.Message, StringComparison.OrdinalIgnoreCase)
+                && Okay == other.Okay
+                && Timeout == other.Timeout;
 
         /// <summary>
         /// Tests whether two <see cref='AdbResponse'/> objects are equally.
@@ -110,5 +103,14 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="right">The <see cref='AdbResponse'/> structure that is to the right of the inequality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="AdbResponse"/> structures are unequally; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(AdbResponse left, AdbResponse right) => !left.Equals(right);
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(IOSuccess, Message, Okay, Timeout);
+
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents the current <see cref="AdbResponse"/>.
+        /// </summary>
+        /// <returns><c>OK</c> if the response is an OK response, or <c>Error: {Message}</c> if the response indicates an error.</returns>
+        public override string ToString() => Equals(OK) ? "OK" : $"Error: {Message}";
     }
 }

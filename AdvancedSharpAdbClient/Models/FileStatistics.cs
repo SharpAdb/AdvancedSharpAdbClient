@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -15,6 +16,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsCreator))]
 #endif
+    [DebuggerDisplay($"{nameof(FileStatistics)} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileType)} = {{{nameof(FileType)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
     public struct FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>
@@ -71,15 +73,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public readonly bool Equals(FileStatistics other) =>
             Path == other.Path
-            && FileType == other.FileType
-            && Size == other.Size
-            && Time == other.Time;
-
-        /// <inheritdoc/>
-        public override readonly int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
-
-        /// <inheritdoc/>
-        public override readonly string ToString() => StringExtensions.Join("\t", FileType, Time, FileType, Path);
+                && FileType == other.FileType
+                && Size == other.Size
+                && Time == other.Time;
 
         /// <summary>
         /// Tests whether two <see cref='FileStatistics'/> objects are equally.
@@ -96,5 +92,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="right">The <see cref='FileStatistics'/> structure that is to the right of the inequality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="FileStatistics"/> structures are unequally; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(FileStatistics left, FileStatistics right) => !left.Equals(right);
+
+        /// <inheritdoc/>
+        public override readonly int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
+
+        /// <inheritdoc/>
+        public override readonly string ToString() => StringExtensions.Join('\t', FileType, Time, FileType, Path);
     }
 }

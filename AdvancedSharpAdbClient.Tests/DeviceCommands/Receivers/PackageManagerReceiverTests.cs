@@ -10,6 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers.Tests
             // Arrange
             DeviceData device = new()
             {
+                Serial = "169.254.109.177:5555",
                 State = DeviceState.Online
             };
 

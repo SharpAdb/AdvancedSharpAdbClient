@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,6 +17,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// </summary>
     /// <param name="AdbClient">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
     /// <param name="Device">The device on which to process command.</param>
+    [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device)
     {
         /// <summary>
@@ -28,7 +28,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Gets the device.
         /// </summary>
-        public DeviceData Device { get; init; } = EnsureDevice(Device);
+        public DeviceData Device { get; init; } = DeviceData.EnsureDevice(ref Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.
@@ -413,21 +413,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));
 #endif
-
-        /// <summary>
-        /// Throws an <see cref="ArgumentNullException"/> if the <paramref name="device"/>
-        /// parameter is <see langword="null"/>, and a <see cref="ArgumentOutOfRangeException"/>
-        /// if <paramref name="device"/> does not have a valid serial number.
-        /// </summary>
-        /// <param name="device">A <see cref="DeviceData"/> object to validate.</param>
-        /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
-        private static DeviceData EnsureDevice([NotNull] DeviceData? device)
-        {
-            ExceptionExtensions.ThrowIfNull(device);
-            return device.IsEmpty
-                ? throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device")
-                : device;
-        }
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex("<\\?xml(.?)*")]
