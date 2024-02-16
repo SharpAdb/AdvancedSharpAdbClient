@@ -147,6 +147,9 @@ namespace AdvancedSharpAdbClient
             progress == null ? null : progress.Report;
 #endif
 
+#if NET
+        [SupportedOSPlatformGuard("Windows")]
+#endif
         public static bool IsWindowsPlatform() =>
 #if NETCORE && !UAP10_0_15138_0
             true;
@@ -161,6 +164,11 @@ namespace AdvancedSharpAdbClient
                 or PlatformID.Xbox;
 #endif
 
+#if NET
+        [SupportedOSPlatformGuard("Linux")]
+        [SupportedOSPlatformGuard("OSX")]
+        [SupportedOSPlatformGuard("FreeBSD")]
+#endif
         public static bool IsUnixPlatform() =>
 #if NETCORE && !UAP10_0_15138_0
             false;

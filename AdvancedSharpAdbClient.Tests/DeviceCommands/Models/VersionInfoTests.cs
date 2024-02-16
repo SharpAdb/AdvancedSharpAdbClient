@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
             Assert.Equal(expected, result);
             if (expected)
             {
-                Assert.Equal(versionCode, version.Major * 1000 + version.Minor * 100 + version.Build * 10 + version.Revision);
+                Assert.Equal(versionCode, (version.Major * 1000) + (version.Minor * 100) + (version.Build * 10) + version.Revision);
             }
             else
             {
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
             Assert.Equal(expected, result);
             if (expected)
             {
-                Assert.Equal(versionCode, version.Major * 1000 + version.Minor * 100 + version.Build * 10 + version.Revision);
+                Assert.Equal(versionCode, (version.Major * 1000) + (version.Minor * 100) + (version.Build * 10) + version.Revision);
             }
             else
             {

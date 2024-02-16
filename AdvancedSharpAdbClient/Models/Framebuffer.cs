@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
     [DebuggerDisplay($"{nameof(Framebuffer)} \\{{ {nameof(Header)} = {{{nameof(Header)}}}, {nameof(Data)} = {{{nameof(Data)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
-    public sealed class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable
+    public sealed class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable, ICloneable<Framebuffer>, ICloneable
     {
         /// <summary>
         /// The <see cref="Array"/> of <see cref="byte"/>s which contains the framebuffer header.
@@ -302,6 +302,19 @@ namespace AdvancedSharpAdbClient.Models
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// Creates a new <see cref="Framebuffer"/> object that is a copy of the current instance with new <see cref="Device"/>.
+        /// </summary>
+        /// <param name="device">The new <see cref="Device"/> to use.</param>
+        /// <returns>A new <see cref="Framebuffer"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
+        public Framebuffer Clone(DeviceData device) => new(device, EndPoint, AdbSocketFactory);
+
+        /// <inheritdoc/>
+        public Framebuffer Clone() => new(Device, EndPoint, AdbSocketFactory);
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => Clone();
 
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.

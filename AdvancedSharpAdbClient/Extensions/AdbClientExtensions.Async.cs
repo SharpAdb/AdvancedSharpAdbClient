@@ -465,7 +465,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task InstallWriteAsync(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
             client.InstallWriteAsync(device, apk, apkName, session, progress.AsAction(), cancellationToken);
-            
+
         /// <summary>
         /// Asynchronously pair with a device for secure TCP/IP communication.
         /// </summary>

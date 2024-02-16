@@ -63,12 +63,12 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v1
+        uses: microsoft/setup-msbuild@v2
         with:
           msbuild-architecture: x64
 
       - name: Setup NuGet.exe
-        uses: NuGet/setup-nuget@v1
+        uses: NuGet/setup-nuget@v2
         
       - name: Install Dependencies
         run: msbuild $env:Solution_Name /t:Restore /p:FullTargets=true /p:GITHUB_ACTIONS=false

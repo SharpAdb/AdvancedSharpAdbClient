@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Threading;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
