@@ -459,6 +459,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Asynchronously clear the input text. The input should be in focus. Use <see cref="Element.ClearInputAsync(int, CancellationToken)"/>  if the element isn't focused.
+        /// </summary>
+        /// <param name="charCount">The length of text to clear.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public async Task ClearInputAsync(int charCount, CancellationToken cancellationToken = default)
+        {
+            await SendKeyEventAsync("KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
+            await SendKeyEventAsync(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously click BACK button.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public Task ClickBackButtonAsync(CancellationToken cancellationToken = default) => SendKeyEventAsync("KEYCODE_BACK", cancellationToken);
+
+        /// <summary>
+        /// Asynchronously click HOME button.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public Task ClickHomeButtonAsync(CancellationToken cancellationToken = default) => SendKeyEventAsync("KEYCODE_HOME", cancellationToken);
+
+        /// <summary>
         /// Start an Android application on device asynchronously.
         /// </summary>
         /// <param name="packageName">The package name of the application to start.</param>

@@ -379,6 +379,26 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Clear the input text. The input should be in focus. Use <see cref="Element.ClearInput(int)"/> if the element isn't focused.
+        /// </summary>
+        /// <param name="charCount">The length of text to clear.</param>
+        public void ClearInput(int charCount)
+        {
+            SendKeyEvent("KEYCODE_MOVE_END");
+            SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
+        }
+
+        /// <summary>
+        /// Click BACK button.
+        /// </summary>
+        public void ClickBackButton() => SendKeyEvent("KEYCODE_BACK");
+
+        /// <summary>
+        /// Click HOME button.
+        /// </summary>
+        public void ClickHomeButton() => SendKeyEvent("KEYCODE_HOME");
+
+        /// <summary>
         /// Start an Android application on device.
         /// </summary>
         /// <param name="packageName">The package name of the application to start.</param>

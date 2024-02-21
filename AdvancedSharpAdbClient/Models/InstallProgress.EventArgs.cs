@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
@@ -87,7 +88,12 @@ namespace AdvancedSharpAdbClient.Models
                 split.Add(c);
             }
 
-            StringBuilder builder = new(new string(split.ToArray()));
+            StringBuilder builder =
+#if NET
+                new StringBuilder().Append(CollectionsMarshal.AsSpan(split));
+#else
+                new(new string(split.ToArray()));
+#endif
 
             if (PackageRequired > 0)
             {

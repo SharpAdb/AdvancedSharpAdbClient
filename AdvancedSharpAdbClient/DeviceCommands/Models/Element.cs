@@ -268,13 +268,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="DeviceClient.ClearInput(int)"/> if the element is focused.
         /// </summary>
         [MemberNotNull(nameof(Text))]
         public void ClearInput() => ClearInput(Text!.Length);
 
         /// <summary>
-        /// Clear the input text. Use <see cref="DeviceExtensions.ClearInput(IAdbClient, DeviceData, int)"/> if the element is focused.
+        /// Clear the input text. Use <see cref="DeviceClient.ClearInput(int)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         public void ClearInput(int charCount)
@@ -331,7 +331,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceClient.ClearInputAsync(int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
@@ -340,7 +340,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             ClearInputAsync(Text!.Length, cancellationToken);
 
         /// <summary>
-        /// Asynchronously clear the input text. Use <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> if the element is focused.
+        /// Asynchronously clear the input text. Use <see cref="DeviceClient.ClearInputAsync(int, CancellationToken)"/> if the element is focused.
         /// </summary>
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

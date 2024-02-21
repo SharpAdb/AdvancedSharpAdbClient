@@ -246,7 +246,7 @@ The text field should be in focus
 static void Main(string[] args)
 {
     ...
-    adbClient.ClearInput(deviceData, 25); // The second argument is to specify the maximum number of characters to be erased
+    deviceClient.ClearInput(25); // The argument is to specify the maximum number of characters to be erased
     ...
 }
 ```
@@ -294,9 +294,9 @@ catch (Exception ex)
 static void Main(string[] args)
 {
     ...
-    adbClient.ClickBackButton(device); // Click Back button
+    deviceClient.ClickBackButton(); // Click Back button
     ...
-    adbClient.ClickHomeButton(device); // Click Home button
+    deviceClient.ClickHomeButton(); // Click Home button
     ...
 }
 ```

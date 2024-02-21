@@ -133,12 +133,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="charCount">The length of text to clear.</param>
-        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)
-        {
-            DeviceClient deviceClient = new(client, device);
-            deviceClient.SendKeyEvent("KEYCODE_MOVE_END");
-            deviceClient.SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
-        }
+        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)=>
+            new DeviceClient(client, device).ClearInput(charCount);
 
         /// <summary>
         /// Click BACK button.
@@ -146,7 +142,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click BACK button.</param>
         public static void ClickBackButton(this IAdbClient client, DeviceData device) =>
-            new DeviceClient(client, device).SendKeyEvent("KEYCODE_BACK");
+            new DeviceClient(client, device).ClickBackButton();
 
         /// <summary>
         /// Click HOME button.
@@ -154,7 +150,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
         public static void ClickHomeButton(this IAdbClient client, DeviceData device) =>
-            new DeviceClient(client, device).SendKeyEvent("KEYCODE_HOME");
+            new DeviceClient(client, device).ClickHomeButton();
 
         /// <summary>
         /// Start an Android application on device.

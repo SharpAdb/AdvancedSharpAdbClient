@@ -150,12 +150,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="charCount">The length of text to clear.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static async Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default)
-        {
-            DeviceClient deviceClient = new(client, device);
-            await deviceClient.SendKeyEventAsync("KEYCODE_MOVE_END", cancellationToken).ConfigureAwait(false);
-            await deviceClient.SendKeyEventAsync(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)), cancellationToken).ConfigureAwait(false);
-        }
+        public static Task ClearInputAsync(this IAdbClient client, DeviceData device, int charCount, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).ClearInputAsync(charCount, cancellationToken);
 
         /// <summary>
         /// Asynchronously click BACK button.
@@ -165,7 +161,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task ClickBackButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
-            new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_BACK", cancellationToken);
+            new DeviceClient(client, device).ClickBackButtonAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously click HOME button.
@@ -175,7 +171,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static Task ClickHomeButtonAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) =>
-            new DeviceClient(client, device).SendKeyEventAsync("KEYCODE_HOME", cancellationToken);
+            new DeviceClient(client, device).ClickHomeButtonAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously start an Android application on device.
