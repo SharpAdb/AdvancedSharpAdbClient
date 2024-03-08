@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="charCount">The length of text to clear.</param>
-        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount)=>
+        public static void ClearInput(this IAdbClient client, DeviceData device, int charCount) =>
             new DeviceClient(client, device).ClearInput(charCount);
 
         /// <summary>
@@ -199,6 +199,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>The <paramref name="permissions"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
@@ -354,6 +355,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>The <paramref name="permissions"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             IProgress<SyncProgressChangedEventArgs>? progress = null,
@@ -409,6 +411,48 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             PackageManager manager = new(client, device, skipInit: true);
             manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
         }
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        public static void Push(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
+            Action<SyncProgressChangedEventArgs>? callback = null,
+            in bool isCancelled = false)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            service.Push(stream, remotePath, (int)permission, timestamp, callback, in isCancelled);
+        }
+
+        /// <summary>
+        /// Pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        public static void Push(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
+            IProgress<SyncProgressChangedEventArgs>? progress,
+            in bool isCancelled = false)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            service.Push(stream, remotePath, (int)permission, timestamp, progress.AsAction(), in isCancelled);
+        }
+#endif
 #endif
 
         /// <summary>

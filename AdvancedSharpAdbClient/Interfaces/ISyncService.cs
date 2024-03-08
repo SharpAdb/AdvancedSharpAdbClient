@@ -30,6 +30,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>The <paramref name="permissions"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, in bool isCancelled);
 
         /// <summary>

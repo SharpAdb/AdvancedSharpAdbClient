@@ -226,6 +226,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <remarks>The <paramref name="permissions"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
@@ -391,7 +392,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
-            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            IProgress<SyncProgressChangedEventArgs>? progress,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -410,9 +411,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <remarks>The <paramref name="permissions"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, int permissions, DateTimeOffset timestamp,
-            IProgress<SyncProgressChangedEventArgs>? progress = null,
+            IProgress<SyncProgressChangedEventArgs>? progress,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -471,6 +473,50 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             PackageManager manager = new(client, device, skipInit: true);
             return manager.InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress, cancellationToken, arguments);
         }
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Asynchronously pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PushAsync(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
+            Action<SyncProgressChangedEventArgs>? callback = null,
+            CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await service.PushAsync(stream, remotePath, (int)permission, timestamp, callback, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously pushes (uploads) a file to the remote device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to put the file.</param>
+        /// <param name="remotePath">The path, on the device, to which to push the file.</param>
+        /// <param name="stream">A <see cref="Stream"/> that contains the contents of the file.</param>
+        /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
+        /// <param name="timestamp">The time at which the file was last modified.</param>
+        /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        public static async Task PushAsync(this IAdbClient client, DeviceData device,
+            string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
+            IProgress<SyncProgressChangedEventArgs>? progress,
+            CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await service.PushAsync(stream, remotePath, (int)permission, timestamp, progress.AsAction(), cancellationToken).ConfigureAwait(false);
+        }
+#endif
 #endif
 
         /// <summary>
