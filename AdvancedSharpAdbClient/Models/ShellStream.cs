@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -52,22 +51,22 @@ namespace AdvancedSharpAdbClient.Models
         public Stream Inner { get; private set; }
 
         /// <inheritdoc/>
-        public override bool CanRead => true;
+        public override bool CanRead => Inner.CanRead;
 
         /// <inheritdoc/>
-        public override bool CanSeek => false;
+        public override bool CanSeek => Inner.CanSeek;
 
         /// <inheritdoc/>
-        public override bool CanWrite => false;
+        public override bool CanWrite => Inner.CanWrite;
 
         /// <inheritdoc/>
-        public override long Length => throw new NotImplementedException();
+        public override long Length => Inner.Length;
 
         /// <inheritdoc/>
         public override long Position
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => Inner.Position;
+            set => Inner.Position = value;
         }
 
 #if HAS_BUFFERS
@@ -97,7 +96,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // Loop over the data, and find a LF (0x0d) character. If it is
-            // followed by a CR (0x0a) character, remove the LF chracter and
+            // followed by a CR (0x0a) character, remove the LF character and
             // keep only the LF character intact.
             for (int i = 0; i < read - 1; i++)
             {
@@ -192,7 +191,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // Loop over the data, and find a LF (0x0d) character. If it is
-            // followed by a CR (0x0a) character, remove the LF chracter and
+            // followed by a CR (0x0a) character, remove the LF character and
             // keep only the LF character intact.
             for (int i = offset; i < offset + read - 1; i++)
             {
@@ -461,20 +460,16 @@ namespace AdvancedSharpAdbClient.Models
 #endif
 
         /// <inheritdoc/>
-        [DoesNotReturn]
-        public override void Flush() => throw new NotImplementedException();
+        public override void Flush() => Inner.Flush();
 
         /// <inheritdoc/>
-        [DoesNotReturn]
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
+        public override long Seek(long offset, SeekOrigin origin) => Inner.Seek(offset, origin);
 
         /// <inheritdoc/>
-        [DoesNotReturn]
-        public override void SetLength(long value) => throw new NotImplementedException();
+        public override void SetLength(long value) => Inner.SetLength(value);
 
         /// <inheritdoc/>
-        [DoesNotReturn]
-        public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
+        public override void Write(byte[] buffer, int offset, int count) => Inner.Write(buffer, offset, count);
 
         /// <inheritdoc/>
         public override string ToString() =>

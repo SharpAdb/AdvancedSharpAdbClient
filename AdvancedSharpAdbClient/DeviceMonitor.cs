@@ -418,12 +418,10 @@ namespace AdvancedSharpAdbClient
                 .ToString();
 
         /// <inheritdoc/>
-        public IDeviceMonitor Clone()
-        {
-            return Socket is not ICloneable<IAdbSocket> cloneable
+        public IDeviceMonitor Clone() =>
+            Socket is not ICloneable<IAdbSocket> cloneable
                 ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
-                : (IDeviceMonitor)new DeviceMonitor(cloneable.Clone(), logger);
-        }
+                : new DeviceMonitor(cloneable.Clone(), logger);
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone();

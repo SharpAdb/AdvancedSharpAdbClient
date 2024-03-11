@@ -53,6 +53,12 @@ namespace AdvancedSharpAdbClient
         protected const int MaxPathLength = 1024;
 
         /// <summary>
+        /// <see langword="true"/> if the <see cref="SyncService"/> is out of date; otherwise, <see langword="false"/>.
+        /// </summary>
+        /// <remarks>Need to invoke <see cref="Reopen"/> before using the <see cref="SyncService"/> again.</remarks>
+        protected bool IsOutdate = false;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
         /// </summary>
         /// <param name="device">The device on which to interact with the files.</param>
@@ -122,6 +128,8 @@ namespace AdvancedSharpAdbClient
 
             Socket.SendAdbRequest("sync:");
             _ = Socket.ReadAdbResponse();
+
+            IsOutdate = false;
         }
 
         /// <inheritdoc/>
@@ -142,77 +150,86 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(remotePath), $"The remote path {remotePath} exceeds the maximum path size {MaxPathLength}");
             }
 
-            Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
+            if (IsOutdate) { Reopen(); }
 
-            // create the buffer used to read.
-            // we read max SYNC_DATA_MAX.
-            byte[] buffer = new byte[MaxBufferSize];
-
-            // We need 4 bytes of the buffer to send the 'DATA' command,
-            // and an additional X bytes to inform how much data we are
-            // sending.
-            byte[] dataBytes = SyncCommand.DATA.GetBytes();
-            byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
-            int headerSize = dataBytes.Length + lengthBytes.Length;
-            int reservedHeaderSize = headerSize;
-            int maxDataSize = MaxBufferSize - reservedHeaderSize;
-            lengthBytes = BitConverter.GetBytes(maxDataSize);
-
-            // Try to get the total amount of bytes to transfer. This is not always possible, for example,
-            // for forward-only streams.
-            long totalBytesToProcess = stream.CanSeek ? stream.Length : 0;
-            long totalBytesRead = 0;
-
-            int read;
-            // look while there is something to read
-            while (!isCancelled && (read =
-#if HAS_BUFFERS
-                stream.Read(buffer.AsSpan(headerSize, maxDataSize))
-#else
-                stream.Read(buffer, headerSize, maxDataSize)
-#endif
-                ) > 0)
+            try
             {
-                // read up to SYNC_DATA_MAX
-                totalBytesRead += read;
+                Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
 
-                if (read != maxDataSize)
+                // create the buffer used to read.
+                // we read max SYNC_DATA_MAX.
+                byte[] buffer = new byte[MaxBufferSize];
+
+                // We need 4 bytes of the buffer to send the 'DATA' command,
+                // and an additional X bytes to inform how much data we are
+                // sending.
+                byte[] dataBytes = SyncCommand.DATA.GetBytes();
+                byte[] lengthBytes = BitConverter.GetBytes(MaxBufferSize);
+                int headerSize = dataBytes.Length + lengthBytes.Length;
+                int reservedHeaderSize = headerSize;
+                int maxDataSize = MaxBufferSize - reservedHeaderSize;
+                lengthBytes = BitConverter.GetBytes(maxDataSize);
+
+                // Try to get the total amount of bytes to transfer. This is not always possible, for example,
+                // for forward-only streams.
+                long totalBytesToProcess = stream.CanSeek ? stream.Length : 0;
+                long totalBytesRead = 0;
+
+                int read;
+                // look while there is something to read
+                while (!isCancelled && (read =
+#if HAS_BUFFERS
+                    stream.Read(buffer.AsSpan(headerSize, maxDataSize))
+#else
+                    stream.Read(buffer, headerSize, maxDataSize)
+#endif
+                    ) > 0)
                 {
-                    // At the end of the line, so we need to recalculate the length of the header
-                    lengthBytes = BitConverter.GetBytes(read);
-                    headerSize = dataBytes.Length + lengthBytes.Length;
+                    // read up to SYNC_DATA_MAX
+                    totalBytesRead += read;
+
+                    if (read != maxDataSize)
+                    {
+                        // At the end of the line, so we need to recalculate the length of the header
+                        lengthBytes = BitConverter.GetBytes(read);
+                        headerSize = dataBytes.Length + lengthBytes.Length;
+                    }
+
+                    int startPosition = reservedHeaderSize - headerSize;
+
+                    Buffer.BlockCopy(dataBytes, 0, buffer, startPosition, dataBytes.Length);
+                    Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
+
+                    // now send the data to the device
+#if HAS_BUFFERS
+                    Socket.Send(buffer.AsSpan(startPosition, read + dataBytes.Length + lengthBytes.Length));
+#else
+                    Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
+#endif
+                    // Let the caller know about our progress, if requested
+                    callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
                 }
 
-                int startPosition = reservedHeaderSize - headerSize;
+                // create the DONE message
+                int time = (int)timestamp.ToUnixTimeSeconds();
+                Socket.SendSyncRequest(SyncCommand.DONE, time);
 
-                Buffer.BlockCopy(dataBytes, 0, buffer, startPosition, dataBytes.Length);
-                Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
+                // read the result, in a byte array containing 2 int
+                // (id, size)
+                SyncCommand result = Socket.ReadSyncResponse();
 
-                // now send the data to the device
-#if HAS_BUFFERS
-                Socket.Send(buffer.AsSpan(startPosition, read + dataBytes.Length + lengthBytes.Length));
-#else
-                Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
-#endif
-                // Let the caller know about our progress, if requested
-                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                switch (result)
+                {
+                    case SyncCommand.FAIL:
+                        string message = Socket.ReadSyncString();
+                        throw new AdbException(message);
+                    case not SyncCommand.OKAY:
+                        throw new AdbException($"The server sent an invalid response {result}");
+                }
             }
-
-            // create the DONE message
-            int time = (int)timestamp.ToUnixTimeSeconds();
-            Socket.SendSyncRequest(SyncCommand.DONE, time);
-
-            // read the result, in a byte array containing 2 int
-            // (id, size)
-            SyncCommand result = Socket.ReadSyncResponse();
-
-            switch (result)
+            finally
             {
-                case SyncCommand.FAIL:
-                    string message = Socket.ReadSyncString();
-                    throw new AdbException(message);
-                case not SyncCommand.OKAY:
-                    throw new AdbException($"The server sent an invalid response {result}");
+                IsOutdate = true;
             }
         }
 
@@ -222,6 +239,8 @@ namespace AdvancedSharpAdbClient
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
+            if (IsOutdate) { Reopen(); }
+
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
             FileStatistics stat = Stat(remoteFilePath);
             int totalBytesToProcess = stat.Size;
@@ -229,49 +248,56 @@ namespace AdvancedSharpAdbClient
 
             byte[] buffer = new byte[MaxBufferSize];
 
-            Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
-
-            while (!isCancelled)
+            try
             {
-                SyncCommand response = Socket.ReadSyncResponse();
+                Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
 
-                switch (response)
+                while (!isCancelled)
                 {
-                    case SyncCommand.DONE:
-                        goto finish;
-                    case SyncCommand.FAIL:
-                        string message = Socket.ReadSyncString();
-                        throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
-                    case not SyncCommand.DATA:
-                        throw new AdbException($"The server sent an invalid response {response}");
-                }
+                    SyncCommand response = Socket.ReadSyncResponse();
 
-                // The first 4 bytes contain the length of the data packet
-                byte[] reply = new byte[4];
-                _ = Socket.Read(reply);
+                    switch (response)
+                    {
+                        case SyncCommand.DONE:
+                            goto finish;
+                        case SyncCommand.FAIL:
+                            string message = Socket.ReadSyncString();
+                            throw new AdbException($"Failed to pull '{remoteFilePath}'. {message}");
+                        case not SyncCommand.DATA:
+                            throw new AdbException($"The server sent an invalid response {response}");
+                    }
 
-                int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+                    // The first 4 bytes contain the length of the data packet
+                    byte[] reply = new byte[4];
+                    _ = Socket.Read(reply);
 
-                if (size > MaxBufferSize)
-                {
-                    throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
-                }
+                    int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
 
-                // now read the length we received
+                    if (size > MaxBufferSize)
+                    {
+                        throw new AdbException($"The adb server is sending {size} bytes of data, which exceeds the maximum chunk size {MaxBufferSize}");
+                    }
+
+                    // now read the length we received
 #if HAS_BUFFERS
-                _ = Socket.Read(buffer.AsSpan(0, size));
-                stream.Write(buffer.AsSpan(0, size));
+                    _ = Socket.Read(buffer.AsSpan(0, size));
+                    stream.Write(buffer.AsSpan(0, size));
 #else
-                _ = Socket.Read(buffer, size);
-                stream.Write(buffer, 0, size);
+                    _ = Socket.Read(buffer, size);
+                    stream.Write(buffer, 0, size);
 #endif
-                totalBytesRead += size;
+                    totalBytesRead += size;
 
-                // Let the caller know about our progress, if requested
-                callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                    // Let the caller know about our progress, if requested
+                    callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                }
+
+                finish: return;
             }
-
-            finish: return;
+            finally
+            {
+                IsOutdate = true;
+            }
         }
 
         /// <inheritdoc/>
@@ -297,39 +323,47 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
+            if (IsOutdate) { Reopen(); }
             bool isLocked = false;
 
-            start:
-            // create the stat request message.
-            Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
-
-            while (true)
+            try
             {
-                SyncCommand response = Socket.ReadSyncResponse();
+                start:
+                // create the stat request message.
+                Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
 
-                switch (response)
+                while (true)
                 {
-                    case 0 when isLocked:
-                        throw new AdbException("The server returned an empty sync response.");
-                    case 0:
-                        Reopen();
-                        isLocked = true;
-                        goto start;
-                    case SyncCommand.DONE:
-                        goto finish;
-                    case not SyncCommand.DENT:
-                        throw new AdbException($"The server returned an invalid sync response {response}.");
+                    SyncCommand response = Socket.ReadSyncResponse();
+
+                    switch (response)
+                    {
+                        case 0 when isLocked:
+                            throw new AdbException("The server returned an empty sync response.");
+                        case 0:
+                            Reopen();
+                            isLocked = true;
+                            goto start;
+                        case SyncCommand.DONE:
+                            goto finish;
+                        case not SyncCommand.DENT:
+                            throw new AdbException($"The server returned an invalid sync response {response}.");
+                    }
+
+                    FileStatistics entry = ReadStatistics();
+                    entry.Path = Socket.ReadSyncString();
+
+                    yield return entry;
+                    isLocked = true;
                 }
 
-                FileStatistics entry = ReadStatistics();
-                entry.Path = Socket.ReadSyncString();
-
-                yield return entry;
-                isLocked = true;
+                finish:
+                yield break;
             }
-
-            finish:
-            yield break;
+            finally
+            {
+                IsOutdate = true;
+            }
         }
 
         /// <summary>
@@ -337,13 +371,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && Socket != null)
             {
-                if (Socket != null)
-                {
-                    Socket.Dispose();
-                    Socket = null!;
-                }
+                Socket.Dispose();
+                Socket = null!;
             }
         }
 
@@ -373,20 +404,16 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="device">The new <see cref="Device"/> to use.</param>
         /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
-        public SyncService Clone(DeviceData device)
-        {
-            return Socket is not ICloneable<IAdbSocket> cloneable
+        public SyncService Clone(DeviceData device) =>
+            Socket is not ICloneable<IAdbSocket> cloneable
                 ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
                 : new SyncService(cloneable.Clone(), device);
-        }
 
         /// <inheritdoc/>
-        public ISyncService Clone()
-        {
-            return Socket is not ICloneable<IAdbSocket> cloneable
+        public ISyncService Clone() =>
+            Socket is not ICloneable<IAdbSocket> cloneable
                 ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
-                : (ISyncService)new SyncService(cloneable.Clone(), Device);
-        }
+                : new SyncService(cloneable.Clone(), Device);
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone();
