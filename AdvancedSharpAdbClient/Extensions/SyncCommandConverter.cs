@@ -24,15 +24,7 @@ namespace AdvancedSharpAdbClient
                 return [0, 0, 0, 0];
             }
 
-            if (command is not (SyncCommand.LIST
-                or SyncCommand.RECV
-                or SyncCommand.SEND
-                or SyncCommand.STAT
-                or SyncCommand.DENT
-                or SyncCommand.FAIL
-                or SyncCommand.DATA
-                or SyncCommand.OKAY
-                or SyncCommand.DONE))
+            if (command is < SyncCommand.STAT or > SyncCommand.LST2)
             {
                 throw new ArgumentOutOfRangeException(nameof(command), $"{command} is not a valid sync command");
             }

@@ -33,9 +33,9 @@ namespace AdvancedSharpAdbClient.Models.Tests
             using MemoryStream stream = new();
             using ShellStream shellStream = new(stream, false);
             Assert.Equal(stream, shellStream.Inner);
-            Assert.True(shellStream.CanRead);
-            Assert.False(shellStream.CanSeek);
-            Assert.False(shellStream.CanWrite);
+            Assert.Equal(stream.CanRead, shellStream.CanRead);
+            Assert.Equal(stream.CanSeek, shellStream.CanSeek);
+            Assert.Equal(stream.CanWrite, shellStream.CanWrite);
         }
 
         [Fact]

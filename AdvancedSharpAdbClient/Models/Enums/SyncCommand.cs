@@ -10,14 +10,14 @@ namespace AdvancedSharpAdbClient.Models
     public enum SyncCommand
     {
         /// <summary>
-        /// List the files in a folder.
+        /// Stat a file.
         /// </summary>
-        LIST = 1,
+        STAT = 1,
 
         /// <summary>
-        /// Retrieve a file from device.
+        /// List the files in a folder.
         /// </summary>
-        RECV,
+        LIST,
 
         /// <summary>
         /// Send a file to device.
@@ -25,9 +25,9 @@ namespace AdvancedSharpAdbClient.Models
         SEND,
 
         /// <summary>
-        /// Stat a file.
+        /// Retrieve a file from device.
         /// </summary>
-        STAT,
+        RECV,
 
         /// <summary>
         /// A directory entry.
@@ -35,9 +35,9 @@ namespace AdvancedSharpAdbClient.Models
         DENT,
 
         /// <summary>
-        /// The operation has failed.
+        /// The operation has completed.
         /// </summary>
-        FAIL,
+        DONE,
 
         /// <summary>
         /// Marks the start of a data packet.
@@ -50,8 +50,23 @@ namespace AdvancedSharpAdbClient.Models
         OKAY,
 
         /// <summary>
-        /// The operation has completed.
+        /// The operation has failed.
         /// </summary>
-        DONE
+        FAIL,
+
+        /// <summary>
+        /// The server has acknowledged the request.
+        /// </summary>
+        QUIT,
+
+        /// <summary>
+        /// Stat a file v2.
+        /// </summary>
+        STA2,
+
+        /// <summary>
+        /// Stat a list v2.
+        /// </summary>
+        LST2
     }
 }
