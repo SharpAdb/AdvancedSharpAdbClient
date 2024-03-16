@@ -38,7 +38,8 @@ namespace AdvancedSharpAdbClient.Tests
                     return service.Stat("/fstab.donatello");
                 });
 
-            Assert.Equal(UnixFileType.Regular, value.FileType & UnixFileType.TypeMask);
+            Assert.Equal(UnixFileStatus.Regular, value.FileMode.GetFileType());
+            Assert.Equal((UnixFileStatus)416, value.FileMode.GetPermissions());
             Assert.Equal(597, value.Size);
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);
         }
@@ -70,29 +71,29 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.Equal(4, value.Length);
 
-            DateTime time = new DateTime(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc).ToLocalTime();
+            DateTime time = new(2015, 11, 3, 9, 47, 4, DateTimeKind.Utc);
 
             FileStatistics dir = value[0];
             Assert.Equal(".", dir.Path);
-            Assert.Equal((UnixFileType)16873, dir.FileType);
+            Assert.Equal((UnixFileStatus)16873, dir.FileMode);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
 
             FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
-            Assert.Equal((UnixFileType)16877, parentDir.FileType);
+            Assert.Equal((UnixFileStatus)16877, parentDir.FileMode);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
 
             FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
-            Assert.Equal((UnixFileType)41471, sdcard0.FileType);
+            Assert.Equal((UnixFileStatus)41471, sdcard0.FileMode);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
 
             FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
-            Assert.Equal((UnixFileType)16749, emulated.FileType);
+            Assert.Equal((UnixFileStatus)16749, emulated.FileMode);
             Assert.Equal(0, emulated.Size);
             Assert.Equal(time, emulated.Time);
         }
@@ -133,7 +134,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Push(Stream, string, int, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Push(Stream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PushTest()
@@ -161,7 +162,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    service.Push(stream, "/sdcard/test", 0644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
+                    service.Push(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
                 });
         }
     }

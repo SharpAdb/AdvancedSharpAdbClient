@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Models
 {
     /// <summary>
     /// Converts <see cref="SyncCommand"/> values to their binary representation and vice versa.

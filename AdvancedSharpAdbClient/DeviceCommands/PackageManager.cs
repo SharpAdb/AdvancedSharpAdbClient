@@ -633,7 +633,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                     Action<SyncProgressChangedEventArgs>? progress = callback == null ? null : args => callback.Invoke(localFilePath, args);
 
                     // As C# can't use octal, the octal literal 666 (rw-Permission) is here converted to decimal (438)
-                    sync.Push(stream, remoteFilePath, 438, File.GetLastWriteTime(localFilePath), progress, false);
+                    sync.Push(stream, remoteFilePath, UnixFileStatus.DefaultFileMode, File.GetLastWriteTime(localFilePath), progress, false);
                 }
 
                 return remoteFilePath;

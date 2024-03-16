@@ -24,7 +24,7 @@
   </Choose>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.msbuild" Version="6.0.1" PrivateAssets="all">
+    <PackageReference Include="coverlet.msbuild" Version="6.0.2" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />

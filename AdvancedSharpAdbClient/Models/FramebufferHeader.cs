@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient.Models
                 }
 
                 // Alpha can be present or absent, but must be 8 bytes long
-                if (Alpha.Length is not 0 and not 8)
+                if (Alpha.Length is not (0 or 8))
                 {
                     throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported");
                 }

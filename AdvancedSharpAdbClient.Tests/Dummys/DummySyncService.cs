@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, in bool isCancelled = false)
+        public void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, in bool isCancelled = false)
         {
             for (int i = 0; i <= 100; i++)
             {
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, CancellationToken cancellationToken = default)
+        public async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, CancellationToken cancellationToken = default)
         {
             for (int i = 0; i <= 100; i++)
             {

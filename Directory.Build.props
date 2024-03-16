@@ -24,7 +24,7 @@
     <RepositoryUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>3.1.11</VersionPrefix>
+    <VersionPrefix>3.2.11</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>

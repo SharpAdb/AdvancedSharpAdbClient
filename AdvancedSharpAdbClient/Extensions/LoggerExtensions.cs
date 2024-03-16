@@ -4,7 +4,7 @@
 
 using System;
 
-namespace AdvancedSharpAdbClient
+namespace AdvancedSharpAdbClient.Logs
 {
     /// <summary>
     /// ILogger extension methods for common scenarios.

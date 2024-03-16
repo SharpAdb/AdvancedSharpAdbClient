@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command" >The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
         /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
-        void SendSyncRequest(SyncCommand command, string path, int permissions);
+        void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permissions);
 
         /// <summary>
         /// Sends a sync request to the device.

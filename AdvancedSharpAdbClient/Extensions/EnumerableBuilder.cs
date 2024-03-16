@@ -50,12 +50,20 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(values),
+                FileMode = (UnixFileStatus)ReadInt32(values),
                 Size = ReadInt32(values),
                 Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(values))
             };
             int ReadInt32(in ReadOnlySpan<byte> data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
         }
+
+        /// <summary>
+        /// Build a <see cref="UnixFileStatus"/> enum.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="UnixFileStatus"/> struct.</param>
+        /// <returns>A new instance of <see cref="UnixFileStatus"/> struct.</returns>
+        public static UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) =>
+            (UnixFileStatus)(values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24));
 
         /// <summary>
         /// Build a <see cref="LogEntry"/> class.

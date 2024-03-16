@@ -19,22 +19,22 @@ namespace AdvancedSharpAdbClient.Tests
                 [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
         /// <summary>
-        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, UnixFileStatus, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void SendSyncSENDRequestAsyncTest() =>
             await RunTestAsync(
-                socket => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", default),
-                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
+                socket => socket.SendSyncRequestAsync(SyncCommand.SEND, "/test", UnixFileStatus.GroupMask | UnixFileStatus.StickyBit | UnixFileStatus.UserExecute | UnixFileStatus.OtherExecute, default),
+                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 9, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
         /// <summary>
-        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, int, CancellationToken)"/> method.
+        /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void SendSyncDENTRequestAsyncTest() =>
             await RunTestAsync(
-                socket => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", 633, default),
-                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
+                socket => socket.SendSyncRequestAsync(SyncCommand.DENT, "/data", default),
+                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 5, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a']);
 
         /// <summary>
         /// Tests the <see cref="AdbSocket.SendSyncRequestAsync(SyncCommand, string, CancellationToken)"/> method.

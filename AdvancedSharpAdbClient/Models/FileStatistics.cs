@@ -13,10 +13,11 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Contains information about a file on the remote device.
     /// </summary>
+    /// <remarks><see href="https://android.googlesource.com/platform/system/adb/+/refs/heads/main/file_sync_service.h"/></remarks>
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsCreator))]
 #endif
-    [DebuggerDisplay($"{nameof(FileStatistics)} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileType)} = {{{nameof(FileType)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
+    [DebuggerDisplay($"{nameof(FileStatistics)} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileMode)} = {{{nameof(FileMode)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
     public struct FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>
@@ -30,9 +31,9 @@ namespace AdvancedSharpAdbClient.Models
         public string Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the <see cref="UnixFileType"/> attributes of the file.
+        /// Gets or sets the <see cref="UnixFileStatus"/> attributes of the file.
         /// </summary>
-        public UnixFileType FileType { get; init; }
+        public UnixFileStatus FileMode { get; init; }
 
         /// <summary>
         /// Gets or sets the total file size, in bytes.
@@ -50,10 +51,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>An enumerator that can be used to iterate through the <see cref="FileStatistics"/>.</returns>
         public readonly IEnumerator<byte> GetEnumerator()
         {
-            yield return (byte)FileType;
-            yield return (byte)((int)FileType >> 8);
-            yield return (byte)((int)FileType >> 16);
-            yield return (byte)((int)FileType >> 24);
+            int mode = (int)FileMode;
+            yield return (byte)mode;
+            yield return (byte)(mode >> 8);
+            yield return (byte)(mode >> 16);
+            yield return (byte)(mode >> 24);
 
             yield return (byte)Size;
             yield return (byte)(Size >> 8);
@@ -73,7 +75,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public readonly bool Equals(FileStatistics other) =>
             Path == other.Path
-                && FileType == other.FileType
+                && FileMode == other.FileMode
                 && Size == other.Size
                 && Time == other.Time;
 
@@ -94,9 +96,9 @@ namespace AdvancedSharpAdbClient.Models
         public static bool operator !=(FileStatistics left, FileStatistics right) => !left.Equals(right);
 
         /// <inheritdoc/>
-        public override readonly int GetHashCode() => HashCode.Combine(Path, FileType, Size, Time);
+        public override readonly int GetHashCode() => HashCode.Combine(Path, FileMode, Size, Time);
 
         /// <inheritdoc/>
-        public override readonly string ToString() => StringExtensions.Join('\t', FileType, Time, FileType, Path);
+        public override readonly string ToString() => StringExtensions.Join('\t', FileMode.ToPermissionCode(), Size, Time, Path);
     }
 }

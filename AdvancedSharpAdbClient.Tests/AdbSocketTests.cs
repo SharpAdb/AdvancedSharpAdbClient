@@ -63,22 +63,22 @@ namespace AdvancedSharpAdbClient.Tests
                 [(byte)'D', (byte)'A', (byte)'T', (byte)'A', 2, 0, 0, 0]);
 
         /// <summary>
-        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string)"/> method.
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string, UnixFileStatus)"/> method.
         /// </summary>
         [Fact]
         public void SendSyncSENDRequestTest() =>
             RunTest(
-                socket => socket.SendSyncRequest(SyncCommand.SEND, "/test"),
-                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 5, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t']);
+                socket => socket.SendSyncRequest(SyncCommand.SEND, "/test", UnixFileStatus.GroupMask | UnixFileStatus.StickyBit | UnixFileStatus.UserExecute | UnixFileStatus.OtherExecute),
+                [(byte)'S', (byte)'E', (byte)'N', (byte)'D', 9, 0, 0, 0, (byte)'/', (byte)'t', (byte)'e', (byte)'s', (byte)'t', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
 
         /// <summary>
-        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string, int)"/> method.
+        /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string)"/> method.
         /// </summary>
         [Fact]
         public void SendSyncDENTRequestTest() =>
             RunTest(
-                socket => socket.SendSyncRequest(SyncCommand.DENT, "/data", 633),
-                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 9, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a', (byte)',', (byte)'6', (byte)'3', (byte)'3']);
+                socket => socket.SendSyncRequest(SyncCommand.DENT, "/data"),
+                [(byte)'D', (byte)'E', (byte)'N', (byte)'T', 5, 0, 0, 0, (byte)'/', (byte)'d', (byte)'a', (byte)'t', (byte)'a']);
 
         /// <summary>
         /// Tests the <see cref="AdbSocket.SendSyncRequest(SyncCommand, string)"/> method.

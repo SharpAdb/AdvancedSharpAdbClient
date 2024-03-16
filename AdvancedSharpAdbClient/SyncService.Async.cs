@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permissions, cancellationToken).ConfigureAwait(false);
+                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient
 
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
         /// <inheritdoc/>
-        public virtual async Task PushAsync(IInputStream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -218,7 +218,7 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permissions, cancellationToken).ConfigureAwait(false);
+                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -510,7 +510,7 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(statResult),
+                FileMode = (UnixFileStatus)ReadInt32(statResult),
                 Size = ReadInt32(statResult),
                 Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
             };

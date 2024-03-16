@@ -56,7 +56,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SendSyncRequestAsync(SyncCommand command, string path, int permissions, CancellationToken cancellationToken);
+        Task SendSyncRequestAsync(SyncCommand command, string path, UnixFileStatus permissions, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously sends a sync request to the device.

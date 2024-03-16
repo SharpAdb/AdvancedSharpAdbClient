@@ -140,7 +140,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, int permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
         {
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permissions);
+                Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -434,7 +434,7 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileType = (UnixFileType)ReadInt32(statResult),
+                FileMode = (UnixFileStatus)ReadInt32(statResult),
                 Size = ReadInt32(statResult),
                 Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
             };
