@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient
     [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
     public partial class SyncService : ISyncService, ICloneable<ISyncService>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        , ISyncService.IWinRT
+        , ISyncService.IWinRT, ICloneable<ISyncService.IWinRT>
 #endif
     {
         /// <summary>
@@ -56,7 +56,13 @@ namespace AdvancedSharpAdbClient
         /// <see langword="true"/> if the <see cref="SyncService"/> is out of date; otherwise, <see langword="false"/>.
         /// </summary>
         /// <remarks>Need to invoke <see cref="Reopen"/> before using the <see cref="SyncService"/> again.</remarks>
-        protected bool IsOutdate = false;
+        protected internal bool IsOutdate = false;
+
+        /// <summary>
+        /// <see langword="true"/> if the <see cref="SyncService"/> is processing; otherwise, <see langword="false"/>.
+        /// </summary>
+        /// <remarks>Recommend to <see cref="Clone()"/> a new <see cref="ISyncService"/> or wait until the process is finished.</remarks>
+        protected internal bool IsProcessing = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncService"/> class.
@@ -142,6 +148,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
 
@@ -155,6 +163,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
+                IsProcessing = true;
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -230,12 +239,15 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
         /// <inheritdoc/>
         public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(remoteFilePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -251,6 +263,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
+                IsProcessing = true;
 
                 while (!isCancelled)
                 {
@@ -297,6 +310,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
@@ -323,6 +337,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public IEnumerable<FileStatistics> GetDirectoryListing(string remotePath)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
             if (IsOutdate) { Reopen(); }
             bool isLocked = false;
 
@@ -331,6 +346,7 @@ namespace AdvancedSharpAdbClient
                 start:
                 // create the stat request message.
                 Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
+                IsProcessing = true;
 
                 while (true)
                 {
@@ -363,6 +379,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
@@ -400,23 +417,26 @@ namespace AdvancedSharpAdbClient
                 .ToString();
 
         /// <summary>
-        /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="Device"/>.
+        /// Creates a new <see cref="ISyncService"/> object that is a copy of the current instance with new <see cref="Device"/>.
         /// </summary>
         /// <param name="device">The new <see cref="Device"/> to use.</param>
-        /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
-        public SyncService Clone(DeviceData device) =>
+        /// <returns>A new <see cref="ISyncService"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
+        public virtual ISyncService Clone(DeviceData device) =>
             Socket is not ICloneable<IAdbSocket> cloneable
                 ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
                 : new SyncService(cloneable.Clone(), device);
 
         /// <inheritdoc/>
-        public ISyncService Clone() =>
-            Socket is not ICloneable<IAdbSocket> cloneable
-                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
-                : new SyncService(cloneable.Clone(), Device);
+        public ISyncService Clone() => Clone(Device);
+
+#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+        /// <inheritdoc/>
+        ISyncService.IWinRT ICloneable<ISyncService.IWinRT>.Clone() => Clone(Device) is ISyncService.IWinRT service ? service
+            : throw new NotSupportedException($"The {nameof(Clone)} method does not return a {nameof(ISyncService.IWinRT)} object.");
+#endif
 
         /// <inheritdoc/>
-        object ICloneable.Clone() => Clone();
+        object ICloneable.Clone() => Clone(Device);
 
         /// <summary>
         /// Reads the statistics of a file from the socket.

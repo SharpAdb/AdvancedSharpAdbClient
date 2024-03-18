@@ -560,7 +560,7 @@ namespace AdvancedSharpAdbClient
         public void Close() => Socket.Dispose();
 
         /// <inheritdoc/>
-        public IAdbSocket Clone()
+        public virtual IAdbSocket Clone()
         {
             if (Socket is not ICloneable<ITcpSocket> cloneable)
             {

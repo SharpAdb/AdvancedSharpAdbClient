@@ -35,7 +35,10 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    return service.Stat("/fstab.donatello");
+                    FileStatistics value = service.Stat("/fstab.donatello");
+                    Assert.False(service.IsProcessing);
+                    Assert.False(service.IsOutdate);
+                    return value;
                 });
 
             Assert.Equal(UnixFileStatus.Regular, value.FileMode.GetFileType());
@@ -66,7 +69,10 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    return service.GetDirectoryListing("/storage").ToArray();
+                    FileStatistics[] value = service.GetDirectoryListing("/storage").ToArray();
+                    Assert.False(service.IsProcessing);
+                    Assert.True(service.IsOutdate);
+                    return value;
                 });
 
             Assert.Equal(4, value.Length);
@@ -127,6 +133,8 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     using SyncService service = new(Socket, Device);
                     service.Pull("/fstab.donatello", stream);
+                    Assert.False(service.IsProcessing);
+                    Assert.True(service.IsOutdate);
                 });
 
             // Make sure the data that has been sent to the stream is the expected data
@@ -163,6 +171,43 @@ namespace AdvancedSharpAdbClient.Tests
                 {
                     using SyncService service = new(Socket, Device);
                     service.Push(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
+                    Assert.False(service.IsProcessing);
+                    Assert.True(service.IsOutdate);
+                });
+        }
+
+        /// <summary>
+        /// Tests the <see cref="SyncService.IsProcessing"/> field.
+        /// </summary>
+        [Fact]
+        public void IsProcessingTest()
+        {
+            RunTest(
+                OkResponses(2),
+                [".", "..", "sdcard0", "emulated"],
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [(SyncCommand.LIST, "/storage")],
+                [SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DENT, SyncCommand.DONE],
+                [
+                    [233, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [237, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86],
+                    [255, 161, 0, 0, 24, 0, 0, 0, 152, 130, 56, 86],
+                    [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
+                ],
+                null,
+                () =>
+                {
+                    using SyncService service = new(Socket, Device);
+                    foreach (FileStatistics stat in service.GetDirectoryListing("/storage"))
+                    {
+                        Assert.False(service.IsOutdate);
+                        Assert.True(service.IsProcessing);
+                        _ = Assert.Throws<InvalidOperationException>(() => service.Push(null, null, default, default));
+                        _ = Assert.Throws<InvalidOperationException>(() => service.Pull(null, null));
+                        _ = Assert.Throws<InvalidOperationException>(() => service.GetDirectoryListing(null).FirstOrDefault());
+                    }
+                    Assert.False(service.IsProcessing);
+                    Assert.True(service.IsOutdate);
                 });
         }
     }

@@ -38,6 +38,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
 
@@ -51,6 +53,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -129,12 +132,15 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
         /// <inheritdoc/>
         public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(remotePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -150,6 +156,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 while (true)
                 {
@@ -199,6 +206,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
@@ -206,6 +214,8 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(stream);
             ExceptionExtensions.ThrowIfNull(remotePath);
 
@@ -219,6 +229,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -305,12 +316,15 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
         /// <inheritdoc/>
         public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+
             ExceptionExtensions.ThrowIfNull(remotePath);
             ExceptionExtensions.ThrowIfNull(stream);
 
@@ -326,6 +340,7 @@ namespace AdvancedSharpAdbClient
             try
             {
                 await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 while (true)
                 {
@@ -374,6 +389,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 #endif
@@ -401,6 +417,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
             bool isLocked = false;
 
@@ -411,6 +428,7 @@ namespace AdvancedSharpAdbClient
             {
                 // create the stat request message.
                 await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 while (true)
                 {
@@ -442,6 +460,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 
@@ -449,6 +468,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
             bool isLocked = false;
 
@@ -457,6 +477,7 @@ namespace AdvancedSharpAdbClient
                 start:
                 // create the stat request message.
                 await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
 
                 while (true)
                 {
@@ -489,6 +510,7 @@ namespace AdvancedSharpAdbClient
             finally
             {
                 IsOutdate = true;
+                IsProcessing = false;
             }
         }
 #endif

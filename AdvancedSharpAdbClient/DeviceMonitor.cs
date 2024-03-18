@@ -418,7 +418,7 @@ namespace AdvancedSharpAdbClient
                 .ToString();
 
         /// <inheritdoc/>
-        public IDeviceMonitor Clone() =>
+        public virtual IDeviceMonitor Clone() =>
             Socket is not ICloneable<IAdbSocket> cloneable
                 ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
                 : new DeviceMonitor(cloneable.Clone(), logger);

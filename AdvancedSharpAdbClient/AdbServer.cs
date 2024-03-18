@@ -274,16 +274,16 @@ namespace AdvancedSharpAdbClient
         public override string ToString() => $"The {nameof(AdbServer)} communicate with adb at {EndPoint}";
 
         /// <summary>
-        /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
+        /// Creates a new <see cref="IAdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
         /// </summary>
         /// <param name="endPoint">The new <see cref="EndPoint"/> to use.</param>
-        /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
-        public AdbServer Clone(EndPoint endPoint) => new(endPoint, AdbSocketFactory, AdbCommandLineClientFactory);
+        /// <returns>A new <see cref="IAdbServer"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
+        public virtual IAdbServer Clone(EndPoint endPoint) => new AdbServer(endPoint, AdbSocketFactory, AdbCommandLineClientFactory);
 
         /// <inheritdoc/>
-        public IAdbServer Clone() => new AdbServer(EndPoint, AdbSocketFactory, AdbCommandLineClientFactory);
+        public IAdbServer Clone() => Clone(EndPoint);
 
         /// <inheritdoc/>
-        object ICloneable.Clone() => Clone();
+        object ICloneable.Clone() => Clone(EndPoint);
     }
 }
