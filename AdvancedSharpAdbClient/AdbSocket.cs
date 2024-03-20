@@ -154,8 +154,8 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permission) =>
-            SendSyncRequest(command, $"{path},{(int)permission.GetPermissions()}");
+        public void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permissions) =>
+            SendSyncRequest(command, $"{path},{(int)permissions.GetPermissions()}");
 
         /// <inheritdoc/>
         public void SendSyncRequest(SyncCommand command, string path)

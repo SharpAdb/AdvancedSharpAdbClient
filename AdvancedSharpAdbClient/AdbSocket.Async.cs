@@ -79,8 +79,8 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public Task SendSyncRequestAsync(SyncCommand command, string path, UnixFileStatus permission, CancellationToken cancellationToken = default) =>
-            SendSyncRequestAsync(command, $"{path},{(int)permission.GetPermissions()}", cancellationToken);
+        public Task SendSyncRequestAsync(SyncCommand command, string path, UnixFileStatus permissions, CancellationToken cancellationToken = default) =>
+            SendSyncRequestAsync(command, $"{path},{(int)permissions.GetPermissions()}", cancellationToken);
 
         /// <inheritdoc/>
         public async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)

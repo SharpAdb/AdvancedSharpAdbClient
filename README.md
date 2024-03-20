@@ -411,7 +411,7 @@ void UploadFile()
     {
         using (FileStream stream = File.OpenRead(@"C:\MyFile.txt"))
         {
-            service.Push(stream, "/data/local/tmp/MyFile.txt", 777, DateTimeOffset.Now, null);
+            service.Push(stream, "/data/local/tmp/MyFile.txt", UnixFileStatus.DefaultFileMode, DateTimeOffset.Now, null);
         }
     }
 }

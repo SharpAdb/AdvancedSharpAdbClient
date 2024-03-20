@@ -11,13 +11,12 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>True</IncludeSymbols>
     <LangVersion>latest</LangVersion>
-    <PackageIcon>Icon.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/SharpAdb/AdvancedSharpAdbClient/main/logo.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>https://github.com/SharpAdb/AdvancedSharpAdbClient/releases</PackageReleaseNotes>
-    <PackageTags>Android;ADB;Communicate;UWP;Xamarin;MAUI;WinUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
+    <PackageTags>Android;ADB;Communication;UWP;Xamarin;WinUI;MAUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>

@@ -4,6 +4,8 @@
     <FullTargets>True</FullTargets>
     <ImportAsync>True</ImportAsync>
     <Nullable>Enable</Nullable>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <Choose>
@@ -63,6 +65,7 @@
 
   <ItemGroup>
     <None Include="..\logo.png" Pack="True" PackagePath="\Icon.png" />
+    <None Include="..\README.md" Pack="True" PackagePath="\README.md"/>
   </ItemGroup>
 
   <ItemGroup>
