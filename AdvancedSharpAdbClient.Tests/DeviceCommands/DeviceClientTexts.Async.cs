@@ -189,7 +189,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="DeviceClient.ClickAsync(Cords, CancellationToken)"/> method.
+        /// Tests the <see cref="DeviceClient.ClickAsync(Point, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void ClickCordsAsyncTest()
@@ -219,7 +219,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         }
 
         /// <summary>
-        /// Tests the <see cref="DeviceClient.SwipeAsync(Cords, Cords, long, CancellationToken)"/> method.
+        /// Tests the <see cref="DeviceClient.SwipeAsync(Point, Point, long, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async void SwipePointAsyncTest()
@@ -355,7 +355,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal("android.widget.TextView", child.Class);
             Assert.Equal("com.bilibili.app.in", child.Package);
             Assert.Equal("com.bilibili.app.in:id/header_info_name", child.ResourceID);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), child.Bounds);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), child.Bounds);
             Assert.Equal(child, element.FindDescendantOrSelf(x => x.Text == "where-where"));
             Assert.Equal(2, element.FindDescendants().Where(x => x.Text == "where-where").Count());
         }
@@ -379,7 +379,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Bounds);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
         }
 
         /// <summary>
@@ -401,7 +401,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);
-            Assert.Equal(Area.FromLTRB(45, 889, 427, 973), element.Bounds);
+            Assert.Equal(Rectangle.FromLTRB(45, 889, 427, 973), element.Bounds);
         }
 
         /// <summary>

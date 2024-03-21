@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -80,13 +81,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Clicks on the specified coordinates asynchronously.
         /// </summary>
-        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        /// <param name="point">The <see cref="Point"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task ClickAsync(Cords cords, CancellationToken cancellationToken = default)
+        public async Task ClickAsync(Point point, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
-            await AdbClient.ExecuteShellCommandAsync(Device, $"input tap {cords.X} {cords.Y}", receiver, cancellationToken).ConfigureAwait(false);
+            await AdbClient.ExecuteShellCommandAsync(Device, $"input tap {point.X} {point.Y}", receiver, cancellationToken).ConfigureAwait(false);
 
             string result = receiver.ToString().Trim();
 
@@ -152,12 +153,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Generates a swipe gesture from first coordinates to second coordinates asynchronously. Specify the speed in ms.
         /// </summary>
-        /// <param name="first">The start element.</param>
-        /// <param name="second">The end element.</param>
+        /// <param name="first">The start <see cref="Point"/>.</param>
+        /// <param name="second">The end <see cref="Point"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public async Task SwipeAsync(Cords first, Cords second, long speed, CancellationToken cancellationToken = default)
+        public async Task SwipeAsync(Point first, Point second, long speed, CancellationToken cancellationToken = default)
         {
             ConsoleOutputReceiver receiver = new() { ParsesErrors = false };
             await AdbClient.ExecuteShellCommandAsync(Device, $"input swipe {first.X} {first.Y} {second.X} {second.Y} {speed}", receiver, cancellationToken).ConfigureAwait(false);

@@ -90,6 +90,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcore5.0'
+                     or '$(TargetFramework)' == 'netstandard1.3'
+                     or '$(TargetFramework)' == 'uap10.0'">
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcore5.0'
                      or '$(TargetFramework)' == 'netcoreapp1.0'
                      or '$(TargetFramework)' == 'netcoreapp1.1'
                      or '$(TargetFramework)' == 'netstandard1.3'
@@ -119,12 +125,6 @@
                         or ('$(TargetFramework)' != 'net3.5-client'
                         and '$(TargetFramework)' != 'net4.0-client'))">
     <DefineConstants>$(DefineConstants);HAS_TASK</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' != 'netcore5.0'
-                        and '$(TargetFramework)' != 'netstandard1.3'
-                        and '$(TargetFramework)' != 'uap10.0'">
-    <DefineConstants>$(DefineConstants);HAS_DRAWING</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net2.0-client'

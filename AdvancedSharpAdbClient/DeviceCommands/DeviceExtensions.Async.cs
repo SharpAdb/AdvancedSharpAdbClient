@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -66,23 +67,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="cords">The <see cref="Cords"/> to click.</param>
+        /// <param name="point">The <see cref="Point"/> to click.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task ClickAsync(this IAdbClient client, DeviceData device, Cords cords, CancellationToken cancellationToken = default) =>
-            new DeviceClient(client, device).ClickAsync(cords, cancellationToken);
+        public static Task ClickAsync(this IAdbClient client, DeviceData device, Point point, CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).ClickAsync(point, cancellationToken);
 
         /// <summary>
         /// Asynchronously generates a swipe gesture from first coordinates to second coordinates. Specify the speed in ms.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
-        /// <param name="first">The start element.</param>
-        /// <param name="second">The end element.</param>
+        /// <param name="first">The start <see cref="Point"/>.</param>
+        /// <param name="second">The end <see cref="Point"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        public static Task SwipeAsync(this IAdbClient client, DeviceData device, Cords first, Cords second, long speed, CancellationToken cancellationToken = default) =>
+        public static Task SwipeAsync(this IAdbClient client, DeviceData device, Point first, Point second, long speed, CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).SwipeAsync(first, second, speed, cancellationToken);
 
         /// <summary>
