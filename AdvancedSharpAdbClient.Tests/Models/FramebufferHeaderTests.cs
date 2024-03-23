@@ -74,7 +74,6 @@ namespace AdvancedSharpAdbClient.Models.Tests
 
 #if WINDOWS
         [Fact]
-        [SupportedOSPlatform("windows")]
         public void ToImageTest()
         {
             byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.bin");
@@ -95,7 +94,6 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-        [SupportedOSPlatform("windows")]
         public void ToImageEmptyTest()
         {
             byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.Empty.bin");

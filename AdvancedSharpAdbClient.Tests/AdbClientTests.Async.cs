@@ -326,9 +326,6 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetFrameBufferAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-#if WINDOWS
-        [SupportedOSPlatform("windows")]
-#endif
         public async void GetFrameBufferAsyncTest()
         {
             string[] requests =

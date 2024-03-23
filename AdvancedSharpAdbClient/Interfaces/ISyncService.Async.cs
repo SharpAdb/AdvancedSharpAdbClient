@@ -91,6 +91,7 @@ namespace AdvancedSharpAdbClient
             /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
 
             /// <summary>
@@ -101,6 +102,7 @@ namespace AdvancedSharpAdbClient
             /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
         }
 #endif

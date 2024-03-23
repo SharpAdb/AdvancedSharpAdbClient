@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="Bitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
 #if NET
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("windows6.1")]
 #endif
         public Bitmap? ToImage(byte[] buffer)
         {
@@ -289,7 +289,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // The pixel format of the framebuffer may not be one that .NET recognizes, so we need to fix that
-            PixelFormat pixelFormat = StandardizePixelFormat(buffer);
+            PixelFormat pixelFormat = StandardizePixelFormat(ref buffer);
 
             Bitmap bitmap = new((int)Width, (int)Height, pixelFormat);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly, pixelFormat);
@@ -307,19 +307,13 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <returns>A <see cref="PixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
-#if HAS_BUFFERS
 #if NET
-        [SupportedOSPlatform("windows")]
+        [SupportedOSPlatform("windows6.1")]
 #endif
-        private PixelFormat StandardizePixelFormat(Span<byte> buffer)
-#else
-        private PixelFormat StandardizePixelFormat(byte[] buffer)
-#endif
+        private PixelFormat StandardizePixelFormat(ref byte[] buffer)
         {
             // Initial parameter validation.
-#if !HAS_BUFFERS
             ExceptionExtensions.ThrowIfNull(buffer);
-#endif
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -354,6 +348,7 @@ namespace AdvancedSharpAdbClient.Models
                 int greenIndex = (int)Green.Offset / 8;
                 int alphaIndex = (int)Alpha.Offset / 8;
 
+                byte[] array = new byte[buffer.Length];
                 // Loop over the array and re-order as required
                 for (int i = 0; i < (int)Size; i += 4)
                 {
@@ -366,19 +361,20 @@ namespace AdvancedSharpAdbClient.Models
                     // so it's really BGRA. Confusing!
                     if (Alpha.Length == 8)
                     {
-                        buffer[i + 3] = alpha;
-                        buffer[i + 2] = red;
-                        buffer[i + 1] = green;
-                        buffer[i + 0] = blue;
+                        array[i + 3] = alpha;
+                        array[i + 2] = red;
+                        array[i + 1] = green;
+                        array[i + 0] = blue;
                     }
                     else
                     {
-                        buffer[i + 3] = red;
-                        buffer[i + 2] = green;
-                        buffer[i + 1] = blue;
-                        buffer[i + 0] = 0;
+                        array[i + 3] = 0;
+                        array[i + 2] = red;
+                        array[i + 1] = green;
+                        array[i + 0] = blue;
                     }
                 }
+                buffer = array;
 
                 // Returns RGB or RGBA, function of the presence of an alpha channel.
                 return Alpha.Length == 0 ? PixelFormat.Format32bppRgb : PixelFormat.Format32bppArgb;
@@ -426,6 +422,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             if (dispatcher.HasThreadAccess)
@@ -497,12 +494,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
+            ExceptionExtensions.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -533,6 +528,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <param name="alphaMode">A <see cref="BitmapAlphaMode"/> which describes how the alpha channel is stored.</param>
         /// <returns>A <see cref="BitmapPixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
         {
             // Initial parameter validation.
@@ -562,8 +558,8 @@ namespace AdvancedSharpAdbClient.Models
                 // Alpha can be present or absent, but must be 8 bytes long
                 alphaMode = Alpha.Length switch
                 {
-                    0 => BitmapAlphaMode.Premultiplied,
-                    8 => BitmapAlphaMode.Ignore,
+                    0 => BitmapAlphaMode.Ignore,
+                    8 => BitmapAlphaMode.Straight,
                     _ => throw new ArgumentOutOfRangeException($"The alpha length {Alpha.Length} is not supported"),
                 };
 

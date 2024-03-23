@@ -515,6 +515,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task InstallAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallAsync(device, apk, progress.AsAction(), cancellationToken, arguments);
 
@@ -530,6 +531,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, baseAPK, splitAPKs, progress.AsAction(), cancellationToken, arguments);
 
@@ -545,6 +547,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, splitAPKs, packageName, progress.AsAction(), cancellationToken, arguments);
 
@@ -560,6 +563,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task InstallWriteAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
             client.InstallWriteAsync(device, apk, apkName, session, progress.AsAction(), cancellationToken);
 #endif

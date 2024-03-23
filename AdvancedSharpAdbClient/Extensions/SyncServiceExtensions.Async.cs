@@ -49,6 +49,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task PushAsync(this ISyncService.IWinRT service, IInputStream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), cancellationToken);
 
@@ -61,6 +62,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Task PullAsync(this ISyncService.IWinRT service, string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken);
 #endif

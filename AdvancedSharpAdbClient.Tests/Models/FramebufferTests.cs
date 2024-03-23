@@ -25,9 +25,6 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-#if WINDOWS
-        [SupportedOSPlatform("windows")]
-#endif
         public void RefreshTest()
         {
             DeviceData device = new()

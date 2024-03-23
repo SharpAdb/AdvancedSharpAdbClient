@@ -108,6 +108,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="function">The <see cref="Task{TResult}"/> to wait.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         /// <returns>The result of the completed task.</returns>
+        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static TResult AwaitByTaskCompleteSource<TResult>(this IAsyncOperation<TResult> function, CancellationToken cancellationToken = default)
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();

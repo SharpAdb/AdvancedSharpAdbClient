@@ -448,9 +448,6 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetFrameBuffer(DeviceData)"/> method.
         /// </summary>
         [Fact]
-#if WINDOWS
-        [SupportedOSPlatform("windows")]
-#endif
         public void GetFrameBufferTest()
         {
             string[] requests =
