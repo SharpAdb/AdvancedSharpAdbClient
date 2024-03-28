@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the state of the installation.
         /// </summary>
-        public PackageInstallProgressState State { get; } = state;
+        public PackageInstallProgressState State => state;
 
         /// <summary>
         /// Gets the number of packages which is finished operation.

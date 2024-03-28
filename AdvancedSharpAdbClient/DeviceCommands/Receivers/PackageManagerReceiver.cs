@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         /// <summary>
         /// Gets the package manager.
         /// </summary>
-        public PackageManager PackageManager { get; } = packageManager;
+        public PackageManager PackageManager => packageManager;
 
         /// <inheritdoc/>
         protected override void ProcessNewLines(IEnumerable<string> lines)

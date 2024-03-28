@@ -257,7 +257,7 @@ namespace AdvancedSharpAdbClient
             /// <summary>
             /// Gets a value that indicates whether the asynchronous operation has completed.
             /// </summary>
-            public bool IsCompleted { get; } = false;
+            public bool IsCompleted => false;
 
             /// <summary>
             /// Ends the await on the completed task.

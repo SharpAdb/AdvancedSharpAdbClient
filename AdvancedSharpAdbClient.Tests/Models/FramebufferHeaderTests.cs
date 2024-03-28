@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.Versioning;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Models.Tests

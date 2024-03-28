@@ -202,7 +202,7 @@ namespace AdvancedSharpAdbClient.Models
         public ColorData Alpha { get; init; }
 
         /// <summary>
-        /// The length of the head in bytes.
+        /// Gets the length of the head in bytes.
         /// </summary>
         public int Count => Version < 2 ? MiniLength : MaxLength;
 
@@ -347,8 +347,8 @@ namespace AdvancedSharpAdbClient.Models
                 int blueIndex = (int)Blue.Offset / 8;
                 int greenIndex = (int)Green.Offset / 8;
                 int alphaIndex = (int)Alpha.Offset / 8;
-
-                byte[] array = new byte[buffer.Length];
+                
+                byte[] array = new byte[(int)Size * 4];
                 // Loop over the array and re-order as required
                 for (int i = 0; i < (int)Size; i += 4)
                 {

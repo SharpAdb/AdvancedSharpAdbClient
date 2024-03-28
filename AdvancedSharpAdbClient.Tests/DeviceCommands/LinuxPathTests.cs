@@ -63,6 +63,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
+        public void CombineDotDirTest()
+        {
+            string result = LinuxPath.Combine("Test.Test", "Test.txt");
+            Assert.Equal("./Test.Test/Test.txt", result);
+
+            result = LinuxPath.Combine("Test/Test.Test", "Test.txt");
+            Assert.Equal("./Test/Test.Test/Test.txt", result);
+
+            result = LinuxPath.Combine("/Test/Test.Test", "Test.txt");
+            Assert.Equal("/Test/Test.Test/Test.txt", result);
+
+            result = LinuxPath.Combine("/Test Test/Test.Test", "Test.txt");
+            Assert.Equal("/Test Test/Test.Test/Test.txt", result);
+        }
+
+        [Fact]
         public void GetDirectoryNameTest()
         {
             string result = LinuxPath.GetDirectoryName("/system/busybox");

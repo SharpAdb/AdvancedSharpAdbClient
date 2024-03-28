@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets the device where the change occurred.
         /// </summary>
         /// <value>The device where the change occurred.</value>
-        public DeviceData Device { get; } = device;
+        public DeviceData Device => device;
 
         /// <inheritdoc/>
         public override string ToString()
@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets the list of device where the change occurred.
         /// </summary>
         /// <value>The list of device where the change occurred.</value>
-        public IEnumerable<DeviceData> Devices { get; } = devices;
+        public IEnumerable<DeviceData> Devices => devices;
 
         /// <inheritdoc/>
         public override string ToString() => $"Got {Devices.Count()} devices";
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the connect state of the device after the reported change.
         /// </summary>
-        public bool IsConnect { get; } = isConnect;
+        public bool IsConnect => isConnect;
 
         /// <inheritdoc/>
         public override string ToString()
@@ -102,12 +102,12 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the state of the device after the reported change.
         /// </summary>
-        public DeviceState NewState { get; } = newState;
+        public DeviceState NewState => newState;
 
         /// <summary>
         /// Gets the state of the device before the reported change.
         /// </summary>
-        public DeviceState OldState { get; } = oldState;
+        public DeviceState OldState => oldState;
 
         /// <inheritdoc/>
         public override string ToString()
