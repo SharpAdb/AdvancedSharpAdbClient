@@ -282,6 +282,21 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(tcpSocket.OutputStream, shellStream.Inner);
         }
 
+
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket adbSocket = new(tcpSocket);
+            Assert.True(adbSocket is ICloneable<IAdbSocket>);
+            using AdbSocket socket = adbSocket.Clone();
+            Assert.NotEqual(adbSocket.Socket, socket.Socket);
+            Assert.Equal(adbSocket.Connected, socket.Connected);
+        }
+
         private static void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
         {
             using DummyTcpSocket tcpSocket = new();

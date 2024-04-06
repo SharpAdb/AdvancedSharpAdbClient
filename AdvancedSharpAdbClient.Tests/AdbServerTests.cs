@@ -249,6 +249,20 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbServer.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            DnsEndPoint endPoint = new("localhost", 5555);
+            Assert.True(adbServer is ICloneable<IAdbServer>);
+            AdbServer server = adbServer.Clone();
+            Assert.Equal(adbServer.EndPoint, server.EndPoint);
+            server = adbServer.Clone(endPoint);
+            Assert.Equal(endPoint, server.EndPoint);
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbServer(EndPoint, Func{EndPoint, IAdbSocket}, Func{string, IAdbCommandLineClient})"/> method.
         /// </summary>
         [Fact]

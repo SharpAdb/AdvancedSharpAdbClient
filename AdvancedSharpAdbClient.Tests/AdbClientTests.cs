@@ -1132,6 +1132,23 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("stat_v2", features.LastOrDefault());
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            Assert.True(TestClient is ICloneable<IAdbClient>);
+#if WINDOWS10_0_17763_0_OR_GREATER
+            Assert.True(TestClient is ICloneable<IAdbClient.IWinRT>);
+#endif
+            AdbClient client = TestClient.Clone();
+            Assert.Equal(TestClient.EndPoint, client.EndPoint);
+            DnsEndPoint endPoint = new("localhost", 5555);
+            client = TestClient.Clone(endPoint);
+            Assert.Equal(endPoint, client.EndPoint);
+        }
+
         private void RunConnectTest(Action test, string connectString)
         {
             string[] requests = [$"host:connect:{connectString}"];

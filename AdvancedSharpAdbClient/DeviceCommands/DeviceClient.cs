@@ -22,14 +22,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device)
     {
         /// <summary>
-        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
+        /// The <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
-        public IAdbClient AdbClient { get; init; } = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
+        private IAdbClient adbClient = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
 
         /// <summary>
-        /// Gets the device.
+        /// The device on which to process command.
         /// </summary>
-        public DeviceData Device { get; init; } = DeviceData.EnsureDevice(ref Device);
+        private DeviceData device = DeviceData.EnsureDevice(ref Device);
+
+        /// <summary>
+        /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
+        /// </summary>
+        public IAdbClient AdbClient
+        {
+            get => adbClient;
+            init => adbClient = value ?? throw new ArgumentNullException(nameof(AdbClient));
+        }
+
+        /// <summary>
+        /// Gets the device on which to process command.
+        /// </summary>
+        public DeviceData Device
+        {
+            get => device;
+            init => device = DeviceData.EnsureDevice(ref value);
+        }
 
         /// <summary>
         /// Gets the current device screen snapshot.

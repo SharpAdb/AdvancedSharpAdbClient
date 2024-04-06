@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
     [DebuggerDisplay($"{nameof(AdbSocket)} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
-    public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<IAdbSocket>, ICloneable
+    public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<AdbSocket>, ICloneable
     {
         /// <summary>
         /// The logger to use when logging messages.
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets the underlying TCP socket that manages the connection with the ADB server.
         /// </summary>
-        public ITcpSocket Socket { get; init; } = socket ?? throw new ArgumentNullException(nameof(socket));
+        public ITcpSocket Socket { get; } = socket ?? throw new ArgumentNullException(nameof(socket));
 
         /// <summary>
         /// Determines whether the specified reply is okay.
@@ -560,15 +560,10 @@ namespace AdvancedSharpAdbClient
         public void Close() => Socket.Dispose();
 
         /// <inheritdoc/>
-        public virtual IAdbSocket Clone()
-        {
-            if (Socket is not ICloneable<ITcpSocket> cloneable)
-            {
-                throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
-            }
-            ITcpSocket socket = cloneable.Clone();
-            return new AdbSocket(socket, logger);
-        }
+        public virtual AdbSocket Clone() =>
+            Socket is ICloneable<ITcpSocket> cloneable
+                ? new AdbSocket(cloneable.Clone(), logger)
+                : throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone();

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// A mock implementation of the <see cref="ITcpSocket"/> class.
     /// </summary>
-    internal class DummyTcpSocket : ITcpSocket
+    internal class DummyTcpSocket : ITcpSocket, ICloneable<DummyTcpSocket>
     {
         /// <summary>
         /// The stream from which the <see cref="DummyTcpSocket"/> reads.
@@ -113,5 +113,17 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         public byte[] GetBytesSent() => OutputStream.ToArray();
+
+        public DummyTcpSocket Clone()
+        {
+            DummyTcpSocket socket = new()
+            {
+                Connected = true,
+                ReceiveBufferSize = ReceiveBufferSize
+            };
+            return socket;
+        }
+
+        object ICloneable.Clone() => Clone();
     }
 }

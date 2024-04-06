@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
     /// between clients and devices.</para>
     /// </summary>
     [DebuggerDisplay($"{nameof(AdbServer)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(CachedAdbPath)} = {{{nameof(CachedAdbPath)}}} }}")]
-    public partial class AdbServer : IAdbServer, ICloneable<IAdbServer>, ICloneable
+    public partial class AdbServer : IAdbServer, ICloneable<AdbServer>, ICloneable
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
@@ -274,14 +274,14 @@ namespace AdvancedSharpAdbClient
         public override string ToString() => $"The {nameof(AdbServer)} communicate with adb at {EndPoint}";
 
         /// <summary>
-        /// Creates a new <see cref="IAdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
+        /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
         /// </summary>
         /// <param name="endPoint">The new <see cref="EndPoint"/> to use.</param>
-        /// <returns>A new <see cref="IAdbServer"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
-        public virtual IAdbServer Clone(EndPoint endPoint) => new AdbServer(endPoint, AdbSocketFactory, AdbCommandLineClientFactory);
+        /// <returns>A new <see cref="AdbServer"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
+        public virtual AdbServer Clone(EndPoint endPoint) => new(endPoint, AdbSocketFactory, AdbCommandLineClientFactory);
 
         /// <inheritdoc/>
-        public IAdbServer Clone() => Clone(EndPoint);
+        public AdbServer Clone() => Clone(EndPoint);
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone(EndPoint);

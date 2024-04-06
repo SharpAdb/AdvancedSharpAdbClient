@@ -90,5 +90,20 @@ namespace AdvancedSharpAdbClient.Tests
             using TcpSocket socket = new();
             _ = Assert.Throws<NotSupportedException>(() => socket.Connect(new CustomEndPoint()));
         }
+
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            using TcpSocket tcpSocket = new();
+            Assert.True(tcpSocket is ICloneable<ITcpSocket>);
+            Assert.Throws<ArgumentNullException>(tcpSocket.Clone);
+            tcpSocket.Connect(new DnsEndPoint("www.bing.com", 80));
+            using TcpSocket socket = tcpSocket.Clone();
+            Assert.Equal(tcpSocket.EndPoint, socket.EndPoint);
+            Assert.True(socket.Connected);
+        }
     }
 }

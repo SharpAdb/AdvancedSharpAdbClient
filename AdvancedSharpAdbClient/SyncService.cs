@@ -42,9 +42,9 @@ namespace AdvancedSharpAdbClient
     /// </code>
     /// </example>
     [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
-    public partial class SyncService : ISyncService, ICloneable<ISyncService>, ICloneable
+    public partial class SyncService : ISyncService, ICloneable<SyncService>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        , ISyncService.IWinRT, ICloneable<ISyncService.IWinRT>
+        , ISyncService.IWinRT
 #endif
     {
         /// <summary>
@@ -417,23 +417,17 @@ namespace AdvancedSharpAdbClient
                 .ToString();
 
         /// <summary>
-        /// Creates a new <see cref="ISyncService"/> object that is a copy of the current instance with new <see cref="Device"/>.
+        /// Creates a new <see cref="SyncService"/> object that is a copy of the current instance with new <see cref="Device"/>.
         /// </summary>
         /// <param name="device">The new <see cref="Device"/> to use.</param>
-        /// <returns>A new <see cref="ISyncService"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
-        public virtual ISyncService Clone(DeviceData device) =>
-            Socket is not ICloneable<IAdbSocket> cloneable
-                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
-                : new SyncService(cloneable.Clone(), device);
+        /// <returns>A new <see cref="SyncService"/> object that is a copy of this instance with new <see cref="Device"/>.</returns>
+        public virtual SyncService Clone(DeviceData device) =>
+            Socket is ICloneable<IAdbSocket> cloneable
+                ? new SyncService(cloneable.Clone(), device)
+                : throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
 
         /// <inheritdoc/>
-        public ISyncService Clone() => Clone(Device);
-
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        /// <inheritdoc/>
-        ISyncService.IWinRT ICloneable<ISyncService.IWinRT>.Clone() => Clone(Device) is ISyncService.IWinRT service ? service
-            : throw new NotSupportedException($"The {nameof(Clone)} method does not return a {nameof(ISyncService.IWinRT)} object.");
-#endif
+        public SyncService Clone() => Clone(Device);
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone(Device);

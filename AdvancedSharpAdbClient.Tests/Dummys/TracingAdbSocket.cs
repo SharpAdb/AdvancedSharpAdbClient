@@ -10,6 +10,8 @@ namespace AdvancedSharpAdbClient.Tests
 {
     internal class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
     {
+        private readonly EndPoint endPoint = endPoint;
+
         public bool DoDispose { get; set; }
 
         public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
@@ -178,5 +180,7 @@ namespace AdvancedSharpAdbClient.Tests
             Reconnect(isForce);
             DidReconnect = true;
         }
+
+        public override AdbSocket Clone() => new TracingAdbSocket(endPoint);
     }
 }

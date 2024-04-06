@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient
     /// </code>
     /// </example>
     [DebuggerDisplay($"{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
-    public partial class DeviceMonitor : IDeviceMonitor, ICloneable<IDeviceMonitor>, ICloneable
+    public partial class DeviceMonitor : IDeviceMonitor, ICloneable<DeviceMonitor>, ICloneable
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         , IAsyncDisposable
 #endif
@@ -418,10 +418,10 @@ namespace AdvancedSharpAdbClient
                 .ToString();
 
         /// <inheritdoc/>
-        public virtual IDeviceMonitor Clone() =>
-            Socket is not ICloneable<IAdbSocket> cloneable
-                ? throw new NotSupportedException($"{Socket.GetType()} does not support cloning.")
-                : new DeviceMonitor(cloneable.Clone(), logger);
+        public virtual DeviceMonitor Clone() =>
+            Socket is ICloneable<IAdbSocket> cloneable
+                ? new DeviceMonitor(cloneable.Clone(), logger)
+                : throw new NotSupportedException($"{Socket.GetType()} does not support cloning.");
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone();

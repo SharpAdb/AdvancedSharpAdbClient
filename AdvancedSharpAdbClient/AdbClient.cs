@@ -30,9 +30,9 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
     [DebuggerDisplay($"{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
-    public partial class AdbClient : IAdbClient, ICloneable<IAdbClient>, ICloneable
+    public partial class AdbClient : IAdbClient, ICloneable<AdbClient>, ICloneable
 #if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        , IAdbClient.IWinRT, ICloneable<IAdbClient.IWinRT>
+        , IAdbClient.IWinRT
 #endif
     {
         /// <summary>
@@ -1133,20 +1133,14 @@ namespace AdvancedSharpAdbClient
         public override string ToString() => $"The {nameof(AdbClient)} communicate with adb server at {EndPoint}";
 
         /// <summary>
-        /// Creates a new <see cref="IAdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
+        /// Creates a new <see cref="AdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.
         /// </summary>
         /// <param name="endPoint">The new <see cref="EndPoint"/> to use.</param>
-        /// <returns>A new <see cref="IAdbClient"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
-        public virtual IAdbClient Clone(EndPoint endPoint) => new AdbClient(endPoint, AdbSocketFactory);
+        /// <returns>A new <see cref="AdbClient"/> object that is a copy of this instance with new <see cref="EndPoint"/>.</returns>
+        public virtual AdbClient Clone(EndPoint endPoint) => new(endPoint, AdbSocketFactory);
 
         /// <inheritdoc/>
-        public IAdbClient Clone() => Clone(EndPoint);
-
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
-        /// <inheritdoc/>
-        IAdbClient.IWinRT ICloneable<IAdbClient.IWinRT>.Clone() => Clone(EndPoint) is IAdbClient.IWinRT client ? client
-            : throw new NotSupportedException($"The {nameof(Clone)} method does not return a {nameof(IAdbClient.IWinRT)} object.");
-#endif
+        public AdbClient Clone() => Clone(EndPoint);
 
         /// <inheritdoc/>
         object ICloneable.Clone() => Clone();

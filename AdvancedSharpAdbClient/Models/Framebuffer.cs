@@ -84,7 +84,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
         /// </summary>
-        public EndPoint EndPoint { get; init; } = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
+        public EndPoint EndPoint { get; } = endPoint ?? throw new ArgumentNullException(nameof(endPoint));
 
         /// <summary>
         /// Gets the framebuffer header. The header contains information such as the width and height and the color encoding.

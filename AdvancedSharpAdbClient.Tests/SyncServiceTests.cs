@@ -210,5 +210,35 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.True(service.IsOutdate);
                 });
         }
+
+        /// <summary>
+        /// Tests the <see cref="SyncService.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            DummyAdbSocket socket = new()
+            {
+                Requests =
+                {
+                    "host:transport:169.254.109.177:5555",
+                    "sync:",
+                    "host:transport:169.254.109.177:5555",
+                    "sync:"
+                }
+            };
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            using SyncService syncService = new(socket, Device);
+            Assert.True(syncService is ICloneable<ISyncService>);
+#if WINDOWS10_0_17763_0_OR_GREATER
+            Assert.True(syncService is ICloneable<ISyncService.IWinRT>);
+#endif
+            using SyncService service = syncService.Clone();
+            Assert.NotEqual(syncService.Socket, service.Socket);
+            Assert.Equal(syncService.Device, service.Device);
+        }
     }
 }

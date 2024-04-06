@@ -283,5 +283,17 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.True(Socket.DidReconnect);
             Assert.True(dummyAdbServer.WasRestarted);
         }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor.Clone()"/> method.
+        /// </summary>
+        [Fact]
+        public void CloneTest()
+        {
+            using DeviceMonitor deviceMonitor = new(Socket);
+            Assert.True(deviceMonitor is ICloneable<IDeviceMonitor>);
+            using DeviceMonitor monitor = deviceMonitor.Clone();
+            Assert.NotEqual(deviceMonitor.Socket, monitor.Socket);
+        }
     }
 }

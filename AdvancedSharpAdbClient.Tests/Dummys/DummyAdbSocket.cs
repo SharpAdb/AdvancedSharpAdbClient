@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// A mock implementation of the <see cref="IAdbSocket"/> class.
     /// </summary>
-    internal class DummyAdbSocket : IDummyAdbSocket
+    internal class DummyAdbSocket : IDummyAdbSocket, ICloneable<DummyAdbSocket>
     {
         /// <summary>
         /// Use this message to cause <see cref="ReadString"/> and <see cref="ReadStringAsync(CancellationToken)"/> to throw
@@ -21,21 +21,21 @@ namespace AdvancedSharpAdbClient.Tests
 
         public DummyAdbSocket() => IsConnected = true;
 
-        public Queue<AdbResponse> Responses { get; } = new Queue<AdbResponse>();
+        public Queue<AdbResponse> Responses { get; init; } = new Queue<AdbResponse>();
 
-        public Queue<SyncCommand> SyncResponses { get; } = new Queue<SyncCommand>();
+        public Queue<SyncCommand> SyncResponses { get; init; } = new Queue<SyncCommand>();
 
-        public Queue<byte[]> SyncDataReceived { get; } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataReceived { get; init; } = new Queue<byte[]>();
 
-        public Queue<byte[]> SyncDataSent { get; } = new Queue<byte[]>();
+        public Queue<byte[]> SyncDataSent { get; init; } = new Queue<byte[]>();
 
-        public Queue<string> ResponseMessages { get; } = new Queue<string>();
+        public Queue<string> ResponseMessages { get; init; } = new Queue<string>();
 
-        public List<string> Requests { get; } = [];
+        public List<string> Requests { get; init; } = [];
 
-        public List<(SyncCommand, string)> SyncRequests { get; } = [];
+        public List<(SyncCommand, string)> SyncRequests { get; init; } = [];
 
-        public Queue<Stream> ShellStreams { get; } = new Queue<Stream>();
+        public Queue<Stream> ShellStreams { get; init; } = new Queue<Stream>();
 
         public bool IsConnected { get; set; }
 
@@ -295,5 +295,19 @@ namespace AdvancedSharpAdbClient.Tests
             await Task.Yield();
             DidReconnect = true;
         }
+
+        public DummyAdbSocket Clone() => new()
+        {
+            Responses = Responses,
+            SyncResponses = SyncResponses,
+            SyncDataReceived = SyncDataReceived,
+            SyncDataSent = SyncDataSent,
+            ResponseMessages = ResponseMessages,
+            Requests = Requests,
+            SyncRequests = SyncRequests,
+            ShellStreams = ShellStreams
+        };
+
+        object ICloneable.Clone() => Clone();
     }
 }
