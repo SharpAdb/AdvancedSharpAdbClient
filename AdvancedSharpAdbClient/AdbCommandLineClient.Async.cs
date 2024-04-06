@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -93,8 +94,7 @@ namespace AdvancedSharpAdbClient
         /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
+        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as <c>adb version</c>.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
         protected async Task RunAdbProcessAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
@@ -113,8 +113,7 @@ namespace AdvancedSharpAdbClient
         /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{Int32}"/> which returns the return code of the <c>adb</c> process.</returns>
-        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
+        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as <c>adb version</c>.</remarks>
         protected async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(command);
@@ -124,7 +123,14 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Asynchronously runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
-        /// <returns>The return code of the process.</returns>
+        /// <param name="filename">The filename of the process to start.</param>
+        /// <param name="command">The command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
+        /// <param name="errorOutput">A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
+        /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
+        /// <returns>A <see cref="Task{Int32}"/> which returns the return code of the process.</returns>
 #if !HAS_PROCESS
         [DoesNotReturn]
 #endif
@@ -142,33 +148,19 @@ namespace AdvancedSharpAdbClient
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
-#if NET5_0_OR_GREATER
-            using (CancellationTokenSource completionSource = new(TimeSpan.FromMilliseconds(5000)))
+            using (CancellationTokenRegistration registration = cancellationToken.Register(process.Kill))
             {
-                try
-                {
-                    await process.WaitForExitAsync(completionSource.Token).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException) when (completionSource.IsCancellationRequested)
-                {
-                    if (!process.HasExited)
-                    {
-                        process.Kill();
-                    }
-                }
+                string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+
+                errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
             }
-#else
-            if (!process.WaitForExit(5000))
+
+            if (!process.HasExited)
             {
                 process.Kill();
             }
-#endif
-
-            string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-            string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-
-            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
 
             // get the return code from the process
             return process.ExitCode;

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -199,7 +200,7 @@ namespace AdvancedSharpAdbClient
                         || (restartServerIfNewer && serverStatus.Version < commandLineVersion))
                     {
                         StopServer();
-                        commandLineClient.StartServer();
+                        commandLineClient.StartServer(Timeout.Infinite);
                         return StartServerResult.RestartedOutdatedDaemon;
                     }
                     else
@@ -209,7 +210,7 @@ namespace AdvancedSharpAdbClient
                 }
                 else
                 {
-                    commandLineClient.StartServer();
+                    commandLineClient.StartServer(Timeout.Infinite);
                     return StartServerResult.Started;
                 }
             }

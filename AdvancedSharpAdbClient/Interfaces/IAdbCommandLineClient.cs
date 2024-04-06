@@ -20,14 +20,16 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Starts the adb server by running the <c>adb start-server</c> command.
         /// </summary>
-        void StartServer();
+        /// <param name="timeout">The timeout in milliseconds to wait for the <c>adb</c> process to exit.</param>
+        void StartServer(int timeout);
 
         /// <summary>
         /// Runs the <c>adb.exe</c> process, invoking a specific <paramref name="command"/>, and reads the standard output.
         /// </summary>
         /// <param name="command">The <c>adb.exe</c> command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
+        /// <param name="timeout">The timeout in milliseconds to wait for the <c>adb</c> process to exit.</param>
         /// <return>A list in which to store the standard output. Each line is added as a new entry.</return>
-        List<string> ExecuteAdbCommand(string command);
+        List<string> ExecuteAdbCommand(string command, int timeout);
 
         /// <summary>
         /// Determines whether the <c>adb.exe</c> file exists.

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 
 namespace AdvancedSharpAdbClient
 {
@@ -85,9 +86,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void StartServer()
+        public void StartServer(int timeout = Timeout.Infinite)
         {
-            int status = RunAdbProcessInner("start-server", null, null);
+            int status = RunAdbProcessInner("start-server", null, null, timeout);
             if (status == 0) { return; }
 
             // Starting the adb server failed for whatever reason. This can happen if adb.exe
@@ -97,15 +98,17 @@ namespace AdvancedSharpAdbClient
 
             // Try again. This time, we don't call "Inner", and an exception will be thrown if the start operation fails
             // again. We'll let that exception bubble up the stack.
-            RunAdbProcess("start-server", null, null);
+            RunAdbProcess("start-server", null, null, timeout);
         }
 
         /// <inheritdoc/>
-        public virtual List<string> ExecuteAdbCommand(string command)
+        /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
+        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
+        public virtual List<string> ExecuteAdbCommand(string command, int timeout = 5000)
         {
             List<string> errorOutput = [];
             List<string> standardOutput = [];
-            int status = RunAdbProcessInner(command, errorOutput, standardOutput);
+            int status = RunAdbProcessInner(command, errorOutput, standardOutput, timeout);
             if (errorOutput.Count > 0)
             {
                 string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
@@ -170,12 +173,13 @@ namespace AdvancedSharpAdbClient
         /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
         /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <param name="timeout">The timeout in milliseconds to wait for the <c>adb</c> process to exit.</param>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
+        /// <c>adb version</c>. This operation times out after 5 seconds in default.</remarks>
         /// <exception cref="AdbException">The process exited with an exit code other than <c>0</c>.</exception>
-        protected void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
+        protected void RunAdbProcess(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, int timeout = 5000)
         {
-            int status = RunAdbProcessInner(command, errorOutput, standardOutput);
+            int status = RunAdbProcessInner(command, errorOutput, standardOutput, timeout);
             if (status != 0) { throw new AdbException($"The adb process returned error code {status} when running command {command}"); }
         }
 
@@ -188,13 +192,14 @@ namespace AdvancedSharpAdbClient
         /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
         /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
         /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <param name="timeout">The timeout in milliseconds to wait for the <c>adb</c> process to exit.</param>
         /// <returns>The return code of the <c>adb</c> process.</returns>
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as
-        /// <c>adb version</c>. This operation times out after 5 seconds.</remarks>
-        protected int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
+        /// <c>adb version</c>. This operation times out after 5 seconds in default.</remarks>
+        protected int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, int timeout = 5000)
         {
             ExceptionExtensions.ThrowIfNull(command);
-            return RunProcess(AdbPath, command, errorOutput, standardOutput);
+            return RunProcess(AdbPath, command, errorOutput, standardOutput, timeout);
         }
 
         /// <summary>
@@ -235,11 +240,18 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Runs process, invoking a specific command, and reads the standard output and standard error output.
         /// </summary>
+        /// <param name="filename">The filename of the process to start.</param>
+        /// <param name="command">The command to invoke, such as <c>version</c> or <c>start-server</c>.</param>
+        /// <param name="errorOutput">A list in which to store the standard error output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard error.</param>
+        /// <param name="standardOutput">A list in which to store the standard output. Each line is added as a new entry.
+        /// This value can be <see langword="null"/> if you are not interested in the standard output.</param>
+        /// <param name="timeout">The timeout in milliseconds to wait for the process to exit.</param>
         /// <returns>The return code of the process.</returns>
 #if !HAS_PROCESS
         [DoesNotReturn]
 #endif
-        protected virtual int RunProcess(string filename, string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput)
+        protected virtual int RunProcess(string filename, string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, int timeout)
         {
 #if HAS_PROCESS
             ProcessStartInfo psi = new(filename, command)
@@ -254,7 +266,7 @@ namespace AdvancedSharpAdbClient
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
             // get the return code from the process
-            if (!process.WaitForExit(5000))
+            if (!process.WaitForExit(timeout))
             {
                 process.Kill();
             }

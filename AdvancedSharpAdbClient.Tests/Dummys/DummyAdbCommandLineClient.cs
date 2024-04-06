@@ -9,12 +9,8 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// A mock implementation of the <see cref="IAdbCommandLineClient"/> class.
     /// </summary>
-    internal class DummyAdbCommandLineClient : AdbCommandLineClient
+    internal class DummyAdbCommandLineClient() : AdbCommandLineClient(ServerName)
     {
-        public DummyAdbCommandLineClient() : base(ServerName)
-        {
-        }
-
         public AdbCommandLineStatus Version { get; set; }
 
         public bool ServerStarted { get; private set; }
@@ -24,7 +20,7 @@ namespace AdvancedSharpAdbClient.Tests
 
         public override Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => Task.FromResult(true);
 
-        protected override int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput)
+        protected override int RunProcess(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, int timeout)
         {
             if (filename == AdbPath)
             {
@@ -55,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests
         protected override async Task<int> RunProcessAsync(string filename, string command, ICollection<string> errorOutput, ICollection<string> standardOutput, CancellationToken cancellationToken = default)
         {
             await Task.Yield();
-            return RunProcess(filename, command, errorOutput, standardOutput);
+            return RunProcess(filename, command, errorOutput, standardOutput, Timeout.Infinite);
         }
 
         private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
