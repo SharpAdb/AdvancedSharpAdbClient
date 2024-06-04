@@ -43,7 +43,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 
@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 
@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 
@@ -125,7 +125,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 
@@ -141,7 +141,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 
@@ -176,7 +176,7 @@ namespace AdvancedSharpAdbClient.Tests
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.AppendFormat("{0}:", target);
+                _ = requestBuilder.Append(target).Append(':');
             }
             _ = requestBuilder.Append(command);
 

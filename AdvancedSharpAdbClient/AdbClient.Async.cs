@@ -798,7 +798,8 @@ namespace AdvancedSharpAdbClient
                     // add size parameter [required for streaming installs]
                     // do last to override any user specified value
                     .Append(" -S ").Append(apk.Length)
-                    .AppendFormat(" {0} {1}.apk", session, apkName);
+                    .Append(' ').Append(session).Append(' ')
+                    .Append(apkName).Append(".apk");
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
@@ -870,7 +871,8 @@ namespace AdvancedSharpAdbClient
                     // add size parameter [required for streaming installs]
                     // do last to override any user specified value
                     .Append(" -S ").Append(apk.Length)
-                    .AppendFormat(" {0} {1}.apk", session, apkName);
+                    .Append(' ').Append(session).Append(' ')
+                    .Append(apkName).Append(".apk");
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
@@ -1118,7 +1120,8 @@ namespace AdvancedSharpAdbClient
                     // add size parameter [required for streaming installs]
                     // do last to override any user specified value
                     .Append(" -S ").Append(apk.Size)
-                    .AppendFormat(" {0} {1}.apk", session, apkName);
+                    .Append(' ').Append(session).Append(' ')
+                    .Append(apkName).Append(".apk");
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
@@ -1189,7 +1192,8 @@ namespace AdvancedSharpAdbClient
                     // add size parameter [required for streaming installs]
                     // do last to override any user specified value
                     .Append(" -S ").Append(apk.Size)
-                    .AppendFormat(" {0} {1}.apk", session, apkName);
+                    .Append(' ').Append(session).Append(' ')
+                    .Append(apkName).Append(".apk");
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);

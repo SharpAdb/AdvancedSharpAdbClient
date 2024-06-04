@@ -638,7 +638,7 @@ fi".Replace("\r\n", "\n"), receiver, cancellationToken).ConfigureAwait(false);
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.AppendFormat(" /proc/{0}/cmdline /proc/{1}/stat", pids[i], pids[i]);
+                _ = catBuilder.Append(" /proc/").Append(pids[i]).Append("/cmdline /proc/").Append(pids[i]).Append("/stat");
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {

@@ -97,12 +97,12 @@ namespace AdvancedSharpAdbClient.Models
 
             if (PackageRequired > 0)
             {
-                _ = builder.AppendFormat(" {0}/{1}", PackageFinished, PackageRequired);
+                _ = builder.Append(' ').Append(PackageFinished).Append('/').Append(PackageRequired);
             }
 
             if (UploadProgress > 0)
             {
-                _ = builder.AppendFormat(" {0}%", UploadProgress);
+                _ = builder.Append(' ').Append(UploadProgress).Append('%');
             }
 
             return builder.ToString();

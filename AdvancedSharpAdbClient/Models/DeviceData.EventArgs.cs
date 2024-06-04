@@ -32,7 +32,7 @@ namespace AdvancedSharpAdbClient.Models
                 _ = builder.Append(": ").Append(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.AppendFormat("({0})", Device.Name);
+                    _ = builder.Append('(').Append(Device.Name).Append(')');
                 }
             }
             return builder.ToString();
@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient.Models
                 _ = builder.Append(": ").Append(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.AppendFormat("({0})", Device.Name);
+                    _ = builder.Append('(').Append(Device.Name).Append(')');
                 }
                 return builder.ToString();
             }
@@ -118,7 +118,7 @@ namespace AdvancedSharpAdbClient.Models
                 _ = builder.Append(' ').Append(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.AppendFormat("({0})", Device.Name);
+                    _ = builder.Append('(').Append(Device.Name).Append(')');
                 }
             }
             _ = builder.Append($" {OldState} -> {NewState}");

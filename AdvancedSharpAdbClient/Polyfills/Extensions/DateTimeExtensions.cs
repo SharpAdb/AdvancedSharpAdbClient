@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             if (seconds is < UnixMinSeconds or > UnixMaxSeconds)
             {
                 throw new ArgumentOutOfRangeException(nameof(seconds),
-                    string.Format("Valid values are between {0} and {1}, inclusive.", UnixMinSeconds, UnixMaxSeconds));
+                    $"Valid values are between {UnixMinSeconds} and {UnixMaxSeconds}, inclusive.");
             }
 
             long ticks = (seconds * TimeSpan.TicksPerSecond) + UnixEpochTicks;

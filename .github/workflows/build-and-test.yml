@@ -25,24 +25,24 @@ jobs:
         os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup .NET Core App
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Setup .NET Core App
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Install Dependencies
-      run: dotnet restore -p:FullTargets=false
+      - name: Install Dependencies
+        run: dotnet restore -p:FullTargets=false
 
-    - name: Build
-      run: dotnet build --no-restore -p:FullTargets=false
+      - name: Build
+        run: dotnet build --no-restore -p:FullTargets=false
 
-    - name: Test
-      run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
+      - name: Test
+        run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
 
   pack-and-publish:
     name: pack-and-publish

@@ -196,7 +196,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 }
             }
 
-            _ = requestBuilder.AppendFormat(" \"{0}\"", remoteFilePath);
+            _ = requestBuilder.Append(" \"").Append(remoteFilePath).Append('"');
 
             string cmd = requestBuilder.ToString();
             InstallOutputReceiver receiver = new();
