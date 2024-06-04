@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Polyfills.Tests
         /// Tests the <see cref="EnumerableExtensions.ToArrayAsync{TSource}(IEnumerable{Task{TSource}})"/> method.
         /// </summary>
         [Fact]
-        public async void TaskToArrayTest()
+        public async Task TaskToArrayTest()
         {
             int[] array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             Task<IEnumerable<int>> arrayTask = TaskExExtensions.Delay(10).ContinueWith(_ => array.Select(x => x));

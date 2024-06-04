@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Tests
     public partial class AdbClientExtensionsTests
     {
         [Fact]
-        public async void ExecuteServerCommandAsyncTest()
+        public async Task ExecuteServerCommandAsyncTest()
         {
             const string target = nameof(target);
             const string command = nameof(command);
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void ExecuteRemoteCommandAsyncTest()
+        public async Task ExecuteRemoteCommandAsyncTest()
         {
             const string command = nameof(command);
             DeviceData device = new() { Serial = "169.254.109.177:5555" };
@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void RunLogServiceAsyncTest()
+        public async Task RunLogServiceAsyncTest()
         {
             DeviceData device = new() { Serial = "169.254.109.177:5555" };
             IProgress<LogEntry> progress = Substitute.For<IProgress<LogEntry>>();

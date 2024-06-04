@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Models.Tests
@@ -85,7 +86,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-        public async void RefreshAsyncTest()
+        public async Task RefreshAsyncTest()
         {
             DeviceData device = new()
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -12,7 +13,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.StatAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StatAsyncTest()
+        public async Task StatAsyncTest()
         {
             FileStatistics value = await RunTestAsync(
                 OkResponses(2),
@@ -41,7 +42,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.GetDirectoryListingAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetListingAsyncTest()
+        public async Task GetListingAsyncTest()
         {
             List<FileStatistics> value = await RunTestAsync(
                 OkResponses(2),
@@ -98,7 +99,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.GetDirectoryAsyncListing(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetAsyncListingTest()
+        public async Task GetAsyncListingTest()
         {
             List<FileStatistics> value = await RunTestAsync(
                 OkResponses(2),
@@ -155,7 +156,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.PullAsync(string, Stream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PullAsyncTest()
+        public async Task PullAsyncTest()
         {
             await using MemoryStream stream = new();
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
@@ -192,7 +193,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.PushAsync(Stream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PushAsyncTest()
+        public async Task PushAsyncTest()
         {
             FileStream stream = File.OpenRead("Assets/Fstab.bin");
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
@@ -227,7 +228,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.IsProcessing"/> field.
         /// </summary>
         [Fact]
-        public async void IsProcessingAsyncTest()
+        public async Task IsProcessingAsyncTest()
         {
             await RunTestAsync(
                 OkResponses(2),
@@ -268,7 +269,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PullWinRTAsyncTest()
+        public async Task PullWinRTAsyncTest()
         {
             using InMemoryRandomAccessStream stream = new();
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
@@ -306,7 +307,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="SyncService.PushAsync(IInputStream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PushWinRTAsyncTest()
+        public async Task PushWinRTAsyncTest()
         {
             StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Fstab.bin"));
             using IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync();

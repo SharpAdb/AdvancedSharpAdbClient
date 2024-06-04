@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.DeviceCommands.Tests
@@ -6,7 +7,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
     public partial class PackageManagerTests
     {
         [Fact]
-        public async void InstallRemotePackageAsyncTest()
+        public async Task InstallRemotePackageAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -30,7 +31,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public async void InstallPackageAsyncTest()
+        public async Task InstallPackageAsyncTest()
         {
             DummySyncService syncService = new();
 
@@ -59,7 +60,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public async void InstallMultipleRemotePackageAsyncTest()
+        public async Task InstallMultipleRemotePackageAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -133,7 +134,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public async void InstallMultiplePackageAsyncTest()
+        public async Task InstallMultiplePackageAsyncTest()
         {
             DummySyncService syncService = new();
 
@@ -204,7 +205,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public async void UninstallPackageAsyncTest()
+        public async Task UninstallPackageAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
@@ -217,7 +218,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         }
 
         [Fact]
-        public async void GetPackageVersionInfoAsyncTest()
+        public async Task GetPackageVersionInfoAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys package com.google.android.gms"] = File.ReadAllText("Assets/DumpSys.GApps.txt");

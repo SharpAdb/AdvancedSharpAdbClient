@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
     public partial class DeviceExtensionsTests
     {
         [Fact]
-        public async void ExecuteServerCommandAsyncTest()
+        public async Task ExecuteServerCommandAsyncTest()
         {
             const string command = nameof(command);
             IAdbSocket socket = Substitute.For<IAdbSocket>();
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.ClearInputAsync(IAdbClient, DeviceData, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ClearInputAsyncTest()
+        public async Task ClearInputAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.ClickBackButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ClickBackButtonAsyncTest()
+        public async Task ClickBackButtonAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_BACK"] = string.Empty;
@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.ClickHomeButtonAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ClickHomeButtonAsyncTest()
+        public async Task ClickHomeButtonAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_HOME"] = string.Empty;
@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.StatAsync(IAdbClient, DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StatAsyncTest()
+        public async Task StatAsyncTest()
         {
             const string remotePath = "/test";
             FileStatistics stats = new();
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.GetDirectoryListingAsync(IAdbClient, DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetDirectoryListingAsyncTest()
+        public async Task GetDirectoryListingAsyncTest()
         {
             const string remotePath = "/test";
             List<FileStatistics> stats = [new()];
@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.GetDirectoryAsyncListing(IAdbClient, DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetDirectoryAsyncListingTest()
+        public async Task GetDirectoryAsyncListingTest()
         {
             const string remotePath = "/test";
             List<FileStatistics> stats = [new()];
@@ -181,7 +181,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.GetEnvironmentVariablesAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetEnvironmentVariablesAsyncTest()
+        public async Task GetEnvironmentVariablesAsyncTest()
         {
             DummyAdbClient adbClient = new();
 
@@ -198,7 +198,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceExtensions.UninstallPackageAsync(IAdbClient, DeviceData, string, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void UninstallPackageAsyncTests()
+        public async Task UninstallPackageAsyncTests()
         {
             DummyAdbClient adbClient = new();
 
@@ -440,7 +440,7 @@ Dexopt state:
 Compiler stats:
   [jp.co.cyberagent.stf]
      base.apk - 1084", 4, "2.1.0", "jp.co.cyberagent.stf")]
-        public async void GetPackageVersionAsyncTest(string command, int versionCode, string versionName, string packageName)
+        public async Task GetPackageVersionAsyncTest(string command, int versionCode, string versionName, string packageName)
         {
             DummyAdbClient adbClient = new();
 
@@ -459,7 +459,7 @@ Compiler stats:
         /// Tests the <see cref="DeviceExtensions.ListProcessesAsync(IAdbClient, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ListProcessesAsyncTest()
+        public async Task ListProcessesAsyncTest()
         {
             DummyAdbClient adbClient = new();
 

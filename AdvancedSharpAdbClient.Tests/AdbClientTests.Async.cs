@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetAdbVersionAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetAdbVersionAsyncTest()
+        public async Task GetAdbVersionAsyncTest()
         {
             string[] responseMessages = ["0020"];
             string[] requests = ["host:version"];
@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.KillAdbAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void KillAdbAsyncTest()
+        public async Task KillAdbAsyncTest()
         {
             string[] requests = ["host:kill"];
 
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetDevicesAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetDevicesAsyncTest()
+        public async Task GetDevicesAsyncTest()
         {
             string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
             string[] requests = ["host:devices-l"];
@@ -80,7 +80,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.CreateForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateForwardAsyncTest() =>
+        public async Task CreateForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 device => TestClient.CreateForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.CreateReverseForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateReverseAsyncTest() =>
+        public async Task CreateReverseAsyncTest() =>
             await RunCreateReverseAsyncTest(
                 device => TestClient.CreateReverseForwardAsync(device, "tcp:1", "tcp:2", true),
                 "tcp:1;tcp:2");
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.CreateForwardAsync(IAdbClient, DeviceData, int, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateTcpForwardAsyncTest() =>
+        public async Task CreateTcpForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 device => TestClient.CreateForwardAsync(device, 3, 4),
                 "tcp:3;tcp:4");
@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.CreateForwardAsync(IAdbClient, DeviceData, int, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateSocketForwardAsyncTest() =>
+        public async Task CreateSocketForwardAsyncTest() =>
             await RunCreateForwardAsyncTest(
                 device => TestClient.CreateForwardAsync(device, 5, "/socket/1"),
                 "tcp:5;local:/socket/1");
@@ -116,7 +116,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.CreateForwardAsync(DeviceData, string, string, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateDuplicateForwardAsyncTest()
+        public async Task CreateDuplicateForwardAsyncTest()
         {
             AdbResponse[] responses = [AdbResponse.FromError("cannot rebind existing socket")];
             string[] requests = ["host-serial:169.254.109.177:5555:forward:norebind:tcp:1;tcp:2"];
@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RemoveForwardAsync(DeviceData, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RemoveForwardAsyncTest()
+        public async Task RemoveForwardAsyncTest()
         {
             string[] requests = ["host-serial:169.254.109.177:5555:killforward:tcp:1"];
 
@@ -148,7 +148,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RemoveReverseForwardAsync(DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RemoveReverseForwardAsyncTest()
+        public async Task RemoveReverseForwardAsyncTest()
         {
             string[] requests =
             [
@@ -167,7 +167,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RemoveAllForwardsAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RemoveAllForwardsAsyncTest()
+        public async Task RemoveAllForwardsAsyncTest()
         {
             string[] requests = ["host-serial:169.254.109.177:5555:killforward-all"];
 
@@ -182,7 +182,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RemoveAllReverseForwardsAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RemoveAllReversesAsyncTest()
+        public async Task RemoveAllReversesAsyncTest()
         {
             string[] requests =
             [
@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ListForwardAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ListForwardAsyncTest()
+        public async Task ListForwardAsyncTest()
         {
             string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
             string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
@@ -223,7 +223,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ListReverseForwardAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ListReverseForwardAsyncTest()
+        public async Task ListReverseForwardAsyncTest()
         {
             string[] responseMessages = ["(reverse) localabstract:scrcpy tcp:100\n(reverse) localabstract: scrcpy2 tcp:100\n(reverse) localabstract: scrcpy3 tcp:100\n"];
 
@@ -250,7 +250,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ExecuteServerCommandAsync(string, string, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ExecuteServerCommandAsyncTest()
+        public async Task ExecuteServerCommandAsyncTest()
         {
             string[] requests = ["host:version"];
 
@@ -275,7 +275,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ExecuteRemoteCommandAsyncTest()
+        public async Task ExecuteRemoteCommandAsyncTest()
         {
             string[] requests =
             [
@@ -302,7 +302,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ExecuteRemoteCommandAsync(string, DeviceData, IShellOutputReceiver?, Encoding, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ExecuteRemoteCommandAsyncUnresponsiveTest()
+        public async Task ExecuteRemoteCommandAsyncUnresponsiveTest()
         {
             string[] requests =
             [
@@ -325,7 +325,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetFrameBufferAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetFrameBufferAsyncTest()
+        public async Task GetFrameBufferAsyncTest()
         {
             string[] requests =
             [
@@ -389,7 +389,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, Action{LogEntry}, CancellationToken, LogId[])"/> method.
         /// </summary>
         [Fact]
-        public async void RunLogServiceAsyncTest()
+        public async Task RunLogServiceAsyncTest()
         {
             string[] requests =
             [
@@ -418,7 +418,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RunLogServiceAsync(DeviceData, CancellationToken, LogId[])"/> method.
         /// </summary>
         [Fact]
-        public async void RunLogServiceEnumerableAsyncTest()
+        public async Task RunLogServiceEnumerableAsyncTest()
         {
             string[] requests =
             [
@@ -445,7 +445,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RebootAsync(string, DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RebootAsyncTest()
+        public async Task RebootAsyncTest()
         {
             string[] requests =
             [
@@ -464,7 +464,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPAddress, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncIPAddressTest() =>
+        public async Task PairAsyncIPAddressTest() =>
             await RunPairAsyncTest(
                 () => TestClient.PairAsync(IPAddress.Loopback, "114514"),
                 "127.0.0.1:5555",
@@ -474,7 +474,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, DnsEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncDnsEndpointTest() =>
+        public async Task PairAsyncDnsEndpointTest() =>
             await RunPairAsyncTest(
                 () => TestClient.PairAsync(new DnsEndPoint("localhost", 1234), "114514"),
                 "localhost:1234",
@@ -484,7 +484,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncIPEndpointTest() =>
+        public async Task PairAsyncIPEndpointTest() =>
             await RunPairAsyncTest(
                 () => TestClient.PairAsync(new IPEndPoint(IPAddress.Loopback, 4321), "114514"),
                 "127.0.0.1:4321",
@@ -494,7 +494,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, string, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncHostEndpointTest() =>
+        public async Task PairAsyncHostEndpointTest() =>
             await RunPairAsyncTest(
                 () => TestClient.PairAsync("localhost:9926", "114514"),
                 "localhost:9926",
@@ -504,35 +504,35 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPAddress, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncIPAddressNullTest() =>
+        public async Task PairAsyncIPAddressNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPAddress)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, DnsEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncDnsEndpointNullTest() =>
+        public async Task PairAsyncDnsEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((DnsEndPoint)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, IPEndPoint, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncIPEndpointNullTest() =>
+        public async Task PairAsyncIPEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((IPEndPoint)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.PairAsync(IAdbClient, string, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void PairAsyncHostEndpointNullTest() =>
+        public async Task PairAsyncHostEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.PairAsync((string)null, "114514"));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPAddress, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncIPAddressTest() =>
+        public async Task ConnectAsyncIPAddressTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(IPAddress.Loopback),
                 "127.0.0.1:5555");
@@ -541,7 +541,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncDnsEndpointTest() =>
+        public async Task ConnectAsyncDnsEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(new DnsEndPoint("localhost", 1234)),
                 "localhost:1234");
@@ -550,7 +550,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncIPEndpointTest() =>
+        public async Task ConnectAsyncIPEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 4321)),
                 "127.0.0.1:4321");
@@ -559,7 +559,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.ConnectAsync(string, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncHostEndpointTest() =>
+        public async Task ConnectAsyncHostEndpointTest() =>
             await RunConnectAsyncTest(
                 () => TestClient.ConnectAsync("localhost:9926"),
                 "localhost:9926");
@@ -568,35 +568,35 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPAddress, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncIPAddressNullTest() =>
+        public async Task ConnectAsyncIPAddressNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPAddress)null));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncDnsEndpointNullTest() =>
+        public async Task ConnectAsyncDnsEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((DnsEndPoint)null));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.ConnectAsync(IAdbClient, IPEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncIPEndpointNullTest() =>
+        public async Task ConnectAsyncIPEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync((IPEndPoint)null));
 
         /// <summary>
         /// Tests the <see cref="AdbClient.ConnectAsync(string, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ConnectAsyncHostEndpointNullTest() =>
+        public async Task ConnectAsyncHostEndpointNullTest() =>
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => TestClient.ConnectAsync(null));
 
         /// <summary>
         /// Tests the <see cref="AdbClientExtensions.DisconnectAsync(IAdbClient, DnsEndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DisconnectAsyncTest()
+        public async Task DisconnectAsyncTest()
         {
             string[] requests = ["host:disconnect:localhost:5555"];
             string[] responseMessages = ["disconnected 127.0.0.1:5555"];
@@ -612,7 +612,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.RootAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void RootAsyncTest()
+        public async Task RootAsyncTest()
         {
             string[] requests =
             [
@@ -639,7 +639,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.UnrootAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void UnrootAsyncTest()
+        public async Task UnrootAsyncTest()
         {
             string[] requests =
             [
@@ -666,7 +666,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, Stream, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallAsyncTest()
+        public async Task InstallAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -714,7 +714,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{Stream}, string, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallMultipleAsyncTest()
+        public async Task InstallMultipleAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -773,7 +773,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, Stream, IEnumerable{Stream}, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallMultipleWithBaseAsyncTest()
+        public async Task InstallMultipleWithBaseAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -848,7 +848,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallCreateAsync(DeviceData, string?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallCreateAsyncTest()
+        public async Task InstallCreateAsyncTest()
         {
             string[] requests =
             [
@@ -873,7 +873,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, Stream, string, string, Action{double}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void InstallWriteAsyncTest()
+        public async Task InstallWriteAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -924,7 +924,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallCommitAsync(DeviceData, string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void InstallCommitAsyncTest()
+        public async Task InstallCommitAsyncTest()
         {
             string[] requests =
             [
@@ -948,7 +948,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, IRandomAccessStream, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallWinRTAsyncTest()
+        public async Task InstallWinRTAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -997,7 +997,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IEnumerable{IRandomAccessStream}, string, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallMultipleWinRTAsyncTest()
+        public async Task InstallMultipleWinRTAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -1057,7 +1057,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallMultipleAsync(DeviceData, IRandomAccessStream, IEnumerable{IRandomAccessStream}, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void InstallMultipleWinRTWithBaseAsyncTest()
+        public async Task InstallMultipleWinRTWithBaseAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -1134,7 +1134,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.InstallWriteAsync(DeviceData, IRandomAccessStream, string, string, Action{double}?, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void InstallWriteWinRTAsyncTest()
+        public async Task InstallWriteWinRTAsyncTest()
         {
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
@@ -1187,7 +1187,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClientExtensions.UninstallAsync(IAdbClient, DeviceData, string, string[])"/> method.
         /// </summary>
         [Fact]
-        public async void UninstallAsyncTest()
+        public async Task UninstallAsyncTest()
         {
             string[] requests =
             [
@@ -1210,7 +1210,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbClient.GetFeatureSetAsync(DeviceData, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetFeatureSetAsyncTest()
+        public async Task GetFeatureSetAsyncTest()
         {
             string[] requests = ["host-serial:169.254.109.177:5555:features"];
             string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];

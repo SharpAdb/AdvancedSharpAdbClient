@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Logs.Tests
@@ -37,7 +38,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async void ReadLogAsyncTest()
+        public async Task ReadLogAsyncTest()
         {
             await using FileStream stream = File.OpenRead(@"Assets/Logcat.bin");
             await using ShellStream shellStream = new(stream, false);
@@ -100,7 +101,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
 
         [Fact]
-        public async void ReadEventLogAsyncTest()
+        public async Task ReadEventLogAsyncTest()
         {
             // The data in this stream was read using a ShellStream, so the CRLF fixing
             // has already taken place.

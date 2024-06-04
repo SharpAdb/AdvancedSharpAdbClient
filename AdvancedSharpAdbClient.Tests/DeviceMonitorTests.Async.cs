@@ -8,7 +8,7 @@ namespace AdvancedSharpAdbClient.Tests
     public partial class DeviceMonitorTests
     {
         [Fact]
-        public async void DeviceDisconnectedAsyncTest()
+        public async Task DeviceDisconnectedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -56,7 +56,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void DeviceConnectedAsyncTest()
+        public async Task DeviceConnectedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="DeviceMonitor.StartAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StartInitialDeviceListAsyncTest()
+        public async Task StartInitialDeviceListAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void TriggeredWhenStatusChangedAsyncTest()
+        public async Task TriggeredWhenStatusChangedAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -183,7 +183,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void NoTriggerIfStatusIsSameAsyncTest()
+        public async Task NoTriggerIfStatusIsSameAsyncTest()
         {
             Socket.WaitForNewData = true;
 
@@ -236,7 +236,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// loop. The <see cref="DeviceMonitor"/> should detect this condition and restart the adb server.
         /// </summary>
         [Fact]
-        public async void AdbKilledAsyncTest()
+        public async Task AdbKilledAsyncTest()
         {
             DummyAdbServer dummyAdbServer = new();
             AdbServer.Instance = dummyAdbServer;

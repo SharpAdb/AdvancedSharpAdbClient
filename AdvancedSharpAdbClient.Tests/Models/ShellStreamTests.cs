@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Models.Tests
@@ -103,7 +104,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-        public async void CRLFAtStartAsyncTest()
+        public async Task CRLFAtStartAsyncTest()
         {
             await using MemoryStream stream = GetStream("\r\nHello, World!");
             await using ShellStream shellStream = new(stream, false);
@@ -122,7 +123,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-        public async void MultipleCRLFInStringAsyncTest()
+        public async Task MultipleCRLFInStringAsyncTest()
         {
             await using MemoryStream stream = GetStream("\r\n1\r\n2\r\n3\r\n4\r\n5");
             await using ShellStream shellStream = new(stream, false);
@@ -144,7 +145,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         }
 
         [Fact]
-        public async void PendingByteAsyncTest()
+        public async Task PendingByteAsyncTest()
         {
             await using MemoryStream stream = GetStream("\r\nH\ra");
             await using ShellStream shellStream = new(stream, false);

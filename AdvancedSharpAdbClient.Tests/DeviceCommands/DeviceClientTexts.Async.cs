@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Xunit;
 
@@ -15,7 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenStringAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenStringAsyncTest()
+        public async Task DumpScreenStringAsyncTest()
         {
             string dump = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
             string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
@@ -35,7 +36,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenStringAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenStringMIUIAsyncTest()
+        public async Task DumpScreenStringMIUIAsyncTest()
         {
             string miuidump = await File.ReadAllTextAsync(@"Assets/DumpScreen.MIUI.txt");
             string cleanMIUIDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
@@ -55,7 +56,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenStringAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenStringEmptyAsyncTest()
+        public async Task DumpScreenStringEmptyAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = string.Empty;
@@ -72,7 +73,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenStringAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenStringErrorAsyncTest()
+        public async Task DumpScreenStringErrorAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.Error.txt");
@@ -87,7 +88,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenAsyncTest()
+        public async Task DumpScreenAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
@@ -109,7 +110,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.DumpScreenWinRTAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void DumpScreenWinRTAsyncTest()
+        public async Task DumpScreenWinRTAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
@@ -132,7 +133,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         /// Tests the <see cref="DeviceClient.ClickAsync(int, int, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ClickAsyncTest()
+        public async Task ClickAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input tap 100 100"] = @"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
@@ -192,7 +193,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.ClickAsync(Point, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ClickCordsAsyncTest()
+        public async Task ClickCordsAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input tap 100 100"] = "Error: Injecting to another application requires INJECT_EVENTS permission\r\n";
@@ -207,7 +208,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.SwipeAsync(int, int, int, int, long, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void SwipeAsyncTest()
+        public async Task SwipeAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
@@ -222,7 +223,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.SwipeAsync(Point, Point, long, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void SwipePointAsyncTest()
+        public async Task SwipePointAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
@@ -237,7 +238,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.SwipeAsync(Element, Element, long, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void SwipeElementAsyncTest()
+        public async Task SwipeElementAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
@@ -259,7 +260,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [InlineData("\r\n", false)]
         [InlineData(" ", false)]
         [InlineData("", false)]
-        public async void IsAppRunningAsyncTest(string response, bool expected)
+        public async Task IsAppRunningAsyncTest(string response, bool expected)
         {
             DummyAdbClient client = new();
             client.Commands["shell:pidof com.google.android.gms"] = response;
@@ -279,7 +280,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [InlineData("app.lawnchair", true)]
         [InlineData("com.android.settings", true)]
         [InlineData("com.google.android.gms", false)]
-        public async void IsAppInForegroundAsyncTest(string packageName, bool expected)
+        public async Task IsAppInForegroundAsyncTest(string packageName, bool expected)
         {
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
@@ -299,7 +300,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Theory]
         [InlineData("com.google.android.gms", "21216 27761\r\n", AppStatus.Background)]
         [InlineData("com.android.gallery3d", "\r\n", AppStatus.Stopped)]
-        public async void GetAppStatusAsyncTest(string packageName, string response, AppStatus expected)
+        public async Task GetAppStatusAsyncTest(string packageName, string response, AppStatus expected)
         {
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
@@ -321,7 +322,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         [Theory]
         [InlineData("app.lawnchair", AppStatus.Foreground)]
         [InlineData("com.android.settings", AppStatus.Foreground)]
-        public async void GetAppStatusForegroundAsyncTest(string packageName, AppStatus expected)
+        public async Task GetAppStatusForegroundAsyncTest(string packageName, AppStatus expected)
         {
             DummyAdbClient client = new();
             client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
@@ -339,7 +340,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.FindElementAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void FindElementAsyncTest()
+        public async Task FindElementAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
@@ -364,7 +365,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.FindElementsAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void FindElementsAsyncTest()
+        public async Task FindElementsAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
@@ -386,7 +387,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.FindAsyncElements(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void FindAsyncElementsTest()
+        public async Task FindAsyncElementsTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
@@ -408,7 +409,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.SendKeyEventAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void SendKeyEventAsyncTest()
+        public async Task SendKeyEventAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
@@ -423,7 +424,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.SendTextAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void SendTextAsyncTest()
+        public async Task SendTextAsyncTest()
         {
             DummyAdbClient client = new();
             client.Commands["shell:input text Hello, World"] = string.Empty;
@@ -438,7 +439,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.StartAppAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StartAppAsyncTest()
+        public async Task StartAppAsyncTest()
         {
             DummyAdbClient client = new();
 
@@ -452,7 +453,7 @@ Caused by: android.os.RemoteException: Remote stack trace:
         /// Tests the <see cref="DeviceClient.StopAppAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StopAppAsyncTest()
+        public async Task StopAppAsyncTest()
         {
             DummyAdbClient client = new();
 

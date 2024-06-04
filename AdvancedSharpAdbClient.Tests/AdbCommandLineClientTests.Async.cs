@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -10,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetVersionAsyncTest()
+        public async Task GetVersionAsyncTest()
         {
             Version adbVersion = new(1, 0, 41);
             string fileVersion = "34.0.4-android-tools";
@@ -29,7 +30,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetVersionAsyncNullTest()
+        public async Task GetVersionAsyncNullTest()
         {
             DummyAdbCommandLineClient commandLine = new()
             {
@@ -42,7 +43,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbCommandLineClient.GetVersionAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void GetOutdatedVersionAsyncTest()
+        public async Task GetOutdatedVersionAsyncTest()
         {
             DummyAdbCommandLineClient commandLine = new()
             {
@@ -55,7 +56,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="AdbCommandLineClient.StartServerAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void StartServerAsyncTest()
+        public async Task StartServerAsyncTest()
         {
             DummyAdbCommandLineClient commandLine = new();
             Assert.False(commandLine.ServerStarted);

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -10,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
     public partial class TcpSocketTests
     {
         [Fact]
-        public async void LifecycleAsyncTest()
+        public async Task LifecycleAsyncTest()
         {
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
@@ -28,7 +29,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         [Fact]
-        public async void LifecycleAsyncMemoryTest()
+        public async Task LifecycleAsyncMemoryTest()
         {
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
@@ -49,7 +50,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="TcpSocket.ReconnectAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void ReconnectAsyncTest()
+        public async Task ReconnectAsyncTest()
         {
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
@@ -68,7 +69,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Tests the <see cref="TcpSocket.ConnectAsync(EndPoint, CancellationToken)"/> method.
         /// </summary>
         [Fact]
-        public async void CreateUnsupportedSocketAsyncTest()
+        public async Task CreateUnsupportedSocketAsyncTest()
         {
             using TcpSocket socket = new();
             _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint()));
