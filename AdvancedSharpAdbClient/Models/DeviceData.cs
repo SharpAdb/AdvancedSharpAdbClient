@@ -107,7 +107,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// <see langword="false"/> if <see cref="DeviceData"/> does not have a valid serial number; otherwise, <see langword="true"/>.
         /// </summary>
-        public bool IsEmpty => string.IsNullOrEmpty(Serial);
+        public bool IsEmpty => !uint.TryParse(TransportId, out _) && string.IsNullOrEmpty(Serial);
 
         /// <summary>
         /// Creates a new instance of the <see cref="DeviceData"/> class based on
@@ -208,9 +208,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(Serial))
+            if (IsEmpty)
             {
-                return $"An empty {GetType()} without {nameof(Serial)}";
+                return $"An empty {GetType()} without {nameof(TransportId)} and {nameof(Serial)}";
             }
 
             StringBuilder builder =
@@ -283,7 +283,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             if (device.IsEmpty)
             {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a serial number for the device");
+                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a transport ID or serial number for the device");
             }
             return ref device;
         }
