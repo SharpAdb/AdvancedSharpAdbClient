@@ -75,6 +75,8 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void ToImageTest()
         {
+            if (!OperatingSystem.IsWindows()) { return; }
+
             byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
             byte[] framebuffer = File.ReadAllBytes("Assets/Framebuffer.bin");
@@ -95,6 +97,8 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void ToImageEmptyTest()
         {
+            if (!OperatingSystem.IsWindows()) { return; }
+
             byte[] data = File.ReadAllBytes("Assets/FramebufferHeader.Empty.bin");
             FramebufferHeader header = FramebufferHeader.Read(data);
 

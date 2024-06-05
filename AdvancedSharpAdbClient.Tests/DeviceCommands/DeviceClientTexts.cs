@@ -198,6 +198,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public void DumpScreenWinRTTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 

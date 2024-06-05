@@ -70,6 +70,8 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(0u, header.ColorSpace);
 
 #if WINDOWS
+            if (!OperatingSystem.IsWindows()) { return; }
+
             using Bitmap image = (Bitmap)framebuffer;
             Assert.NotNull(image);
             Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
@@ -131,6 +133,8 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(0u, header.ColorSpace);
 
 #if WINDOWS
+            if (!OperatingSystem.IsWindows()) { return; }
+
             using Bitmap image = (Bitmap)framebuffer;
             Assert.NotNull(image);
             Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);

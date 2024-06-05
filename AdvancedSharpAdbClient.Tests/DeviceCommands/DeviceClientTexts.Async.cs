@@ -112,6 +112,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async Task DumpScreenWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
 

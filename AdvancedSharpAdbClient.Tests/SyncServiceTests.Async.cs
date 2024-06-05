@@ -271,6 +271,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task PullWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             using InMemoryRandomAccessStream stream = new();
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
             byte[] contentLength = BitConverter.GetBytes(content.Length);
@@ -309,6 +311,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task PushWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Fstab.bin"));
             using IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync();
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");

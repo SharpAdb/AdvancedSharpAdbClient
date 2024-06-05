@@ -368,6 +368,8 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0u, header.ColorSpace);
 
 #if WINDOWS
+            if (!OperatingSystem.IsWindows()) { return; }
+
             using Bitmap image = framebuffer.ToImage();
             Assert.NotNull(image);
             Assert.Equal(PixelFormat.Format32bppArgb, image.PixelFormat);
@@ -900,14 +902,6 @@ namespace AdvancedSharpAdbClient.Tests
 
                 byte[] response = AdbClient.Encoding.GetBytes($"Success: streamed {stream.Length} bytes\n");
 
-                double temp = 0;
-                Progress<double> progress = new();
-                progress.ProgressChanged += (sender, args) =>
-                {
-                    Assert.True(temp <= args, $"{nameof(args)}: {args} is less than {temp}.");
-                    temp = args;
-                };
-
                 await RunTestAsync(
                     OkResponses(2),
                     NoResponseMessages,
@@ -916,7 +910,7 @@ namespace AdvancedSharpAdbClient.Tests
                     NoSyncResponses,
                     [response],
                     applicationDataChunks,
-                    () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062", progress));
+                    () => TestClient.InstallWriteAsync(Device, stream, "base", "936013062", new InstallProgress()));
             }
         }
 
@@ -950,6 +944,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task InstallWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
@@ -999,6 +995,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task InstallMultipleWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
@@ -1059,6 +1057,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task InstallMultipleWinRTWithBaseAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
@@ -1136,6 +1136,8 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task InstallWriteWinRTAsyncTest()
         {
+            if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
+
             // The app data is sent in chunks of 32 kb
             List<byte[]> applicationDataChunks = [];
 
