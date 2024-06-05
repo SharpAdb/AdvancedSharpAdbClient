@@ -146,7 +146,10 @@ namespace AdvancedSharpAdbClient.Tests
             // to a specific device
             if (device != null)
             {
-                SendAdbRequest($"host:transport:{device.Serial}");
+                if(!string.IsNullOrWhiteSpace(device.TransportId) && uint.TryParse(device.TransportId,out var tid))
+                    SendAdbRequest($"host:transport-id:{tid}");
+                else
+                    SendAdbRequest($"host:transport:{device.Serial}");
 
                 try
                 {
