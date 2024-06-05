@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously lists the contents of a directory on the device.
         /// </summary>

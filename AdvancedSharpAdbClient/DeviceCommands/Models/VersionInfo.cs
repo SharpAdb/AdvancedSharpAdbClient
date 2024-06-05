@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             return true;
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Try to parse the <see cref="VersionName"/> into a <see cref="PackageVersion"/> object.
         /// </summary>

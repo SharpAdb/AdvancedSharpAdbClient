@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     [DebuggerDisplay($"{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class DeviceMonitor : IDeviceMonitor, ICloneable<DeviceMonitor>, ICloneable
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         , IAsyncDisposable
 #endif
     {

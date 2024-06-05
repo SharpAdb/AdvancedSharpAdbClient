@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient
         public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate, Encoding encoding, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, predicate.AsShellOutputReceiver(), encoding, cancellationToken);
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously executes a command on the adb server and returns the output.
         /// </summary>
@@ -503,7 +503,7 @@ namespace AdvancedSharpAdbClient
                 ? throw new ArgumentNullException(nameof(endpoint))
                 : client.DisconnectAsync(endpoint.Host, endpoint.Port, cancellationToken);
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Asynchronously installs an Android application on an device.
         /// </summary>

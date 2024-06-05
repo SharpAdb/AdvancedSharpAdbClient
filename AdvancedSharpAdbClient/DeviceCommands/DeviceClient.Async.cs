@@ -59,7 +59,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return null;
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Gets the current device screen snapshot asynchronously.
         /// </summary>
@@ -362,7 +362,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return [];
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Gets elements by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>

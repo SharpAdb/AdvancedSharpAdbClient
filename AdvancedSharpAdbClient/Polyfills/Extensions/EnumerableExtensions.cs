@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         public static Task<TSource[]> ToArrayAsync<TSource>(this IEnumerable<Task<TSource>> source) =>
             source.WhenAll();
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously creates a <see cref="List{T}"/> from an <see cref="IAsyncEnumerable{T}"/>.
         /// </summary>

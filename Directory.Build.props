@@ -48,8 +48,7 @@
     <TargetPlatformMinVersion>10.0.15138.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'
-                         or '$(TargetFramework)' == 'uap10.0.15138.0'">
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'uap'))">
     <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
     <DefaultLanguage>en-US</DefaultLanguage>
     <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP;UAP10_0</DefineConstants>

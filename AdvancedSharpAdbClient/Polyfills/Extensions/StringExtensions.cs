@@ -105,7 +105,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <returns>A string that consists of the elements of <paramref name="values"/> delimited by the
         /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
         public static string Join(char separator, params object?[] values) =>
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UAP10_0_15138_0
+#if HAS_FULLSTRING
             string.Join(separator, values);
 #else
             Join(new string([separator]), values);
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <returns>A string that consists of the elements of <paramref name="value"/> delimited by the
         /// <paramref name="separator"/> string.<para>-or-</para><see cref="string.Empty"/> if values has zero elements.</returns>
         public static string Join(char separator, params string?[] value) =>
-#if NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER || UAP10_0_15138_0
+#if HAS_FULLSTRING
             string.Join(separator, value);
 #else
             string.Join(new string([separator]), value);

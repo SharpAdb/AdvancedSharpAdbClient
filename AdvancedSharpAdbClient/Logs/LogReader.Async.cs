@@ -151,7 +151,7 @@ namespace AdvancedSharpAdbClient.Logs
                     // Use a stream on the data buffer. This will make sure that,
                     // if anything goes wrong parsing the data, we never go past
                     // the message boundary itself.
-#if NETCOREAPP3_0_OR_GREATER
+#if COMP_NETSTANDARD2_1
                     await
 #endif
                     using (MemoryStream dataStream = new(data))

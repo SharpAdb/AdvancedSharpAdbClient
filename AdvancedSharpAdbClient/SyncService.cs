@@ -43,7 +43,7 @@ namespace AdvancedSharpAdbClient
     /// </example>
     [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
     public partial class SyncService : ISyncService, ICloneable<SyncService>, ICloneable
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         , ISyncService.IWinRT
 #endif
     {

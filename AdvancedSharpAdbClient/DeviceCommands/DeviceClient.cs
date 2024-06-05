@@ -90,7 +90,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return null;
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Gets the current device screen snapshot.
         /// </summary>

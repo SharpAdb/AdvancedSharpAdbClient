@@ -109,7 +109,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="buffer">A span of bytes that contains the data to be sent.</param>
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <returns>The number of bytes sent to the Socket.</returns>
-        int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags) => Send(buffer.ToArray(), buffer.Length, socketFlags);
+        int Send(ReadOnlySpan<byte> buffer, SocketFlags socketFlags)
+#if COMP_NETSTANDARD2_1
+            => Send(buffer.ToArray(), buffer.Length, socketFlags)
+#endif
+            ;
 
         /// <summary>
         /// Receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
@@ -119,6 +123,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <returns>The number of bytes received.</returns>
         int Receive(Span<byte> buffer, SocketFlags socketFlags)
+#if COMP_NETSTANDARD2_1
         {
             byte[] bytes = new byte[buffer.Length];
             int length = Receive(bytes, bytes.Length, socketFlags);
@@ -128,6 +133,9 @@ namespace AdvancedSharpAdbClient
             }
             return length;
         }
+#else
+            ;
+#endif
 #endif
 
         /// <summary>

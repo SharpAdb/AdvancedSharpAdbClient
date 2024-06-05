@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <inheritdoc/>
         [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
@@ -465,7 +465,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
         public async IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {

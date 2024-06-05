@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient
         public static Task PullAsync(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken);
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Asynchronously pushes (uploads) a file to the remote device.
         /// </summary>

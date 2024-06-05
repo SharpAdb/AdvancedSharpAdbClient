@@ -50,7 +50,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken);
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
@@ -75,7 +75,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ReopenAsync(CancellationToken cancellationToken);
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Provides access to the WinRT specific methods of the <see cref="ISyncService"/> interface.
         /// </summary>

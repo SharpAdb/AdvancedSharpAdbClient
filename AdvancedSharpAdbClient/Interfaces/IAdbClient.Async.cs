@@ -228,7 +228,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken);
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously executes a command on the adb server and returns the output.
         /// </summary>
@@ -448,7 +448,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns the list of all features supported by the current device.</returns>
         Task<IEnumerable<string>> GetFeatureSetAsync(DeviceData device, CancellationToken cancellationToken);
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Provides access to the WinRT specific methods of the <see cref="IAdbClient"/> interface.
         /// </summary>

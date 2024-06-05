@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient
             await ExecuteServerCommandAsync("shell", command, socket, receiver, encoding, cancellationToken);
         }
 
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
         public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
-#if NETCOREAPP3_0_OR_GREATER
+#if COMP_NETSTANDARD2_1
             await
 #endif
             using Stream stream = socket.GetShellStream();
@@ -397,7 +397,7 @@ namespace AdvancedSharpAdbClient
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
-#if NETCOREAPP3_0_OR_GREATER
+#if COMP_NETSTANDARD2_1
             await
 #endif
             using Stream stream = socket.GetShellStream();
@@ -932,7 +932,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <inheritdoc/>
         [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)

@@ -579,7 +579,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
                 using (ISyncService sync = SyncServiceFactory(AdbClient, Device))
                 {
-#if NETCOREAPP3_0_OR_GREATER
+#if COMP_NETSTANDARD2_1
                     await
 #endif
                     using Stream stream = await GetFileStreamAsync(localFilePath, cancellationToken).ConfigureAwait(false);

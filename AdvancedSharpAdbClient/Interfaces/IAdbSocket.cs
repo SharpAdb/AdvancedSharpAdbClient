@@ -140,7 +140,11 @@ namespace AdvancedSharpAdbClient
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A span of bytes that acts as a buffer, containing the data to send.</param>
-        void Send(ReadOnlySpan<byte> data) => Send(data.ToArray());
+        void Send(ReadOnlySpan<byte> data)
+#if COMP_NETSTANDARD2_1
+            => Send(data.ToArray())
+#endif
+            ;
 
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
@@ -150,6 +154,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>The total number of bytes read.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         int Read(Span<byte> data)
+#if COMP_NETSTANDARD2_1
         {
             byte[] bytes = new byte[data.Length];
             int length = Read(bytes);
@@ -159,6 +164,9 @@ namespace AdvancedSharpAdbClient
             }
             return length;
         }
+#else
+            ;
+#endif
 #endif
 
         /// <summary>

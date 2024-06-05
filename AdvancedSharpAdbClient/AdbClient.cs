@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient
     /// </remarks>
     [DebuggerDisplay($"{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public partial class AdbClient : IAdbClient, ICloneable<AdbClient>, ICloneable
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         , IAdbClient.IWinRT
 #endif
     {

@@ -83,7 +83,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             Children = FindElements(client, device, xmlNode);
         }
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Initializes a new instance of the <see cref="Element"/> class.
         /// </summary>
@@ -212,7 +212,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         public static Element? FromXmlNode(IAdbClient client, DeviceData device, XmlNode? xmlNode) =>
             xmlNode?.Attributes?["bounds"] != null ? new Element(client, device, xmlNode) : null;
 
-#if WINDOWS_UWP || WINDOWS10_0_17763_0_OR_GREATER
+#if HAS_WINRT
         /// <summary>
         /// Creates a new <see cref='Element'/> with the specified <see cref="Windows.Data.Xml.Dom.IXmlNode"/>.
         /// </summary>
