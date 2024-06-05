@@ -401,7 +401,14 @@ namespace AdvancedSharpAdbClient
             // to a specific device
             if (device != null)
             {
-                SendAdbRequest($"host:transport:{device.Serial}");
+                if (uint.TryParse(device.TransportId, out uint tid))
+                {
+                    SendAdbRequest($"host:transport-id:{tid}");
+                }
+                else
+                {
+                    SendAdbRequest($"host:transport:{device.Serial}");
+                }
 
                 try
                 {

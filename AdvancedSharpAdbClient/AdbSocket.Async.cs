@@ -262,7 +262,9 @@ namespace AdvancedSharpAdbClient
             // to a specific device
             if (device != null)
             {
-                await SendAdbRequestAsync($"host:transport:{device.Serial}", cancellationToken).ConfigureAwait(false);
+                await (uint.TryParse(device.TransportId, out uint tid)
+                    ? SendAdbRequestAsync($"host:transport-id:{tid}", cancellationToken).ConfigureAwait(false)
+                    : SendAdbRequestAsync($"host:transport:{device.Serial}", cancellationToken).ConfigureAwait(false));
 
                 try
                 {
