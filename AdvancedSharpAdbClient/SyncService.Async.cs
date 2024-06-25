@@ -201,7 +201,7 @@ namespace AdvancedSharpAdbClient
                     cancellationToken.ThrowIfCancellationRequested();
                 }
 
-                finish: return;
+            finish: return;
             }
             finally
             {
@@ -422,7 +422,7 @@ namespace AdvancedSharpAdbClient
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
             bool isLocked = false;
 
-            start:
+        start:
             List<FileStatistics> value = [];
 
             try
@@ -455,7 +455,7 @@ namespace AdvancedSharpAdbClient
                     value.Add(entry);
                 }
 
-                finish:
+            finish:
                 return value;
             }
             finally

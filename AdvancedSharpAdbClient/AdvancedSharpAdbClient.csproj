@@ -47,6 +47,7 @@
       System.Range;
       System.Runtime.CompilerServices.CallerArgumentExpressionAttribute;
       System.Runtime.CompilerServices.IsExternalInit;
+      System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute
     </PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
@@ -61,6 +62,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.Tests" />
     <InternalsVisibleTo Include="AdvancedSharpAdbClient.WinRT" />
+    <InternalsVisibleTo Include="AdvancedSharpAdbClient.Native" />
   </ItemGroup>
 
   <ItemGroup>

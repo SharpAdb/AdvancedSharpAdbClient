@@ -356,7 +356,7 @@ namespace System
             return (int)hash;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static void Initialize(out uint v1, out uint v2, out uint v3, out uint v4)
         {
             v1 = s_seed + Prime1 + Prime2;
@@ -365,19 +365,19 @@ namespace System
             v4 = s_seed - Prime1;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static uint Round(uint hash, uint input)
         {
             return RotateLeft(hash + (input * Prime2), 13) * Prime1;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static uint QueueRound(uint hash, uint queuedValue)
         {
             return RotateLeft(hash + (queuedValue * Prime3), 17) * Prime4;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static uint MixState(uint v1, uint v2, uint v3, uint v4)
         {
             return RotateLeft(v1, 1) + RotateLeft(v2, 7) + RotateLeft(v3, 12) + RotateLeft(v4, 18);
@@ -388,7 +388,7 @@ namespace System
             return s_seed + Prime5;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static uint MixFinal(uint hash)
         {
             hash ^= hash >> 15;
@@ -407,7 +407,7 @@ namespace System
         /// <param name="offset">The number of bits to rotate by.
         /// Any value outside the range [0..31] is treated as congruent mod 32.</param>
         /// <returns>The rotated value.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static uint RotateLeft(uint value, int offset)
             => (value << offset) | (value >> (32 - offset));
 

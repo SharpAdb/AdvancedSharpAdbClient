@@ -91,7 +91,7 @@ namespace System
         /// It is expected Range will be used with collections which always have non negative length/count.
         /// We validate the range is inside the length scope though.
         /// </remarks>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public Tuple<int, int> GetOffsetAndLength(int length)
         {
             int start = Start.GetOffset(length);

@@ -305,7 +305,7 @@ namespace AdvancedSharpAdbClient
                     callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
                 }
 
-                finish: return;
+            finish: return;
             }
             finally
             {
@@ -343,7 +343,7 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                start:
+            start:
                 // create the stat request message.
                 Socket.SendSyncRequest(SyncCommand.LIST, remotePath);
                 IsProcessing = true;
@@ -373,7 +373,7 @@ namespace AdvancedSharpAdbClient
                     isLocked = true;
                 }
 
-                finish:
+            finish:
                 yield break;
             }
             finally
