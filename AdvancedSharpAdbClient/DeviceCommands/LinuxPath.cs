@@ -24,7 +24,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <summary>
         /// Pattern to escape filenames for shell command consumption.
         /// </summary>
-        private const string EscapePattern = "([\\\\()*+?\"'#/\\s])";
+        private const string EscapePattern = """([\\()*+?"'#/\s])""";
 
         /// <summary>
         /// The <see cref="Array"/> of <see cref="char"/>s which are invalid in a path.
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns>The entry name.</returns>
-        public static string Escape(string path) => EscapeRegex().Replace(path, new MatchEvaluator(m => m.Result("\\\\$1")));
+        public static string Escape(string path) => EscapeRegex().Replace(path, new MatchEvaluator(m => m.Result(@"\\$1")));
 
         /// <summary>
         /// Quotes the specified path.

@@ -23,7 +23,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         /// <summary>
         /// A regular expression which can be used to parse the <c>getprop</c> output.
         /// </summary>
-        private const string GetPropPattern = "^\\[([^]]+)\\]\\:\\s*\\[(.*)\\]$";
+        private const string GetPropPattern = @"^\[([^]]+)\]\:\s*\[(.*)\]$";
 
         /// <summary>
         /// The <see cref="Regex"/> cached by <see cref="AddOutput(string)"/>.

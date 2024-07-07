@@ -27,9 +27,12 @@ namespace AdvancedSharpAdbClient.Models.Tests
         public void ToStringTest()
         {
             AdbCommandLineStatus status = new(new Version(1, 0, 41), "34.0.4-android-tools", "/data/data/com.termux/files/usr/bin/adb");
-            Assert.Equal(@"Android Debug Bridge version 1.0.41
-Version 34.0.4-android-tools
-Installed as /data/data/com.termux/files/usr/bin/adb", status.ToString(), ignoreLineEndingDifferences: true);
+            Assert.Equal(
+                """
+                Android Debug Bridge version 1.0.41
+                Version 34.0.4-android-tools
+                Installed as /data/data/com.termux/files/usr/bin/adb
+                """, status.ToString(), ignoreLineEndingDifferences: true);
         }
     }
 }

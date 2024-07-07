@@ -14,9 +14,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands["shell:/system/bin/getprop"] = @"[init.svc.BGW]: [running]
-[init.svc.MtkCodecService]: [running]
-[init.svc.bootanim]: [stopped]";
+            client.Commands["shell:/system/bin/getprop"] = 
+                """
+                [init.svc.BGW]: [running]
+                [init.svc.MtkCodecService]: [running]
+                [init.svc.bootanim]: [stopped]
+                """;
 
             Dictionary<string, string> properties = client.GetProperties(device);
             Assert.NotNull(properties);

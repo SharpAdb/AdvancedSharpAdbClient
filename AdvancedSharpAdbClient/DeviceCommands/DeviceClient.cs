@@ -458,14 +458,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #endif
 
 #if NET7_0_OR_GREATER
-        [GeneratedRegex("<\\?xml(.?)*")]
+        [GeneratedRegex(@"<\?xml(.?)*")]
         private static partial Regex GetXmlRegex();
 #else
         /// <summary>
         /// Gets a <see cref="Regex"/> for parsing the xml.
         /// </summary>
         /// <returns>The <see cref="Regex"/> for parsing the xml.</returns>
-        private static Regex GetXmlRegex() => new("<\\?xml(.?)*");
+        private static Regex GetXmlRegex() => new(@"<\?xml(.?)*");
 #endif
     }
 }

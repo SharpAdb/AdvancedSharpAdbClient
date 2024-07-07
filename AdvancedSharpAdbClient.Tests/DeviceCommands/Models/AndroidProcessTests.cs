@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
         [Fact]
         public void ParseTest()
         {
-            string line = @"1 (init) S 0 0 0 0 -1 1077936384 1467 168323 0 38 12 141 863 249 20 0 1 0 4 2535424 245 4294967295 1 1 0 0 0 0 0 0 65536 4294967295 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 0";
+            string line = "1 (init) S 0 0 0 0 -1 1077936384 1467 168323 0 38 12 141 863 249 20 0 1 0 4 2535424 245 4294967295 1 1 0 0 0 0 0 0 65536 4294967295 0 0 17 3 0 0 0 0 0 0 0 0 0 0 0 0 0";
 
             AndroidProcess process = AndroidProcess.Parse(line);
 
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models.Tests
         [Fact]
         public void ParseWithSpaceTest()
         {
-            string line = @"194(irq/432-mdm sta) S 2 0 0 0 - 1 2130240 0 0 0 0 0 1 0 0 - 51 0 1 0 172 0 0 4294967295 0 0 0 0 0 0 0 2147483647 0 4294967295 0 0 17 1 50 1 0 0 0 0 0 0 0 0 0 0 0";
+            string line = "194(irq/432-mdm sta) S 2 0 0 0 - 1 2130240 0 0 0 0 0 1 0 0 - 51 0 1 0 172 0 0 4294967295 0 0 0 0 0 0 0 2147483647 0 4294967295 0 0 17 1 50 1 0 0 0 0 0 0 0 0 0 0 0";
 
             AndroidProcess process = AndroidProcess.Parse(line);
 

@@ -138,28 +138,31 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task ClickAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:input tap 100 100"] = @"java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
-        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
-        at android.os.Parcel.createException(Parcel.java:2357)
-        at android.os.Parcel.readException(Parcel.java:2340)
-        at android.os.Parcel.readException(Parcel.java:2282)
-        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
-        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
-        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
-        at com.android.commands.input.Input.access$200(Input.java:41)
-        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
-        at com.android.commands.input.Input$InputTap.run(Input.java:217)
-        at com.android.commands.input.Input.onRun(Input.java:107)
-        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
-        at com.android.commands.input.Input.main(Input.java:71)
-        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
-        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
-Caused by: android.os.RemoteException: Remote stack trace:
-        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
-        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
-        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
-        at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)";
+            client.Commands["shell:input tap 100 100"] =
+                """
+                java.lang.SecurityException: Injecting to another application requires INJECT_EVENTS permission
+                        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+                        at android.os.Parcel.createException(Parcel.java:2357)
+                        at android.os.Parcel.readException(Parcel.java:2340)
+                        at android.os.Parcel.readException(Parcel.java:2282)
+                        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+                        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+                        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+                        at com.android.commands.input.Input.access$200(Input.java:41)
+                        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+                        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+                        at com.android.commands.input.Input.onRun(Input.java:107)
+                        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+                        at com.android.commands.input.Input.main(Input.java:71)
+                        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+                        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+                Caused by: android.os.RemoteException: Remote stack trace:
+                        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+                        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+                        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+                        at android.os.Binder.execTransactInternal(Binder.java:1165)
+                        at android.os.Binder.execTransact(Binder.java:1134)
+                """;
 
             JavaException exception = await Assert.ThrowsAsync<JavaException>(() => new DeviceClient(client, Device).ClickAsync(100, 100));
 
@@ -168,27 +171,30 @@ Caused by: android.os.RemoteException: Remote stack trace:
 
             Assert.Equal("SecurityException", exception.JavaName);
             Assert.Equal("Injecting to another application requires INJECT_EVENTS permission", exception.Message);
-            Assert.Equal(@"        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
-        at android.os.Parcel.createException(Parcel.java:2357)
-        at android.os.Parcel.readException(Parcel.java:2340)
-        at android.os.Parcel.readException(Parcel.java:2282)
-        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
-        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
-        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
-        at com.android.commands.input.Input.access$200(Input.java:41)
-        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
-        at com.android.commands.input.Input$InputTap.run(Input.java:217)
-        at com.android.commands.input.Input.onRun(Input.java:107)
-        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
-        at com.android.commands.input.Input.main(Input.java:71)
-        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
-        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
-Caused by: android.os.RemoteException: Remote stack trace:
-        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
-        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
-        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
-        at android.os.Binder.execTransactInternal(Binder.java:1165)
-        at android.os.Binder.execTransact(Binder.java:1134)", exception.JavaStackTrace, ignoreLineEndingDifferences: true);
+            Assert.Equal(
+                """
+                        at android.os.Parcel.createExceptionOrNull(Parcel.java:2373)
+                        at android.os.Parcel.createException(Parcel.java:2357)
+                        at android.os.Parcel.readException(Parcel.java:2340)
+                        at android.os.Parcel.readException(Parcel.java:2282)
+                        at android.hardware.input.IInputManager$Stub$Proxy.injectInputEvent(IInputManager.java:946)
+                        at android.hardware.input.InputManager.injectInputEvent(InputManager.java:907)
+                        at com.android.commands.input.Input.injectMotionEvent(Input.java:397)
+                        at com.android.commands.input.Input.access$200(Input.java:41)
+                        at com.android.commands.input.Input$InputTap.sendTap(Input.java:223)
+                        at com.android.commands.input.Input$InputTap.run(Input.java:217)
+                        at com.android.commands.input.Input.onRun(Input.java:107)
+                        at com.android.internal.os.BaseCommand.run(BaseCommand.java:60)
+                        at com.android.commands.input.Input.main(Input.java:71)
+                        at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+                        at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:438)
+                Caused by: android.os.RemoteException: Remote stack trace:
+                        at com.android.server.input.InputManagerService.injectInputEventInternal(InputManagerService.java:677)
+                        at com.android.server.input.InputManagerService.injectInputEvent(InputManagerService.java:651)
+                        at android.hardware.input.IInputManager$Stub.onTransact(IInputManager.java:430)
+                        at android.os.Binder.execTransactInternal(Binder.java:1165)
+                        at android.os.Binder.execTransact(Binder.java:1134)
+                """, exception.JavaStackTrace, ignoreLineEndingDifferences: true);
         }
 
         /// <summary>
@@ -285,8 +291,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async Task IsAppInForegroundAsyncTest(string packageName, bool expected)
         {
             DummyAdbClient client = new();
-            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
-    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}";
+            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] =
+                """
+                    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+                    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}
+                """;
 
             bool result = await new DeviceClient(client, Device).IsAppInForegroundAsync(packageName);
 
@@ -305,8 +314,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async Task GetAppStatusAsyncTest(string packageName, string response, AppStatus expected)
         {
             DummyAdbClient client = new();
-            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
-    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}";
+            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] =
+                """
+                    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+                    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}
+                """;
             client.Commands[$"shell:pidof {packageName}"] = response;
 
             AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName);
@@ -327,8 +339,11 @@ Caused by: android.os.RemoteException: Remote stack trace:
         public async Task GetAppStatusForegroundAsyncTest(string packageName, AppStatus expected)
         {
             DummyAdbClient client = new();
-            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] = @"    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
-    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}";
+            client.Commands["shell:dumpsys activity activities | grep mResumedActivity"] =
+                """
+                    mResumedActivity: ActivityRecord{1f5309a u0 com.android.settings/.homepage.SettingsHomepageActivity t61029}
+                    mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}
+                """;
 
             AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName);
 

@@ -598,13 +598,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // on the API level. We do the branching on the device (inside a shell script) to avoid roundtrips.
             // This if/then/else syntax was tested on Android 2.x, 4.x and 7
             ConsoleOutputReceiver receiver = new();
-            await client.ExecuteShellCommandAsync(device, @"SDK=""$(/system/bin/getprop ro.build.version.sdk)""
-if [ $SDK -lt 24 ]
-then
-    /system/bin/ls /proc/
-else
-    /system/bin/ls -1 /proc/
-fi".Replace("\r\n", "\n"), receiver, cancellationToken).ConfigureAwait(false);
+            await client.ExecuteShellCommandAsync(
+                device,
+                "SDK=\"$(/system/bin/getprop ro.build.version.sdk)\"\nif [ $SDK -lt 24 ]; then\n/system/bin/ls /proc/\nelse\n/system/bin/ls -1 /proc/\nfi",
+                receiver,
+                cancellationToken).ConfigureAwait(false);
 
             List<int> pids = [];
 
