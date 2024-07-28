@@ -29,11 +29,6 @@ namespace AdvancedSharpAdbClient.Models
         private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceData"/> struct.
-        /// </summary>
-        public DeviceData() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DeviceData"/> struct based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
