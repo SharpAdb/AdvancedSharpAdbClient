@@ -32,15 +32,10 @@ namespace AdvancedSharpAdbClient.Models
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardSpec"/> struct.
-        /// </summary>
-        public ForwardSpec() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ForwardSpec"/> struct from its <see cref="string"/> representation.
         /// </summary>
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
-        public ForwardSpec(string spec) : this()
+        public ForwardSpec(string spec)
         {
             ExceptionExtensions.ThrowIfNull(spec);
 

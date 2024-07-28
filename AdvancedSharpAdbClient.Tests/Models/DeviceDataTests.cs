@@ -230,7 +230,10 @@ namespace AdvancedSharpAdbClient.Models.Tests
                 Model = model,
                 Name = name,
                 TransportId = transportId,
-                State = DeviceState.Online
+                State = DeviceState.Online,
+                Usb = string.Empty,
+                Features = [],
+                Message = string.Empty
             };
 
             Assert.True(d1 == d2);

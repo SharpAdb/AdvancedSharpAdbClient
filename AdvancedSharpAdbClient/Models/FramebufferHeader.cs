@@ -39,16 +39,11 @@ namespace AdvancedSharpAdbClient.Models
         public const int MiniLength = 52;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct.
-        /// </summary>
-        public FramebufferHeader() { }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
-        public FramebufferHeader(byte[] data) : this()
+        public FramebufferHeader(byte[] data)
         {
             if (data.Length is < MiniLength or > MaxLength)
             {
@@ -102,7 +97,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
-        public FramebufferHeader(ReadOnlySpan<byte> data) : this()
+        public FramebufferHeader(ReadOnlySpan<byte> data)
         {
             if (data.Length is < MiniLength or > MaxLength)
             {

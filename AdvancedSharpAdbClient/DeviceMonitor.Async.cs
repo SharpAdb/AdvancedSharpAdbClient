@@ -250,11 +250,6 @@ namespace AdvancedSharpAdbClient
         private readonly struct ThreadSwitcher : INotifyCompletion
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ThreadSwitcher"/> struct.
-            /// </summary>
-            public ThreadSwitcher() { }
-
-            /// <summary>
             /// Gets a value that indicates whether the asynchronous operation has completed.
             /// </summary>
             public bool IsCompleted => false;
