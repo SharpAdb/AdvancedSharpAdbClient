@@ -24,6 +24,9 @@ namespace AdvancedSharpAdbClient.Logs
     /// Minimalistic logger that does nothing.
     /// </summary>
     public class NullLogger<T> : NullLogger, ILogger<T>
+#if NET9_0_OR_GREATER
+        where T : allows ref struct
+#endif
     {
         /// <summary>
         /// Returns an instance of <see cref="NullLogger{T}"/>.

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 #if NET40
 using Microsoft.Runtime.CompilerServices;
@@ -137,21 +138,31 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         public static void AwaitByTaskCompleteSource(this Task function, CancellationToken cancellationToken = default)
         {
+#if NET5_0_OR_GREATER
+            TaskCompletionSource taskCompletionSource = new();
+#else
             TaskCompletionSource<object?> taskCompletionSource = new();
-            Task<object?> task = taskCompletionSource.Task;
+#endif
+#pragma warning disable IDE0008
+            var task = taskCompletionSource.Task;
+#pragma warning restore IDE0008
             _ = Task.Factory.StartNew(async () =>
             {
                 try
                 {
                     await function.ConfigureAwait(false);
+#if NET5_0_OR_GREATER
+                    _ = taskCompletionSource.TrySetResult();
+#else
                     _ = taskCompletionSource.TrySetResult(null);
+#endif
                 }
                 catch (Exception e)
                 {
                     _ = taskCompletionSource.TrySetException(e);
                 }
             }, cancellationToken);
-            _ = task.Result;
+            task.Wait(cancellationToken);
         }
 
         /// <summary>

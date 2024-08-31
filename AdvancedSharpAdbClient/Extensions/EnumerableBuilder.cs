@@ -276,13 +276,13 @@ namespace AdvancedSharpAdbClient
             ushort? ReadUInt16(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 2);
-                return data == null ? null : (ushort)(data[0] | (data[1] << 8));
+                return data.IsEmpty ? null : (ushort)(data[0] | (data[1] << 8));
             }
 
             uint? ReadUInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data == null ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+                return data.IsEmpty ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
             }
 
             int? ReadInt32(in ReadOnlySpan<byte> bytes)
