@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Processes the incoming <see cref="DeviceData"/>.
         /// </summary>
-        protected virtual void UpdateDevices(IEnumerable<DeviceData> collection)
+        protected virtual void UpdateDevices(params IEnumerable<DeviceData> collection)
         {
             lock (devices)
             {

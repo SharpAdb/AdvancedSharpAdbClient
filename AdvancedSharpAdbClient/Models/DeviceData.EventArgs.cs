@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="devices">The list of device.</param>
     [DebuggerDisplay($"{nameof(DeviceDataNotifyEventArgs)} \\{{ {nameof(Devices)} = {{{nameof(Devices)}}} }}")]
-    public sealed class DeviceDataNotifyEventArgs(IEnumerable<DeviceData> devices) : EventArgs
+    public sealed class DeviceDataNotifyEventArgs(params IEnumerable<DeviceData> devices) : EventArgs
     {
         /// <summary>
         /// Gets the list of device where the change occurred.

@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="AdbCommandLineStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="AdbCommandLineStatus"/> struct.</returns>
-        public static AdbCommandLineStatus AdbCommandLineStatusCreator(ReadOnlySpan<string> values) =>
+        public static AdbCommandLineStatus AdbCommandLineStatusCreator(params ReadOnlySpan<string> values) =>
             AdbCommandLineStatus.GetVersionFromOutput(values);
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace AdvancedSharpAdbClient
                     };
             }
 
-            static void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
+            static void ReadLogEntry(BinaryReader reader, params ICollection<object> parent)
             {
                 EventLogType type = (EventLogType)reader.ReadByte();
 

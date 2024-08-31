@@ -103,7 +103,7 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// </summary>
         /// <param name="lines">A <see cref="IEnumerable{String}"/> which represents a <see cref="JavaException"/>.</param>
         /// <returns>The equivalent <see cref="JavaException"/>.</returns>
-        public static JavaException Parse(IEnumerable<string> lines)
+        public static JavaException Parse(params IEnumerable<string> lines)
         {
             string exception = string.Empty, message = string.Empty;
             StringBuilder stackTrace = new();

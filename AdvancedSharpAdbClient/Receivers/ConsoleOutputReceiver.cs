@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Receivers
         /// Processes the new lines.
         /// </summary>
         /// <param name="lines">The lines.</param>
-        protected override void ProcessNewLines(IEnumerable<string> lines)
+        protected override void ProcessNewLines(params IEnumerable<string> lines)
         {
             foreach (string line in lines)
             {
