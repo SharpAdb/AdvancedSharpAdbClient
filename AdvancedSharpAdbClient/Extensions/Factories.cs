@@ -13,6 +13,9 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public static class Factories
     {
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         static Factories() => Reset();
 
         /// <summary>
@@ -49,6 +52,9 @@ namespace AdvancedSharpAdbClient
             nameof(AdbClientFactory),
             nameof(AdbCommandLineClientFactory),
             nameof(SyncServiceFactory))]
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public static void Reset()
         {
             AdbSocketFactory = endPoint => new AdbSocket(endPoint);

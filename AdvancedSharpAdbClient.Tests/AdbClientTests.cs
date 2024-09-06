@@ -1141,7 +1141,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void CloneTest()
         {
             Assert.True(TestClient is ICloneable<IAdbClient>);
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
             Assert.True(TestClient is ICloneable<IAdbClient.IWinRT>);
 #endif
             AdbClient client = TestClient.Clone();

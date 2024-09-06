@@ -68,7 +68,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if NET
         [SupportedOSPlatform("Windows10.0.10240.0")]
 #endif
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(cancellationToken).ConfigureAwait(false);

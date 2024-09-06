@@ -101,7 +101,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 #endif
             .FromResult(result);
 
-#if WINDOWS_UWP
+#if HAS_WINRT
         /// <summary>
         /// Wait a <see cref="Task{TResult}"/> synchronously by <see cref="TaskCompletionSource{TResult}"/> and return the result.
         /// </summary>
@@ -109,7 +109,9 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="function">The <see cref="Task{TResult}"/> to wait.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         /// <returns>The result of the completed task.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public static TResult AwaitByTaskCompleteSource<TResult>(this IAsyncOperation<TResult> function, CancellationToken cancellationToken = default)
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();
@@ -138,7 +140,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         public static void AwaitByTaskCompleteSource(this Task function, CancellationToken cancellationToken = default)
         {
-#if NET5_0_OR_GREATER
+#if NET
             TaskCompletionSource taskCompletionSource = new();
 #else
             TaskCompletionSource<object?> taskCompletionSource = new();
@@ -151,7 +153,7 @@ namespace AdvancedSharpAdbClient.Polyfills
                 try
                 {
                     await function.ConfigureAwait(false);
-#if NET5_0_OR_GREATER
+#if NET
                     _ = taskCompletionSource.TrySetResult();
 #else
                     _ = taskCompletionSource.TrySetResult(null);

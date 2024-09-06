@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Models
     /// CR LF character. This stream undoes that change.</summary>
     /// <remarks><seealso href="http://stackoverflow.com/questions/13578416/read-binary-stdout-data-from-adb-shell"/></remarks>
     [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
-    public class ShellStream : Stream
+    public partial class ShellStream : Stream
     {
         /// <summary>
         /// The <see cref="bool"/> value which indicates whether the <see cref="ShellStream"/> should close the <see cref="Inner"/> stream when closed.

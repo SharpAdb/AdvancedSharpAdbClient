@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="StartAsync(CancellationToken)"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
-#if NET5_0_OR_GREATER
+#if NET
         protected TaskCompletionSource? FirstDeviceListParsed;
 #else
         protected TaskCompletionSource<object?>? FirstDeviceListParsed;
@@ -138,7 +138,7 @@ namespace AdvancedSharpAdbClient
                     {
                         // Switch to the background thread to avoid blocking the caller.
                         _ = Task.Factory.StartNew(
-#if NET5_0_OR_GREATER
+#if NET
                             () => FirstDeviceListParsed?.TrySetResult(),
 #else
                             () => FirstDeviceListParsed?.TrySetResult(null),

@@ -73,7 +73,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 #if NET
         [SupportedOSPlatform("Windows10.0.10240.0")]
 #endif
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public readonly bool TryAsPackageVersion(out PackageVersion version)
         {
             ushort[] numbs = GetVersionNumbers(VersionName).Split('.', StringSplitOptions.RemoveEmptyEntries).Select(ushort.Parse).Take(4).ToArray();

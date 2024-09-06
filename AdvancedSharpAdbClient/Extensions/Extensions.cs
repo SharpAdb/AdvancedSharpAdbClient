@@ -147,6 +147,22 @@ namespace AdvancedSharpAdbClient
             progress == null ? null : progress.Report;
 #endif
 
+#if HAS_WINRT
+        /// <summary>
+        /// Returns the absolute path for the specified path string.
+        /// </summary>
+        /// <param name="path">The file or directory for which to obtain absolute path information.</param>
+        /// <returns>The fully qualified location of <paramref name="path"/>, such as "C:\MyFile.txt".</returns>
+        public static string GetFullPath(string path) =>
+            Uri.TryCreate(path, UriKind.Absolute, out Uri? uri)
+                ? uri switch
+                {
+                    { IsFile: true } => uri.LocalPath,
+                    _ => uri.ToString(),
+                }
+                : Path.GetFullPath(path);
+#endif
+
 #if NET
         [SupportedOSPlatformGuard("Windows")]
 #endif
