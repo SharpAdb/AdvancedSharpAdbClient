@@ -114,16 +114,10 @@ namespace AdvancedSharpAdbClient.Tests
 
         public byte[] GetBytesSent() => OutputStream.ToArray();
 
-        public DummyTcpSocket Clone()
+        public DummyTcpSocket Clone() => new()
         {
-            DummyTcpSocket socket = new()
-            {
-                Connected = true,
-                ReceiveBufferSize = ReceiveBufferSize
-            };
-            return socket;
-        }
-
-        object ICloneable.Clone() => Clone();
+            Connected = true,
+            ReceiveBufferSize = ReceiveBufferSize
+        };
     }
 }

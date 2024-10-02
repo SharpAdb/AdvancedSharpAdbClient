@@ -390,7 +390,7 @@ namespace AdvancedSharpAdbClient
                     cancellationToken.ThrowIfCancellationRequested();
                 }
 
-                finish: return;
+            finish: return;
             }
             finally
             {
@@ -480,7 +480,7 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                start:
+            start:
                 // create the stat request message.
                 await Socket.SendSyncRequestAsync(SyncCommand.LIST, remotePath, cancellationToken).ConfigureAwait(false);
                 IsProcessing = true;
@@ -510,7 +510,7 @@ namespace AdvancedSharpAdbClient
                     isLocked = true;
                 }
 
-                finish:
+            finish:
                 yield break;
             }
             finally

@@ -131,7 +131,7 @@ namespace AdvancedSharpAdbClient
 #endif
         public virtual bool CheckAdbFileExists(string adbPath) => adbPath == "adb" ||
 #if HAS_WINRT
-            StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File);
+            (StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File));
 #else
             File.Exists(adbPath);
 #endif

@@ -20,4 +20,6 @@ namespace System.Collections.Generic
         int Count { get; }
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Collections.Generic.IReadOnlyCollection<>))]
 #endif

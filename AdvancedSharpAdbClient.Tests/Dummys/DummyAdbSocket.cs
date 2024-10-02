@@ -314,7 +314,5 @@ namespace AdvancedSharpAdbClient.Tests
             SyncRequests = SyncRequests,
             ShellStreams = ShellStreams
         };
-
-        object ICloneable.Clone() => Clone();
     }
 }

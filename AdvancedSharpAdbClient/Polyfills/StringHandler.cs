@@ -361,4 +361,6 @@ namespace System.Runtime.CompilerServices
         }
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Runtime.CompilerServices.DefaultInterpolatedStringHandler))]
 #endif
