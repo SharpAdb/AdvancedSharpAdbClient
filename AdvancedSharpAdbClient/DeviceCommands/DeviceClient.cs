@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     /// <param name="AdbClient">The <see cref="IAdbClient"/> to use to communicate with the Android Debug Bridge.</param>
     /// <param name="Device">The device on which to process command.</param>
     [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
-    public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device)
+    public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device) : ICloneable<DeviceClient>, ICloneable
     {
         /// <summary>
         /// The <see cref="IAdbClient"/> to use when communicating with the device.
@@ -442,6 +442,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             client = AdbClient;
             device = Device;
         }
+
+        /// <inheritdoc/>
+        DeviceClient ICloneable<DeviceClient>.Clone() => this with { };
+
+        /// <inheritdoc/>
+        object ICloneable.Clone() => ((ICloneable<DeviceClient>)this).Clone();
 
 #if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
         /// <inheritdoc/>
