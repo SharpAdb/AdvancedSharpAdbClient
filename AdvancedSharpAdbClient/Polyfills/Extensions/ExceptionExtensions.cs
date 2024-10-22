@@ -76,15 +76,15 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// </summary>
         /// <param name="value">The argument to validate as non-negative.</param>
         /// <param name="paramName">The name of the parameter with which <paramref name="value"/> corresponds.</param>
-#if NET8_0_OR_GREATER
         public static void ThrowIfNegative<T>(T value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+#if NET8_0_OR_GREATER
             where T : INumberBase<T>
         {
             ArgumentOutOfRangeException.ThrowIfNegative(value, paramName);
 #else
-        public static void ThrowIfNegative(double value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+            where T : struct, IComparable<T>
         {
-            if (value < 0)
+            if (value.CompareTo(default) < 0)
             {
                 throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} ('{value}') must be a non-negative value.");
             }

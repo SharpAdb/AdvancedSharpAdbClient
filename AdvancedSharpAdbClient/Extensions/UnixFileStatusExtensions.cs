@@ -216,7 +216,7 @@ namespace AdvancedSharpAdbClient.Models
 #else
             char[] code = new char[10];
 #endif
-            BitArray array = new(new[] { (int)mode });
+            BitArray array = new([(int)mode]);
 
             code[9] = array[0]
                 ? array[9] ? 't' : 'x'

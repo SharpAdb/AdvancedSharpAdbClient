@@ -60,9 +60,8 @@
     <TargetPlatformVersion>10.0.22621.0</TargetPlatformVersion>
   </PropertyGroup>
   
-  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0-windows10.0.18362.0'))">
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0-windows10.0.17763.0'))">
     <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
-    <WindowsSdkPackageVersion>10.0.18362.42</WindowsSdkPackageVersion>
   </PropertyGroup>
 
 </Project>

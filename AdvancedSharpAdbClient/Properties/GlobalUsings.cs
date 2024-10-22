@@ -22,6 +22,7 @@ global using System.Runtime.InteropServices.WindowsRuntime;
 global using Windows.ApplicationModel;
 global using Windows.Foundation;
 global using Windows.Foundation.Metadata;
+global using Windows.Storage;
 global using Windows.Storage.Streams;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
@@ -31,7 +32,6 @@ global using TimeSpan = System.TimeSpan;
 
 #if HAS_WUXC
 global using Windows.Graphics.Imaging;
-global using Windows.Storage;
 global using Windows.System;
 global using Windows.UI.Core;
 global using Windows.UI.Xaml.Media.Imaging;
