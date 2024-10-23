@@ -4,12 +4,11 @@
     <LangVersion>latest</LangVersion>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
-  
+
   <Choose>
     <When Condition="'$(IsWindows)' == 'True' and '$(IsStandard)' != 'True'">
       <PropertyGroup>
-        <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
-        <WindowsSdkPackageVersion>10.0.18362.42</WindowsSdkPackageVersion>
+        <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
       </PropertyGroup>
     </When>
     <Otherwise>
@@ -40,5 +39,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net1.1'))">
+    <DefineConstants>$(DefineConstants);HAS_IMAGING</DefineConstants>
+  </PropertyGroup>
 
 </Project>

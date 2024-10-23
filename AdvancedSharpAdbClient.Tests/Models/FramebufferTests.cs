@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -69,7 +67,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-#if WINDOWS
+#if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
 
             using Bitmap image = (Bitmap)framebuffer;
@@ -132,7 +130,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-#if WINDOWS
+#if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
 
             using Bitmap image = (Bitmap)framebuffer;

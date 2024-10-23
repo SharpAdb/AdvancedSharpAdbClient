@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -367,7 +365,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-#if WINDOWS
+#if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
 
             using Bitmap image = framebuffer.ToImage();
