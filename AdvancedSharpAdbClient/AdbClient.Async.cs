@@ -653,8 +653,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -697,8 +696,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -1053,8 +1051,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -1100,8 +1097,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);

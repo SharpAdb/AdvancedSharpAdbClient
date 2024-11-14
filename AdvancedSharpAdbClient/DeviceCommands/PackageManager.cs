@@ -322,8 +322,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, callback, arguments);
 
-            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             int count = 0;
+            callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             foreach (string splitRemoteFilePath in splitRemoteFilePaths)
             {
                 RemoveRemotePackage(splitRemoteFilePath);
