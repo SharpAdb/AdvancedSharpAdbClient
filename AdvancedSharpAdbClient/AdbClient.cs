@@ -339,6 +339,20 @@ namespace AdvancedSharpAdbClient
 
             socket.SendAdbRequest(request.ToString());
             _ = socket.ReadAdbResponse();
+
+            try
+            {
+                using StreamReader reader = new(socket.GetShellStream());
+                // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+                // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+                // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+                // -- one of the integration test fetches output 1000 times and found no truncations.
+                while (reader.ReadLine() != null) ;
+            }
+            catch (Exception e)
+            {
+                throw new ShellCommandUnresponsiveException(e);
+            }
         }
 
         /// <inheritdoc/>
@@ -411,18 +425,18 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
+        public IEnumerable<string> ExecuteServerEnumerable(string target, string command, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = CreateAdbSocket();
-            foreach (string line in ExecuteServerCommand(target, command, socket, encoding))
+            foreach (string line in ExecuteServerEnumerable(target, command, socket, encoding))
             {
                 yield return line;
             }
         }
 
         /// <inheritdoc/>
-        public virtual IEnumerable<string> ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding)
+        public virtual IEnumerable<string> ExecuteServerEnumerable(string target, string command, IAdbSocket socket, Encoding encoding)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -458,14 +472,14 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding)
+        public IEnumerable<string> ExecuteRemoteEnumerable(string command, DeviceData device, Encoding encoding)
         {
             EnsureDevice(device);
 
             using IAdbSocket socket = CreateAdbSocket();
             socket.SetDevice(device);
 
-            foreach (string line in ExecuteServerCommand("shell", command, socket, encoding))
+            foreach (string line in ExecuteServerEnumerable("shell", command, socket, encoding))
             {
                 yield return line;
             }

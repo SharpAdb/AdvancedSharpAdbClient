@@ -178,6 +178,29 @@ namespace AdvancedSharpAdbClient
 
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
             await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            try
+            {
+                using StreamReader reader = new(socket.GetShellStream());
+                // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+                // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+                // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+                // -- one of the integration test fetches output 1000 times and found no truncations.
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    if (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) == null) { break; }
+                }
+            }
+            catch (Exception e)
+            {
+                // If a cancellation was requested, this main loop is interrupted with an exception
+                // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                // In all other cases, something went wrong, and we want to report it to the user.
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new ShellCommandUnresponsiveException(e);
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -258,18 +281,18 @@ namespace AdvancedSharpAdbClient
 
 #if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
-        public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = CreateAdbSocket();
-            await foreach (string? line in ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            await foreach (string? line in ExecuteServerEnumerableAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
             {
                 yield return line;
             }
         }
 
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public virtual async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -311,7 +334,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(encoding);
@@ -319,7 +342,7 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken);
 
-            await foreach (string? line in ExecuteServerCommandAsync("shell", command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            await foreach (string? line in ExecuteServerEnumerableAsync("shell", command, socket, encoding, cancellationToken).ConfigureAwait(false))
             {
                 yield return line;
             }

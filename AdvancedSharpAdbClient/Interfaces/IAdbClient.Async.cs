@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
 
 #if COMP_NETSTANDARD2_1
         /// <summary>
-        /// Asynchronously executes a command on the adb server and returns the output.
+        /// Asynchronously executes a command on the adb server and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -238,11 +238,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerCommand(target, command, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerEnumerable(target, command, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
-        /// Asynchronously executes a command on the adb server and returns the output.
+        /// Asynchronously executes a command on the adb server and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -251,19 +251,19 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerCommand(target, command, socket, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerEnumerable(target, command, socket, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
-        /// Asynchronously executes a command on the device and returns the output.
+        /// Asynchronously executes a command on the device and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteRemoteCommand(command, device, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteRemoteEnumerable(command, device, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously runs the event log service on a device and returns it.

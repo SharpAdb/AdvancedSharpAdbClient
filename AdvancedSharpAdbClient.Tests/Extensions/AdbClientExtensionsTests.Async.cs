@@ -44,7 +44,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(default, x.ArgAt<CancellationToken>(5));
                     return Task.CompletedTask;
                 });
-            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteServerEnumerableAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
@@ -53,7 +53,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(default, x.ArgAt<CancellationToken>(3));
                     return result.AsEnumerableAsync(x.ArgAt<CancellationToken>(3));
                 });
-            _ = client.ExecuteServerCommandAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteServerEnumerableAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
@@ -70,8 +70,8 @@ namespace AdvancedSharpAdbClient.Tests
             await client.ExecuteServerCommandAsync(target, command, socket, predicate);
             await client.ExecuteServerCommandAsync(target, command, predicate, encoding);
             await client.ExecuteServerCommandAsync(target, command, socket, predicate, encoding);
-            Assert.Equal(result, await AdbClientExtensions.ExecuteServerCommandAsync(client, target, command).ToListAsync());
-            Assert.Equal(result, await AdbClientExtensions.ExecuteServerCommandAsync(client, target, command, socket).ToListAsync());
+            Assert.Equal(result, await client.ExecuteServerEnumerableAsync(target, command).ToListAsync());
+            Assert.Equal(result, await client.ExecuteServerEnumerableAsync(target, command, socket).ToListAsync());
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(default, x.ArgAt<CancellationToken>(4));
                     return Task.CompletedTask;
                 });
-            _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), device, Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
+            _ = client.ExecuteRemoteEnumerableAsync(Arg.Any<string>(), device, Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient.Tests
             await client.ExecuteRemoteCommandAsync(command, device, receiver);
             await client.ExecuteRemoteCommandAsync(command, device, predicate);
             await client.ExecuteRemoteCommandAsync(command, device, predicate, encoding);
-            Assert.Equal(result, await AdbClientExtensions.ExecuteRemoteCommandAsync(client, command, device).ToListAsync());
+            Assert.Equal(result, await client.ExecuteRemoteEnumerableAsync(command, device).ToListAsync());
         }
 
         [Fact]
