@@ -17,33 +17,24 @@ global using System.Runtime.Versioning;
 global using System.Numerics;
 #endif
 
-#if WINDOWS_UWP
+#if HAS_WINRT
 global using System.Runtime.InteropServices.WindowsRuntime;
 global using Windows.ApplicationModel;
 global using Windows.Foundation;
 global using Windows.Foundation.Metadata;
-global using Windows.Graphics.Imaging;
 global using Windows.Storage;
 global using Windows.Storage.Streams;
-global using Windows.System;
-global using Windows.UI.Core;
-global using Windows.UI.Xaml.Media.Imaging;
 global using Buffer = System.Buffer;
 global using DateTime = System.DateTime;
 global using Point = System.Drawing.Point;
 global using TimeSpan = System.TimeSpan;
 #endif
 
-#if WINDOWS10_0_17763_0_OR_GREATER
-global using System.Runtime.InteropServices.WindowsRuntime;
-global using Windows.ApplicationModel;
-global using Windows.Foundation;
-global using Windows.Foundation.Metadata;
-global using Windows.Storage.Streams;
-global using Buffer = System.Buffer;
-global using DateTime = System.DateTime;
-global using Point = System.Drawing.Point;
-global using TimeSpan = System.TimeSpan;
+#if HAS_WUXC
+global using Windows.Graphics.Imaging;
+global using Windows.System;
+global using Windows.UI.Core;
+global using Windows.UI.Xaml.Media.Imaging;
 #endif
 
 #if HAS_TASK

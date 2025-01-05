@@ -233,7 +233,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             using SyncService syncService = new(socket, Device);
             Assert.True(syncService is ICloneable<ISyncService>);
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
             Assert.True(syncService is ICloneable<ISyncService.IWinRT>);
 #endif
             using SyncService service = syncService.Clone();

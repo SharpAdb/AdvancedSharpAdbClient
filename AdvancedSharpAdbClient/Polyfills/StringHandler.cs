@@ -251,7 +251,7 @@ namespace System.Runtime.CompilerServices
         /// Writes the specified character span to the handler.
         /// </summary>
         /// <param name="value">The span to write.</param>
-        public void AppendFormatted(ReadOnlySpan<char> value) => _ = _builder.Append(value);
+        public void AppendFormatted(params ReadOnlySpan<char> value) => _ = _builder.Append(value);
 
         /// <summary>
         /// Writes the specified string of chars to the handler.
@@ -361,4 +361,6 @@ namespace System.Runtime.CompilerServices
         }
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Runtime.CompilerServices.DefaultInterpolatedStringHandler))]
 #endif

@@ -36,6 +36,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Doesn't check adb file when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
             if (StringExtensions.IsNullOrWhiteSpace(adbPath))
@@ -123,9 +126,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public virtual bool CheckAdbFileExists(string adbPath) => adbPath == "adb" ||
-#if WINDOWS_UWP
-            StorageFile.GetFileFromPathAsync(adbPath).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File);
+#if HAS_WINRT
+            (StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File));
 #else
             File.Exists(adbPath);
 #endif

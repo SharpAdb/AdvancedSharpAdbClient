@@ -45,7 +45,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="AdbCommandLineStatus"/> object that represents the version and path of the adb command line client.</returns>
-        public static AdbCommandLineStatus GetVersionFromOutput(IEnumerable<string> output)
+        public static AdbCommandLineStatus GetVersionFromOutput(params IEnumerable<string> output)
         {
             int index = 0;
             Version? adbVersion = null;
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="output">The output of the <c>adb.exe version</c> command.</param>
         /// <returns>A <see cref="AdbCommandLineStatus"/> object that represents the version and path of the adb command line client.</returns>
-        public static AdbCommandLineStatus GetVersionFromOutput(ReadOnlySpan<string> output)
+        public static AdbCommandLineStatus GetVersionFromOutput(params ReadOnlySpan<string> output)
         {
             int index = 0;
             Version? adbVersion = null;
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient.Models
         }
 
         /// <inheritdoc/>
-        public override string ToString() => string.Join(Environment.NewLine, [.. this]);
+        public override string ToString() => string.Join(Environment.NewLine, (string[])[.. this]);
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex(VersionPattern)]

@@ -19,7 +19,11 @@ namespace AdvancedSharpAdbClient
         /// is used to block the <see cref="StartAsync(CancellationToken)"/> method until the <see cref="DeviceMonitorLoopAsync"/>
         /// has processed the first list of devices.
         /// </summary>
+#if NET
+        protected TaskCompletionSource? FirstDeviceListParsed;
+#else
         protected TaskCompletionSource<object?>? FirstDeviceListParsed;
+#endif
 
         /// <summary>
         /// A <see cref="CancellationToken"/> that can be used to cancel the <see cref="MonitorTask"/>.
@@ -39,11 +43,11 @@ namespace AdvancedSharpAdbClient
             {
                 try
                 {
-                    FirstDeviceListParsed = new TaskCompletionSource<object?>();
+                    FirstDeviceListParsed = new();
                     using CancellationTokenRegistration cancellationTokenRegistration = cancellationToken.Register(() => FirstDeviceListParsed.SetCanceled());
                     MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
                     // Wait for the worker thread to have read the first list of devices.
-                    _ = await FirstDeviceListParsed.Task.ConfigureAwait(false);
+                    await FirstDeviceListParsed.Task.ConfigureAwait(false);
                 }
                 finally
                 {
@@ -133,7 +137,15 @@ namespace AdvancedSharpAdbClient
                     if (FirstDeviceListParsed != null)
                     {
                         // Switch to the background thread to avoid blocking the caller.
-                        _ = Task.Factory.StartNew(() => FirstDeviceListParsed?.TrySetResult(null), default, TaskCreationOptions.None, TaskScheduler.Default);
+                        _ = Task.Factory.StartNew(
+#if NET
+                            () => FirstDeviceListParsed?.TrySetResult(),
+#else
+                            () => FirstDeviceListParsed?.TrySetResult(null),
+#endif
+                            default,
+                            TaskCreationOptions.None,
+                            TaskScheduler.Default);
                     }
                 }
                 catch (TaskCanceledException ex)

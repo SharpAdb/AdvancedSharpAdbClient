@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -489,7 +487,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-#if WINDOWS
+#if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
 
             using Bitmap image = framebuffer.ToImage();
@@ -1141,7 +1139,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void CloneTest()
         {
             Assert.True(TestClient is ICloneable<IAdbClient>);
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
             Assert.True(TestClient is ICloneable<IAdbClient.IWinRT>);
 #endif
             AdbClient client = TestClient.Clone();

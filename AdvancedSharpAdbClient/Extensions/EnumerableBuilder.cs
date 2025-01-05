@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="AdbCommandLineStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="AdbCommandLineStatus"/> struct.</returns>
-        public static AdbCommandLineStatus AdbCommandLineStatusCreator(ReadOnlySpan<string> values) =>
+        public static AdbCommandLineStatus AdbCommandLineStatusCreator(params ReadOnlySpan<string> values) =>
             AdbCommandLineStatus.GetVersionFromOutput(values);
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace AdvancedSharpAdbClient
                     };
             }
 
-            static void ReadLogEntry(BinaryReader reader, ICollection<object> parent)
+            static void ReadLogEntry(BinaryReader reader, params ICollection<object> parent)
             {
                 EventLogType type = (EventLogType)reader.ReadByte();
 
@@ -276,13 +276,13 @@ namespace AdvancedSharpAdbClient
             ushort? ReadUInt16(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 2);
-                return data == null ? null : (ushort)(data[0] | (data[1] << 8));
+                return data.IsEmpty ? null : (ushort)(data[0] | (data[1] << 8));
             }
 
             uint? ReadUInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data == null ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+                return data.IsEmpty ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
             }
 
             int? ReadInt32(in ReadOnlySpan<byte> bytes)

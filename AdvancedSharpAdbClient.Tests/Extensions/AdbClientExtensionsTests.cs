@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(3));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(4));
                 });
-            _ = client.ExecuteServerCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>())
+            _ = client.ExecuteServerEnumerable(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(encoding, x.ArgAt<Encoding>(2));
                     return result;
                 });
-            _ = client.ExecuteServerCommand(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>())
+            _ = client.ExecuteServerEnumerable(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(target, x.ArgAt<string>(0));
@@ -65,8 +65,8 @@ namespace AdvancedSharpAdbClient.Tests
             client.ExecuteServerCommand(target, command, socket, predicate);
             client.ExecuteServerCommand(target, command, predicate, encoding);
             client.ExecuteServerCommand(target, command, socket, predicate, encoding);
-            Assert.Equal(result, AdbClientExtensions.ExecuteServerCommand(client, target, command));
-            Assert.Equal(result, AdbClientExtensions.ExecuteServerCommand(client, target, command, socket));
+            Assert.Equal(result, client.ExecuteServerEnumerable(target, command));
+            Assert.Equal(result, client.ExecuteServerEnumerable(target, command, socket));
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                 });
-            _ = client.ExecuteRemoteCommand(Arg.Any<string>(), device, Arg.Any<Encoding>())
+            _ = client.ExecuteRemoteEnumerable(Arg.Any<string>(), device, Arg.Any<Encoding>())
                 .Returns(x =>
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient.Tests
             client.ExecuteRemoteCommand(command, device, receiver);
             client.ExecuteRemoteCommand(command, device, predicate);
             client.ExecuteRemoteCommand(command, device, predicate, encoding);
-            Assert.Equal(result, AdbClientExtensions.ExecuteRemoteCommand(client, command, device));
+            Assert.Equal(result, client.ExecuteRemoteEnumerable(command, device));
         }
 
         [Fact]

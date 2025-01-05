@@ -26,7 +26,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// The collection itself cannot be <see langword="null"/>, but it can contain elements that are
         /// <see langword="null"/>, if type <typeparamref name="TSource"/> is a reference type.</param>
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="collection"/> is null.</exception>
-        public static void AddRange<TSource>(this ICollection<TSource> source, IEnumerable<TSource> collection)
+        public static void AddRange<TSource>(this ICollection<TSource> source, params IEnumerable<TSource> collection)
         {
             ExceptionExtensions.ThrowIfNull(source);
             ExceptionExtensions.ThrowIfNull(collection);

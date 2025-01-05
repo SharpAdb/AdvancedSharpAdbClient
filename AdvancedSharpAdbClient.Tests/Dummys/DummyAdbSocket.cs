@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// A mock implementation of the <see cref="IAdbSocket"/> class.
     /// </summary>
-    internal class DummyAdbSocket : IDummyAdbSocket, ICloneable<DummyAdbSocket>
+    internal partial class DummyAdbSocket : IDummyAdbSocket, ICloneable<DummyAdbSocket>
     {
         /// <summary>
         /// Use this message to cause <see cref="ReadString"/> and <see cref="ReadStringAsync(CancellationToken)"/> to throw
@@ -314,7 +314,5 @@ namespace AdvancedSharpAdbClient.Tests
             SyncRequests = SyncRequests,
             ShellStreams = ShellStreams
         };
-
-        object ICloneable.Clone() => Clone();
     }
 }

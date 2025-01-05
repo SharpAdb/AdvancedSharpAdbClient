@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-#if WINDOWS_UWP
+#if HAS_WUXC
 using System.Threading;
 #endif
 
@@ -342,7 +342,7 @@ namespace AdvancedSharpAdbClient.Models
                 int blueIndex = (int)Blue.Offset / 8;
                 int greenIndex = (int)Green.Offset / 8;
                 int alphaIndex = (int)Alpha.Offset / 8;
-                
+
                 byte[] array = new byte[(int)Size * 4];
                 // Loop over the array and re-order as required
                 for (int i = 0; i < (int)Size; i += 4)
@@ -408,7 +408,18 @@ namespace AdvancedSharpAdbClient.Models
         }
 #endif
 
-#if WINDOWS_UWP
+#if HAS_WUXC
+        /// <summary>
+        /// Gets is <see cref="DispatcherQueue.HasThreadAccess"/> supported.
+        /// </summary>
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+        [SupportedOSPlatformGuard("Windows10.0.18362.0")]
+#endif
+#pragma warning disable CA1416
+        public static bool IsHasThreadAccessSupported { get; } = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess");
+#pragma warning restore CA1416
+
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
@@ -417,7 +428,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             if (dispatcher.HasThreadAccess)
@@ -452,10 +465,13 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 327680u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.16299.0")]
+#endif
+        [ContractVersion(typeof(UniversalApiContract), 0x50000u)]
         public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
-            if (ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess") && dispatcher.HasThreadAccess)
+            if (IsHasThreadAccessSupported && dispatcher.HasThreadAccess)
             {
                 return ToBitmapAsync(buffer, cancellationToken);
             }
@@ -489,7 +505,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(buffer);
@@ -523,7 +541,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <param name="alphaMode">A <see cref="BitmapAlphaMode"/> which describes how the alpha channel is stored.</param>
         /// <returns>A <see cref="BitmapPixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
         {
             // Initial parameter validation.

@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers.Tests
             };
 
             DummyAdbClient client = new();
-            client.Commands["shell:/system/bin/getprop"] = 
+            client.Commands["shell:/system/bin/getprop"] =
                 """
                 [init.svc.BGW]: [running]
                 [init.svc.MtkCodecService]: [running]

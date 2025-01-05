@@ -230,7 +230,7 @@ namespace AdvancedSharpAdbClient
 
 #if COMP_NETSTANDARD2_1
         /// <summary>
-        /// Asynchronously executes a command on the adb server and returns the output.
+        /// Asynchronously executes a command on the adb server and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -238,11 +238,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerCommand(target, command, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerEnumerable(target, command, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
-        /// Asynchronously executes a command on the adb server and returns the output.
+        /// Asynchronously executes a command on the adb server and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="target">The target of command, such as <c>shell</c>, <c>remount</c>, <c>dev</c>, <c>tcp</c>, <c>local</c>,
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
@@ -251,19 +251,19 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerCommand(target, command, socket, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerEnumerable(target, command, socket, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
-        /// Asynchronously executes a command on the device and returns the output.
+        /// Asynchronously executes a command on the device and returns the <see cref="IAsyncEnumerable{String}"/> output.
         /// </summary>
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteRemoteCommand(command, device, encoding).AsEnumerableAsync(cancellationToken);
+        IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteRemoteEnumerable(command, device, encoding).AsEnumerableAsync(cancellationToken);
 
         /// <summary>
         /// Asynchronously runs the event log service on a device and returns it.
@@ -464,7 +464,6 @@ namespace AdvancedSharpAdbClient
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
@@ -478,7 +477,6 @@ namespace AdvancedSharpAdbClient
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
@@ -492,7 +490,6 @@ namespace AdvancedSharpAdbClient
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback, CancellationToken cancellationToken, params string[] arguments);
 
             /// <summary>
@@ -506,7 +503,6 @@ namespace AdvancedSharpAdbClient
             /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            [ContractVersion(typeof(UniversalApiContract), 65536u)]
             Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? callback, CancellationToken cancellationToken);
         }
 #endif

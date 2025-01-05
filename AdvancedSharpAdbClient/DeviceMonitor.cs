@@ -162,10 +162,10 @@ namespace AdvancedSharpAdbClient
             {
                 try
                 {
-                    FirstDeviceListParsed = new TaskCompletionSource<object?>();
+                    FirstDeviceListParsed = new();
                     MonitorTask = DeviceMonitorLoopAsync(MonitorTaskCancellationTokenSource.Token);
                     // Wait for the worker thread to have read the first list of devices.
-                    _ = FirstDeviceListParsed.Task.AwaitByTaskCompleteSource();
+                    FirstDeviceListParsed.Task.AwaitByTaskCompleteSource();
                 }
                 finally
                 {
@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Processes the incoming <see cref="DeviceData"/>.
         /// </summary>
-        protected virtual void UpdateDevices(IEnumerable<DeviceData> collection)
+        protected virtual void UpdateDevices(params IEnumerable<DeviceData> collection)
         {
             lock (devices)
             {

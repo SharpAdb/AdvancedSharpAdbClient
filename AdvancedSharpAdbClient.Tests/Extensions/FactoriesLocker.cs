@@ -7,7 +7,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// Locker for the <see cref="Factories"/> class.
     /// </summary>
-    public class FactoriesLocker : IDisposable
+    public partial class FactoriesLocker : IDisposable
     {
         public static SemaphoreSlim SlimLocker { get; } = new(1, 1);
 

@@ -178,6 +178,29 @@ namespace AdvancedSharpAdbClient
 
             await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
             await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
+
+            try
+            {
+                using StreamReader reader = new(socket.GetShellStream());
+                // Previously, we would loop while reader.Peek() >= 0. Turns out that this would
+                // break too soon in certain cases (about every 10 loops, so it appears to be a timing
+                // issue). Checking for reader.ReadLine() to return null appears to be much more robust
+                // -- one of the integration test fetches output 1000 times and found no truncations.
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    if (await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false) == null) { break; }
+                }
+            }
+            catch (Exception e)
+            {
+                // If a cancellation was requested, this main loop is interrupted with an exception
+                // because the socket is closed. In that case, we don't need to throw a ShellCommandUnresponsiveException.
+                // In all other cases, something went wrong, and we want to report it to the user.
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    throw new ShellCommandUnresponsiveException(e);
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -258,18 +281,18 @@ namespace AdvancedSharpAdbClient
 
 #if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
-        public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
             using IAdbSocket socket = CreateAdbSocket();
-            await foreach (string? line in ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            await foreach (string? line in ExecuteServerEnumerableAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
             {
                 yield return line;
             }
         }
 
         /// <inheritdoc/>
-        public virtual async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public virtual async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             ExceptionExtensions.ThrowIfNull(encoding);
 
@@ -311,7 +334,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
             ExceptionExtensions.ThrowIfNull(encoding);
@@ -319,7 +342,7 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken);
 
-            await foreach (string? line in ExecuteServerCommandAsync("shell", command, socket, encoding, cancellationToken).ConfigureAwait(false))
+            await foreach (string? line in ExecuteServerEnumerableAsync("shell", command, socket, encoding, cancellationToken).ConfigureAwait(false))
             {
                 yield return line;
             }
@@ -653,8 +676,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -697,8 +719,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -934,7 +955,9 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_WINRT
         /// <inheritdoc/>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1003,6 +1026,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1048,8 +1074,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSplitSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -1057,6 +1082,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+#if HAS_WINRT && NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1092,8 +1120,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            int i = 0;
-            await splitAPKs.Select(splitAPK => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{i++}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
+            await splitAPKs.Select((splitAPK, index) => InstallWriteAsync(device, splitAPK, $"{nameof(splitAPK)}{index}", session, OnSyncProgressChanged, cancellationToken)).WhenAll().ConfigureAwait(false);
 
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Installing));
             await InstallCommitAsync(device, session, cancellationToken).ConfigureAwait(false);
@@ -1101,6 +1128,9 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? callback = null, CancellationToken cancellationToken = default)
         {
             callback?.Invoke(0);
@@ -1173,6 +1203,9 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         protected virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<string?, double>? callback, CancellationToken cancellationToken = default)
         {
             callback?.Invoke(apkName, 0);

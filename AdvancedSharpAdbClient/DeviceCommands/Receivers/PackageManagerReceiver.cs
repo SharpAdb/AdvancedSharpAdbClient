@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
         public PackageManager PackageManager => packageManager;
 
         /// <inheritdoc/>
-        protected override void ProcessNewLines(IEnumerable<string> lines)
+        protected override void ProcessNewLines(params IEnumerable<string> lines)
         {
             PackageManager.Packages.Clear();
 

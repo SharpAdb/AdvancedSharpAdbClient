@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
     [DebuggerDisplay($"{nameof(Framebuffer)} \\{{ {nameof(Header)} = {{{nameof(Header)}}}, {nameof(Data)} = {{{nameof(Data)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
-    public sealed class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable, ICloneable<Framebuffer>, ICloneable
+    public sealed partial class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable, ICloneable<Framebuffer>, ICloneable
     {
         /// <summary>
         /// The <see cref="Array"/> of <see cref="byte"/>s which contains the framebuffer header.
@@ -234,13 +234,15 @@ namespace AdvancedSharpAdbClient.Models
         public static explicit operator Bitmap?(Framebuffer value) => value.ToImage();
 #endif
 
-#if WINDOWS_UWP
+#if HAS_WUXC
         /// <summary>
         /// Converts the framebuffer data to a <see cref="WriteableBitmap"/>.
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public Task<WriteableBitmap?> ToBitmapAsync(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
@@ -253,7 +255,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.10240.0")]
+#endif
         public Task<WriteableBitmap?> ToBitmapAsync(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
@@ -266,7 +270,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="DispatcherQueue"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-        [ContractVersion(typeof(UniversalApiContract), 327680u)]
+#if NET
+        [SupportedOSPlatform("Windows10.0.16299.0")]
+#endif
+        [ContractVersion(typeof(UniversalApiContract), 0x50000u)]
         public Task<WriteableBitmap?> ToBitmapAsync(DispatcherQueue dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();

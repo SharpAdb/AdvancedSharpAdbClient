@@ -26,8 +26,8 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteRemoteCommand(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding) =>
             ExecuteServerCommand("shell", command, receiver, encoding);
 
-        public IEnumerable<string> ExecuteRemoteCommand(string command, DeviceData device, Encoding encoding) =>
-            ExecuteServerCommand("shell", command, encoding);
+        public IEnumerable<string> ExecuteRemoteEnumerable(string command, DeviceData device, Encoding encoding) =>
+            ExecuteServerEnumerable("shell", command, encoding);
 
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, CancellationToken cancellationToken = default) =>
             ExecuteServerCommandAsync("shell", command, cancellationToken);
@@ -35,8 +35,8 @@ namespace AdvancedSharpAdbClient.Tests
         public Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default) =>
             ExecuteServerCommandAsync("shell", command, receiver, encoding, cancellationToken);
 
-        public IAsyncEnumerable<string> ExecuteRemoteCommandAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerCommandAsync("shell", command, encoding, cancellationToken);
+        public IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
+            ExecuteServerEnumerableAsync("shell", command, encoding, cancellationToken);
 
         public void ExecuteServerCommand(string target, string command)
         {
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteServerCommand(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding) =>
             ExecuteServerCommand(target, command, receiver, encoding);
 
-        public IEnumerable<string> ExecuteServerCommand(string target, string command, Encoding encoding)
+        public IEnumerable<string> ExecuteServerEnumerable(string target, string command, Encoding encoding)
         {
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
@@ -115,8 +115,8 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public IEnumerable<string> ExecuteServerCommand(string target, string command, IAdbSocket socket, Encoding encoding) =>
-            ExecuteServerCommand(target, command, encoding);
+        public IEnumerable<string> ExecuteServerEnumerable(string target, string command, IAdbSocket socket, Encoding encoding) =>
+            ExecuteServerEnumerable(target, command, encoding);
 
         public async Task ExecuteServerCommandAsync(string target, string command, CancellationToken cancellationToken = default)
         {
@@ -171,7 +171,7 @@ namespace AdvancedSharpAdbClient.Tests
         public Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken) =>
             ExecuteServerCommandAsync(target, command, receiver, encoding, cancellationToken);
 
-        public async IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             StringBuilder requestBuilder = new();
             if (!StringExtensions.IsNullOrWhiteSpace(target))
@@ -197,8 +197,8 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public IAsyncEnumerable<string> ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken = default) =>
-            ExecuteServerCommandAsync(target, command, socket, encoding, cancellationToken);
+        public IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken = default) =>
+            ExecuteServerEnumerableAsync(target, command, socket, encoding, cancellationToken);
 
         #region Not Implemented
 

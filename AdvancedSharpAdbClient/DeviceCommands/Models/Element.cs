@@ -92,7 +92,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
 #if NET
         [SupportedOSPlatform("Windows10.0.10240.0")]
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
 #endif
         public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
         {
@@ -223,7 +222,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
 #if NET
         [SupportedOSPlatform("Windows10.0.10240.0")]
 #endif
-        [ContractVersion(typeof(UniversalApiContract), 65536u)]
         public static Element? FromIXmlNode(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode) =>
             xmlNode.Attributes?.GetNamedItem("bounds") != null ? new Element(client, device, xmlNode) : null;
 #endif

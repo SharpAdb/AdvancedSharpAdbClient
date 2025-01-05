@@ -21,4 +21,6 @@ namespace System.Collections.Generic
         T this[int index] { get; }
     }
 }
+#else
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Collections.Generic.IReadOnlyList<>))]
 #endif

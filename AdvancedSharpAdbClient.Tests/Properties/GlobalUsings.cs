@@ -13,7 +13,7 @@ global using AdvancedSharpAdbClient.Tests;
 global using AdvancedSharpAdbClient.Logs.Tests;
 #endregion
 
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
 global using Windows.ApplicationModel;
 global using System.Runtime.InteropServices.WindowsRuntime;
 global using Windows.Storage;

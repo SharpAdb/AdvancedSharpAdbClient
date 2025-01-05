@@ -191,8 +191,8 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        public static IEnumerable<string> ExecuteServerCommand(this IAdbClient client, string target, string command) =>
-            client.ExecuteServerCommand(target, command, AdbClient.Encoding);
+        public static IEnumerable<string> ExecuteServerEnumerable(this IAdbClient client, string target, string command) =>
+            client.ExecuteServerEnumerable(target, command, AdbClient.Encoding);
 
         /// <summary>
         /// Executes a command on the adb server and returns the output.
@@ -203,8 +203,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        public static IEnumerable<string> ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket) =>
-            client.ExecuteServerCommand(target, command, socket, AdbClient.Encoding);
+        public static IEnumerable<string> ExecuteServerEnumerable(this IAdbClient client, string target, string command, IAdbSocket socket) =>
+            client.ExecuteServerEnumerable(target, command, socket, AdbClient.Encoding);
 
         /// <summary>
         /// Executes a shell command on the device and returns the output.
@@ -213,8 +213,8 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
-        public static IEnumerable<string> ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device) =>
-            client.ExecuteRemoteCommand(command, device, AdbClient.Encoding);
+        public static IEnumerable<string> ExecuteRemoteEnumerable(this IAdbClient client, string command, DeviceData device) =>
+            client.ExecuteRemoteEnumerable(command, device, AdbClient.Encoding);
 
         /// <summary>
         /// Runs the event log service on a device.

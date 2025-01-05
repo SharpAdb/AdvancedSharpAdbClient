@@ -63,7 +63,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
         /// <returns>An array whose elements contain the substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
         public static string[] Split(this string text, char separator, StringSplitOptions options = StringSplitOptions.None) =>
-            text.Split(new[] { separator }, options);
+            text.Split([separator], options);
 
         /// <summary>
         /// Splits a string into a maximum number of substrings based on a specified delimiting
@@ -77,7 +77,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
         /// <returns>An array that contains at most count substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
         public static string[] Split(this string text, char separator, int count, StringSplitOptions options = StringSplitOptions.None) =>
-            text.Split(new[] { separator }, count, options);
+            text.Split([separator], count, options);
 
         /// <summary>
         /// Determines whether this string instance starts with the specified character.

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdvancedSharpAdbClient.Tests
 {
-    internal class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
+    internal partial class TracingAdbSocket(EndPoint endPoint) : AdbSocket(endPoint), IDummyAdbSocket
     {
         private readonly EndPoint endPoint = endPoint;
 

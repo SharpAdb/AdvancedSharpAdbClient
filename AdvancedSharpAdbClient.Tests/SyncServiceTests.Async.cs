@@ -252,7 +252,7 @@ namespace AdvancedSharpAdbClient.Tests
                         Assert.True(service.IsProcessing);
                         _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((Stream)null, null, default, default));
                         _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (Stream)null));
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
                         _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((IInputStream)null, null, default, default));
                         _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (IOutputStream)null));
 #endif
@@ -264,7 +264,7 @@ namespace AdvancedSharpAdbClient.Tests
                 });
         }
 
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
         /// <summary>
         /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
         /// </summary>
@@ -313,7 +313,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
 
-            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Fstab.bin"));
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/Fstab.bin"));
             using IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync();
             byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
             byte[] contentMessage =

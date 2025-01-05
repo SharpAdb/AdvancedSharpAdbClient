@@ -9,7 +9,7 @@ namespace AdvancedSharpAdbClient.Tests
     /// <summary>
     /// A mock implementation of the <see cref="ISyncService"/> class.
     /// </summary>
-    internal class DummySyncService : ISyncService
+    internal partial class DummySyncService : ISyncService
     {
         public Dictionary<string, Stream> UploadedFiles { get; } = [];
 

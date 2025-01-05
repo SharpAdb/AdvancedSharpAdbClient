@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using Xunit;
 
@@ -71,7 +69,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
             Assert.Equal(data.AsSpan(), [.. header]);
         }
 
-#if WINDOWS
+#if HAS_IMAGING
         [Fact]
         public void ToImageTest()
         {

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -367,7 +365,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(1u, header.Version);
             Assert.Equal(0u, header.ColorSpace);
 
-#if WINDOWS
+#if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
 
             using Bitmap image = framebuffer.ToImage();
@@ -937,7 +935,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () => TestClient.InstallCommitAsync(Device, "936013062"));
         }
 
-#if WINDOWS10_0_17763_0_OR_GREATER
+#if WINDOWS10_0_18362_0_OR_GREATER
         /// <summary>
         /// Tests the <see cref="AdbClient.InstallAsync(DeviceData, IRandomAccessStream, Action{InstallProgressEventArgs}?, CancellationToken, string[])"/> method.
         /// </summary>
@@ -963,7 +961,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             byte[] response = "Success\n"u8.ToArray();
 
-            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\TestApp\base.apk"));
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/TestApp/base.apk"));
             using (IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync())
             {
                 string[] requests =
@@ -1012,7 +1010,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\TestApp\split_config.arm64_v8a.apk"));
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/TestApp/split_config.arm64_v8a.apk"));
             using IRandomAccessStreamWithContentType abiStream = await storageFile.OpenReadAsync();
 
             string[] requests =
@@ -1086,9 +1084,9 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\TestApp\base.apk"));
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/TestApp/base.apk"));
             using IRandomAccessStreamWithContentType baseStream = await storageFile.OpenReadAsync();
-            storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\TestApp\split_config.arm64_v8a.apk"));
+            storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/TestApp/split_config.arm64_v8a.apk"));
             using IRandomAccessStreamWithContentType abiStream = await storageFile.OpenReadAsync();
 
             string[] requests =
@@ -1153,7 +1151,7 @@ namespace AdvancedSharpAdbClient.Tests
                 }
             }
 
-            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\TestApp\base.apk"));
+            StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/TestApp/base.apk"));
             using (IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync())
             {
                 string[] requests =
