@@ -273,6 +273,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
+#if HAS_XPATH
         /// <summary>
         /// Gets element by xpath. You can specify the waiting time in timeout.
         /// </summary>
@@ -357,6 +358,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             }
             while (stopwatch.Elapsed < timeout);
         }
+#endif
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.

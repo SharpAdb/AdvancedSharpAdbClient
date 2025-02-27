@@ -97,6 +97,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static Task<AppStatus> GetAppStatusAsync(this IAdbClient client, DeviceData device, string packageName, CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).GetAppStatusAsync(packageName, cancellationToken);
 
+#if HAS_XPATH
         /// <summary>
         /// Asynchronously get element by xpath. You can specify the waiting time in timeout.
         /// </summary>
@@ -120,6 +121,21 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns the <see cref="List{Element}"/> of <see cref="Element"/> has got.</returns>
         public static Task<IEnumerable<Element>> FindElementsAsync(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
             new DeviceClient(client, device).FindElementsAsync(xpath, cancellationToken);
+
+#if COMP_NETSTANDARD2_1
+        /// <summary>
+        /// Gets elements by xpath asynchronously. You can specify the waiting time in timeout.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to run the command.</param>
+        /// <param name="xpath">The xpath of the elements.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.
+        /// Only check once if <see langword="default"/>. Or it will continue check until <see cref="CancellationToken.IsCancellationRequested"/> is <see langword="true"/>.</param>
+        /// <returns>The <see cref="IAsyncEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        public static IAsyncEnumerable<Element> FindAsyncElements(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", CancellationToken cancellationToken = default) =>
+            new DeviceClient(client, device).FindAsyncElements(xpath, cancellationToken);
+#endif
+#endif
 
         /// <summary>
         /// Asynchronously send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.
