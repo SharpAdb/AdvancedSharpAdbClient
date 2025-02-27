@@ -256,6 +256,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             return isAppRunning ? AppStatus.Background : AppStatus.Stopped;
         }
 
+#if HAS_XPATH
         /// <summary>
         /// Gets element by xpath asynchronously. You can specify the waiting time in timeout.
         /// </summary>
@@ -414,6 +415,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 if (cancellationToken == default) { break; }
             }
         }
+#endif
 #endif
 
         /// <summary>

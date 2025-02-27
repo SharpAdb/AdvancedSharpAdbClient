@@ -86,6 +86,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public static AppStatus GetAppStatus(this IAdbClient client, DeviceData device, string packageName) =>
             new DeviceClient(client, device).GetAppStatus(packageName);
 
+#if HAS_XPATH
         /// <summary>
         /// Gets element by xpath. You can specify the waiting time in timeout.
         /// </summary>
@@ -109,6 +110,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
         public static IEnumerable<Element> FindElements(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default) =>
             new DeviceClient(client, device).FindElements(xpath, timeout);
+#endif
 
         /// <summary>
         /// Send key event to specific. You can see key events here https://developer.android.com/reference/android/view/KeyEvent.

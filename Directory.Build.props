@@ -4,7 +4,7 @@
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat and wherewhere</Authors>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
-    <Copyright>Copyright © 2021 - 2024 SharpAdb. All Rights Reserved.</Copyright>
+    <Copyright>Copyright © 2021 - 2025 SharpAdb. All Rights Reserved.</Copyright>
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET, Mono, Unity applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
     <Deterministic>True</Deterministic>
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -23,7 +23,7 @@
     <RepositoryUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
-    <VersionPrefix>3.3.14</VersionPrefix>
+    <VersionPrefix>3.4.14</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
