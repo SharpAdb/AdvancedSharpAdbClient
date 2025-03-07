@@ -32,6 +32,7 @@ body:
       description: Specify the version of AdvancedSharpAdbClient you're using.
       options:
         - "Latest Source"
+        - "3.4.14"
         - "3.3.13"
         - "3.3.12"
         - "3.2.11"
@@ -73,6 +74,7 @@ body:
         - ".NET 7"
         - ".NET 8"
         - ".NET 9"
+        - ".NET 10"
         - "Others"
   - type: dropdown
     attributes:
@@ -107,6 +109,7 @@ body:
         - "MonoDevelop 5.x"
         - "MonoDevelop 4.x"
         - "MonoDevelop 3.x"
+        - "Rider 2025"
         - "Rider 2024"
         - "Rider 2023"
         - "Rider 2022"
