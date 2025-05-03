@@ -164,7 +164,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 {
                     Assert.Equal(remotePath, x.ArgAt<string>(0));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(1));
-                    return stats.AsEnumerableAsync(x.ArgAt<CancellationToken>(1));
+                    return stats.AsAsyncEnumerable(x.ArgAt<CancellationToken>(1));
                 });
 
             Factories.SyncServiceFactory = (c, d) =>

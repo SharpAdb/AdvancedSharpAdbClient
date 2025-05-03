@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken).ConfigureAwait(false);
             _ = await WriteAsync(pathBytes, cancellationToken).ConfigureAwait(false);
@@ -141,11 +141,11 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-            ExceptionExtensions.ThrowIfNegative(offset);
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentOutOfRangeException.ThrowIfNegative<int>(offset);
 
             length = length != -1 ? length : data.Length;
-            ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
+            ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
             int totalRead = offset;
@@ -306,8 +306,6 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-
             int count = -1;
             int totalRead = 0;
             int length = data.Length;

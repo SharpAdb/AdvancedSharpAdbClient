@@ -505,7 +505,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             StringBuilder requestBuilder = new("pm install-create");
 
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            if (!string.IsNullOrWhiteSpace(packageName))
             {
                 _ = requestBuilder.Append(" -p ").Append(packageName);
             }
@@ -568,7 +568,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(path)).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenStreamForReadAsync()).Unwrap();
 #else
-            TaskExExtensions.FromResult<Stream>(File.OpenRead(path));
+            Task.FromResult<Stream>(File.OpenRead(path));
 #endif
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace System.Runtime.CompilerServices
     /// Provides a handler used by the language compiler to process interpolated strings into <see cref="string"/> instances.
     /// </summary>
     [InterpolatedStringHandler]
-    internal readonly struct DefaultInterpolatedStringHandler
+    internal readonly ref struct DefaultInterpolatedStringHandler
     {
         /// <summary>
         /// Expected average length of formatted data used for an individual interpolation expression result.
@@ -31,14 +31,14 @@ namespace System.Runtime.CompilerServices
         private const int MinimumArrayPoolLength = 256;
 
         /// <summary>
+        /// The associated <see cref="StringBuilder"/> to which to append.
+        /// </summary>
+        private readonly StringBuilder _stringBuilder;
+
+        /// <summary>
         /// Optional provider to pass to IFormattable.ToString or ISpanFormattable.TryFormat calls.
         /// </summary>
         private readonly IFormatProvider? _provider;
-
-        /// <summary>
-        /// The <see cref="StringBuilder"/> used to build the string.
-        /// </summary>
-        private readonly StringBuilder _builder;
 
         /// <summary>
         /// Whether <see cref="_provider"/> provides an ICustomFormatter.
@@ -57,7 +57,7 @@ namespace System.Runtime.CompilerServices
         /// </summary>
         public DefaultInterpolatedStringHandler()
         {
-            _builder = new StringBuilder();
+            _stringBuilder = new StringBuilder();
             _hasCustomFormatter = false;
         }
 
@@ -69,7 +69,7 @@ namespace System.Runtime.CompilerServices
         /// <remarks>This is intended to be called only by compiler-generated code. Arguments are not validated as they'd otherwise be for members intended to be used directly.</remarks>
         public DefaultInterpolatedStringHandler(int literalLength, int formattedCount)
         {
-            _builder = new StringBuilder(GetDefaultLength(literalLength, formattedCount));
+            _stringBuilder = new StringBuilder(GetDefaultLength(literalLength, formattedCount));
             _hasCustomFormatter = false;
         }
 
@@ -82,7 +82,7 @@ namespace System.Runtime.CompilerServices
         /// <remarks>This is intended to be called only by compiler-generated code. Arguments are not validated as they'd otherwise be for members intended to be used directly.</remarks>
         public DefaultInterpolatedStringHandler(int literalLength, int formattedCount, IFormatProvider? provider)
         {
-            _builder = new StringBuilder(GetDefaultLength(literalLength, formattedCount));
+            _stringBuilder = new StringBuilder(GetDefaultLength(literalLength, formattedCount));
             _provider = provider;
             _hasCustomFormatter = provider != null && HasCustomFormatter(provider);
         }
@@ -98,7 +98,7 @@ namespace System.Runtime.CompilerServices
         /// Gets the built <see cref="string"/>.
         /// </summary>
         /// <returns>The built string.</returns>
-        public override string ToString() => _builder.ToString();
+        public override string ToString() => _stringBuilder.ToString();
 
         /// <summary>
         /// Gets the built <see cref="string"/> and clears the handler.
@@ -112,17 +112,44 @@ namespace System.Runtime.CompilerServices
         /// </remarks>
         public string ToStringAndClear()
         {
-            string result = _builder.ToString();
-            _ = _builder.Clear();
+            string result = _stringBuilder.ToString();
+            _ = _stringBuilder.Clear();
             return result;
         }
+
+        /// <summary>
+        /// Clears the handler.
+        /// </summary>
+        /// <remarks>
+        /// This releases any resources used by the handler. The method should be invoked only
+        /// once and as the last thing performed on the handler. Subsequent use is erroneous, ill-defined,
+        /// and may destabilize the process, as may using any other copies of the handler after <see cref="Clear"/>
+        /// is called on any one of them.
+        /// </remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
+        public void Clear() => _ = _stringBuilder.Clear();
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Gets a span of the characters appended to the handler.
+        /// </summary>
+        public ReadOnlySpan<char> Text
+        {
+            get
+            {
+                Span<char> result = new char[_stringBuilder.Length];
+                _stringBuilder.CopyTo(0, result, _stringBuilder.Length);
+                return result;
+            }
+        }
+#endif
 
         /// <summary>
         /// Writes the specified string to the handler.
         /// </summary>
         /// <param name="value">The string to write.</param>
         [MethodImpl((MethodImplOptions)0x100)]
-        public void AppendLiteral(string value) => _ = _builder.Append(value);
+        public void AppendLiteral(string value) => _ = _stringBuilder.Append(value);
 
         #region AppendFormatted
         #region AppendFormatted T
@@ -187,7 +214,7 @@ namespace System.Runtime.CompilerServices
         /// <typeparam name="T">The type of the value to write.</typeparam>
         public void AppendFormatted<T>(T value, int alignment)
         {
-            int startingPos = _builder.Length;
+            int startingPos = _stringBuilder.Length;
             AppendFormatted(value);
             if (alignment != 0)
             {
@@ -204,7 +231,7 @@ namespace System.Runtime.CompilerServices
         /// <typeparam name="T">The type of the value to write.</typeparam>
         public void AppendFormatted<T>(T value, int alignment, string? format)
         {
-            int startingPos = _builder.Length;
+            int startingPos = _stringBuilder.Length;
             AppendFormatted(value, format);
             if (alignment != 0)
             {
@@ -251,7 +278,7 @@ namespace System.Runtime.CompilerServices
         /// Writes the specified character span to the handler.
         /// </summary>
         /// <param name="value">The span to write.</param>
-        public void AppendFormatted(params ReadOnlySpan<char> value) => _ = _builder.Append(value);
+        public void AppendFormatted(params ReadOnlySpan<char> value) => _ = _stringBuilder.Append(value);
 
         /// <summary>
         /// Writes the specified string of chars to the handler.
@@ -281,13 +308,13 @@ namespace System.Runtime.CompilerServices
             if (leftAlign)
             {
                 AppendFormatted(value);
-                int _pos = _builder.Length;
-                _ = _builder.Insert(_pos, " ", paddingRequired);
+                int _pos = _stringBuilder.Length;
+                _ = _stringBuilder.Insert(_pos, " ", paddingRequired);
             }
             else
             {
-                int _pos = _builder.Length;
-                _ = _builder.Insert(_pos, " ", paddingRequired);
+                int _pos = _stringBuilder.Length;
+                _ = _stringBuilder.Insert(_pos, " ", paddingRequired);
                 AppendFormatted(value);
             }
         }
@@ -341,7 +368,7 @@ namespace System.Runtime.CompilerServices
         /// <param name="alignment">Non-zero minimum number of characters that should be written for this value.  If the value is negative, it indicates left-aligned and the required minimum is the absolute value.</param>
         private void AppendOrInsertAlignmentIfNeeded(int startingPos, int alignment)
         {
-            int _pos = _builder.Length;
+            int _pos = _stringBuilder.Length;
             int charsWritten = _pos - startingPos;
 
             bool leftAlign = false;
@@ -355,12 +382,12 @@ namespace System.Runtime.CompilerServices
             if (paddingNeeded > 0)
             {
                 _ = leftAlign
-                    ? _builder.Insert(_pos, " ", paddingNeeded)
-                    : _builder.Insert(startingPos, " ", paddingNeeded);
+                    ? _stringBuilder.Insert(_pos, " ", paddingNeeded)
+                    : _stringBuilder.Insert(startingPos, " ", paddingNeeded);
             }
         }
     }
 }
 #else
-[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Runtime.CompilerServices.DefaultInterpolatedStringHandler))]
+        [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Runtime.CompilerServices.DefaultInterpolatedStringHandler))]
 #endif

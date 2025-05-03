@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
         public ForwardSpec(string spec)
         {
-            ExceptionExtensions.ThrowIfNull(spec);
+            ArgumentNullException.ThrowIfNull(spec);
 
             string[] parts = spec.Split(':', 2, StringSplitOptions.RemoveEmptyEntries);
 

@@ -160,7 +160,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void SendSyncRequest(SyncCommand command, string path)
         {
-            ExceptionExtensions.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             SendSyncRequest(command, pathBytes.Length);
             _ = Write(pathBytes);
@@ -216,11 +216,11 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual int Read(byte[] data, int offset, int length)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-            ExceptionExtensions.ThrowIfNegative(offset);
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentOutOfRangeException.ThrowIfNegative<int>(offset);
 
             length = length != -1 ? length : data.Length;
-            ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
+            ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
             int totalRead = offset;

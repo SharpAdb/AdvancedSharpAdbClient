@@ -48,7 +48,7 @@ namespace AdvancedSharpAdbClient
             int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
             if (errorOutput.Count > 0)
             {
-                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                string error = string.Join(Environment.NewLine, errorOutput!);
                 throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
             }
             else
@@ -79,11 +79,11 @@ namespace AdvancedSharpAdbClient
 #if HAS_WINRT && NET
         [SupportedOSPlatform("Windows10.0.10240.0")]
 #endif
-        public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? TaskExExtensions.FromResult(true) :
+        public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? Task.FromResult(true) :
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));
 #else
-            TaskExExtensions.FromResult(File.Exists(adbPath));
+            Task.FromResult(File.Exists(adbPath));
 #endif
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as <c>adb version</c>.</remarks>
         protected async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(command);
+            ArgumentNullException.ThrowIfNull(command);
             return await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
         }
 

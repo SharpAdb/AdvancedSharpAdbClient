@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient
 #endif
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
-            if (StringExtensions.IsNullOrWhiteSpace(adbPath))
+            if (string.IsNullOrWhiteSpace(adbPath))
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }
@@ -114,7 +114,7 @@ namespace AdvancedSharpAdbClient
             int status = RunAdbProcessInner(command, errorOutput, standardOutput, timeout);
             if (errorOutput.Count > 0)
             {
-                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                string error = string.Join(Environment.NewLine, errorOutput!);
                 throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
             }
             else
@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient
         /// <c>adb version</c>. This operation times out after 5 seconds in default.</remarks>
         protected int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, int timeout = 5000)
         {
-            ExceptionExtensions.ThrowIfNull(command);
+            ArgumentNullException.ThrowIfNull(command);
             return RunProcess(AdbPath, command, errorOutput, standardOutput, timeout);
         }
 

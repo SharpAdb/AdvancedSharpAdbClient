@@ -112,7 +112,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbCommandLineClientFactory">The <see cref="Func{String, IAdbCommandLineClient}"/> to create <see cref="IAdbCommandLineClient"/>.</param>
         public AdbServer(EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory, Func<string, IAdbCommandLineClient> adbCommandLineClientFactory)
         {
-            ExceptionExtensions.ThrowIfNull(endPoint);
+            ArgumentNullException.ThrowIfNull(endPoint);
 
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -225,7 +225,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public StartServerResult RestartServer(string adbPath) =>
-            StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
+            string.IsNullOrWhiteSpace(adbPath) ? RestartServer() : StartServer(adbPath, true);
 
         /// <inheritdoc/>
         public void StopServer()

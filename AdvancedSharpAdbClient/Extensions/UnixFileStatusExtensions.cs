@@ -106,7 +106,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="UnixFileStatus"/> representing the parsed permission code.</returns>
         public static UnixFileStatus FromPermissionCode(string code)
         {
-            ExceptionExtensions.ThrowIfNull(code);
+            ArgumentNullException.ThrowIfNull(code);
 
             if (code.Length is not (9 or 10))
             {

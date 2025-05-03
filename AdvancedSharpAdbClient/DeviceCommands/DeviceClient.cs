@@ -409,7 +409,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public void ClearInput(int charCount)
         {
             SendKeyEvent("KEYCODE_MOVE_END");
-            SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
+            SendKeyEvent(string.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
         }
 
         /// <summary>

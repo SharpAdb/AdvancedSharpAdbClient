@@ -39,7 +39,7 @@ namespace AdvancedSharpAdbClient.Receivers
         protected virtual Task ThrowOnErrorAsync(string line, CancellationToken cancellationToken = default)
         {
             ThrowOnError(line);
-            return TaskExExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient.Receivers
         protected virtual Task ProcessNewLinesAsync(IEnumerable<string> lines, CancellationToken cancellationToken = default)
         {
             ProcessNewLines(lines);
-            return TaskExExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

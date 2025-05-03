@@ -32,6 +32,6 @@ namespace AdvancedSharpAdbClient.Logs
 
         /// <inheritdoc/>
         public override string ToString() =>
-            $"{TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {Tag,-8}: {StringExtensions.Join(", ", Values)}";
+            $"{TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff} {ProcessId,5} {ProcessId,5} {Tag,-8}: {string.Join(", ", Values)}";
     }
 }

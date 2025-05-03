@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="closeStream"><see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/> stream when closed; otherwise, <see langword="false"/>.</param>
         public ShellStream(Stream inner, bool closeStream = false)
         {
-            ExceptionExtensions.ThrowIfNull(inner);
+            ArgumentNullException.ThrowIfNull(inner);
 
             if (!inner.CanRead)
             {

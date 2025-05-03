@@ -58,7 +58,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) =>
-            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).AsEnumerableAsync(cancellationToken);
+            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).AsAsyncEnumerable(cancellationToken);
 #endif
 
         /// <summary>

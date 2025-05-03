@@ -10,7 +10,7 @@
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <IncludeSymbols>True</IncludeSymbols>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <PackageIconUrl>https://raw.githubusercontent.com/SharpAdb/AdvancedSharpAdbClient/main/logo.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</PackageProjectUrl>

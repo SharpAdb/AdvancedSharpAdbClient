@@ -170,7 +170,7 @@ namespace AdvancedSharpAdbClient
         public virtual async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, CancellationToken cancellationToken = default)
         {
             StringBuilder request = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = request.Append(target).Append(':');
             }
@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
             using IAdbSocket socket = CreateAdbSocket();
             await ExecuteServerCommandAsync(target, command, socket, receiver, encoding, cancellationToken);
         }
@@ -225,10 +225,10 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
 
             StringBuilder request = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = request.Append(target).Append(':');
             }
@@ -271,7 +271,7 @@ namespace AdvancedSharpAdbClient
         public async Task ExecuteRemoteCommandAsync(string command, DeviceData device, IShellOutputReceiver? receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken);
@@ -283,7 +283,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
             using IAdbSocket socket = CreateAdbSocket();
             await foreach (string? line in ExecuteServerEnumerableAsync(target, command, socket, encoding, cancellationToken).ConfigureAwait(false))
             {
@@ -294,10 +294,10 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
 
             StringBuilder request = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = request.Append(target).Append(':');
             }
@@ -337,7 +337,7 @@ namespace AdvancedSharpAdbClient
         public async IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(encoding);
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken);
@@ -403,7 +403,7 @@ namespace AdvancedSharpAdbClient
         public async Task RunLogServiceAsync(DeviceData device, Action<LogEntry> messageSink, CancellationToken cancellationToken = default, params LogId[] logNames)
         {
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(messageSink);
+            ArgumentNullException.ThrowIfNull(messageSink);
 
             // The 'log' service has been deprecated, see
             // https://android.googlesource.com/platform/system/core/+/7aa39a7b199bb9803d3fd47246ee9530b4a96177
@@ -477,7 +477,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task<string> PairAsync(string host, int port, string code, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(host);
+            ArgumentNullException.ThrowIfNull(host);
 
             using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
@@ -490,7 +490,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task<string> ConnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(host);
+            ArgumentNullException.ThrowIfNull(host);
 
             using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
@@ -503,7 +503,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task<string> DisconnectAsync(string host, int port = DefaultPort, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(host);
+            ArgumentNullException.ThrowIfNull(host);
 
             using IAdbSocket socket = CreateAdbSocket();
             string address = host.Contains(':') ? host : $"{host}:{port}";
@@ -557,7 +557,7 @@ namespace AdvancedSharpAdbClient
             {
                 // Give adbd some time to kill itself and come back up.
                 // We can't use wait-for-device because devices (e.g. adb over network) might not come back.
-                await TaskExExtensions.Delay(3000, cancellationToken).ConfigureAwait(false);
+                await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -567,7 +567,7 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apk);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
@@ -636,8 +636,8 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(baseAPK);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
+            ArgumentNullException.ThrowIfNull(baseAPK);
+            ArgumentNullException.ThrowIfNull(splitAPKs);
 
             if (!baseAPK.CanRead || !baseAPK.CanSeek)
             {
@@ -689,8 +689,8 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
-            ExceptionExtensions.ThrowIfNull(packageName);
+            ArgumentNullException.ThrowIfNull(splitAPKs);
+            ArgumentNullException.ThrowIfNull(packageName);
 
             if (splitAPKs.Any(apk => apk == null || !apk.CanRead || !apk.CanSeek))
             {
@@ -765,7 +765,7 @@ namespace AdvancedSharpAdbClient
         public async Task<string> InstallCreateAsync(DeviceData device, string packageName, CancellationToken cancellationToken = default, params string[] arguments)
         {
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(packageName);
+            ArgumentNullException.ThrowIfNull(packageName);
 
             StringBuilder requestBuilder =
                 new StringBuilder("exec:cmd package 'install-create'")
@@ -805,9 +805,9 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(0);
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
-            ExceptionExtensions.ThrowIfNull(apkName);
-            ExceptionExtensions.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apkName);
+            ArgumentNullException.ThrowIfNull(session);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
@@ -878,9 +878,9 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(apkName, 0);
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
-            ExceptionExtensions.ThrowIfNull(apkName);
-            ExceptionExtensions.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apkName);
+            ArgumentNullException.ThrowIfNull(session);
 
             if (!apk.CanRead || !apk.CanSeek)
             {
@@ -963,7 +963,7 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apk);
 
             if (!apk.CanRead)
             {
@@ -1034,8 +1034,8 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(baseAPK);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
+            ArgumentNullException.ThrowIfNull(baseAPK);
+            ArgumentNullException.ThrowIfNull(splitAPKs);
 
             if (!baseAPK.CanRead)
             {
@@ -1090,8 +1090,8 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(splitAPKs);
-            ExceptionExtensions.ThrowIfNull(packageName);
+            ArgumentNullException.ThrowIfNull(splitAPKs);
+            ArgumentNullException.ThrowIfNull(packageName);
 
             if (splitAPKs.Any(apk => apk == null || !apk.CanRead))
             {
@@ -1136,9 +1136,9 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(0);
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
-            ExceptionExtensions.ThrowIfNull(apkName);
-            ExceptionExtensions.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apkName);
+            ArgumentNullException.ThrowIfNull(session);
 
             if (!apk.CanRead)
             {
@@ -1211,9 +1211,9 @@ namespace AdvancedSharpAdbClient
             callback?.Invoke(apkName, 0);
 
             EnsureDevice(device);
-            ExceptionExtensions.ThrowIfNull(apk);
-            ExceptionExtensions.ThrowIfNull(apkName);
-            ExceptionExtensions.ThrowIfNull(session);
+            ArgumentNullException.ThrowIfNull(apk);
+            ArgumentNullException.ThrowIfNull(apkName);
+            ArgumentNullException.ThrowIfNull(session);
 
             if (!apk.CanRead)
             {

@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             Client = client;
             Device = device;
 
-            ExceptionExtensions.ThrowIfNull(xmlNode);
+            ArgumentNullException.ThrowIfNull(xmlNode);
             XmlDocument doc = new();
             doc.LoadXml(xmlNode.GetXml());
             Node = doc.FirstChild;

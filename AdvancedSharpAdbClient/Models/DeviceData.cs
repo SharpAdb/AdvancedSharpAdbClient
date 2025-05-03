@@ -256,7 +256,7 @@ namespace AdvancedSharpAdbClient.Models
 
             if (Features?.Length > 0)
             {
-                _ = builder.Append(" features:").Append(StringExtensions.Join(',', Features));
+                _ = builder.Append(" features:").Append(string.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
@@ -278,7 +278,7 @@ namespace AdvancedSharpAdbClient.Models
         {
             if (device.IsEmpty)
             {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a transport ID or serial number for the device");
+                throw new ArgumentOutOfRangeException(paramName, "You must specific a transport ID or serial number for the device");
             }
             return ref device;
         }
@@ -301,7 +301,7 @@ namespace AdvancedSharpAdbClient.Models
                 return DeviceState.NoPermissions;
             }
             // Else, we try to match a value of the DeviceState enumeration.
-            else if (EnumExtensions.TryParse(state, true, out DeviceState value))
+            else if (Enum.TryParse(state, true, out DeviceState value))
             {
                 return value;
             }

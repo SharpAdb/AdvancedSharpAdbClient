@@ -274,7 +274,7 @@ namespace AdvancedSharpAdbClient.Models
 #endif
         public Bitmap? ToImage(byte[] buffer)
         {
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -308,7 +308,7 @@ namespace AdvancedSharpAdbClient.Models
         private PixelFormat StandardizePixelFormat(ref byte[] buffer)
         {
             // Initial parameter validation.
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -510,7 +510,7 @@ namespace AdvancedSharpAdbClient.Models
 #endif
         public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -547,7 +547,7 @@ namespace AdvancedSharpAdbClient.Models
         private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
         {
             // Initial parameter validation.
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {

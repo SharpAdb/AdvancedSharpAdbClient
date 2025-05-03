@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             return taskCompletionSource.Task;
 #else
-            return Task.Factory.StartNew(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
+            return Task.Run(() => socket.Receive(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
 
@@ -183,7 +183,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 
             return taskCompletionSource.Task;
 #else
-            return Task.Factory.StartNew(() => socket.Send(buffer, offset, size, socketFlags), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default);
+            return Task.Run(() => socket.Send(buffer, offset, size, socketFlags), cancellationToken);
 #endif
         }
     }

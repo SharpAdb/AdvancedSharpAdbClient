@@ -28,8 +28,8 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="collection"/> is null.</exception>
         public static void AddRange<TSource>(this ICollection<TSource> source, params IEnumerable<TSource> collection)
         {
-            ExceptionExtensions.ThrowIfNull(source);
-            ExceptionExtensions.ThrowIfNull(collection);
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(collection);
 
             if (source is List<TSource> list)
             {
@@ -94,7 +94,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
-        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this IEnumerable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public static async IAsyncEnumerable<TSource> AsAsyncEnumerable<TSource>(this IEnumerable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using IEnumerator<TSource> enumerator = source.GetEnumerator();
             while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())
@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
-        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this Task<IEnumerable<TSource>> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public static async IAsyncEnumerable<TSource> AsAsyncEnumerable<TSource>(this Task<IEnumerable<TSource>> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using IEnumerator<TSource> enumerator = await source.ContinueWith(x => x.Result.GetEnumerator()).ConfigureAwait(false);
             while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())

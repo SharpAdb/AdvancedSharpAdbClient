@@ -150,8 +150,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(stream);
-            ExceptionExtensions.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
             {
@@ -248,8 +248,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(remoteFilePath);
-            ExceptionExtensions.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remoteFilePath);
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (IsOutdate) { Reopen(); }
 
@@ -450,7 +450,7 @@ namespace AdvancedSharpAdbClient
             {
                 FileMode = (UnixFileStatus)ReadInt32(statResult),
                 Size = ReadInt32(statResult),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(statResult))
             };
             int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
 #endif

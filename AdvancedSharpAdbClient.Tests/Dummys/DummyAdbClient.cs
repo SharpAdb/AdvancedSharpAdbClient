@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteServerCommand(string target, string command)
         {
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }
@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding)
         {
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }
@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Tests
         public IEnumerable<string> ExecuteServerEnumerable(string target, string command, Encoding encoding)
         {
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }
@@ -123,7 +123,7 @@ namespace AdvancedSharpAdbClient.Tests
             await Task.Yield();
 
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }
@@ -139,7 +139,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }
@@ -174,7 +174,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             StringBuilder requestBuilder = new();
-            if (!StringExtensions.IsNullOrWhiteSpace(target))
+            if (!string.IsNullOrWhiteSpace(target))
             {
                 _ = requestBuilder.Append(target).Append(':');
             }

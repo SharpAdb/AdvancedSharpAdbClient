@@ -558,7 +558,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             StringBuilder requestBuilder = new("pm install-create");
 
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            if (!string.IsNullOrWhiteSpace(packageName))
             {
                 _ = requestBuilder.Append(" -p ").Append(packageName);
             }

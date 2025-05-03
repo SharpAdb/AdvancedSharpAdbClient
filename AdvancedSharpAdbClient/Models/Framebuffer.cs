@@ -335,6 +335,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
         /// </summary>
-        private void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
+        private void EnsureNotDisposed() => ObjectDisposedException.ThrowIf(disposed, this);
     }
 }

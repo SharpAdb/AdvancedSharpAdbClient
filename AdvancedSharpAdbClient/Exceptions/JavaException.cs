@@ -121,10 +121,10 @@ namespace AdvancedSharpAdbClient.Exceptions
                             exception = m.Groups[1].Value;
 
                             message = m.Groups[2].Value;
-                            message = StringExtensions.IsNullOrWhiteSpace(message) ? UnknownError : message;
+                            message = string.IsNullOrWhiteSpace(message) ? UnknownError : message;
                         }
                     }
-                    else if (!StringExtensions.IsNullOrWhiteSpace(line))
+                    else if (!string.IsNullOrWhiteSpace(line))
                     {
                         stackTrace.AppendLine(line.TrimEnd());
                     }

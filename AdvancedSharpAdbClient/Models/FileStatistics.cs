@@ -99,6 +99,6 @@ namespace AdvancedSharpAdbClient.Models
         public override readonly int GetHashCode() => HashCode.Combine(Path, FileMode, Size, Time);
 
         /// <inheritdoc/>
-        public override readonly string ToString() => StringExtensions.Join('\t', FileMode.ToPermissionCode(), Size, Time, Path);
+        public override readonly string ToString() => string.Join('\t', FileMode.ToPermissionCode(), Size, Time, Path);
     }
 }

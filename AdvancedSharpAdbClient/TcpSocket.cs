@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient
         [MemberNotNull(nameof(EndPoint))]
         public void Connect(EndPoint endPoint)
         {
-            ExceptionExtensions.ThrowIfNull(endPoint);
+            ArgumentNullException.ThrowIfNull(endPoint);
 
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
