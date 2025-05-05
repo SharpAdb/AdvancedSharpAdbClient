@@ -22,32 +22,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device) : ICloneable<DeviceClient>, ICloneable
     {
         /// <summary>
-        /// The <see cref="IAdbClient"/> to use when communicating with the device.
-        /// </summary>
-        private IAdbClient adbClient = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
-
-        /// <summary>
-        /// The device on which to process command.
-        /// </summary>
-        private DeviceData device = DeviceData.EnsureDevice(ref Device);
-
-        /// <summary>
         /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
         public IAdbClient AdbClient
         {
-            get => adbClient;
-            init => adbClient = value ?? throw new ArgumentNullException(nameof(AdbClient));
-        }
+            get;
+            init => field = value ?? throw new ArgumentNullException(nameof(AdbClient));
+        } = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
 
         /// <summary>
         /// Gets the device on which to process command.
         /// </summary>
         public DeviceData Device
         {
-            get => device;
-            init => device = DeviceData.EnsureDevice(ref value);
-        }
+            get;
+            init => field = DeviceData.EnsureDevice(ref value);
+        } = DeviceData.EnsureDevice(ref Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.

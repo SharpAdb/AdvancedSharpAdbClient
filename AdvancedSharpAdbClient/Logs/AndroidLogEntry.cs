@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// Maps Android log priorities to chars used to represent them in the system log.
         /// </summary>
-        private static readonly Dictionary<Priority, char> PriorityFormatters = new(6)
+        private static readonly Dictionary<Priority, char> PriorityFormatters = new(7)
         {
             { Priority.Verbose, 'V' },
             { Priority.Debug, 'D' },

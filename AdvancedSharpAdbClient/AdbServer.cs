@@ -154,7 +154,7 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
         /// </summary>
-        protected static bool IsStarting { get; set; } = false;
+        protected static bool IsStarting { get; set; }
 
         /// <summary>
         /// The path to the adb server. Cached from calls to <see cref="StartServer(string, bool)"/>. Used when restarting

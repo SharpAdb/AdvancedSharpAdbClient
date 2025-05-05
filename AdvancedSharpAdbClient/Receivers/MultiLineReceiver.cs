@@ -22,7 +22,7 @@ namespace AdvancedSharpAdbClient.Receivers
         /// Gets or sets a value indicating whether [trim lines].
         /// </summary>
         /// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
-        public bool TrimLines { get; set; } = false;
+        public bool TrimLines { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the receiver parses error messages.

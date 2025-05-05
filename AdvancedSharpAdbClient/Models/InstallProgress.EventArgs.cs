@@ -92,7 +92,7 @@ namespace AdvancedSharpAdbClient.Models
 #if NET
                 new StringBuilder().Append(CollectionsMarshal.AsSpan(split));
 #else
-                new(new string(split.ToArray()));
+                new(new string([.. split]));
 #endif
 
             if (PackageRequired > 0)
