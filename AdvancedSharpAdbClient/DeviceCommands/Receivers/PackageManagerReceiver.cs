@@ -31,7 +31,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 
             foreach (string line in lines)
             {
-                if (line != null && line.StartsWith("package:"))
+                if (line?.StartsWith("package:") == true)
                 {
                     // Samples include:
                     // package:/system/app/LegacyCamera.apk=com.android.camera

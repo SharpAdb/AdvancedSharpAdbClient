@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// Use this message to cause <see cref="ReadString"/> and <see cref="ReadStringAsync(CancellationToken)"/> to throw
         /// a <see cref="AdbException"/> indicating that the adb server has forcefully closed the connection.
         /// </summary>
-        public const string ServerDisconnected = "ServerDisconnected";
+        public const string ServerDisconnected = nameof(ServerDisconnected);
 
         public DummyAdbSocket() => IsConnected = true;
 

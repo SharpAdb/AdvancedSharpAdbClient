@@ -5,8 +5,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
 {
     internal class DummyLogger(string name) : ILogger
     {
-        public string Name { get; } = name;
-
+        public string Name => name;
         public void Log(LogLevel logLevel, Exception exception, string message, params object[] args)
         {
             Debug.Write($"{Name} logged: ");
@@ -17,7 +16,6 @@ namespace AdvancedSharpAdbClient.Logs.Tests
     internal class DummyLogger<T> : DummyLogger, ILogger<T>
     {
         public Type Type { get; } = typeof(T);
-
         public DummyLogger() : base(typeof(T).Name) { }
     }
 

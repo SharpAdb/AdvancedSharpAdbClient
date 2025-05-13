@@ -260,7 +260,7 @@ namespace AdvancedSharpAdbClient
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
-            if (device != null)
+            if (!device.IsEmpty)
             {
                 await (uint.TryParse(device.TransportId, out uint tid)
                     ? SendAdbRequestAsync($"host:transport-id:{tid}", cancellationToken).ConfigureAwait(false)

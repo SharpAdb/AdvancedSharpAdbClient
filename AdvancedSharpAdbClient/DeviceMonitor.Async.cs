@@ -133,7 +133,7 @@ namespace AdvancedSharpAdbClient
                     if (FirstDeviceListParsed != null)
                     {
                         // Switch to the background thread to avoid blocking the caller.
-                        _ = Task.Run(() => FirstDeviceListParsed?.TrySetResult());
+                        _ = Task.Run(FirstDeviceListParsed.TrySetResult);
                     }
                 }
                 catch (TaskCanceledException ex)

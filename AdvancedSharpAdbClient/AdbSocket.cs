@@ -399,7 +399,7 @@ namespace AdvancedSharpAdbClient
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
-            if (device != null)
+            if (!device.IsEmpty)
             {
                 if (uint.TryParse(device.TransportId, out uint tid))
                 {
