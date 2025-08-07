@@ -122,7 +122,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendKeyEvent(key);
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Send text to device. Doesn't support Unicode.
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
