@@ -45,7 +45,7 @@ jobs:
         run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
 
   pack-and-publish:
-    name: pack-and-publish
+    if: github.event_name == 'push'
     needs: build-and-test
     runs-on: windows-latest
     env:

@@ -145,24 +145,30 @@ namespace AdvancedSharpAdbClient
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = errorOutput != null,
+                RedirectStandardOutput = standardOutput != null
             };
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
             using (CancellationTokenRegistration registration = cancellationToken.Register(process.Kill))
             {
-                string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-                string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                if (errorOutput != null)
+                {
+                    string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                    errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                }
 
-                errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-                standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            }
+                if (standardOutput != null)
+                {
+                    string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                    standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                }
 
-            if (!process.HasExited)
-            {
-                process.Kill();
+                if (!process.HasExited)
+                {
+                    await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
             // get the return code from the process

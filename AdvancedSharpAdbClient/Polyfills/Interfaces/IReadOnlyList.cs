@@ -11,7 +11,11 @@ namespace System.Collections.Generic
     /// </summary>
     /// <typeparam name="T">The type of elements in the read-only list.</typeparam>
     [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET40_OR_GREATER
+    internal interface IReadOnlyList<out T> : IReadOnlyCollection<T>
+#else
     internal interface IReadOnlyList<T> : IReadOnlyCollection<T>
+#endif
     {
         /// <summary>
         /// Gets the element at the specified index in the read-only list.

@@ -121,7 +121,7 @@ namespace AdvancedSharpAdbClient.Models
                     _ = builder.Append('(').Append(Device.Name).Append(')');
                 }
             }
-            _ = builder.Append($" {OldState} -> {NewState}");
+            _ = builder.Append(' ').Append(OldState).Append(" -> ").Append(NewState);
             return builder.ToString();
         }
     }

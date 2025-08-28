@@ -982,7 +982,7 @@ namespace AdvancedSharpAdbClient
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
-            _ = requestBuilder.Append($" -S {apk.Size}");
+            _ = requestBuilder.Append(" -S ").Append(apk.Size);
 
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);

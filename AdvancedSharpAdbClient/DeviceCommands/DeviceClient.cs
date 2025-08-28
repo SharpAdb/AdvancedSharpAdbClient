@@ -447,8 +447,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
         /// <inheritdoc/>
         public virtual bool Equals(DeviceClient? other) =>
-            (object?)this == other ||
-                (other != (object?)null
+            (object)this == other ||
+                (other is not null
                 && EqualityComparer<Type>.Default.Equals(EqualityContract, other.EqualityContract)
                 && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));

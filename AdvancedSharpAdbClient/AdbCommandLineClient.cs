@@ -166,7 +166,7 @@ namespace AdvancedSharpAdbClient
             }
             else
             {
-                throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+                throw new NotSupportedException("SharpAdbClient only supports launching adb on Windows, Mac OS and Linux");
             }
         }
 
@@ -265,8 +265,8 @@ namespace AdvancedSharpAdbClient
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = errorOutput != null,
+                RedirectStandardOutput = standardOutput != null
             };
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
@@ -277,11 +277,17 @@ namespace AdvancedSharpAdbClient
                 process.Kill();
             }
 
-            string standardErrorString = process.StandardError.ReadToEnd();
-            string standardOutputString = process.StandardOutput.ReadToEnd();
+            if (errorOutput != null)
+            {
+                string standardErrorString = process.StandardError.ReadToEnd();
+                errorOutput.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            }
 
-            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            if (standardOutput != null)
+            {
+                string standardOutputString = process.StandardOutput.ReadToEnd();
+                standardOutput.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            }
 
             return process.ExitCode;
 #else
