@@ -416,9 +416,7 @@ namespace AdvancedSharpAdbClient.Models
         [SupportedOSPlatform("Windows10.0.10240.0")]
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
 #endif
-#pragma warning disable CA1416
         public static bool IsHasThreadAccessSupported { get; } = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess");
-#pragma warning restore CA1416
 
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.

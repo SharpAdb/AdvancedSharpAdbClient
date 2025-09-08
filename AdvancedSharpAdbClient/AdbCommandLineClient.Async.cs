@@ -156,13 +156,13 @@ namespace AdvancedSharpAdbClient
                 if (errorOutput != null)
                 {
                     string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-                    errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                    errorOutput.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
                 }
 
                 if (standardOutput != null)
                 {
                     string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-                    standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                    standardOutput.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
                 }
 
                 if (!process.HasExited)

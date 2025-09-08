@@ -7,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -66,20 +65,6 @@ namespace AdvancedSharpAdbClient.Models
 
                     _ => throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
                 };
-
-        /// <summary>
-        /// Provides a string representation of the <see cref="ColorData"/> struct.
-        /// </summary>
-        /// <param name="builder">The <see cref="StringBuilder"/> to append the string representation to.</param>
-        /// <returns><see langword="true"/> if the members were appended to the <paramref name="builder"/>; otherwise, <see langword="false"/>.</returns>
-        private bool PrintMembers(StringBuilder builder)
-        {
-            _ = builder.Append("Offset = ")
-                       .Append(Offset)
-                       .Append(", Length = ")
-                       .Append(Length);
-            return true;
-        }
 
         /// <summary>
         /// Deconstruct the <see cref="ColorData"/> struct.
