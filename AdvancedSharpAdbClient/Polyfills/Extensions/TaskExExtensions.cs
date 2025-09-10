@@ -33,6 +33,9 @@ namespace AdvancedSharpAdbClient.Polyfills
             FromResult<object?>(null);
 #endif
 
+        /// <summary>
+        /// The extension for the <see cref="Task"/> class.
+        /// </summary>
         extension(Task)
         {
 #if NETFRAMEWORK && !NET46_OR_GREATER

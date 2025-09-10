@@ -17,6 +17,9 @@ namespace AdvancedSharpAdbClient.Polyfills
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal static class StringExtensions
     {
+        /// <summary>
+        /// The extension for the <see cref="string"/> class.
+        /// </summary>
         extension(string text)
         {
 #if NETFRAMEWORK && !NET40_OR_GREATER

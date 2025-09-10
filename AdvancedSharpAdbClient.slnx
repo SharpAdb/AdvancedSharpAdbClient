@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AdvancedSharpAdbClient.Tests/AdvancedSharpAdbClient.Tests.csproj" />
+  <Project Path="AdvancedSharpAdbClient/AdvancedSharpAdbClient.csproj" />
+</Solution>

@@ -36,8 +36,15 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Doesn't check adb file when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-#if HAS_WINRT && NET
+#if NET
+#if HAS_WINRT
         [SupportedOSPlatform("Windows10.0.10240.0")]
+#else
+        [SupportedOSPlatform("Windows")]
+        [SupportedOSPlatform("Linux")]
+        [SupportedOSPlatform("OSX")]
+        [SupportedOSPlatform("FreeBSD")]
+#endif
 #endif
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
@@ -143,21 +150,24 @@ namespace AdvancedSharpAdbClient
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
+#if NET
+        [SupportedOSPlatformGuard("Windows")]
+        [SupportedOSPlatformGuard("Linux")]
+        [SupportedOSPlatformGuard("OSX")]
+        [SupportedOSPlatformGuard("FreeBSD")]
+#endif
         protected virtual void EnsureIsValidAdbFile(string adbPath)
         {
             if (adbPath == "adb") { return; }
 
-            bool isWindows = Extensions.IsWindowsPlatform();
-            bool isUnix = Extensions.IsUnixPlatform();
-
-            if (isWindows)
+            if (OperatingSystem.IsWindows())
             {
                 if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
                 }
             }
-            else if (isUnix)
+            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
             {
                 if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
                 {

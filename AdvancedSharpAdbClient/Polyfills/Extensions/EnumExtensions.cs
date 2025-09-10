@@ -14,6 +14,9 @@ namespace AdvancedSharpAdbClient.Polyfills
     [EditorBrowsable(EditorBrowsableState.Never)]
     internal static class EnumExtensions
     {
+        /// <summary>
+        /// The extension for the <see cref="Enum"/> class.
+        /// </summary>
         extension(Enum)
         {
             /// <summary>

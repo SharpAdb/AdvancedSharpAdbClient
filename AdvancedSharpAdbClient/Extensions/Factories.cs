@@ -13,8 +13,15 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     public static class Factories
     {
-#if HAS_WINRT && NET
+#if NET
+#if HAS_WINRT
         [SupportedOSPlatform("Windows10.0.10240.0")]
+#else
+        [SupportedOSPlatform("Windows")]
+        [SupportedOSPlatform("Linux")]
+        [SupportedOSPlatform("OSX")]
+        [SupportedOSPlatform("FreeBSD")]
+#endif
 #endif
         static Factories() => Reset();
 
@@ -52,8 +59,15 @@ namespace AdvancedSharpAdbClient
             nameof(AdbClientFactory),
             nameof(AdbCommandLineClientFactory),
             nameof(SyncServiceFactory))]
-#if HAS_WINRT && NET
+#if NET
+#if HAS_WINRT
         [SupportedOSPlatform("Windows10.0.10240.0")]
+#else
+        [SupportedOSPlatform("Windows")]
+        [SupportedOSPlatform("Linux")]
+        [SupportedOSPlatform("OSX")]
+        [SupportedOSPlatform("FreeBSD")]
+#endif
 #endif
         public static void Reset()
         {

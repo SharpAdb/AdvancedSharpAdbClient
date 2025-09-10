@@ -56,6 +56,9 @@ namespace AdvancedSharpAdbClient.Polyfills
         public static DateTime Epoch { get; } = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 #if NETFRAMEWORK && !NET46_OR_GREATER
+        /// <summary>
+        /// The extension for the <see cref="DateTimeOffset"/> struct.
+        /// </summary>
         extension(DateTimeOffset dateTimeOffset)
         {
 #if NET20

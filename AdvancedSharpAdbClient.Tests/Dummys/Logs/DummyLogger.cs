@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
         }
     }
 
-    internal class DummyLogger<T> : DummyLogger, ILogger<T>
+    internal class DummyLogger<T> : DummyLogger, ILogger<T> where T : allows ref struct
     {
         public Type Type { get; } = typeof(T);
         public DummyLogger() : base(typeof(T).Name) { }

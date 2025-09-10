@@ -9,12 +9,12 @@
   <Choose>
     <When Condition="'$(IsWindows)' == 'True' and '$(IsStandard)' != 'True'">
       <PropertyGroup>
-        <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+        <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
       </PropertyGroup>
     </Otherwise>
   </Choose>

@@ -18,6 +18,9 @@ namespace AdvancedSharpAdbClient.Polyfills
     internal static class ExceptionExtensions
     {
 #if !NET6_0_OR_GREATER
+        /// <summary>
+        /// The extension for the <see cref="ArgumentNullException"/> class.
+        /// </summary>
         extension(ArgumentNullException)
         {
             /// <summary>
@@ -35,6 +38,9 @@ namespace AdvancedSharpAdbClient.Polyfills
         }
 #endif
 
+        /// <summary>
+        /// The extension for the <see cref="ArgumentOutOfRangeException"/> class.
+        /// </summary>
         extension(ArgumentOutOfRangeException)
         {
             /// <summary>
@@ -83,6 +89,9 @@ namespace AdvancedSharpAdbClient.Polyfills
         }
 
 #if !NET7_0_OR_GREATER
+        /// <summary>
+        /// The extension for the <see cref="ObjectDisposedException"/> class.
+        /// </summary>
         extension(ObjectDisposedException)
         {
             /// <summary>

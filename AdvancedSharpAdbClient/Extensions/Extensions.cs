@@ -9,7 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -175,44 +174,6 @@ namespace AdvancedSharpAdbClient
                     _ => uri.ToString(),
                 }
                 : Path.GetFullPath(path);
-#endif
-
-#if NET
-        [SupportedOSPlatformGuard("Windows")]
-#endif
-        public static bool IsWindowsPlatform() =>
-#if NETCORE && !UAP10_0_15138_0
-            true;
-#elif !NETFRAMEWORK || NET48_OR_GREATER
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#else
-            Environment.OSVersion.Platform
-                is PlatformID.Win32S
-                or PlatformID.Win32Windows
-                or PlatformID.Win32NT
-                or PlatformID.WinCE
-                or PlatformID.Xbox;
-#endif
-
-#if NET
-        [SupportedOSPlatformGuard("Linux")]
-        [SupportedOSPlatformGuard("OSX")]
-        [SupportedOSPlatformGuard("FreeBSD")]
-#endif
-        public static bool IsUnixPlatform() =>
-#if NETCORE && !UAP10_0_15138_0
-            false;
-#elif !NETFRAMEWORK || NET48_OR_GREATER
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-            || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-#if NETCOREAPP3_0_OR_GREATER
-            || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
-#endif
-            ;
-#else
-            Environment.OSVersion.Platform
-                is PlatformID.Unix
-                or PlatformID.MacOSX;
 #endif
     }
 }
