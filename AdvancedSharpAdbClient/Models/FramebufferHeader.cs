@@ -587,57 +587,34 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder =
-                new StringBuilder(nameof(FramebufferHeader))
-                    .Append(" { ")
-                    .Append(nameof(Version))
-                    .Append(" = ")
-                    .Append(Version)
-                    .Append(", ")
-                    .Append(nameof(Bpp))
-                    .Append(" = ")
-                    .Append(Bpp);
+            DefaultInterpolatedStringHandler handler = new(121, 10);
+            handler.AppendLiteral($"{nameof(FramebufferHeader)} {{ {nameof(Version)} = ");
+            handler.AppendFormatted(Version);
+            handler.AppendLiteral($", {nameof(Bpp)} = ");
+            handler.AppendFormatted(Bpp);
 
             if (Version >= 2)
             {
-                _ = builder
-                    .Append(", ")
-                    .Append(nameof(ColorSpace))
-                    .Append(" = ")
-                    .Append(ColorSpace);
+                handler.AppendLiteral($", {nameof(ColorSpace)} = ");
+                handler.AppendFormatted(ColorSpace);
             }
 
-            return builder
-                .Append(", ")
-                .Append(nameof(Size))
-                .Append(" = ")
-                .Append(Size)
-                .Append(", ")
-                .Append(nameof(Width))
-                .Append(" = ")
-                .Append(Width)
-                .Append(", ")
-                .Append(nameof(Height))
-                .Append(" = ")
-                .Append(Height)
-                .Append(", ")
-                .Append(nameof(Red))
-                .Append(" = ")
-                .Append(Red)
-                .Append(", ")
-                .Append(nameof(Blue))
-                .Append(" = ")
-                .Append(Blue)
-                .Append(", ")
-                .Append(nameof(Green))
-                .Append(" = ")
-                .Append(Green)
-                .Append(", ")
-                .Append(nameof(Alpha))
-                .Append(" = ")
-                .Append(Alpha)
-                .Append(" }")
-                .ToString();
+            handler.AppendLiteral($", {nameof(Size)} = ");
+            handler.AppendFormatted(Size);
+            handler.AppendLiteral($", {nameof(Width)} = ");
+            handler.AppendFormatted(Width);
+            handler.AppendLiteral($", {nameof(Height)} = ");
+            handler.AppendFormatted(Height);
+            handler.AppendLiteral($", {nameof(Red)} = ");
+            handler.AppendFormatted(Red);
+            handler.AppendLiteral($", {nameof(Blue)} = ");
+            handler.AppendFormatted(Blue);
+            handler.AppendLiteral($", {nameof(Green)} = ");
+            handler.AppendFormatted(Green);
+            handler.AppendLiteral($", {nameof(Alpha)} = ");
+            handler.AppendFormatted(Alpha);
+            handler.AppendLiteral(" }");
+            return handler.ToStringAndClear();
         }
 
         /// <inheritdoc/>

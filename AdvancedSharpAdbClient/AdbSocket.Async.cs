@@ -124,19 +124,11 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-#if HAS_BUFFERS
-            ReadAsync(data.AsMemory(), cancellationToken).AsTask();
-#else
             ReadAsync(data, 0, data.Length, cancellationToken);
-#endif
 
         /// <inheritdoc/>
         public virtual Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) =>
-#if HAS_BUFFERS
-            ReadAsync(data.AsMemory(0, length), cancellationToken).AsTask();
-#else
             ReadAsync(data, 0, length, cancellationToken);
-#endif
 
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
@@ -284,7 +276,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
         public virtual async ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
@@ -367,7 +359,7 @@ namespace AdvancedSharpAdbClient
             return true;
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously write until all data in "data" is written or the connection fails or times out.
         /// </summary>

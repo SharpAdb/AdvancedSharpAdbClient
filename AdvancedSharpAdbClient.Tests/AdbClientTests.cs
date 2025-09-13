@@ -66,6 +66,16 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.FormAdbRequest(ReadOnlySpan{char})"/> method.
+        /// </summary>
+        [Fact]
+        public void FormAdbRequestSpanTest()
+        {
+            Assert.Equal("0009host:kill"u8, AdbClient.FormAdbRequest("host:kill".AsSpan()));
+            Assert.Equal("000Chost:version"u8, AdbClient.FormAdbRequest("host:version".AsSpan()));
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(string, int)"/> method.
         /// </summary>
         [Fact]
@@ -73,6 +83,16 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Assert.Equal("0008tcp:1984"u8, AdbClient.CreateAdbForwardRequest(null, 1984));
             Assert.Equal("0012tcp:1981:127.0.0.1"u8, AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(ReadOnlySpan{char}, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void CreateAdbForwardRequestSpanTest()
+        {
+            Assert.Equal("0008tcp:1984"u8, AdbClient.CreateAdbForwardRequest([], 1984));
+            Assert.Equal("0012tcp:1981:127.0.0.1"u8, AdbClient.CreateAdbForwardRequest("127.0.0.1".AsSpan(), 1981));
         }
 
         /// <summary>

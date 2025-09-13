@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -88,24 +89,31 @@ namespace AdvancedSharpAdbClient.Models
                 split.Add(c);
             }
 
-            StringBuilder builder =
+            DefaultInterpolatedStringHandler builder = new(4, 4);
 #if NET
-                new StringBuilder().Append(CollectionsMarshal.AsSpan(split));
+            builder.AppendFormatted(CollectionsMarshal.AsSpan(split));
+#elif HAS_BUFFERS
+            builder.AppendFormatted([.. split]);
 #else
-                new(new string([.. split]));
+            builder.AppendLiteral(new string([.. split]));
 #endif
 
             if (PackageRequired > 0)
             {
-                _ = builder.Append(' ').Append(PackageFinished).Append('/').Append(PackageRequired);
+                builder.AppendFormatted(' ');
+                builder.AppendFormatted(PackageFinished);
+                builder.AppendFormatted('/');
+                builder.AppendFormatted(PackageRequired);
             }
 
             if (UploadProgress > 0)
             {
-                _ = builder.Append(' ').Append(UploadProgress).Append('%');
+                builder.AppendFormatted(' ');
+                builder.AppendFormatted(UploadProgress);
+                builder.AppendFormatted('%');
             }
 
-            return builder.ToString();
+            return builder.ToStringAndClear();
         }
     }
 }

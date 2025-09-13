@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
@@ -26,16 +27,20 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new("Device changed");
+            DefaultInterpolatedStringHandler builder = new(18, 2);
+            builder.AppendLiteral("Device changed");
             if (!Device.IsEmpty)
             {
-                _ = builder.Append(": ").Append(Device.Serial);
+                builder.AppendLiteral(": ");
+                builder.AppendLiteral(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.Append('(').Append(Device.Name).Append(')');
+                    builder.AppendFormatted('(');
+                    builder.AppendLiteral(Device.Name);
+                    builder.AppendFormatted(')');
                 }
             }
-            return builder.ToString();
+            return builder.ToStringAndClear();
         }
     }
 

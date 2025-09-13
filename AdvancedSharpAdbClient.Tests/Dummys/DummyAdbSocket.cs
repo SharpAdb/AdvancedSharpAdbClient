@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -64,6 +65,8 @@ namespace AdvancedSharpAdbClient.Tests
         public void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permission) => SyncRequests.Add((command, $"{path},{(int)permission}"));
 
         public void SendAdbRequest(string request) => Requests.Add(request);
+
+        public void SendAdbRequest(DefaultInterpolatedStringHandler request) => Requests.Add(request.ToString());
 
         public int Read(byte[] data)
         {

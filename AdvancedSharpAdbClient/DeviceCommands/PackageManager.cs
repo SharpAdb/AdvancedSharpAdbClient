@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
@@ -131,17 +132,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new(ListFull);
+            DefaultInterpolatedStringHandler requestBuilder = new(19, Arguments?.Length ?? 0);
+            requestBuilder.AppendLiteral(ListFull);
 
             if (Arguments != null)
             {
                 foreach (string argument in Arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             PackageManagerReceiver pmr = new(this);
             AdbClient.ExecuteShellCommand(Device, cmd, pmr);
         }
@@ -189,19 +192,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(" \"").Append(remoteFilePath).Append('"');
+            requestBuilder.AppendLiteral(" \"");
+            requestBuilder.AppendLiteral(remoteFilePath);
+            requestBuilder.AppendFormatted('"');
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
@@ -497,19 +504,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm uninstall");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm uninstall");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(' ').Append(packageName);
+            requestBuilder.AppendFormatted(' ');
+            requestBuilder.AppendLiteral(packageName);
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
@@ -556,22 +566,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install-create");
+            DefaultInterpolatedStringHandler requestBuilder = new(21, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install-create");
 
             if (!string.IsNullOrWhiteSpace(packageName))
             {
-                _ = requestBuilder.Append(" -p ").Append(packageName);
+                requestBuilder.AppendLiteral(" -p ");
+                requestBuilder.AppendLiteral(packageName!);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 

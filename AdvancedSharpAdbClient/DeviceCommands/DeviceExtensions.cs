@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 
@@ -567,19 +568,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // Doing cat on each file one by one takes too much time. Doing cat on all of them at the same time doesn't work
             // either, because the command line would be too long.
             // So we do it 25 processes at at time.
-            StringBuilder catBuilder = new();
+            DefaultInterpolatedStringHandler catBuilder = new(3, pids.Count);
             ProcessOutputReceiver processOutputReceiver = new();
 
-            _ = catBuilder.Append("cat");
+            catBuilder.AppendLiteral("cat");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.Append(" /proc/").Append(pids[i]).Append("/cmdline /proc/").Append(pids[i]).Append("/stat");
+                catBuilder.AppendLiteral(" /proc/");
+                catBuilder.AppendFormatted(pids[i]);
+                catBuilder.AppendLiteral("/cmdline /proc/");
+                catBuilder.AppendFormatted(pids[i]);
+                catBuilder.AppendLiteral("/stat");
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-                    _ = catBuilder.Clear().Append("cat");
+                    client.ExecuteShellCommand(device, catBuilder.ToStringAndClear(), processOutputReceiver);
+                    catBuilder.AppendLiteral("cat");
                 }
             }
 

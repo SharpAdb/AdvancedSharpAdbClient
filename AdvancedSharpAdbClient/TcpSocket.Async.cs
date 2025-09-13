@@ -25,11 +25,7 @@ namespace AdvancedSharpAdbClient
             }
 
             EndPoint = endPoint;
-#if NET6_0_OR_GREATER
             await Socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
-#else
-            await Task.Run(() => Socket.Connect(endPoint), cancellationToken).ConfigureAwait(false);
-#endif
             Socket.Blocking = true;
         }
 

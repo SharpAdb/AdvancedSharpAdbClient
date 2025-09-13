@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Xunit;
 
@@ -265,6 +266,17 @@ namespace AdvancedSharpAdbClient.Tests
             RunTest(
                 socket => socket.SendAdbRequest("Test"),
                 "0004Test"u8.ToArray());
+
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.SendAdbRequest(DefaultInterpolatedStringHandler)"/> method.
+        /// </summary>
+        [Fact]
+        public void SendAdbRequestSpanTest()
+        {
+            RunTest(
+                socket => socket.SendAdbRequest((DefaultInterpolatedStringHandler)$"Test"),
+                "0004Test"u8.ToArray());
+        }
 
         /// <summary>
         /// Tests the <see cref="AdbSocket.GetShellStream"/> method.

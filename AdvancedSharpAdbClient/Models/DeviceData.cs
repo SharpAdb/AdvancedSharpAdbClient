@@ -208,63 +208,80 @@ namespace AdvancedSharpAdbClient.Models
                 return $"An empty {GetType()} without {nameof(TransportId)} and {nameof(Serial)}";
             }
 
-            StringBuilder builder =
-                new StringBuilder(Serial)
-                    .Append('\t');
+            DefaultInterpolatedStringHandler builder = new(55, 9);
+            builder.AppendLiteral(Serial);
+            builder.AppendFormatted('\t');
 
-            _ = State switch
+            switch(State)
             {
-                DeviceState.Online => builder.Append("device"),
-                DeviceState.NoPermissions => builder.Append("no permissions"),
-                DeviceState.Connecting
-                or DeviceState.Offline
-                or DeviceState.BootLoader
-                or DeviceState.Host
-                or DeviceState.Recovery
-                or DeviceState.Download
-                or DeviceState.Sideload
-                or DeviceState.Unauthorized
-                or DeviceState.Authorizing
-                or DeviceState.Unknown => builder.Append(State.ToString().ToLowerInvariant()),
-                _ => builder.AppendFormat("unknown({0:X})", (int)State),
+                case DeviceState.Online:
+                    builder.AppendLiteral("device");
+                    break;
+                case DeviceState.NoPermissions:
+                    builder.AppendLiteral("no permissions");
+                    break;
+                case DeviceState.Connecting
+                    or DeviceState.Offline
+                    or DeviceState.BootLoader
+                    or DeviceState.Host
+                    or DeviceState.Recovery
+                    or DeviceState.Download
+                    or DeviceState.Sideload
+                    or DeviceState.Unauthorized
+                    or DeviceState.Authorizing
+                    or DeviceState.Unknown:
+                    builder.AppendLiteral(State.ToString().ToLowerInvariant());
+                    break;
+                default:
+                    builder.AppendLiteral("unknown(");
+                    builder.AppendFormatted((int)State, "X");
+                    builder.AppendFormatted(')');
+                    break;
             };
 
             if (!string.IsNullOrEmpty(Message))
             {
-                _ = builder.Append(' ').Append(Message);
+                builder.AppendFormatted(' ');
+                builder.AppendLiteral(Message);
             }
 
             if (!string.IsNullOrEmpty(Usb))
             {
-                _ = builder.Append(" usb:").Append(Usb);
+                builder.AppendLiteral(" usb:");
+                builder.AppendLiteral(Usb);
             }
 
             if (!string.IsNullOrEmpty(Product))
             {
-                _ = builder.Append(" product:").Append(Product);
+                builder.AppendLiteral(" product:");
+                builder.AppendLiteral(Product);
             }
 
             if (!string.IsNullOrEmpty(Model))
             {
-                _ = builder.Append(" model:").Append(Model);
+                builder.AppendLiteral(" model:");
+                builder.AppendLiteral(Model);
             }
 
             if (!string.IsNullOrEmpty(Name))
             {
-                _ = builder.Append(" device:").Append(Name);
+                builder.AppendLiteral(" device:");
+                builder.AppendLiteral(Name);
             }
 
             if (Features?.Length > 0)
             {
-                _ = builder.Append(" features:").Append(string.Join(',', Features));
+                builder.AppendLiteral(" features:");
+                builder.AppendLiteral(string.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
             {
-                _ = builder.Append(" transport_id:").Append(TransportId);
+                builder.AppendLiteral(" transport_id:");
+                builder.AppendLiteral(TransportId);
             }
 
-            return builder.ToString();
+            return builder.ToStringAndClear();
         }
 
         /// <summary>
@@ -316,81 +333,63 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>The value of the <see cref="DebuggerDisplayAttribute"/> for this instance.</returns>
         private string GetDebuggerDisplay()
         {
-            StringBuilder builder =
-                new StringBuilder(nameof(DeviceData))
-                    .Append(" { ");
+            DefaultInterpolatedStringHandler builder = new(113, 9);
+            builder.AppendLiteral($"{nameof(DeviceData)} {{ ");
 
             if (!string.IsNullOrEmpty(Serial))
             {
-                _ = builder
-                    .Append(nameof(Serial))
-                    .Append(" = ")
-                    .Append(Serial)
-                    .Append(", ");
+                builder.AppendLiteral($"{nameof(Serial)} = ");
+                builder.AppendLiteral(Serial);
+                builder.AppendLiteral(", ");
             }
 
-            _ = builder
-                .Append(nameof(State))
-                .Append(" = ")
-                .Append(State);
+            builder.AppendLiteral($"{nameof(State)} = ");
+            builder.AppendFormatted(State);
 
             if (!string.IsNullOrEmpty(Message))
             {
-                _ = builder
-                    .Append(nameof(Message))
-                    .Append(" = ")
-                    .Append(Message);
+                builder.AppendLiteral($"{nameof(Message)} = ");
+                builder.AppendLiteral(Message);
             }
 
             if (!string.IsNullOrEmpty(Usb))
             {
-                _ = builder
-                    .Append(nameof(Usb))
-                    .Append(" = ")
-                    .Append(Usb);
+                builder.AppendLiteral($"{nameof(Usb)} = ");
+                builder.AppendLiteral(Usb);
             }
 
             if (!string.IsNullOrEmpty(Product))
             {
-                _ = builder
-                    .Append(nameof(Product))
-                    .Append(" = ")
-                    .Append(Product);
+                builder.AppendLiteral($"{nameof(Product)} = ");
+                builder.AppendLiteral(Product);
             }
 
             if (!string.IsNullOrEmpty(Model))
             {
-                _ = builder
-                    .Append(nameof(Model))
-                    .Append(" = ")
-                    .Append(Model);
+                builder.AppendLiteral($"{nameof(Model)} = ");
+                builder.AppendLiteral(Model);
             }
 
             if (!string.IsNullOrEmpty(Name))
             {
-                _ = builder
-                    .Append(nameof(Name))
-                    .Append(" = ")
-                    .Append(Name);
+                builder.AppendLiteral($"{nameof(Name)} = ");
+                builder.AppendLiteral(Name);
             }
 
             if (Features?.Length > 0)
             {
-                _ = builder
-                    .Append(nameof(Features))
-                    .Append(" = ")
-                    .Append(Features);
+                builder.AppendLiteral($"{nameof(Features)} = ");
+                builder.AppendLiteral(string.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
             {
-                _ = builder
-                    .Append(nameof(TransportId))
-                    .Append(" = ")
-                    .Append(TransportId);
+                builder.AppendLiteral($"{nameof(TransportId)} = ");
+                builder.AppendLiteral(TransportId);
             }
 
-            return builder.Append(" }").ToString();
+            builder.AppendLiteral(" }");
+            return builder.ToStringAndClear();
         }
 
 #if NET7_0_OR_GREATER

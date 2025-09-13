@@ -15,6 +15,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The extension for the <see cref="SyncCommand"/> enum.
         /// </summary>
+        /// <param name="command">The <see cref="SyncCommand"/> to extend.</param>
         extension(SyncCommand command)
         {
             /// <summary>

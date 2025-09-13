@@ -117,6 +117,10 @@
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
   </ItemGroup>
 
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
+    <DefineConstants>$(DefineConstants);COMP_NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))">
     <DefineConstants>$(DefineConstants);COMP_NETSTANDARD2_1</DefineConstants>
   </PropertyGroup>

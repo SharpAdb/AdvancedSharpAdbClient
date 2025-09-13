@@ -169,14 +169,15 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task ExecuteServerCommandAsync(string target, string command, IAdbSocket socket, CancellationToken cancellationToken = default)
         {
-            StringBuilder request = new();
+            DefaultInterpolatedStringHandler request = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = request.Append(target).Append(':');
+                request.AppendLiteral(target);
+                request.AppendFormatted(':');
             }
-            _ = request.Append(command);
+            request.AppendLiteral(command);
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            await socket.SendAdbRequestAsync(request.ToStringAndClear(), cancellationToken);
             await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             try
@@ -227,14 +228,15 @@ namespace AdvancedSharpAdbClient
         {
             ArgumentNullException.ThrowIfNull(encoding);
 
-            StringBuilder request = new();
+            DefaultInterpolatedStringHandler request = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = request.Append(target).Append(':');
+                request.AppendLiteral(target);
+                request.AppendFormatted(':');
             }
-            _ = request.Append(command);
+            request.AppendLiteral(command);
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            await socket.SendAdbRequestAsync(request.ToStringAndClear(), cancellationToken);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             try
@@ -296,14 +298,15 @@ namespace AdvancedSharpAdbClient
         {
             ArgumentNullException.ThrowIfNull(encoding);
 
-            StringBuilder request = new();
+            DefaultInterpolatedStringHandler request = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = request.Append(target).Append(':');
+                request.AppendLiteral(target);
+                request.AppendFormatted(':');
             }
-            _ = request.Append(command);
+            request.AppendLiteral(command);
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken);
+            await socket.SendAdbRequestAsync(request.ToStringAndClear(), cancellationToken);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), encoding);
@@ -358,14 +361,16 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            StringBuilder request = new("shell:logcat -B");
+            DefaultInterpolatedStringHandler request = new(19, logNames.Length);
+            request.AppendLiteral("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                _ = request.Append(" -b ").Append(logName.ToString().ToLowerInvariant());
+                request.AppendLiteral(" -b ");
+                request.AppendLiteral(logName.ToString().ToLowerInvariant());
             }
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(request.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
 #if COMP_NETSTANDARD2_1
@@ -410,14 +415,16 @@ namespace AdvancedSharpAdbClient
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            StringBuilder request = new("shell:logcat -B");
+            DefaultInterpolatedStringHandler request = new(19, logNames.Length);
+            request.AppendLiteral("shell:logcat -B");
 
             foreach (LogId logName in logNames)
             {
-                _ = request.Append(" -b ").Append(logName.ToString().ToLowerInvariant());
+                request.AppendLiteral(" -b ");
+                request.AppendLiteral(logName.ToString().ToLowerInvariant());
             }
 
-            await socket.SendAdbRequestAsync(request.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(request.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
 #if COMP_NETSTANDARD2_1
@@ -574,24 +581,27 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder = new("exec:cmd package 'install'");
+            using IAdbSocket socket = CreateAdbSocket();
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            DefaultInterpolatedStringHandler requestBuilder = new(31, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
-            _ = requestBuilder.Append(" -S ").Append(apk.Length);
+            requestBuilder.AppendLiteral(" -S ");
+            requestBuilder.AppendFormatted(apk.Length);
 
-            using IAdbSocket socket = CreateAdbSocket();
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(requestBuilder.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -602,11 +612,13 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
-            {
-                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
 #else
             while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+#endif
             {
+#if COMP_NETSTANDARD2_1
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+#else
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
@@ -731,20 +743,22 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new("exec:cmd package 'install-create'");
+            using IAdbSocket socket = CreateAdbSocket();
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            DefaultInterpolatedStringHandler requestBuilder = new(33, arguments?.Length ?? 0);
+            requestBuilder.AppendLiteral("exec:cmd package 'install-create'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            using IAdbSocket socket = CreateAdbSocket();
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(requestBuilder.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
@@ -767,22 +781,24 @@ namespace AdvancedSharpAdbClient
             EnsureDevice(device);
             ArgumentNullException.ThrowIfNull(packageName);
 
-            StringBuilder requestBuilder =
-                new StringBuilder("exec:cmd package 'install-create'")
-                    .Append(" -p ").Append(packageName);
+            using IAdbSocket socket = CreateAdbSocket();
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            DefaultInterpolatedStringHandler requestBuilder = new(37 + packageName.Length, arguments?.Length ?? 0);
+            requestBuilder.AppendLiteral("exec:cmd package 'install-create'");
+            requestBuilder.AppendFormatted(" -p ");
+            requestBuilder.AppendLiteral(packageName);
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            using IAdbSocket socket = CreateAdbSocket();
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(requestBuilder.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
@@ -814,18 +830,10 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder =
-                new StringBuilder($"exec:cmd package 'install-write'")
-                    // add size parameter [required for streaming installs]
-                    // do last to override any user specified value
-                    .Append(" -S ").Append(apk.Length)
-                    .Append(' ').Append(session).Append(' ')
-                    .Append(apkName).Append(".apk");
-
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync($"exec:cmd package 'install-write' -S {apk.Length} {session} {apkName}.apk", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -836,11 +844,13 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_BUFFERS
             while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
-            {
-                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
 #else
             while ((read = await apk.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+#endif
             {
+#if COMP_NETSTANDARD2_1
+                await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+#else
                 await socket.SendAsync(buffer, read, cancellationToken).ConfigureAwait(false);
 #endif
                 totalBytesRead += read;
@@ -887,18 +897,10 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable and seekable stream");
             }
 
-            StringBuilder requestBuilder =
-                new StringBuilder($"exec:cmd package 'install-write'")
-                    // add size parameter [required for streaming installs]
-                    // do last to override any user specified value
-                    .Append(" -S ").Append(apk.Length)
-                    .Append(' ').Append(session).Append(' ')
-                    .Append(apkName).Append(".apk");
-
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync($"exec:cmd package 'install-write' -S {apk.Length} {session} {apkName}.apk", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -907,7 +909,7 @@ namespace AdvancedSharpAdbClient
             long totalBytesToProcess = apk.Length;
             long totalBytesRead = 0;
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             while ((read = await apk.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
             {
                 await socket.SendAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
@@ -970,24 +972,27 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
             }
 
-            StringBuilder requestBuilder = new("exec:cmd package 'install'");
+            using IAdbSocket socket = CreateAdbSocket();
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            DefaultInterpolatedStringHandler requestBuilder = new(30, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("exec:cmd package 'install'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
             // add size parameter [required for streaming installs]
             // do last to override any user specified value
-            _ = requestBuilder.Append(" -S ").Append(apk.Size);
+            requestBuilder.AppendLiteral(" -S ");
+            requestBuilder.AppendFormatted(apk.Size);
 
-            using IAdbSocket socket = CreateAdbSocket();
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(requestBuilder.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -1145,18 +1150,10 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
             }
 
-            StringBuilder requestBuilder =
-                new StringBuilder($"exec:cmd package 'install-write'")
-                    // add size parameter [required for streaming installs]
-                    // do last to override any user specified value
-                    .Append(" -S ").Append(apk.Size)
-                    .Append(' ').Append(session).Append(' ')
-                    .Append(apkName).Append(".apk");
-
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync($"exec:cmd package 'install-write' -S {apk.Size} {session} {apkName}.apk", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -1220,18 +1217,10 @@ namespace AdvancedSharpAdbClient
                 throw new ArgumentOutOfRangeException(nameof(apk), "The apk stream must be a readable stream");
             }
 
-            StringBuilder requestBuilder =
-                new StringBuilder($"exec:cmd package 'install-write'")
-                    // add size parameter [required for streaming installs]
-                    // do last to override any user specified value
-                    .Append(" -S ").Append(apk.Size)
-                    .Append(' ').Append(session).Append(' ')
-                    .Append(apkName).Append(".apk");
-
             using IAdbSocket socket = CreateAdbSocket();
             await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
 
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync($"exec:cmd package 'install-write' -S {apk.Size} {session} {apkName}.apk", cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             byte[] buffer = new byte[32 * 1024];
@@ -1274,22 +1263,25 @@ namespace AdvancedSharpAdbClient
         {
             EnsureDevice(device);
 
-            StringBuilder requestBuilder = new("exec:cmd package 'uninstall'");
+            using IAdbSocket socket = CreateAdbSocket();
+            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
+
+            DefaultInterpolatedStringHandler requestBuilder = new(29, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("exec:cmd package 'uninstall'");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            _ = requestBuilder.Append(' ').Append(packageName);
+            requestBuilder.AppendFormatted(' ');
+            requestBuilder.AppendLiteral(packageName);
 
-            using IAdbSocket socket = CreateAdbSocket();
-            await socket.SetDeviceAsync(device, cancellationToken).ConfigureAwait(false);
-
-            await socket.SendAdbRequestAsync(requestBuilder.ToString(), cancellationToken).ConfigureAwait(false);
+            await socket.SendAdbRequestAsync(requestBuilder.ToStringAndClear(), cancellationToken).ConfigureAwait(false);
             _ = await socket.ReadAdbResponseAsync(cancellationToken).ConfigureAwait(false);
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);

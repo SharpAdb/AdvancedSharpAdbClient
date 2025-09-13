@@ -59,6 +59,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <summary>
         /// The extension for the <see cref="DateTimeOffset"/> struct.
         /// </summary>
+        /// <param name="dateTimeOffset">The <see cref="DateTimeOffset"/> to extend.</param>
         extension(DateTimeOffset dateTimeOffset)
         {
 #if NET20

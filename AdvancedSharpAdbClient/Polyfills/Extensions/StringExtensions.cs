@@ -20,6 +20,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <summary>
         /// The extension for the <see cref="string"/> class.
         /// </summary>
+        /// <param name="text">The <see cref="string"/> to extend.</param>
         extension(string text)
         {
 #if NETFRAMEWORK && !NET40_OR_GREATER

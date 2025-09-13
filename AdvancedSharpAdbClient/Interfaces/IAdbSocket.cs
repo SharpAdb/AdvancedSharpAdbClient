@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -77,6 +78,26 @@ namespace AdvancedSharpAdbClient
         /// <param name="request">The request to send.</param>
         void SendAdbRequest(string request);
 
+#if NET10_0_OR_GREATER
+        /// <summary>
+        /// Sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="ReadAdbResponse()"/>.
+        /// </summary>
+        /// <param name="request">The request to send.</param>
+        void SendAdbRequest(DefaultInterpolatedStringHandler request)
+        {
+            byte[] data = AdbClient.FormAdbRequest(request.Text);
+            try
+            {
+                Send(data);
+            }
+            catch (IOException)
+            {
+                throw new IOException($"Failed sending the request '{request.Text}' to ADB");
+            }
+        }
+#endif
+
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
         /// the socket closed or the timeout expired).
@@ -135,16 +156,12 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
         AdbResponse ReadAdbResponse();
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A span of bytes that acts as a buffer, containing the data to send.</param>
-        void Send(ReadOnlySpan<byte> data)
-#if COMP_NETSTANDARD2_1
-            => Send(data.ToArray())
-#endif
-            ;
+        void Send(ReadOnlySpan<byte> data) => Send(data.ToArray(), data.Length);
 
         /// <summary>
         /// Reads from the socket until the array is filled, or no more data is coming(because
@@ -154,19 +171,12 @@ namespace AdvancedSharpAdbClient
         /// <returns>The total number of bytes read.</returns>
         /// <remarks>This uses the default time out value.</remarks>
         int Read(Span<byte> data)
-#if COMP_NETSTANDARD2_1
         {
             byte[] bytes = new byte[data.Length];
-            int length = Read(bytes);
-            for (int i = 0; i < length; i++)
-            {
-                data[i] = bytes[i];
-            }
+            int length = Read(bytes, data.Length);
+            bytes.CopyTo(data);
             return length;
         }
-#else
-            ;
-#endif
 #endif
 
         /// <summary>

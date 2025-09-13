@@ -141,7 +141,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // followed by the actual framebuffer content
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             _ = socket.Read(Data.AsSpan(0, (int)Header.Size));
 #else
             _ = socket.Read(Data, (int)Header.Size);
@@ -193,7 +193,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // followed by the actual framebuffer content
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             _ = await socket.ReadAsync(Data.AsMemory(0, (int)Header.Size), cancellationToken).ConfigureAwait(false);
 #else
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);

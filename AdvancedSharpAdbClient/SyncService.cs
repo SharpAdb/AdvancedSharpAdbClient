@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient
                     Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                     // now send the data to the device
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     Socket.Send(buffer.AsSpan(startPosition, read + dataBytes.Length + lengthBytes.Length));
 #else
                     Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
@@ -292,11 +292,14 @@ namespace AdvancedSharpAdbClient
                     }
 
                     // now read the length we received
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     _ = Socket.Read(buffer.AsSpan(0, size));
-                    stream.Write(buffer.AsSpan(0, size));
 #else
                     _ = Socket.Read(buffer, size);
+#endif
+#if HAS_BUFFERS
+                    stream.Write(buffer.AsSpan(0, size));
+#else
                     stream.Write(buffer, 0, size);
 #endif
                     totalBytesRead += size;
@@ -438,7 +441,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected FileStatistics ReadStatistics()
         {
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             Span<byte> statResult = stackalloc byte[12];
             _ = Socket.Read(statResult);
             return EnumerableBuilder.FileStatisticsCreator(statResult);

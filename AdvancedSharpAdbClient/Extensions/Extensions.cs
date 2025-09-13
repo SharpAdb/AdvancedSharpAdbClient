@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -175,5 +176,13 @@ namespace AdvancedSharpAdbClient
                 }
                 : Path.GetFullPath(path);
 #endif
+
+        /// <summary>
+        /// Sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="IAdbSocket.ReadAdbResponse()"/>.
+        /// </summary>
+        /// <param name="socket">The socket to use.</param>
+        /// <param name="request">The request to send.</param>
+        public static void SendAdbRequest(this IAdbSocket socket, scoped in DefaultInterpolatedStringHandler request) => socket.SendAdbRequest(request.ToString());
     }
 }

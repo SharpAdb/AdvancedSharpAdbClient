@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient
@@ -134,16 +135,25 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder =
-                new StringBuilder("The ")
-                    .Append(nameof(TcpSocket));
-            return (Connected
-                ? builder.Append(" connect with ")
-                         .Append(EndPoint)
-                : EndPoint == null
-                    ? builder.Append(" without initialized")
-                    : builder.Append(" disconnect with ")
-                             .Append(EndPoint)).ToString();
+            DefaultInterpolatedStringHandler handler = new(33, 1);
+            handler.AppendLiteral($"The {nameof(TcpSocket)}");
+
+            if (Connected)
+            {
+                handler.AppendLiteral(" connect with ");
+                handler.AppendFormatted(EndPoint);
+            }
+            else if (EndPoint == null)
+            {
+                handler.AppendLiteral(" without initialized");
+            }
+            else
+            {
+                handler.AppendLiteral(" disconnect with ");
+                handler.AppendFormatted(EndPoint);
+            }
+
+            return handler.ToStringAndClear();
         }
 
         /// <inheritdoc/>

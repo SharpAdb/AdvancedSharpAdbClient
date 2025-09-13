@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient
                     Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                     // now send the data to the device
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     await Socket.SendAsync(buffer.AsMemory(startPosition, read + dataBytes.Length + lengthBytes.Length), cancellationToken).ConfigureAwait(false);
 #else
                     await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
@@ -185,11 +185,14 @@ namespace AdvancedSharpAdbClient
                     }
 
                     // now read the length we received
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     await Socket.ReadAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
-                    await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
 #else
                     await Socket.ReadAsync(buffer, size, cancellationToken).ConfigureAwait(false);
+#endif
+#if HAS_BUFFERS
+                    await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
+#else
                     await stream.WriteAsync(buffer, 0, size, cancellationToken).ConfigureAwait(false);
 #endif
                     totalBytesRead += size;
@@ -528,7 +531,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected async Task<FileStatistics> ReadStatisticsAsync(CancellationToken cancellationToken = default)
         {
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             Memory<byte> statResult = new byte[12];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
             return EnumerableBuilder.FileStatisticsCreator(statResult.Span);
