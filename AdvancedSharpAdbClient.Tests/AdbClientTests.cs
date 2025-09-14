@@ -1169,6 +1169,16 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(endPoint, client.EndPoint);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            AdbClient adbClient = new();
+            Assert.Equal($"The {typeof(AdbClient)} communicate with adb server at '127.0.0.1:5037'.", adbClient.ToString());
+        }
+
         private void RunConnectTest(Action test, string connectString)
         {
             string[] requests = [$"host:connect:{connectString}"];

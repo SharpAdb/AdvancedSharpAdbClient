@@ -1,0 +1,28 @@
+{
+  "$schema": "https://github.com/mhutch/MonoDevelop.MSBuildEditor/raw/refs/heads/main/MonoDevelop.MSBuild/Schemas/buildschema.json",
+  "properties": {
+    "FullTargets": {
+      "description": "Value indicating whether target to all platforms",
+      "type": "bool",
+      "defaultValue": "false"
+    },
+    "ImportAsync": {
+      "description": "Value indicating whether reference the AsyncBridge and Microsoft.Bcl.Async",
+      "type": "bool",
+      "defaultValue": "false"
+    },
+    "IsStandard": {
+      "description": "Value indicating whether only target to .NET Standard",
+      "type": "bool",
+      "defaultValue": "false"
+    },
+    "IsWindows": {
+      "description": "Value indicating whether is running on Windows",
+      "type": "bool"
+    },
+    "IsTestProject": {
+      "description": "Value indicating whether the project is a test project",
+      "type": "bool"
+    }
+  }
+}

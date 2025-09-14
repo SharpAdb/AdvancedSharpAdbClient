@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="IsRunning">The value indicating whether the server is currently running.</param>
     /// <param name="Version">The version of the server when it is running.</param>
-    [DebuggerDisplay($"{nameof(AdbServerStatus)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Version)} = {{{nameof(Version)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbServerStatus)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Version)} = {{{nameof(Version)}}} }}")]
     public readonly record struct AdbServerStatus(bool IsRunning, Version? Version)
     {
         /// <summary>

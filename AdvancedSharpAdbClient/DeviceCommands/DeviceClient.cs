@@ -36,8 +36,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public DeviceData Device
         {
             get;
-            init => field = DeviceData.EnsureDevice(ref value);
-        } = DeviceData.EnsureDevice(ref Device);
+            init => field = DeviceData.EnsureDevice(value);
+        } = DeviceData.EnsureDevice(Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.
@@ -441,7 +441,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <inheritdoc/>
         object ICloneable.Clone() => ((ICloneable<DeviceClient>)this).Clone();
 
-#if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
+#if !NET40_OR_GREATER && !COMP_NETSTANDARD2_0
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(EqualityContract, AdbClient, Device);
 

@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient.Receivers
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
     /// <param name="logger">The logger to use when logging.</param>
-    [DebuggerDisplay($"{nameof(ConsoleOutputReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}}, {nameof(Output)} = {{{nameof(Output)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(ConsoleOutputReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}}, {nameof(Output)} = {{{nameof(Output)}}} }}")]
     public partial class ConsoleOutputReceiver(ILogger<ConsoleOutputReceiver>? logger = null) : MultiLineReceiver
     {
         /// <summary>

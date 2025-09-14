@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
@@ -41,7 +40,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
     public partial class SyncService : ISyncService, ICloneable<SyncService>, ICloneable
 #if HAS_WINRT
         , ISyncService.IWinRT
@@ -100,7 +99,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
-            Device = DeviceData.EnsureDevice(ref device);
+            Device = DeviceData.EnsureDevice(device);
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             Open();
         }
@@ -406,18 +405,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(SyncService))
-                .Append(" { ")
-                .Append(nameof(Socket))
-                .Append(" = ")
-                .Append(Socket)
-                .Append(", ")
-                .Append(nameof(Device))
-                .Append(" = ")
-                .Append(Device)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Socket)} = {Socket}, {nameof(Device)} = {Device} }}";
 
         /// <summary>
         /// Creates a new <see cref="SyncService"/> object that is a copy of the current instance with new <see cref="Device"/>.

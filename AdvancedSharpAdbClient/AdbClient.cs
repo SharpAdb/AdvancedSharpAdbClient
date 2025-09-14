@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
-    [DebuggerDisplay($"{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public partial class AdbClient : IAdbClient, ICloneable<AdbClient>, ICloneable
 #if HAS_WINRT
         , IAdbClient.IWinRT
@@ -944,7 +944,7 @@ namespace AdvancedSharpAdbClient
                 }
             }
 
-            socket.SendAdbRequest(requestBuilder.ToString());
+            socket.SendAdbRequest(requestBuilder);
             _ = socket.ReadAdbResponse();
 
             using StreamReader reader = new(socket.GetShellStream(), Encoding);
@@ -1195,7 +1195,7 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
 
         /// <inheritdoc/>
-        public override string ToString() => $"The {nameof(AdbClient)} communicate with adb server at {EndPoint}";
+        public override string ToString() => $"The {GetType()} communicate with adb server at '{EndPoint}'.";
 
         /// <summary>
         /// Creates a new <see cref="AdbClient"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.

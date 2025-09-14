@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
-    [DebuggerDisplay($"{nameof(AdbSocket)} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbSocket)} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<AdbSocket>, ICloneable
     {
         /// <summary>
@@ -557,14 +557,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(AdbSocket))
-                .Append(" { ")
-                .Append(nameof(Socket))
-                .Append(" = ")
-                .Append(Socket)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Socket)} = {Socket} }}";
 
         /// <inheritdoc/>
         public void Close() => Socket.Dispose();

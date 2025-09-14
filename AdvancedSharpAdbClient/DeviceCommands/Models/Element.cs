@@ -431,7 +431,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] Element? other) =>
             (object?)this == other ||
-                (other != (object?)null
+                (other is not null
                 && EqualityComparer<IAdbClient>.Default.Equals(Client, other.Client)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device)
                 && (Node == null
@@ -445,17 +445,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <summary>
         /// Tests whether two <see cref='Element'/> objects are equally.
         /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        /// <param name="left">The <see cref='Element'/> class that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='Element'/> class that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> class are equally; otherwise <see langword="false"/>.</returns>
         public static bool operator ==(Element? left, Element? right) => (object?)left == right || (left?.Equals(right) ?? false);
 
         /// <summary>
         /// Tests whether two <see cref='Element'/> objects are different.
         /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        /// <param name="left">The <see cref='Element'/> class that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='Element'/> class that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> class are unequally; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(Element? left, Element? right) => !(left == right);
 
         /// <inheritdoc/>

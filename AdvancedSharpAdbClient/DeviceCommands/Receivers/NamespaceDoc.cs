@@ -11,5 +11,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.Receivers.NamespaceDoc;
+    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.Receivers.NamespaceDoc
+    {
+        /// <summary>
+        /// The name of the namespace <see cref="Receivers"/>.
+        /// </summary>
+        public new const string Name = $"{DeviceCommands.NamespaceDoc.Name}.{nameof(Receivers)}";
+    }
 }

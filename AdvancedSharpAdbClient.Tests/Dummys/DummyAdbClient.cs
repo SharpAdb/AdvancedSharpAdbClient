@@ -40,14 +40,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void ExecuteServerCommand(string target, string command)
         {
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
         }
 
@@ -56,14 +57,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void ExecuteServerCommand(string target, string command, IShellOutputReceiver receiver, Encoding encoding)
         {
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
 
             if (Commands.TryGetValue(request, out string value))
@@ -91,14 +93,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public IEnumerable<string> ExecuteServerEnumerable(string target, string command, Encoding encoding)
         {
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
 
             if (Commands.TryGetValue(request, out string value))
@@ -122,14 +125,15 @@ namespace AdvancedSharpAdbClient.Tests
         {
             await Task.Yield();
 
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
         }
 
@@ -138,14 +142,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public async Task ExecuteServerCommandAsync(string target, string command, IShellOutputReceiver receiver, Encoding encoding, CancellationToken cancellationToken = default)
         {
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
 
             if (Commands.TryGetValue(request, out string value))
@@ -173,14 +178,15 @@ namespace AdvancedSharpAdbClient.Tests
 
         public async IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            StringBuilder requestBuilder = new();
+            DefaultInterpolatedStringHandler requestBuilder = new(1, 2);
             if (!string.IsNullOrWhiteSpace(target))
             {
-                _ = requestBuilder.Append(target).Append(':');
+                requestBuilder.AppendLiteral(target);
+                requestBuilder.AppendFormatted(':');
             }
-            _ = requestBuilder.Append(command);
+            requestBuilder.AppendLiteral(command);
 
-            string request = requestBuilder.ToString();
+            string request = requestBuilder.ToStringAndClear();
             ReceivedCommands.Add(request);
 
             if (Commands.TryGetValue(request, out string value))

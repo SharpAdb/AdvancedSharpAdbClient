@@ -1,4 +1,4 @@
-﻿#if (NETSTANDARD && !NETSTANDARD2_0_OR_GREATER) || (NETCORE && !UAP10_0_15138_0)
+﻿#if !NETFRAMEWORK && !NETCOREAPP && !COMP_NETSTANDARD2_0
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 

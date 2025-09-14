@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -65,7 +64,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public PackageManager(IAdbClient client, DeviceData device, Func<IAdbClient, DeviceData, ISyncService>? syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager>? logger = null, params string[] arguments)
         {
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
-            Device = DeviceData.EnsureDevice(ref device);
+            Device = DeviceData.EnsureDevice(device);
             Packages = [];
             Arguments = arguments;
 
@@ -543,18 +542,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(PackageManager))
-                .Append(" { ")
-                .Append(nameof(Device))
-                .Append(" = ")
-                .Append(Device)
-                .Append(", ")
-                .Append(nameof(AdbClient))
-                .Append(" = ")
-                .Append(AdbClient)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Device)} = {Device}, {nameof(AdbClient)} = {AdbClient} }}";
 
         /// <summary>
         /// Like "install", but starts an install session.

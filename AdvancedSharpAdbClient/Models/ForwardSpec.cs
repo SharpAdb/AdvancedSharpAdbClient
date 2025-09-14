@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
-    [DebuggerDisplay($"{nameof(ForwardSpec)} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(ForwardSpec)} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
     public readonly struct ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
     /// </summary>
-    [DebuggerDisplay($"{nameof(ProcessOutputReceiver)} \\{{ {nameof(Processes)} = {{{nameof(Processes)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(ProcessOutputReceiver)} \\{{ {nameof(Processes)} = {{{nameof(Processes)}}} }}")]
     public class ProcessOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

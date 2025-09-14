@@ -13,5 +13,11 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc;
+    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc
+    {
+        /// <summary>
+        /// The name of the namespace <see cref="Polyfills"/>.
+        /// </summary>
+        public new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Polyfills)}";
+    }
 }

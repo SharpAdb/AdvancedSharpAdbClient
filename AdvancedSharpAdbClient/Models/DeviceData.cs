@@ -3,11 +3,11 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.Models
@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-    public readonly partial struct DeviceData : IEquatable<DeviceData>
+    public sealed partial class DeviceData() : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -29,11 +29,11 @@ namespace AdvancedSharpAdbClient.Models
         private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceData"/> struct based on
+        /// Initializes a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
-        public DeviceData(string data)
+        public DeviceData(string data) : this()
         {
             Match match = Regex.Match(data);
             if (match.Success)
@@ -157,32 +157,34 @@ namespace AdvancedSharpAdbClient.Models
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is DeviceData other && Equals(other);
 
         /// <inheritdoc/>
-        public bool Equals(DeviceData other) =>
-            Serial == other.Serial
-                && State == other.State
-                && Model == other.Model
-                && Product == other.Product
-                && Name == other.Name
-                && Features == other.Features
-                && Usb == other.Usb
-                && TransportId == other.TransportId
-                && Message == other.Message;
+        public bool Equals([NotNullWhen(true)] DeviceData? other) =>
+            (object)this == other ||
+                (other is not null
+                    && Serial == other.Serial
+                    && State == other.State
+                    && Model == other.Model
+                    && Product == other.Product
+                    && Name == other.Name
+                    && Features == other.Features
+                    && Usb == other.Usb
+                    && TransportId == other.TransportId
+                    && Message == other.Message);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are equally.
         /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(DeviceData? left, DeviceData? right) => left.Equals(right);
+        /// <param name="left">The <see cref='DeviceData'/> class that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> class that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> class are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(DeviceData? left, DeviceData? right) => EqualityComparer<DeviceData?>.Default.Equals(left, right);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are different.
         /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(DeviceData? left, DeviceData? right) => !left.Equals(right);
+        /// <param name="left">The <see cref='DeviceData'/> class that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> class that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> class are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(DeviceData? left, DeviceData? right) => !(left == right);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -291,13 +293,14 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="paramName">The name of the parameter with which <paramref name="device"/> corresponds.</param>
         /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="device"/> does not have a valid serial number.</exception>
-        public static ref DeviceData EnsureDevice(ref DeviceData device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
+        public static DeviceData EnsureDevice([NotNull] DeviceData? device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
         {
+            ArgumentNullException.ThrowIfNull(device, paramName);
             if (device.IsEmpty)
             {
                 throw new ArgumentOutOfRangeException(paramName, "You must specific a transport ID or serial number for the device");
             }
-            return ref device;
+            return device;
         }
 
         /// <summary>
@@ -334,7 +337,8 @@ namespace AdvancedSharpAdbClient.Models
         private string GetDebuggerDisplay()
         {
             DefaultInterpolatedStringHandler builder = new(113, 9);
-            builder.AppendLiteral($"{nameof(DeviceData)} {{ ");
+            builder.AppendFormatted(GetType());
+            builder.AppendLiteral($" {{ ");
 
             if (!string.IsNullOrEmpty(Serial))
             {

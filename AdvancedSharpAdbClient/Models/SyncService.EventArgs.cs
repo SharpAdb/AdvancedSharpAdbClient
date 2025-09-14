@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Provides data for the <see cref="ISyncService"/> interface.
     /// </summary>
-    [DebuggerDisplay($"{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(ReceivedBytesSize)} = {{{nameof(ReceivedBytesSize)}}}, {nameof(TotalBytesToReceive)} = {{{nameof(TotalBytesToReceive)}}}, {nameof(ProgressPercentage)} = {{{nameof(ProgressPercentage)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(ReceivedBytesSize)} = {{{nameof(ReceivedBytesSize)}}}, {nameof(TotalBytesToReceive)} = {{{nameof(TotalBytesToReceive)}}}, {nameof(ProgressPercentage)} = {{{nameof(ProgressPercentage)}}} }}")]
     public sealed class SyncProgressChangedEventArgs(long current, long total) : EventArgs
     {
         /// <summary>

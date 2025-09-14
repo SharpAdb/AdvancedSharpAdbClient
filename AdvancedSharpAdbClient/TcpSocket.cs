@@ -9,14 +9,13 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
     /// <summary>
     /// Implements the <see cref="ITcpSocket"/> interface using the standard <see cref="System.Net.Sockets.Socket"/> class.
     /// </summary>
-    [DebuggerDisplay($"{nameof(TcpSocket)} \\{{ {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(ReceiveBufferSize)} = {{{nameof(ReceiveBufferSize)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(TcpSocket)} \\{{ {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(ReceiveBufferSize)} = {{{nameof(ReceiveBufferSize)}}} }}")]
     public sealed partial class TcpSocket : ITcpSocket, ICloneable<TcpSocket>, ICloneable
     {
         /// <summary>
@@ -136,12 +135,14 @@ namespace AdvancedSharpAdbClient
         public override string ToString()
         {
             DefaultInterpolatedStringHandler handler = new(33, 1);
-            handler.AppendLiteral($"The {nameof(TcpSocket)}");
+            handler.AppendLiteral("The ");
+            handler.AppendFormatted(GetType());
 
             if (Connected)
             {
-                handler.AppendLiteral(" connect with ");
+                handler.AppendLiteral(" connect with '");
                 handler.AppendFormatted(EndPoint);
+                handler.AppendFormatted('\'');
             }
             else if (EndPoint == null)
             {
@@ -149,10 +150,12 @@ namespace AdvancedSharpAdbClient
             }
             else
             {
-                handler.AppendLiteral(" disconnect with ");
+                handler.AppendLiteral(" disconnect with '");
                 handler.AppendFormatted(EndPoint);
+                handler.AppendFormatted('\'');
             }
 
+            handler.AppendFormatted('.');
             return handler.ToStringAndClear();
         }
 

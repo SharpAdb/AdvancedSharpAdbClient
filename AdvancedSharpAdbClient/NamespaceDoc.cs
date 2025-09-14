@@ -43,5 +43,11 @@ namespace AdvancedSharpAdbClient
     /// </c>
     /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc;
+    internal abstract class NamespaceDoc
+    {
+        /// <summary>
+        /// The name of the namespace <see cref="AdvancedSharpAdbClient"/>.
+        /// </summary>
+        public const string Name = nameof(AdvancedSharpAdbClient);
+    }
 }

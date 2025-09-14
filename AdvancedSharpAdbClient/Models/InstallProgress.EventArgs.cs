@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -15,7 +14,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents the state of apk installation.
     /// </summary>
     /// <param name="state">The state of the installation.</param>
-    [DebuggerDisplay($"{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(InstallProgressEventArgs)} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
     public sealed class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>

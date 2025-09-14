@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 #if HAS_WUXC
 using System.Threading;
@@ -588,7 +587,8 @@ namespace AdvancedSharpAdbClient.Models
         public override string ToString()
         {
             DefaultInterpolatedStringHandler handler = new(121, 10);
-            handler.AppendLiteral($"{nameof(FramebufferHeader)} {{ {nameof(Version)} = ");
+            handler.AppendFormatted(GetType());
+            handler.AppendLiteral($" {{ {nameof(Version)} = ");
             handler.AppendFormatted(Version);
             handler.AppendLiteral($", {nameof(Bpp)} = ");
             handler.AppendFormatted(Bpp);

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
-    [DebuggerDisplay($"{nameof(InstallOutputReceiver)} \\{{ {nameof(Success)} = {{{nameof(Success)}}}, {nameof(SuccessMessage)} = {{{nameof(SuccessMessage)}}}, {nameof(ErrorMessage)} = {{{nameof(ErrorMessage)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(InstallOutputReceiver)} \\{{ {nameof(Success)} = {{{nameof(Success)}}}, {nameof(SuccessMessage)} = {{{nameof(SuccessMessage)}}}, {nameof(ErrorMessage)} = {{{nameof(ErrorMessage)}}} }}")]
     public partial class InstallOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

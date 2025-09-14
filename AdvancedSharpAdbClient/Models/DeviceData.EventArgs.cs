@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -15,7 +14,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="device">The device.</param>
-    [DebuggerDisplay($"{nameof(DeviceDataEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}} }}")]
     public abstract class DeviceDataEventArgs(DeviceData device) : EventArgs
     {
         /// <summary>
@@ -48,7 +47,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="devices">The list of device.</param>
-    [DebuggerDisplay($"{nameof(DeviceDataNotifyEventArgs)} \\{{ {nameof(Devices)} = {{{nameof(Devices)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataNotifyEventArgs)} \\{{ {nameof(Devices)} = {{{nameof(Devices)}}} }}")]
     public sealed class DeviceDataNotifyEventArgs(params IEnumerable<DeviceData> devices) : EventArgs
     {
         /// <summary>
@@ -66,7 +65,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="device">The device.</param>
     /// <param name="isConnect">The device after the reported change.</param>
-    [DebuggerDisplay($"{nameof(DeviceDataConnectEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(IsConnect)} = {{{nameof(IsConnect)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataConnectEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(IsConnect)} = {{{nameof(IsConnect)}}} }}")]
     public sealed class DeviceDataConnectEventArgs(DeviceData device, bool isConnect) : DeviceDataEventArgs(device)
     {
         /// <summary>
@@ -77,20 +76,24 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("Device ")
-                .Append(IsConnect ? "connected" : "disconnected");
+            DefaultInterpolatedStringHandler builder = new(23, 2);
+            builder.AppendLiteral("Device ");
+            builder.AppendLiteral(IsConnect ? "connected" : "disconnected");
             if (Device.IsEmpty)
             {
-                return builder.ToString();
+                return builder.ToStringAndClear();
             }
             else
             {
-                _ = builder.Append(": ").Append(Device.Serial);
+                builder.AppendLiteral(": ");
+                builder.AppendLiteral(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.Append('(').Append(Device.Name).Append(')');
+                    builder.AppendFormatted('(');
+                    builder.AppendLiteral(Device.Name);
+                    builder.AppendFormatted(')');
                 }
-                return builder.ToString();
+                return builder.ToStringAndClear();
             }
         }
     }
@@ -101,7 +104,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device.</param>
     /// <param name="newState">The state of the device after the reported change.</param>
     /// <param name="oldState">The state of the device before the reported change.</param>
-    [DebuggerDisplay($"{nameof(DeviceDataChangeEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(NewState)} = {{{nameof(NewState)}}}, {nameof(OldState)} = {{{nameof(OldState)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataChangeEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(NewState)} = {{{nameof(NewState)}}}, {nameof(OldState)} = {{{nameof(OldState)}}} }}")]
     public sealed class DeviceDataChangeEventArgs(DeviceData device, DeviceState newState, DeviceState oldState) : DeviceDataEventArgs(device)
     {
         /// <summary>
@@ -117,17 +120,24 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder = new("Device state changed:");
+            DefaultInterpolatedStringHandler builder = new(29, 4);
+            builder.AppendLiteral("Device state changed:");
             if (!Device.IsEmpty)
             {
-                _ = builder.Append(' ').Append(Device.Serial);
+                builder.AppendFormatted(' ');
+                builder.AppendLiteral(Device.Serial);
                 if (!string.IsNullOrEmpty(Device.Name))
                 {
-                    _ = builder.Append('(').Append(Device.Name).Append(')');
+                    builder.AppendFormatted('(');
+                    builder.AppendLiteral(Device.Name);
+                    builder.AppendFormatted(')');
                 }
             }
-            _ = builder.Append(' ').Append(OldState).Append(" -> ").Append(NewState);
-            return builder.ToString();
+            builder.AppendFormatted(' ');
+            builder.AppendFormatted(OldState);
+            builder.AppendLiteral(" -> ");
+            builder.AppendFormatted(NewState);
+            return builder.ToStringAndClear();
         }
     }
 }

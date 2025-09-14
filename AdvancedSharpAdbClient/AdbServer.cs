@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient
     /// giant multiplexing loop whose purpose is to orchestrate the exchange of data
     /// between clients and devices.</para>
     /// </summary>
-    [DebuggerDisplay($"{nameof(AdbServer)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(CachedAdbPath)} = {{{nameof(CachedAdbPath)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbServer)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(CachedAdbPath)} = {{{nameof(CachedAdbPath)}}} }}")]
     public partial class AdbServer : IAdbServer, ICloneable<AdbServer>, ICloneable
     {
         /// <summary>
@@ -272,7 +272,7 @@ namespace AdvancedSharpAdbClient
         public IAdbSocket CreateAdbSocket() => AdbSocketFactory(EndPoint);
 
         /// <inheritdoc/>
-        public override string ToString() => $"The {nameof(AdbServer)} communicate with adb at {EndPoint}";
+        public override string ToString() => $"The {GetType()} communicate with adb at '{EndPoint}'.";
 
         /// <summary>
         /// Creates a new <see cref="AdbServer"/> object that is a copy of the current instance with new <see cref="EndPoint"/>.

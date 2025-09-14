@@ -309,6 +309,17 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(adbSocket.Connected, socket.Connected);
         }
 
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket adbSocket = new(tcpSocket);
+            Assert.Equal($"{typeof(AdbSocket)} {{ {nameof(AdbSocket.Socket)} = {tcpSocket} }}", adbSocket.ToString());
+        }
+
         private static void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)
         {
             using DummyTcpSocket tcpSocket = new();

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using Xunit;
 
@@ -42,8 +41,8 @@ namespace AdvancedSharpAdbClient.Tests
             ReadOnlySpan<byte> data = "GET / HTTP/1.1\n\n"u8;
             socket.Send(data, SocketFlags.None);
 
-            byte[] responseData = new byte[128];
-            socket.Receive([.. responseData], SocketFlags.None);
+            Span<byte> responseData = new byte[128];
+            socket.Receive(responseData, SocketFlags.None);
 
             _ = Encoding.ASCII.GetString(responseData);
         }
@@ -78,7 +77,7 @@ namespace AdvancedSharpAdbClient.Tests
                 ReceiveBufferSize = 1024
             };
             // https://stackoverflow.com/questions/29356626/is-there-a-way-to-reduce-the-minimum-lower-limit-of-the-socket-send-buffer-size
-            Assert.Equal(RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? 2304 : 1024, socket.ReceiveBufferSize);
+            Assert.Equal(OperatingSystem.IsLinux() ? 2304 : 1024, socket.ReceiveBufferSize);
         }
 
         /// <summary>
@@ -104,6 +103,22 @@ namespace AdvancedSharpAdbClient.Tests
             using TcpSocket socket = tcpSocket.Clone();
             Assert.Equal(tcpSocket.EndPoint, socket.EndPoint);
             Assert.True(socket.Connected);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="TcpSocket.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            using TcpSocket socket = new();
+            Assert.Equal($"The {typeof(TcpSocket)} without initialized.", socket.ToString());
+
+            socket.Connect(new DnsEndPoint("www.bing.com", 80));
+            Assert.Equal($"The {typeof(TcpSocket)} connect with 'Unspecified/www.bing.com:80'.", socket.ToString());
+
+            socket.Dispose();
+            Assert.Equal($"The {typeof(TcpSocket)} disconnect with 'Unspecified/www.bing.com:80'.", socket.ToString());
         }
     }
 }

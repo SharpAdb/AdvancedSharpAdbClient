@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -53,6 +52,6 @@ namespace AdvancedSharpAdbClient.Tests
             return RunProcess(filename, command, errorOutput, standardOutput, Timeout.Infinite);
         }
 
-        private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
+        private static string ServerName => OperatingSystem.IsWindows() ? "adb.exe" : "adb";
     }
 }

@@ -10,7 +10,7 @@ namespace AdvancedSharpAdbClient.Receivers
     /// <summary>
     /// A multiline receiver to receive and process shell output with multi lines.
     /// </summary>
-    [DebuggerDisplay($"{nameof(MultiLineReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(MultiLineReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}} }}")]
     public abstract partial class MultiLineReceiver : ShellOutputReceiver
     {
         /// <summary>

@@ -10,7 +10,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -35,7 +34,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    [DebuggerDisplay($"{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
+    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class DeviceMonitor : IDeviceMonitor, ICloneable<DeviceMonitor>, ICloneable
 #if COMP_NETSTANDARD2_1
         , IAsyncDisposable
@@ -359,7 +358,7 @@ namespace AdvancedSharpAdbClient
                 // add them to the list, and start monitoring them.
 
                 bool isChanged = false;
-                List<DeviceData> devices = collection.ToList();
+                List<DeviceData> devices = [.. collection];
                 for (int i = this.devices.Count; --i >= 0;)
                 {
                     DeviceData currentDevice = this.devices[i];
@@ -391,7 +390,7 @@ namespace AdvancedSharpAdbClient
                     foreach (DeviceData device in devices)
                     {
                         this.devices.Add(device);
-                        DeviceConnected?.Invoke(this, new DeviceDataConnectEventArgs(device, false));
+                        DeviceConnected?.Invoke(this, new DeviceDataConnectEventArgs(device, true));
                     }
                     isChanged = true;
                 }
@@ -404,18 +403,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(SyncService))
-                .Append(" { ")
-                .Append(nameof(Socket))
-                .Append(" = ")
-                .Append(Socket)
-                .Append(", ")
-                .Append(nameof(IsRunning))
-                .Append(" = ")
-                .Append(IsRunning)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Socket)} = {Socket}, {nameof(IsRunning)} = {IsRunning} }}";
 
         /// <inheritdoc/>
         public virtual DeviceMonitor Clone() =>

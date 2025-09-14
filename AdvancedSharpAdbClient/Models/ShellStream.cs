@@ -5,7 +5,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -472,14 +471,7 @@ namespace AdvancedSharpAdbClient.Models
         public override void Write(byte[] buffer, int offset, int count) => Inner.Write(buffer, offset, count);
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(ShellStream))
-                .Append(" { ")
-                .Append(nameof(Inner))
-                .Append(" = ")
-                .Append(Inner)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Inner)} = {Inner} }}";
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)

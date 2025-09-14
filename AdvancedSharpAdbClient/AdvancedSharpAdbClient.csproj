@@ -160,7 +160,7 @@
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net4.7'))
                          or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp1.0'))
-                         or (!($([MSBuild]::GetTargetFrameworkIdentifier('$(TargetFramework)')) == '.NETFramework')
+                         or (!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net1.1'))
                          and $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')))">
     <DefineConstants>$(DefineConstants);HAS_VALUETUPLE</DefineConstants>
   </PropertyGroup>
