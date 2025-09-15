@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.AdbCommandLineStatusCreator))]
 #endif
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbCommandLineStatus)} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
     public readonly partial record struct AdbCommandLineStatus(Version? AdbVersion, string? FileVersion, string? FilePath)
     {
         /// <summary>

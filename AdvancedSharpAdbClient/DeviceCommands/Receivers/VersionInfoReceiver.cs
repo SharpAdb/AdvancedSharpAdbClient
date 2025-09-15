@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(VersionInfoReceiver)} \\{{ {nameof(VersionInfo)} = {{{nameof(VersionInfo)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(VersionInfo)} = {{{nameof(VersionInfo)}}} }}")]
     public partial class VersionInfoReceiver : InfoOutputReceiver
     {
         /// <summary>

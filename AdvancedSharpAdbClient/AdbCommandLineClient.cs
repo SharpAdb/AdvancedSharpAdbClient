@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbCommandLineClient)} \\{{ {nameof(AdbPath)} = {{{nameof(AdbPath)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(AdbPath)} = {{{nameof(AdbPath)}}} }}")]
     public partial class AdbCommandLineClient : IAdbCommandLineClient
     {
 #if HAS_PROCESS

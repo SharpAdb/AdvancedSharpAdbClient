@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Contains information about port forwarding configured by the Android Debug Bridge.
     /// </summary>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(ForwardData)} \\{{ {nameof(SerialNumber)} = {{{nameof(SerialNumber)}}}, {nameof(LocalSpec)} = {{{nameof(LocalSpec)}}}, {nameof(RemoteSpec)} = {{{nameof(RemoteSpec)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(SerialNumber)} = {{{nameof(SerialNumber)}}}, {nameof(LocalSpec)} = {{{nameof(LocalSpec)}}}, {nameof(RemoteSpec)} = {{{nameof(RemoteSpec)}}} }}")]
     public sealed class ForwardData : IEquatable<ForwardData>
     {
         /// <summary>

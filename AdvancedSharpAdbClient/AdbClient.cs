@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb_client.c">adb_client.c</seealso></para>
     /// <para><seealso href="https://github.com/android/platform_system_core/blob/master/adb/adb.c">adb.c</seealso></para>
     /// </remarks>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AdbClient)} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public partial class AdbClient : IAdbClient, ICloneable<AdbClient>, ICloneable
 #if HAS_WINRT
         , IAdbClient.IWinRT

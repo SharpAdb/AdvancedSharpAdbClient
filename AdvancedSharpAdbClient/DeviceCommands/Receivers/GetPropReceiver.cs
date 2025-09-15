@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +13,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Parses the output of the <c>getprop</c> command, which lists all properties of an Android device.
     /// </summary>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(GetPropReceiver)} \\{{ {nameof(Properties)} = {{{nameof(Properties)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Properties)} = {{{nameof(Properties)}}} }}")]
     public sealed partial class GetPropReceiver : ShellOutputReceiver
     {
         /// <summary>

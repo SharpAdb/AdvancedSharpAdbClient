@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -11,7 +12,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// Represents an entry in event buffer of the the Android log.
     /// </summary>
     /// <remarks><seealso href="https://android.googlesource.com/platform/system/core/+/master/include/log/log.h#482"/></remarks>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(EventLogEntry)} \\{{ {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(Tag)} = {{{nameof(Tag)}}}, {nameof(Values)} = {{{nameof(Values)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(Tag)} = {{{nameof(Tag)}}}, {nameof(Values)} = {{{nameof(Values)}}} }}")]
     public class EventLogEntry : LogEntry
     {
         /// <summary>

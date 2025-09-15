@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// <summary>
     /// Implement of screen element, likes Selenium.
     /// </summary>
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Bounds)} = {{{nameof(Bounds)}}}, {nameof(Class)} = {{{nameof(Class)}}}, {nameof(Text)} = {{{nameof(Text)}}}, {nameof(Package)} = {{{nameof(Package)}}}, {nameof(Device)} = {{{nameof(Device)}}} }}")]
     public class Element : IEquatable<Element>
     {
         /// <summary>

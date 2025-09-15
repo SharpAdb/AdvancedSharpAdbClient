@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceMonitor)} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = {{{nameof(Devices)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Devices)} = \\{{ {{{nameof(Devices)}}} }}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class DeviceMonitor : IDeviceMonitor, ICloneable<DeviceMonitor>, ICloneable
 #if COMP_NETSTANDARD2_1
         , IAsyncDisposable

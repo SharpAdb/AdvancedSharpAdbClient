@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -10,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes output of the <c>pm install</c> command.
     /// </summary>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(InstallOutputReceiver)} \\{{ {nameof(Success)} = {{{nameof(Success)}}}, {nameof(SuccessMessage)} = {{{nameof(SuccessMessage)}}}, {nameof(ErrorMessage)} = {{{nameof(ErrorMessage)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Success)} = {{{nameof(Success)}}}, {nameof(SuccessMessage)} = {{{nameof(SuccessMessage)}}}, {nameof(ErrorMessage)} = {{{nameof(ErrorMessage)}}} }}")]
     public partial class InstallOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

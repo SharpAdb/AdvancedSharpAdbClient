@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="device">The device.</param>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Device)} = {{{nameof(Device)}}} }}")]
     public abstract class DeviceDataEventArgs(DeviceData device) : EventArgs
     {
         /// <summary>
@@ -47,7 +47,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The event arguments that are passed when a device event occurs.
     /// </summary>
     /// <param name="devices">The list of device.</param>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataNotifyEventArgs)} \\{{ {nameof(Devices)} = {{{nameof(Devices)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Devices)} = {{{nameof(Devices)}}} }}")]
     public sealed class DeviceDataNotifyEventArgs(params IEnumerable<DeviceData> devices) : EventArgs
     {
         /// <summary>
@@ -65,7 +65,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <param name="device">The device.</param>
     /// <param name="isConnect">The device after the reported change.</param>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataConnectEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(IsConnect)} = {{{nameof(IsConnect)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(IsConnect)} = {{{nameof(IsConnect)}}} }}")]
     public sealed class DeviceDataConnectEventArgs(DeviceData device, bool isConnect) : DeviceDataEventArgs(device)
     {
         /// <summary>
@@ -104,7 +104,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device.</param>
     /// <param name="newState">The state of the device after the reported change.</param>
     /// <param name="oldState">The state of the device before the reported change.</param>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(DeviceDataChangeEventArgs)} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(NewState)} = {{{nameof(NewState)}}}, {nameof(OldState)} = {{{nameof(OldState)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Device)} = {{{nameof(Device)}}}, {nameof(NewState)} = {{{nameof(NewState)}}}, {nameof(OldState)} = {{{nameof(OldState)}}} }}")]
     public sealed class DeviceDataChangeEventArgs(DeviceData device, DeviceState newState, DeviceState oldState) : DeviceDataEventArgs(device)
     {
         /// <summary>

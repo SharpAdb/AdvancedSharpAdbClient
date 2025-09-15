@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents the state of apk installation.
     /// </summary>
     /// <param name="state">The state of the installation.</param>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(InstallProgressEventArgs)} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
     public sealed class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>

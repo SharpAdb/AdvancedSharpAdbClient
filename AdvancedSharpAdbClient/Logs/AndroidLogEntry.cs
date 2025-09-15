@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -11,7 +12,7 @@ namespace AdvancedSharpAdbClient.Logs
     /// Represents a standard Android log entry (an entry in any Android log buffer except the Event buffer).
     /// </summary>
     /// <remarks><seealso href="https://android.googlesource.com/platform/system/logging/+/refs/heads/main/liblog/logprint.cpp"/></remarks>
-    [DebuggerDisplay($"{NamespaceDoc.Name}.{nameof(AndroidLogEntry)} \\{{ {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(Priority)} = {{{nameof(Priority)}}}, {nameof(Tag)} = {{{nameof(Tag)}}}, {nameof(Message)} = {{{nameof(Message)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(Priority)} = {{{nameof(Priority)}}}, {nameof(Tag)} = {{{nameof(Tag)}}}, {nameof(Message)} = {{{nameof(Message)}}} }}")]
     public class AndroidLogEntry : LogEntry
     {
         /// <summary>
