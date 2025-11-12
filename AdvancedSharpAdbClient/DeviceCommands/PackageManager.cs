@@ -155,9 +155,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -225,9 +222,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -290,9 +284,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -427,9 +418,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallPackage(packageFilePath, progress.AsAction(), arguments);
 
@@ -451,9 +439,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), arguments);
 
@@ -465,9 +450,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(splitPackageFilePaths, packageName, progress.AsAction(), arguments);
 
@@ -612,9 +594,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The file to be opened for reading.</param>
         /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual Stream GetFileStream(string path) =>
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(path)).AwaitByTaskCompleteSource().OpenStreamForReadAsync().AwaitByTaskCompleteSource();
@@ -629,9 +608,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? callback)
         {
             callback?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));

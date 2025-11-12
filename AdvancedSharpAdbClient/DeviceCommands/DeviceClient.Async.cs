@@ -65,9 +65,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{XmlDocument}"/> which returns a <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task<Windows.Data.Xml.Dom.XmlDocument?> DumpScreenWinRTAsync(CancellationToken cancellationToken = default)
         {
             string xmlString = await DumpScreenStringAsync(cancellationToken).ConfigureAwait(false);

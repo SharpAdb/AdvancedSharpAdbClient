@@ -215,9 +215,6 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_WINRT
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
@@ -327,9 +324,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }

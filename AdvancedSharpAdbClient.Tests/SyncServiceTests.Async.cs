@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal((UnixFileStatus)416, value.FileMode.GetPermissions());
             Assert.Equal(597, value.Size);
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);
-            Assert.Equal("-rw-r-----\t597\t1970/1/1 0:00:00 +00:00\t/fstab.donatello", value.ToString());
+            Assert.Equal($"-rw-r-----\t597\t{value.Time}\t/fstab.donatello", value.ToString());
         }
 
         /// <summary>
@@ -78,28 +78,28 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal((UnixFileStatus)16873, dir.FileMode);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
-            Assert.Equal("drwxr-x--x\t0\t2015/11/3 9:47:04 +00:00\t.", dir.ToString());
+            Assert.Equal($"drwxr-x--x\t0\t{dir.Time}\t.", dir.ToString());
 
             FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
             Assert.Equal((UnixFileStatus)16877, parentDir.FileMode);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
-            Assert.Equal("drwxr-xr-x\t0\t2015/11/3 9:47:04 +00:00\t..", parentDir.ToString());
+            Assert.Equal($"drwxr-xr-x\t0\t{dir.Time}\t..", parentDir.ToString());
 
             FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
             Assert.Equal((UnixFileStatus)41471, sdcard0.FileMode);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
-            Assert.Equal("lrwxrwxrwx\t24\t2015/11/3 9:47:04 +00:00\tsdcard0", sdcard0.ToString());
+            Assert.Equal($"lrwxrwxrwx\t24\t{dir.Time}\tsdcard0", sdcard0.ToString());
 
             FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
             Assert.Equal((UnixFileStatus)16749, emulated.FileMode);
             Assert.Equal(0, emulated.Size);
             Assert.Equal(time, emulated.Time);
-            Assert.Equal("dr-xr-xr-x\t0\t2015/11/3 9:47:04 +00:00\temulated", emulated.ToString());
+            Assert.Equal($"dr-xr-xr-x\t0\t{dir.Time}\temulated", emulated.ToString());
         }
 
         /// <summary>
@@ -139,24 +139,28 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal((UnixFileStatus)16873, dir.FileMode);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
+            Assert.Equal($"drwxr-x--x\t0\t{dir.Time}\t.", dir.ToString());
 
             FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
             Assert.Equal((UnixFileStatus)16877, parentDir.FileMode);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
+            Assert.Equal($"drwxr-xr-x\t0\t{dir.Time}\t..", parentDir.ToString());
 
             FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
             Assert.Equal((UnixFileStatus)41471, sdcard0.FileMode);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
+            Assert.Equal($"lrwxrwxrwx\t24\t{dir.Time}\tsdcard0", sdcard0.ToString());
 
             FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
             Assert.Equal((UnixFileStatus)16749, emulated.FileMode);
             Assert.Equal(0, emulated.Size);
             Assert.Equal(time, emulated.Time);
+            Assert.Equal($"dr-xr-xr-x\t0\t{dir.Time}\temulated", emulated.ToString());
         }
 
         /// <summary>

@@ -85,9 +85,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT()
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();

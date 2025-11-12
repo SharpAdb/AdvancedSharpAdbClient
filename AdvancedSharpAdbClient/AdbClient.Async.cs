@@ -957,9 +957,6 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_WINRT
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task InstallAsync(DeviceData device, IRandomAccessStream apk, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1031,9 +1028,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultipleAsync(DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1087,9 +1081,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultipleAsync(DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -1133,9 +1124,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<double>? callback = null, CancellationToken cancellationToken = default)
         {
             callback?.Invoke(0);
@@ -1200,9 +1188,6 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual async Task InstallWriteAsync(DeviceData device, IRandomAccessStream apk, string apkName, string session, Action<string?, double>? callback, CancellationToken cancellationToken = default)
         {
             callback?.Invoke(apkName, 0);

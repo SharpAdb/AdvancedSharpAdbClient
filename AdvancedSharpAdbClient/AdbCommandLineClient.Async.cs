@@ -74,9 +74,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? Task.FromResult(true) :
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));

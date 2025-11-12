@@ -412,7 +412,6 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets is <see cref="DispatcherQueue.HasThreadAccess"/> supported.
         /// </summary>
 #if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
 #endif
         public static bool IsHasThreadAccessSupported { get; } = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess");
@@ -425,9 +424,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             if (dispatcher.HasThreadAccess)
@@ -502,9 +498,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(buffer);
@@ -538,9 +531,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <param name="alphaMode">A <see cref="BitmapAlphaMode"/> which describes how the alpha channel is stored.</param>
         /// <returns>A <see cref="BitmapPixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
         {
             // Initial parameter validation.

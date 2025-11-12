@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Equal(Priority.Info, androidLog.Priority);
             Assert.Equal("ActivityManager", androidLog.Tag);
             Assert.Equal("Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={50066, 9997, 3003, 1028, 1015} abi=x86", androidLog.Message);
-            Assert.Equal($"15-11-15 07:38:20.000   707   707 I ActivityManager: Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={{50066, 9997, 3003, 1028, 1015}} abi=x86", androidLog.ToString());
+            Assert.Equal($"{log.TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff}   707   707 I ActivityManager: Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={{50066, 9997, 3003, 1028, 1015}} abi=x86", androidLog.ToString());
 
             Assert.NotNull(reader.ReadEntry());
             Assert.NotNull(reader.ReadEntry());
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Equal(Priority.Info, androidLog.Priority);
             Assert.Equal("ActivityManager", androidLog.Tag);
             Assert.Equal("Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={50066, 9997, 3003, 1028, 1015} abi=x86", androidLog.Message);
-            Assert.Equal($"15-11-15 07:38:20.000   707   707 I ActivityManager: Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={{50066, 9997, 3003, 1028, 1015}} abi=x86", androidLog.ToString());
+            Assert.Equal($"{log.TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff}   707   707 I ActivityManager: Start proc com.google.android.gm for broadcast com.google.android.gm/.widget.GmailWidgetProvider: pid=7026 uid=10066 gids={{50066, 9997, 3003, 1028, 1015}} abi=x86", androidLog.ToString());
 
             Assert.NotNull(await reader.ReadEntryAsync());
             Assert.NotNull(await reader.ReadEntryAsync());
@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Single(eventLog.Values);
             Assert.NotNull(eventLog.Values[0]);
             Assert.IsType<List<object>>(eventLog.Values[0]);
-            Assert.Equal($"15-11-16 09:48:40.000   707   707 0       : System.Collections.Generic.List`1[System.Object]", eventLog.ToString());
+            Assert.Equal($"{entry.TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff}   707   707 0       : System.Collections.Generic.List`1[System.Object]", eventLog.ToString());
 
             List<object> list = (List<object>)eventLog.Values[0];
             Assert.Equal(3, list.Count);
@@ -128,7 +128,7 @@ namespace AdvancedSharpAdbClient.Logs.Tests
             Assert.Single(eventLog.Values);
             Assert.NotNull(eventLog.Values[0]);
             Assert.IsType<List<object>>(eventLog.Values[0]);
-            Assert.Equal($"15-11-16 09:48:40.000   707   707 0       : System.Collections.Generic.List`1[System.Object]", eventLog.ToString());
+            Assert.Equal($"{entry.TimeStamp.LocalDateTime:yy-MM-dd HH:mm:ss.fff}   707   707 0       : System.Collections.Generic.List`1[System.Object]", eventLog.ToString());
 
             List<object> list = (List<object>)eventLog.Values[0];
             Assert.Equal(3, list.Count);
