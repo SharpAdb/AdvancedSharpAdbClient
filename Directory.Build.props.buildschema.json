@@ -11,11 +11,6 @@
       "type": "bool",
       "defaultValue": "false"
     },
-    "IsStandard": {
-      "description": "Value indicating whether only target to .NET Standard",
-      "type": "bool",
-      "defaultValue": "false"
-    },
     "IsWindows": {
       "description": "Value indicating whether is running on Windows",
       "type": "bool"

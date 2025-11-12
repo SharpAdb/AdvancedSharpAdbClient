@@ -239,7 +239,7 @@ namespace AdvancedSharpAdbClient.Models
                     builder.AppendFormatted((int)State, "X");
                     builder.AppendFormatted(')');
                     break;
-            };
+            }
 
             if (!string.IsNullOrEmpty(Message))
             {

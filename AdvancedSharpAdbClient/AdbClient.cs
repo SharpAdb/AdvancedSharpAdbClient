@@ -390,7 +390,7 @@ namespace AdvancedSharpAdbClient
                 // break too soon in certain cases (about every 10 loops, so it appears to be a timing
                 // issue). Checking for reader.ReadLine() to return null appears to be much more robust
                 // -- one of the integration test fetches output 1000 times and found no truncations.
-                while (reader.ReadLine() != null) ;
+                while (reader.ReadLine() != null) { }
             }
             catch (Exception e)
             {
