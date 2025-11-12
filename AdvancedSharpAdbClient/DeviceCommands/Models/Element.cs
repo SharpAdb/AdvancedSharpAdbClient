@@ -248,7 +248,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Send text to device. Doesn't support Unicode.
         /// </summary>
         /// <param name="text">The text to send.</param>
         public void SendText(string text)
@@ -309,7 +309,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         }
 
         /// <summary>
-        /// Asynchronously send text to device. Doesn't support Russian.
+        /// Asynchronously send text to device. Doesn't support Unicode.
         /// </summary>
         /// <param name="text">The text to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>

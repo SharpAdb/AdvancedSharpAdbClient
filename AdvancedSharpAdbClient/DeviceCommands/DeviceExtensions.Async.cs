@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             new DeviceClient(client, device).SendKeyEventAsync(key, cancellationToken);
 
         /// <summary>
-        /// Asynchronously send text to device. Doesn't support Russian.
+        /// Asynchronously send text to device. Doesn't support Unicode.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>

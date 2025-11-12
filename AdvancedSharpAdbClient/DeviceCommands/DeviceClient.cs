@@ -369,7 +369,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
-        /// Send text to device. Doesn't support Russian.
+        /// Send text to device. Doesn't support Unicode.
         /// </summary>
         /// <param name="text">The text to send.</param>
         public void SendText(string text)
