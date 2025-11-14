@@ -3,11 +3,11 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdvancedSharpAdbClient.Models
@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents a device that is connected to the Android Debug Bridge.
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
-    public readonly partial struct DeviceData : IEquatable<DeviceData>
+    public sealed partial class DeviceData() : IEquatable<DeviceData>
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.
@@ -29,11 +29,11 @@ namespace AdvancedSharpAdbClient.Models
         private static readonly Regex Regex = DeviceDataRegex();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeviceData"/> struct based on
+        /// Initializes a new instance of the <see cref="DeviceData"/> class based on
         /// data retrieved from the Android Debug Bridge.
         /// </summary>
         /// <param name="data">The data retrieved from the Android Debug Bridge that represents a device.</param>
-        public DeviceData(string data)
+        public DeviceData(string data) : this()
         {
             Match match = Regex.Match(data);
             if (match.Success)
@@ -157,32 +157,34 @@ namespace AdvancedSharpAdbClient.Models
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is DeviceData other && Equals(other);
 
         /// <inheritdoc/>
-        public bool Equals(DeviceData other) =>
-            Serial == other.Serial
-                && State == other.State
-                && Model == other.Model
-                && Product == other.Product
-                && Name == other.Name
-                && Features == other.Features
-                && Usb == other.Usb
-                && TransportId == other.TransportId
-                && Message == other.Message;
+        public bool Equals([NotNullWhen(true)] DeviceData? other) =>
+            (object)this == other ||
+                (other is not null
+                    && Serial == other.Serial
+                    && State == other.State
+                    && Model == other.Model
+                    && Product == other.Product
+                    && Name == other.Name
+                    && Features == other.Features
+                    && Usb == other.Usb
+                    && TransportId == other.TransportId
+                    && Message == other.Message);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are equally.
         /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(DeviceData? left, DeviceData? right) => left.Equals(right);
+        /// <param name="left">The <see cref='DeviceData'/> class that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> class that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> class are equally; otherwise <see langword="false"/>.</returns>
+        public static bool operator ==(DeviceData? left, DeviceData? right) => EqualityComparer<DeviceData?>.Default.Equals(left, right);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are different.
         /// </summary>
-        /// <param name="left">The <see cref='DeviceData'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='DeviceData'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> structures are unequally; otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(DeviceData? left, DeviceData? right) => !left.Equals(right);
+        /// <param name="left">The <see cref='DeviceData'/> class that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='DeviceData'/> class that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> class are unequally; otherwise <see langword="false"/>.</returns>
+        public static bool operator !=(DeviceData? left, DeviceData? right) => !(left == right);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -208,63 +210,80 @@ namespace AdvancedSharpAdbClient.Models
                 return $"An empty {GetType()} without {nameof(TransportId)} and {nameof(Serial)}";
             }
 
-            StringBuilder builder =
-                new StringBuilder(Serial)
-                    .Append('\t');
+            DefaultInterpolatedStringHandler builder = new(55, 9);
+            builder.AppendLiteral(Serial);
+            builder.AppendFormatted('\t');
 
-            _ = State switch
+            switch(State)
             {
-                DeviceState.Online => builder.Append("device"),
-                DeviceState.NoPermissions => builder.Append("no permissions"),
-                DeviceState.Connecting
-                or DeviceState.Offline
-                or DeviceState.BootLoader
-                or DeviceState.Host
-                or DeviceState.Recovery
-                or DeviceState.Download
-                or DeviceState.Sideload
-                or DeviceState.Unauthorized
-                or DeviceState.Authorizing
-                or DeviceState.Unknown => builder.Append(State.ToString().ToLowerInvariant()),
-                _ => builder.AppendFormat("unknown({0:X})", (int)State),
-            };
+                case DeviceState.Online:
+                    builder.AppendLiteral("device");
+                    break;
+                case DeviceState.NoPermissions:
+                    builder.AppendLiteral("no permissions");
+                    break;
+                case DeviceState.Connecting
+                    or DeviceState.Offline
+                    or DeviceState.BootLoader
+                    or DeviceState.Host
+                    or DeviceState.Recovery
+                    or DeviceState.Download
+                    or DeviceState.Sideload
+                    or DeviceState.Unauthorized
+                    or DeviceState.Authorizing
+                    or DeviceState.Unknown:
+                    builder.AppendLiteral(State.ToString().ToLowerInvariant());
+                    break;
+                default:
+                    builder.AppendLiteral("unknown(");
+                    builder.AppendFormatted((int)State, "X");
+                    builder.AppendFormatted(')');
+                    break;
+            }
 
             if (!string.IsNullOrEmpty(Message))
             {
-                _ = builder.Append(' ').Append(Message);
+                builder.AppendFormatted(' ');
+                builder.AppendLiteral(Message);
             }
 
             if (!string.IsNullOrEmpty(Usb))
             {
-                _ = builder.Append(" usb:").Append(Usb);
+                builder.AppendLiteral(" usb:");
+                builder.AppendLiteral(Usb);
             }
 
             if (!string.IsNullOrEmpty(Product))
             {
-                _ = builder.Append(" product:").Append(Product);
+                builder.AppendLiteral(" product:");
+                builder.AppendLiteral(Product);
             }
 
             if (!string.IsNullOrEmpty(Model))
             {
-                _ = builder.Append(" model:").Append(Model);
+                builder.AppendLiteral(" model:");
+                builder.AppendLiteral(Model);
             }
 
             if (!string.IsNullOrEmpty(Name))
             {
-                _ = builder.Append(" device:").Append(Name);
+                builder.AppendLiteral(" device:");
+                builder.AppendLiteral(Name);
             }
 
             if (Features?.Length > 0)
             {
-                _ = builder.Append(" features:").Append(StringExtensions.Join(',', Features));
+                builder.AppendLiteral(" features:");
+                builder.AppendLiteral(string.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
             {
-                _ = builder.Append(" transport_id:").Append(TransportId);
+                builder.AppendLiteral(" transport_id:");
+                builder.AppendLiteral(TransportId);
             }
 
-            return builder.ToString();
+            return builder.ToStringAndClear();
         }
 
         /// <summary>
@@ -274,13 +293,14 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="paramName">The name of the parameter with which <paramref name="device"/> corresponds.</param>
         /// <returns>The <paramref name="device"/> parameter, if it is valid.</returns>
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="device"/> does not have a valid serial number.</exception>
-        public static ref DeviceData EnsureDevice(ref DeviceData device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
+        public static DeviceData EnsureDevice([NotNull] DeviceData? device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
         {
+            ArgumentNullException.ThrowIfNull(device, paramName);
             if (device.IsEmpty)
             {
-                throw new ArgumentOutOfRangeException(nameof(device), "You must specific a transport ID or serial number for the device");
+                throw new ArgumentOutOfRangeException(paramName, "You must specific a transport ID or serial number for the device");
             }
-            return ref device;
+            return device;
         }
 
         /// <summary>
@@ -301,7 +321,7 @@ namespace AdvancedSharpAdbClient.Models
                 return DeviceState.NoPermissions;
             }
             // Else, we try to match a value of the DeviceState enumeration.
-            else if (EnumExtensions.TryParse(state, true, out DeviceState value))
+            else if (Enum.TryParse(state, true, out DeviceState value))
             {
                 return value;
             }
@@ -316,81 +336,64 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>The value of the <see cref="DebuggerDisplayAttribute"/> for this instance.</returns>
         private string GetDebuggerDisplay()
         {
-            StringBuilder builder =
-                new StringBuilder(nameof(DeviceData))
-                    .Append(" { ");
+            DefaultInterpolatedStringHandler builder = new(113, 9);
+            builder.AppendFormatted(GetType());
+            builder.AppendLiteral($" {{ ");
 
             if (!string.IsNullOrEmpty(Serial))
             {
-                _ = builder
-                    .Append(nameof(Serial))
-                    .Append(" = ")
-                    .Append(Serial)
-                    .Append(", ");
+                builder.AppendLiteral($"{nameof(Serial)} = ");
+                builder.AppendLiteral(Serial);
+                builder.AppendLiteral(", ");
             }
 
-            _ = builder
-                .Append(nameof(State))
-                .Append(" = ")
-                .Append(State);
+            builder.AppendLiteral($"{nameof(State)} = ");
+            builder.AppendFormatted(State);
 
             if (!string.IsNullOrEmpty(Message))
             {
-                _ = builder
-                    .Append(nameof(Message))
-                    .Append(" = ")
-                    .Append(Message);
+                builder.AppendLiteral($"{nameof(Message)} = ");
+                builder.AppendLiteral(Message);
             }
 
             if (!string.IsNullOrEmpty(Usb))
             {
-                _ = builder
-                    .Append(nameof(Usb))
-                    .Append(" = ")
-                    .Append(Usb);
+                builder.AppendLiteral($"{nameof(Usb)} = ");
+                builder.AppendLiteral(Usb);
             }
 
             if (!string.IsNullOrEmpty(Product))
             {
-                _ = builder
-                    .Append(nameof(Product))
-                    .Append(" = ")
-                    .Append(Product);
+                builder.AppendLiteral($"{nameof(Product)} = ");
+                builder.AppendLiteral(Product);
             }
 
             if (!string.IsNullOrEmpty(Model))
             {
-                _ = builder
-                    .Append(nameof(Model))
-                    .Append(" = ")
-                    .Append(Model);
+                builder.AppendLiteral($"{nameof(Model)} = ");
+                builder.AppendLiteral(Model);
             }
 
             if (!string.IsNullOrEmpty(Name))
             {
-                _ = builder
-                    .Append(nameof(Name))
-                    .Append(" = ")
-                    .Append(Name);
+                builder.AppendLiteral($"{nameof(Name)} = ");
+                builder.AppendLiteral(Name);
             }
 
             if (Features?.Length > 0)
             {
-                _ = builder
-                    .Append(nameof(Features))
-                    .Append(" = ")
-                    .Append(Features);
+                builder.AppendLiteral($"{nameof(Features)} = ");
+                builder.AppendLiteral(string.Join(',', Features));
             }
 
             if (!string.IsNullOrEmpty(TransportId))
             {
-                _ = builder
-                    .Append(nameof(TransportId))
-                    .Append(" = ")
-                    .Append(TransportId);
+                builder.AppendLiteral($"{nameof(TransportId)} = ");
+                builder.AppendLiteral(TransportId);
             }
 
-            return builder.Append(" }").ToString();
+            builder.AppendLiteral(" }");
+            return builder.ToStringAndClear();
         }
 
 #if NET7_0_OR_GREATER

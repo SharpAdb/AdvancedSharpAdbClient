@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace AdvancedSharpAdbClient
 {
@@ -41,7 +40,7 @@ namespace AdvancedSharpAdbClient
     /// }
     /// </code>
     /// </example>
-    [DebuggerDisplay($"{nameof(SyncService)} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(IsOpen)} = {{{nameof(IsOpen)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(MaxBufferSize)} = {{{nameof(MaxBufferSize)}}} }}")]
     public partial class SyncService : ISyncService, ICloneable<SyncService>, ICloneable
 #if HAS_WINRT
         , ISyncService.IWinRT
@@ -100,7 +99,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to interact with the files.</param>
         public SyncService(IAdbSocket socket, DeviceData device)
         {
-            Device = DeviceData.EnsureDevice(ref device);
+            Device = DeviceData.EnsureDevice(device);
             Socket = socket ?? throw new ArgumentNullException(nameof(socket));
             Open();
         }
@@ -150,8 +149,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(stream);
-            ExceptionExtensions.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
             {
@@ -210,7 +209,7 @@ namespace AdvancedSharpAdbClient
                     Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                     // now send the data to the device
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     Socket.Send(buffer.AsSpan(startPosition, read + dataBytes.Length + lengthBytes.Length));
 #else
                     Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
@@ -248,8 +247,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(remoteFilePath);
-            ExceptionExtensions.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remoteFilePath);
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (IsOutdate) { Reopen(); }
 
@@ -292,11 +291,14 @@ namespace AdvancedSharpAdbClient
                     }
 
                     // now read the length we received
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     _ = Socket.Read(buffer.AsSpan(0, size));
-                    stream.Write(buffer.AsSpan(0, size));
 #else
                     _ = Socket.Read(buffer, size);
+#endif
+#if HAS_BUFFERS
+                    stream.Write(buffer.AsSpan(0, size));
+#else
                     stream.Write(buffer, 0, size);
 #endif
                     totalBytesRead += size;
@@ -403,18 +405,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(SyncService))
-                .Append(" { ")
-                .Append(nameof(Socket))
-                .Append(" = ")
-                .Append(Socket)
-                .Append(", ")
-                .Append(nameof(Device))
-                .Append(" = ")
-                .Append(Device)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Socket)} = {Socket}, {nameof(Device)} = {Device} }}";
 
         /// <summary>
         /// Creates a new <see cref="SyncService"/> object that is a copy of the current instance with new <see cref="Device"/>.
@@ -438,7 +429,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected FileStatistics ReadStatistics()
         {
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             Span<byte> statResult = stackalloc byte[12];
             _ = Socket.Read(statResult);
             return EnumerableBuilder.FileStatisticsCreator(statResult);
@@ -450,7 +441,7 @@ namespace AdvancedSharpAdbClient
             {
                 FileMode = (UnixFileStatus)ReadInt32(statResult),
                 Size = ReadInt32(statResult),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(statResult))
             };
             int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
 #endif

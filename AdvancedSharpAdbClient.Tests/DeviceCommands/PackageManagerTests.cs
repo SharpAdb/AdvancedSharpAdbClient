@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, default));
             _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(null, new DeviceData { Serial = "169.254.109.177:5555" }));
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new PackageManager(Substitute.For<IAdbClient>(), default));
+            _ = Assert.Throws<ArgumentNullException>(() => new PackageManager(Substitute.For<IAdbClient>(), default));
         }
 
         [Theory]
@@ -255,6 +255,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             VersionInfo versionInfo = manager.GetVersionInfo("com.google.android.gms");
             Assert.Equal(11062448, versionInfo.VersionCode);
             Assert.Equal("11.0.62 (448-160311229)", versionInfo.VersionName);
+        }
+
+        [Fact]
+        public void ToStringTest()
+        {
+            DummyAdbClient client = new();
+            PackageManager manager = new(client, Device, skipInit: true);
+            Assert.Equal($"{typeof(PackageManager)} {{ {nameof(PackageManager.Device)} = {Device}, {nameof(PackageManager.AdbClient)} = {client} }}", manager.ToString());
         }
 
         private struct InstallProgress(params PackageInstallProgressState[] states) : IProgress<InstallProgressEventArgs>

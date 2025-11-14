@@ -66,6 +66,16 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbClient.FormAdbRequest(ReadOnlySpan{char})"/> method.
+        /// </summary>
+        [Fact]
+        public void FormAdbRequestSpanTest()
+        {
+            Assert.Equal("0009host:kill"u8, AdbClient.FormAdbRequest("host:kill".AsSpan()));
+            Assert.Equal("000Chost:version"u8, AdbClient.FormAdbRequest("host:version".AsSpan()));
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(string, int)"/> method.
         /// </summary>
         [Fact]
@@ -73,6 +83,16 @@ namespace AdvancedSharpAdbClient.Tests
         {
             Assert.Equal("0008tcp:1984"u8, AdbClient.CreateAdbForwardRequest(null, 1984));
             Assert.Equal("0012tcp:1981:127.0.0.1"u8, AdbClient.CreateAdbForwardRequest("127.0.0.1", 1981));
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.CreateAdbForwardRequest(ReadOnlySpan{char}, int)"/> method.
+        /// </summary>
+        [Fact]
+        public void CreateAdbForwardRequestSpanTest()
+        {
+            Assert.Equal("0008tcp:1984"u8, AdbClient.CreateAdbForwardRequest([], 1984));
+            Assert.Equal("0012tcp:1981:127.0.0.1"u8, AdbClient.CreateAdbForwardRequest("127.0.0.1".AsSpan(), 1981));
         }
 
         /// <summary>
@@ -1139,7 +1159,7 @@ namespace AdvancedSharpAdbClient.Tests
         public void CloneTest()
         {
             Assert.True(TestClient is ICloneable<IAdbClient>);
-#if WINDOWS10_0_18362_0_OR_GREATER
+#if WINDOWS10_0_17763_0_OR_GREATER
             Assert.True(TestClient is ICloneable<IAdbClient.IWinRT>);
 #endif
             AdbClient client = TestClient.Clone();
@@ -1147,6 +1167,16 @@ namespace AdvancedSharpAdbClient.Tests
             DnsEndPoint endPoint = new("localhost", 5555);
             client = TestClient.Clone(endPoint);
             Assert.Equal(endPoint, client.EndPoint);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbClient.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            AdbClient adbClient = new();
+            Assert.Equal($"The {typeof(AdbClient)} communicate with adb server at '127.0.0.1:5037'.", adbClient.ToString());
         }
 
         private void RunConnectTest(Action test, string connectString)

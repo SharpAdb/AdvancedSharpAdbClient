@@ -3,7 +3,6 @@
 // </copyright>
 
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -43,7 +42,12 @@ namespace AdvancedSharpAdbClient
     /// Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
     /// </c>
     /// </remarks>
-    [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc;
+    internal abstract class NamespaceDoc
+    {
+        /// <summary>
+        /// The name of the namespace <see cref="AdvancedSharpAdbClient"/>.
+        /// </summary>
+        public const string Name = nameof(AdvancedSharpAdbClient);
+    }
 }

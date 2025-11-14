@@ -4,6 +4,6 @@
     {
         public ILogger CreateLogger(string categoryName) => new DummyLogger(categoryName);
 
-        public ILogger<T> CreateLogger<T>() => new DummyLogger<T>();
+        public ILogger<T> CreateLogger<T>() where T : allows ref struct => new DummyLogger<T>();
     }
 }

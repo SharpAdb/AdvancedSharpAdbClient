@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -15,7 +16,7 @@ namespace AdvancedSharpAdbClient.Receivers
     /// fetch the console output that was received, used the <see cref="ToString"/> method.
     /// </summary>
     /// <param name="logger">The logger to use when logging.</param>
-    [DebuggerDisplay($"{nameof(ConsoleOutputReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}}, {nameof(Output)} = {{{nameof(Output)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}}, {nameof(Output)} = {{{nameof(Output)}}} }}")]
     public partial class ConsoleOutputReceiver(ILogger<ConsoleOutputReceiver>? logger = null) : MultiLineReceiver
     {
         /// <summary>

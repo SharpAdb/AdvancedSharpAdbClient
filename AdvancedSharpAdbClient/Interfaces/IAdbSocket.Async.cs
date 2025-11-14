@@ -134,18 +134,14 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="AdbResponse"/> object that represents the response from the Android Debug Bridge.</returns>
         Task<AdbResponse> ReadAdbResponseAsync(CancellationToken cancellationToken);
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously sends the specified number of bytes of data to a <see cref="IAdbSocket"/>,
         /// </summary>
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
-#if COMP_NETSTANDARD2_1
-            => new(SendAsync(data.ToArray(), cancellationToken))
-#endif
-            ;
+        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default) => new(SendAsync(data.ToArray(), data.Length, cancellationToken));
 
         /// <summary>
         /// Asynchronously receives data from a <see cref="IAdbSocket"/> into a receive buffer.
@@ -155,22 +151,14 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="ValueTask{Int32}"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
         public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
-#if COMP_NETSTANDARD2_1
         {
             byte[] bytes = new byte[data.Length];
-            return new(ReadAsync(bytes, cancellationToken).ContinueWith(x =>
+            return new(ReadAsync(bytes, bytes.Length, cancellationToken).ContinueWith(x =>
             {
-                int length = x.Result;
-                for (int i = 0; i < length; i++)
-                {
-                    data.Span[i] = bytes[i];
-                }
-                return length;
+                bytes.CopyTo(data);
+                return x.Result;
             }));
         }
-#else
-            ;
-#endif
 #endif
 
         /// <summary>

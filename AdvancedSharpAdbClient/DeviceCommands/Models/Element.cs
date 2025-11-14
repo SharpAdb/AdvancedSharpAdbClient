@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// <summary>
     /// Implement of screen element, likes Selenium.
     /// </summary>
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Bounds)} = {{{nameof(Bounds)}}}, {nameof(Class)} = {{{nameof(Class)}}}, {nameof(Text)} = {{{nameof(Text)}}}, {nameof(Package)} = {{{nameof(Package)}}}, {nameof(Device)} = {{{nameof(Device)}}} }}")]
     public class Element : IEquatable<Element>
     {
         /// <summary>
@@ -90,15 +92,12 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <param name="client">The current ADB client that manages the connection.</param>
         /// <param name="device">The current device containing the element.</param>
         /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Element(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode)
         {
             Client = client;
             Device = device;
 
-            ExceptionExtensions.ThrowIfNull(xmlNode);
+            ArgumentNullException.ThrowIfNull(xmlNode);
             XmlDocument doc = new();
             doc.LoadXml(xmlNode.GetXml());
             Node = doc.FirstChild;
@@ -219,9 +218,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <param name="device">The current device containing the element.</param>
         /// <param name="xmlNode">The <see cref="Windows.Data.Xml.Dom.IXmlNode"/> of the element.</param>
         /// <returns>The new <see cref="Element"/> that this method creates.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static Element? FromIXmlNode(IAdbClient client, DeviceData device, Windows.Data.Xml.Dom.IXmlNode xmlNode) =>
             xmlNode.Attributes?.GetNamedItem("bounds") != null ? new Element(client, device, xmlNode) : null;
 #endif
@@ -431,7 +427,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <inheritdoc/>
         public bool Equals([NotNullWhen(true)] Element? other) =>
             (object?)this == other ||
-                (other != (object?)null
+                (other is not null
                 && EqualityComparer<IAdbClient>.Default.Equals(Client, other.Client)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device)
                 && (Node == null
@@ -445,17 +441,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <summary>
         /// Tests whether two <see cref='Element'/> objects are equally.
         /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the equality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the equality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are equally; otherwise <see langword="false"/>.</returns>
+        /// <param name="left">The <see cref='Element'/> class that is to the left of the equality operator.</param>
+        /// <param name="right">The <see cref='Element'/> class that is to the right of the equality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> class are equally; otherwise <see langword="false"/>.</returns>
         public static bool operator ==(Element? left, Element? right) => (object?)left == right || (left?.Equals(right) ?? false);
 
         /// <summary>
         /// Tests whether two <see cref='Element'/> objects are different.
         /// </summary>
-        /// <param name="left">The <see cref='Element'/> structure that is to the left of the inequality operator.</param>
-        /// <param name="right">The <see cref='Element'/> structure that is to the right of the inequality operator.</param>
-        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> structures are unequally; otherwise <see langword="false"/>.</returns>
+        /// <param name="left">The <see cref='Element'/> class that is to the left of the inequality operator.</param>
+        /// <param name="right">The <see cref='Element'/> class that is to the right of the inequality operator.</param>
+        /// <returns>This operator returns <see langword="true"/> if the two <see cref="Element"/> class are unequally; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(Element? left, Element? right) => !(left == right);
 
         /// <inheritdoc/>

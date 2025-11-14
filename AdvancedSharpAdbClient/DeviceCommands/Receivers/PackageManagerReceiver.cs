@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -11,7 +12,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// Parses the output of the various <c>pm</c> commands.
     /// </summary>
     /// <param name="packageManager">The parent package manager.</param>
-    [DebuggerDisplay($"{nameof(PackageManagerReceiver)} \\{{ {nameof(PackageManager)} = {{{nameof(PackageManager)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(PackageManager)} = {{{nameof(PackageManager)}}} }}")]
     public class PackageManagerReceiver(PackageManager packageManager) : MultiLineReceiver
     {
         /// <summary>
@@ -31,7 +32,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 
             foreach (string line in lines)
             {
-                if (line != null && line.StartsWith("package:"))
+                if (line?.StartsWith("package:") == true)
                 {
                     // Samples include:
                     // package:/system/app/LegacyCamera.apk=com.android.camera

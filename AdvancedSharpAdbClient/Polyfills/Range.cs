@@ -104,4 +104,7 @@ namespace System
 #endif
     }
 }
+#elif COMP_NETSTANDARD2_1
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Index))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Range))]
 #endif

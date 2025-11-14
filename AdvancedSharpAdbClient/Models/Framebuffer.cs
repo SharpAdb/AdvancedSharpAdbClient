@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -18,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="device">The device for which to fetch the frame buffer.</param>
     /// <param name="endPoint">The <see cref="EndPoint"/> at which the adb server is listening.</param>
     /// <param name="adbSocketFactory">The <see cref="Func{EndPoint, IAdbSocket}"/> to create <see cref="IAdbSocket"/>.</param>
-    [DebuggerDisplay($"{nameof(Framebuffer)} \\{{ {nameof(Header)} = {{{nameof(Header)}}}, {nameof(Data)} = {{{nameof(Data)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Header)} = {{{nameof(Header)}}}, {nameof(Data)} = {{{nameof(Data)}}}, {nameof(Device)} = {{{nameof(Device)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}} }}")]
     public sealed partial class Framebuffer(DeviceData device, EndPoint endPoint, Func<EndPoint, IAdbSocket> adbSocketFactory) : IDisposable, ICloneable<Framebuffer>, ICloneable
     {
         /// <summary>
@@ -79,7 +78,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the device for which to fetch the frame buffer.
         /// </summary>
-        public DeviceData Device { get; } = DeviceData.EnsureDevice(ref device);
+        public DeviceData Device { get; } = DeviceData.EnsureDevice(device);
 
         /// <summary>
         /// Gets the <see cref="System.Net.EndPoint"/> at which the adb server is listening.
@@ -141,7 +140,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // followed by the actual framebuffer content
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             _ = socket.Read(Data.AsSpan(0, (int)Header.Size));
 #else
             _ = socket.Read(Data, (int)Header.Size);
@@ -193,7 +192,7 @@ namespace AdvancedSharpAdbClient.Models
             }
 
             // followed by the actual framebuffer content
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             _ = await socket.ReadAsync(Data.AsMemory(0, (int)Header.Size), cancellationToken).ConfigureAwait(false);
 #else
             _ = await socket.ReadAsync(Data, (int)Header.Size, cancellationToken).ConfigureAwait(false);
@@ -240,9 +239,6 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Task<WriteableBitmap?> ToBitmapAsync(CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
@@ -255,9 +251,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="dispatcher">The target <see cref="CoreDispatcher"/> to invoke the code on.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>An <see cref="WriteableBitmap"/> which represents the framebuffer data.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Task<WriteableBitmap?> ToBitmapAsync(CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
@@ -282,18 +275,7 @@ namespace AdvancedSharpAdbClient.Models
 #endif
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(Framebuffer))
-                .Append(" { ")
-                .Append(nameof(Header))
-                .Append(" = ")
-                .Append(Header)
-                .Append(", ")
-                .Append(nameof(Data))
-                .Append(" = ")
-                .Append(Data)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Header)} = {Header}, {nameof(Data)} = {Data} }}";
 
         /// <inheritdoc/>
         private void Dispose(bool disposing)
@@ -335,6 +317,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Throws an exception if this <see cref="Framebuffer"/> has been disposed.
         /// </summary>
-        private void EnsureNotDisposed() => ExceptionExtensions.ThrowIf(disposed, this);
+        private void EnsureNotDisposed() => ObjectDisposedException.ThrowIf(disposed, this);
     }
 }

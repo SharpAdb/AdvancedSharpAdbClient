@@ -5,11 +5,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Security.Cryptography;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -48,7 +46,7 @@ namespace AdvancedSharpAdbClient
             int status = await RunAdbProcessInnerAsync(command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
             if (errorOutput.Count > 0)
             {
-                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                string error = string.Join(Environment.NewLine, errorOutput!);
                 throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
             }
             else
@@ -76,14 +74,11 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
-        public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? TaskExExtensions.FromResult(true) :
+        public virtual Task<bool> CheckAdbFileExistsAsync(string adbPath, CancellationToken cancellationToken = default) => adbPath == "adb" ? Task.FromResult(true) :
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AsTask(cancellationToken).ContinueWith(x => x.Result != null && x.Result.IsOfType(StorageItemTypes.File));
 #else
-            TaskExExtensions.FromResult(File.Exists(adbPath));
+            Task.FromResult(File.Exists(adbPath));
 #endif
 
         /// <summary>
@@ -119,7 +114,7 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Use this command only for <c>adb</c> commands that return immediately, such as <c>adb version</c>.</remarks>
         protected async Task<int> RunAdbProcessInnerAsync(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(command);
+            ArgumentNullException.ThrowIfNull(command);
             return await RunProcessAsync(AdbPath, command, errorOutput, standardOutput, cancellationToken).ConfigureAwait(false);
         }
 
@@ -145,24 +140,30 @@ namespace AdvancedSharpAdbClient
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = errorOutput != null,
+                RedirectStandardOutput = standardOutput != null
             };
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
 
             using (CancellationTokenRegistration registration = cancellationToken.Register(process.Kill))
             {
-                string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-                string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                if (errorOutput != null)
+                {
+                    string standardErrorString = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                    errorOutput.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                }
 
-                errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-                standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            }
+                if (standardOutput != null)
+                {
+                    string standardOutputString = await process.StandardOutput.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+                    standardOutput.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+                }
 
-            if (!process.HasExited)
-            {
-                process.Kill();
+                if (!process.HasExited)
+                {
+                    await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
             // get the return code from the process

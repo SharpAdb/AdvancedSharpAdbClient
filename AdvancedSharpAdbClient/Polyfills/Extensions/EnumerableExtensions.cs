@@ -28,8 +28,8 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="collection"/> is null.</exception>
         public static void AddRange<TSource>(this ICollection<TSource> source, params IEnumerable<TSource> collection)
         {
-            ExceptionExtensions.ThrowIfNull(source);
-            ExceptionExtensions.ThrowIfNull(collection);
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(collection);
 
             if (source is List<TSource> list)
             {
@@ -71,30 +71,13 @@ namespace AdvancedSharpAdbClient.Polyfills
 
 #if COMP_NETSTANDARD2_1
         /// <summary>
-        /// Asynchronously creates a <see cref="List{T}"/> from an <see cref="IAsyncEnumerable{T}"/>.
-        /// </summary>
-        /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
-        /// <param name="source">The <see cref="IAsyncEnumerable{T}"/> to create a <see cref="List{T}"/> from.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
-        /// <returns>A <see cref="Task{List}"/> which returns a <see cref="List{T}"/> that contains elements from the input sequence.</returns>
-        public static async ValueTask<List<TSource>> ToListAsync<TSource>(this IAsyncEnumerable<TSource> source, CancellationToken cancellationToken = default)
-        {
-            List<TSource> list = [];
-            await foreach (TSource item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
-            {
-                list.Add(item);
-            }
-            return list;
-        }
-
-        /// <summary>
         /// Returns the input typed as <see cref="IAsyncEnumerable{TSource}"/>.
         /// </summary>
         /// <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
-        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this IEnumerable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public static async IAsyncEnumerable<TSource> ToAsyncEnumerable<TSource>(this IEnumerable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using IEnumerator<TSource> enumerator = source.GetEnumerator();
             while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())
@@ -111,7 +94,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="source">The sequence to type as <see cref="IAsyncEnumerable{TSource}"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The input sequence typed as <see cref="IAsyncEnumerable{TSource}"/>.</returns>
-        public static async IAsyncEnumerable<TSource> AsEnumerableAsync<TSource>(this Task<IEnumerable<TSource>> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public static async IAsyncEnumerable<TSource> ToAsyncEnumerable<TSource>(this Task<IEnumerable<TSource>> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             using IEnumerator<TSource> enumerator = await source.ContinueWith(x => x.Result.GetEnumerator()).ConfigureAwait(false);
             while (!cancellationToken.IsCancellationRequested && enumerator.MoveNext())

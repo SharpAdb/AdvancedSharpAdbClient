@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsCreator))]
 #endif
-    [DebuggerDisplay($"{nameof(FileStatistics)} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileMode)} = {{{nameof(FileMode)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileMode)} = {{{nameof(FileMode)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
     public struct FileStatistics : IEquatable<FileStatistics>
     {
         /// <summary>
@@ -99,6 +99,6 @@ namespace AdvancedSharpAdbClient.Models
         public override readonly int GetHashCode() => HashCode.Combine(Path, FileMode, Size, Time);
 
         /// <inheritdoc/>
-        public override readonly string ToString() => StringExtensions.Join('\t', FileMode.ToPermissionCode(), Size, Time, Path);
+        public override readonly string ToString() => string.Join('\t', FileMode.ToPermissionCode()!, Size, Time, Path!);
     }
 }

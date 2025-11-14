@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient
@@ -24,7 +25,7 @@ namespace AdvancedSharpAdbClient
     /// </summary>
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
-    [DebuggerDisplay($"{nameof(AdbSocket)} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(Socket)} = {{{nameof(Socket)}}} }}")]
     public partial class AdbSocket(ITcpSocket socket, ILogger<AdbSocket>? logger = null) : IAdbSocket, ICloneable<AdbSocket>, ICloneable
     {
         /// <summary>
@@ -160,7 +161,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public void SendSyncRequest(SyncCommand command, string path)
         {
-            ExceptionExtensions.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             SendSyncRequest(command, pathBytes.Length);
             _ = Write(pathBytes);
@@ -197,30 +198,32 @@ namespace AdvancedSharpAdbClient
             }
         }
 
+#if NET10_0_OR_GREATER
         /// <inheritdoc/>
-        public virtual int Read(byte[] data) =>
-#if HAS_BUFFERS
-            Read(data.AsSpan());
-#else
-            Read(data, 0, data.Length);
+        public void SendAdbRequest(DefaultInterpolatedStringHandler request)
+        {
+            byte[] data = AdbClient.FormAdbRequest(request.Text);
+            if (!Write(data))
+            {
+                throw new IOException($"Failed sending the request '{request.Text}' to ADB");
+            }
+        }
 #endif
 
         /// <inheritdoc/>
-        public virtual int Read(byte[] data, int length) =>
-#if HAS_BUFFERS
-            Read(data.AsSpan(0, length));
-#else
-            Read(data, 0, length);
-#endif
+        public virtual int Read(byte[] data) => Read(data, 0, data.Length);
+
+        /// <inheritdoc/>
+        public virtual int Read(byte[] data, int length) => Read(data, 0, length);
 
         /// <inheritdoc/>
         public virtual int Read(byte[] data, int offset, int length)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-            ExceptionExtensions.ThrowIfNegative(offset);
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentOutOfRangeException.ThrowIfNegative(offset);
 
             length = length != -1 ? length : data.Length;
-            ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
+            ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
             int totalRead = offset;
@@ -328,7 +331,7 @@ namespace AdvancedSharpAdbClient
             return response;
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
         public virtual void Send(ReadOnlySpan<byte> data)
         {
@@ -399,7 +402,7 @@ namespace AdvancedSharpAdbClient
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
-            if (device != null)
+            if (!device.IsEmpty)
             {
                 if (uint.TryParse(device.TransportId, out uint tid))
                 {
@@ -449,7 +452,7 @@ namespace AdvancedSharpAdbClient
             return true;
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Write until all data in "data" is written or the connection fails or times out.
         /// </summary>
@@ -554,14 +557,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(AdbSocket))
-                .Append(" { ")
-                .Append(nameof(Socket))
-                .Append(" = ")
-                .Append(Socket)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Socket)} = {Socket} }}";
 
         /// <inheritdoc/>
         public void Close() => Socket.Dispose();

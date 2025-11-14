@@ -18,7 +18,7 @@ namespace AdvancedSharpAdbClient.Logs
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.LogEntryCreator))]
 #endif
-    [DebuggerDisplay($"{nameof(AndroidLogEntry)} \\{{ {nameof(PayloadLength)} = {{{nameof(PayloadLength)}}}, {nameof(HeaderSize)} = {{{nameof(HeaderSize)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(ThreadId)} = {{{nameof(ThreadId)}}}, {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(NanoSeconds)} = {{{nameof(NanoSeconds)}}}, {nameof(Id)} = {{{nameof(Id)}}}, {nameof(Uid)} = {{{nameof(Uid)}}}, {nameof(Data)} = {{{nameof(Data)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(PayloadLength)} = {{{nameof(PayloadLength)}}}, {nameof(HeaderSize)} = {{{nameof(HeaderSize)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}}, {nameof(ThreadId)} = {{{nameof(ThreadId)}}}, {nameof(TimeStamp)} = {{{nameof(TimeStamp)}}}, {nameof(NanoSeconds)} = {{{nameof(NanoSeconds)}}}, {nameof(Id)} = {{{nameof(Id)}}}, {nameof(Uid)} = {{{nameof(Uid)}}}, {nameof(Data)} = {{{nameof(Data)}}} }}")]
     public class LogEntry
     {
         /// <summary>

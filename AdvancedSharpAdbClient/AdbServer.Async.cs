@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Task<StartServerResult> RestartServerAsync(string adbPath, CancellationToken cancellationToken = default) =>
-            StringExtensions.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
+            string.IsNullOrWhiteSpace(adbPath) ? RestartServerAsync(cancellationToken) : StartServerAsync(adbPath, true, cancellationToken);
 
         /// <inheritdoc/>
         public async Task StopServerAsync(CancellationToken cancellationToken = default)

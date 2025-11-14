@@ -38,7 +38,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <returns>The combined path.</returns>
         public static string Combine(params string[] paths)
         {
-            ExceptionExtensions.ThrowIfNull(paths);
+            ArgumentNullException.ThrowIfNull(paths);
 
             int capacity = 0;
             int num2 = 0;
@@ -208,7 +208,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The path.</param>
         internal static void CheckInvalidPathChars(string path)
         {
-            ExceptionExtensions.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(path);
 
             if (path.ToCharArray().Any(c => c < 0x20 || InvalidCharacters.Contains(c)))
             {

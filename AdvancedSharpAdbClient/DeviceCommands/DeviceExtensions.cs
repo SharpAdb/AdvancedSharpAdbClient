@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Xml;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
@@ -290,9 +290,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -309,9 +306,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -328,9 +322,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -386,9 +377,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -405,9 +393,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -424,9 +409,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
         {
             PackageManager manager = new(client, device, skipInit: true);
@@ -567,19 +549,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             // Doing cat on each file one by one takes too much time. Doing cat on all of them at the same time doesn't work
             // either, because the command line would be too long.
             // So we do it 25 processes at at time.
-            StringBuilder catBuilder = new();
+            DefaultInterpolatedStringHandler catBuilder = new(3, pids.Count);
             ProcessOutputReceiver processOutputReceiver = new();
 
-            _ = catBuilder.Append("cat");
+            catBuilder.AppendLiteral("cat");
 
             for (int i = 0; i < pids.Count; i++)
             {
-                _ = catBuilder.Append(" /proc/").Append(pids[i]).Append("/cmdline /proc/").Append(pids[i]).Append("/stat");
+                catBuilder.AppendLiteral(" /proc/");
+                catBuilder.AppendFormatted(pids[i]);
+                catBuilder.AppendLiteral("/cmdline /proc/");
+                catBuilder.AppendFormatted(pids[i]);
+                catBuilder.AppendLiteral("/stat");
 
                 if (i > 0 && (i % 25 == 0 || i == pids.Count - 1))
                 {
-                    client.ExecuteShellCommand(device, catBuilder.ToString(), processOutputReceiver);
-                    _ = catBuilder.Clear().Append("cat");
+                    client.ExecuteShellCommand(device, catBuilder.ToStringAndClear(), processOutputReceiver);
+                    catBuilder.AppendLiteral("cat");
                 }
             }
 

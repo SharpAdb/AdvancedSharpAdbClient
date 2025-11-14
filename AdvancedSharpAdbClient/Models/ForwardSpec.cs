@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <summary>
     /// Represents an adb forward specification as used by the various adb port forwarding functions.
     /// </summary>
-    [DebuggerDisplay($"{nameof(ForwardSpec)} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
     public readonly struct ForwardSpec : IEquatable<ForwardSpec>
     {
         /// <summary>
@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="spec">A <see cref="string"/> which represents a <see cref="ForwardSpec"/>.</param>
         public ForwardSpec(string spec)
         {
-            ExceptionExtensions.ThrowIfNull(spec);
+            ArgumentNullException.ThrowIfNull(spec);
 
             string[] parts = spec.Split(':', 2, StringSplitOptions.RemoveEmptyEntries);
 

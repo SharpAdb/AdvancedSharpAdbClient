@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.AdbCommandLineStatusCreator))]
 #endif
-    [DebuggerDisplay($"{nameof(AdbServerStatus)} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
     public readonly partial record struct AdbCommandLineStatus(Version? AdbVersion, string? FileVersion, string? FilePath)
     {
         /// <summary>
@@ -149,7 +149,7 @@ namespace AdvancedSharpAdbClient.Models
         }
 
         /// <inheritdoc/>
-        public override string ToString() => string.Join(Environment.NewLine, (string[])[.. this]);
+        public override string ToString() => string.Join(Environment.NewLine, [.. this]);
 
 #if NET7_0_OR_GREATER
         [GeneratedRegex(VersionPattern)]

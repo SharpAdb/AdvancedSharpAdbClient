@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Models
     /// The response returned by ADB server.
     /// </summary>
     /// <param name="message">the message of <see cref="AdbResponse"/>.</param>
-    [DebuggerDisplay($"{nameof(AdbResponse)} \\{{ {nameof(IOSuccess)} = {{{nameof(IOSuccess)}}}, {nameof(Okay)} = {{{nameof(Okay)}}}, {nameof(Timeout)} = {{{nameof(Timeout)}}}, {nameof(Message)} = {{{nameof(Message)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(IOSuccess)} = {{{nameof(IOSuccess)}}}, {nameof(Okay)} = {{{nameof(Okay)}}}, {nameof(Timeout)} = {{{nameof(Timeout)}}}, {nameof(Message)} = {{{nameof(Message)}}} }}")]
     public readonly struct AdbResponse(string message) : IEquatable<AdbResponse>
     {
         /// <summary>

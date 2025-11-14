@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes command line output of the <c>dumpsys package</c> command.
     /// </summary>
-    [DebuggerDisplay($"{nameof(VersionInfoReceiver)} \\{{ {nameof(VersionInfo)} = {{{nameof(VersionInfo)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(VersionInfo)} = {{{nameof(VersionInfo)}}} }}")]
     public partial class VersionInfoReceiver : InfoOutputReceiver
     {
         /// <summary>
@@ -67,7 +67,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 
             // We check whether the line is indented. If it's not, and it's not an empty line, we take it is
             // a section header line and update the data accordingly.
-            if (StringExtensions.IsNullOrWhiteSpace(line))
+            if (string.IsNullOrWhiteSpace(line))
             {
                 return;
             }

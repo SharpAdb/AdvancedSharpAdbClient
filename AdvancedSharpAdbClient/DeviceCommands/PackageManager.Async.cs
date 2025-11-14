@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
@@ -23,17 +23,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new(ListFull);
+            DefaultInterpolatedStringHandler requestBuilder = new(19, Arguments?.Length ?? 0);
+            requestBuilder.AppendLiteral(ListFull);
 
             if (Arguments != null)
             {
                 foreach (string argument in Arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             PackageManagerReceiver pmr = new(this);
             return AdbClient.ExecuteShellCommandAsync(Device, cmd, pmr, cancellationToken);
         }
@@ -47,9 +49,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallPackageAsync(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -85,19 +84,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(" \"").Append(remoteFilePath).Append('"');
+            requestBuilder.AppendLiteral(" \"");
+            requestBuilder.AppendLiteral(remoteFilePath);
+            requestBuilder.AppendFormatted('"');
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
 
@@ -117,9 +120,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -195,9 +195,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, CancellationToken cancellationToken = default, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -359,9 +356,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallPackageAsync(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallPackageAsync(packageFilePath, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
@@ -387,9 +381,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultiplePackageAsync(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultiplePackageAsync(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
@@ -403,9 +394,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task InstallMultiplePackageAsync(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             await InstallMultiplePackageAsync(splitPackageFilePaths, packageName, progress.AsAction(), cancellationToken, arguments).ConfigureAwait(false);
 
@@ -456,19 +444,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm uninstall");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm uninstall");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(' ').Append(packageName);
+            requestBuilder.AppendFormatted(' ');
+            requestBuilder.AppendLiteral(packageName);
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
@@ -503,22 +494,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install-create");
+            DefaultInterpolatedStringHandler requestBuilder = new(21, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install-create");
 
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            if (!string.IsNullOrWhiteSpace(packageName))
             {
-                _ = requestBuilder.Append(" -p ").Append(packageName);
+                requestBuilder.AppendLiteral(" -p ");
+                requestBuilder.AppendLiteral(packageName!);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             await AdbClient.ExecuteShellCommandAsync(Device, cmd, receiver, cancellationToken).ConfigureAwait(false);
 
@@ -561,14 +555,11 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The file to be opened for reading.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{Stream}"/> which returns a read-only <see cref="Stream"/> on the specified path.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual Task<Stream> GetFileStreamAsync(string path, CancellationToken cancellationToken = default) =>
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(path)).AsTask(cancellationToken).ContinueWith(x => x.Result.OpenStreamForReadAsync()).Unwrap();
 #else
-            TaskExExtensions.FromResult<Stream>(File.OpenRead(path));
+            Task.FromResult<Stream>(File.OpenRead(path));
 #endif
 
         /// <summary>
@@ -579,9 +570,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual async Task<string> SyncPackageToDeviceAsync(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken = default)
         {
             callback?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));

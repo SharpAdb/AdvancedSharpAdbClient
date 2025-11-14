@@ -6,9 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 #if NET40
 using Microsoft.Runtime.CompilerServices;
@@ -26,39 +24,75 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <summary>
         /// Singleton cached task that's been completed successfully.
         /// </summary>
-        internal static readonly Task s_cachedCompleted =
+        private static readonly Task s_cachedCompleted =
 #if NET45_OR_GREATER
             Task.
 #else
             TaskEx.
 #endif
             FromResult<object?>(null);
-
-        /// <summary>
-        /// Gets a task that's already been completed successfully.
-        /// </summary>
-        public static Task CompletedTask => s_cachedCompleted;
-#else
-        /// <summary>
-        /// Gets a task that's already been completed successfully.
-        /// </summary>
-        public static Task CompletedTask => Task.CompletedTask;
 #endif
 
         /// <summary>
-        /// Creates a task that completes after a specified number of milliseconds.
+        /// The extension for the <see cref="Task"/> class.
         /// </summary>
-        /// <param name="dueTime">The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.</param>
-        /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-        /// <returns>A task that represents the time delay.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
-        public static Task Delay(int dueTime, CancellationToken cancellationToken = default) =>
+        extension(Task)
+        {
+#if NETFRAMEWORK && !NET46_OR_GREATER
+            /// <summary>
+            /// Gets a task that's already been completed successfully.
+            /// </summary>
+            public static Task CompletedTask => s_cachedCompleted;
+#endif
+
 #if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
+            /// <summary>
+            /// Queues the specified work to run on the ThreadPool and returns a <see cref="Task"/> handle for that work.
+            /// </summary>
+            /// <param name="action">The work to execute asynchronously</param>
+            /// <param name="cancellationToken">A cancellation token that should be used to cancel the work</param>
+            /// <returns>A Task that represents the work queued to execute in the ThreadPool.</returns>
+            /// <exception cref="ArgumentNullException">The <paramref name="action"/> parameter was null.</exception>
+            /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
+            public static Task Run(Action action, CancellationToken cancellationToken) => TaskEx.Run(action, cancellationToken);
+
+            /// <summary>
+            /// Queues the specified work to run on the ThreadPool and returns a <see cref="Task{TResult}"/> handle for that work.
+            /// </summary>
+            /// <param name="function">The work to execute asynchronously</param>
+            /// <returns>A <see cref="Task{TResult}"/> that represents the work queued to execute in the ThreadPool.</returns>
+            /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was null.</exception>
+            public static Task<TResult> Run<TResult>(Func<TResult> function) => TaskEx.Run(function);
+
+            /// <summary>
+            /// Queues the specified work to run on the ThreadPool and returns a <see cref="Task{TResult}"/> handle for that work.
+            /// </summary>
+            /// <param name="function">The work to execute asynchronously</param>
+            /// <param name="cancellationToken">A cancellation token that should be used to cancel the work</param>
+            /// <returns>A <see cref="Task{TResult}"/> that represents the work queued to execute in the ThreadPool.</returns>
+            /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was null.</exception>
+            /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
+            public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken) => TaskEx.Run(function, cancellationToken);
+
+            /// <summary>
+            /// Creates a task that completes after a specified number of milliseconds.
+            /// </summary>
+            /// <param name="dueTime">The number of milliseconds to wait before completing the returned task, or -1 to wait indefinitely.</param>
+            /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+            /// <returns>A task that represents the time delay.</returns>
+            /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
+            public static Task Delay(int dueTime, CancellationToken cancellationToken = default) => TaskEx.Delay(dueTime, cancellationToken);
+
+            /// <summary>
+            /// Creates a <see cref="Task{TResult}"/> that's completed successfully with the specified result.
+            /// </summary>
+            /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
+            /// <param name="result">The result to store into the completed task.</param>
+            /// <returns>The successfully completed task.</returns>
+            public static Task<TResult> FromResult<TResult>(TResult result) => TaskEx.FromResult(result);
 #endif
-            .Delay(dueTime, cancellationToken);
+        }
+
 
         /// <summary>
         /// Creates a task that will complete when all of the <see cref="Task"/> objects in an enumerable collection have completed.
@@ -87,20 +121,6 @@ namespace AdvancedSharpAdbClient.Polyfills
 #endif
             .WhenAll(tasks);
 
-        /// <summary>
-        /// Creates a <see cref="Task{TResult}"/> that's completed successfully with the specified result.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
-        /// <param name="result">The result to store into the completed task.</param>
-        /// <returns>The successfully completed task.</returns>
-        public static Task<TResult> FromResult<TResult>(TResult result) =>
-#if NETFRAMEWORK && !NET45_OR_GREATER
-            TaskEx
-#else
-            Task
-#endif
-            .FromResult(result);
-
 #if HAS_WINRT
         /// <summary>
         /// Wait a <see cref="Task{TResult}"/> synchronously by <see cref="TaskCompletionSource{TResult}"/> and return the result.
@@ -109,14 +129,11 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="function">The <see cref="Task{TResult}"/> to wait.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         /// <returns>The result of the completed task.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public static TResult AwaitByTaskCompleteSource<TResult>(this IAsyncOperation<TResult> function, CancellationToken cancellationToken = default)
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();
             Task<TResult> task = taskCompletionSource.Task;
-            _ = Task.Factory.StartNew(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
@@ -140,24 +157,14 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work if it has not yet started.</param>
         public static void AwaitByTaskCompleteSource(this Task function, CancellationToken cancellationToken = default)
         {
-#if NET
             TaskCompletionSource taskCompletionSource = new();
-#else
-            TaskCompletionSource<object?> taskCompletionSource = new();
-#endif
-#pragma warning disable IDE0008
-            var task = taskCompletionSource.Task;
-#pragma warning restore IDE0008
-            _ = Task.Factory.StartNew(async () =>
+            Task task = taskCompletionSource.Task;
+            _ = Task.Run(async () =>
             {
                 try
                 {
                     await function.ConfigureAwait(false);
-#if NET
                     _ = taskCompletionSource.TrySetResult();
-#else
-                    _ = taskCompletionSource.TrySetResult(null);
-#endif
                 }
                 catch (Exception e)
                 {
@@ -178,7 +185,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         {
             TaskCompletionSource<TResult> taskCompletionSource = new();
             Task<TResult> task = taskCompletionSource.Task;
-            _ = Task.Factory.StartNew(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {

@@ -40,8 +40,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(stream);
-            ExceptionExtensions.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
             {
@@ -100,7 +100,7 @@ namespace AdvancedSharpAdbClient
                     Buffer.BlockCopy(lengthBytes, 0, buffer, startPosition + dataBytes.Length, lengthBytes.Length);
 
                     // now send the data to the device
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     await Socket.SendAsync(buffer.AsMemory(startPosition, read + dataBytes.Length + lengthBytes.Length), cancellationToken).ConfigureAwait(false);
 #else
                     await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
@@ -141,8 +141,8 @@ namespace AdvancedSharpAdbClient
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(remotePath);
-            ExceptionExtensions.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
 
@@ -185,11 +185,14 @@ namespace AdvancedSharpAdbClient
                     }
 
                     // now read the length we received
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
                     await Socket.ReadAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
-                    await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
 #else
                     await Socket.ReadAsync(buffer, size, cancellationToken).ConfigureAwait(false);
+#endif
+#if HAS_BUFFERS
+                    await stream.WriteAsync(buffer.AsMemory(0, size), cancellationToken).ConfigureAwait(false);
+#else
                     await stream.WriteAsync(buffer, 0, size, cancellationToken).ConfigureAwait(false);
 #endif
                     totalBytesRead += size;
@@ -212,15 +215,12 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_WINRT
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(stream);
-            ExceptionExtensions.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
 
             if (remotePath.Length > MaxPathLength)
             {
@@ -324,15 +324,12 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
-            ExceptionExtensions.ThrowIfNull(remotePath);
-            ExceptionExtensions.ThrowIfNull(stream);
+            ArgumentNullException.ThrowIfNull(remotePath);
+            ArgumentNullException.ThrowIfNull(stream);
 
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
 
@@ -528,7 +525,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatistics"/> object that contains information about the file.</returns>
         protected async Task<FileStatistics> ReadStatisticsAsync(CancellationToken cancellationToken = default)
         {
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
             Memory<byte> statResult = new byte[12];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
             return EnumerableBuilder.FileStatisticsCreator(statResult.Span);
@@ -540,7 +537,7 @@ namespace AdvancedSharpAdbClient
             {
                 FileMode = (UnixFileStatus)ReadInt32(statResult),
                 Size = ReadInt32(statResult),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(statResult))
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(statResult))
             };
             int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
 #endif

@@ -64,5 +64,17 @@ namespace AdvancedSharpAdbClient.Tests
             commandLine.StartServer();
             Assert.True(commandLine.ServerStarted);
         }
+
+        /// <summary>
+        /// Tests the <see cref="AdbCommandLineClient.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            DummyAdbCommandLineClient commandLine = new();
+            Assert.Equal($"The {typeof(DummyAdbCommandLineClient)} process with adb command line at '{ServerName}'.", commandLine.ToString());
+        }
+
+        private static string ServerName => OperatingSystem.IsWindows() ? "adb.exe" : "adb";
     }
 }

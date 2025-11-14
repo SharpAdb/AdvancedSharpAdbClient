@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -12,7 +13,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes the output of the <c>printenv</c> command, which dumps all environment variables of an Android device.
     /// </summary>
-    [DebuggerDisplay($"{nameof(EnvironmentVariablesReceiver)} \\{{ {nameof(EnvironmentVariables)} = {{{nameof(EnvironmentVariables)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(EnvironmentVariables)} = {{{nameof(EnvironmentVariables)}}} }}")]
     public sealed partial class EnvironmentVariablesReceiver : ShellOutputReceiver
     {
         /// <summary>

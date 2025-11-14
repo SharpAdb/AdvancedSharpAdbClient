@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Receivers
     {
         /// <inheritdoc/>
         public virtual Task<bool> AddOutputAsync(string line, CancellationToken cancellationToken = default) =>
-            TaskExExtensions.FromResult(AddOutput(line));
+            Task.FromResult(AddOutput(line));
 
         /// <inheritdoc/>
         public virtual Task FlushAsync(CancellationToken cancellationToken = default) =>
@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient.Receivers
         protected virtual Task DoneAsync(CancellationToken cancellationToken = default)
         {
             Done();
-            return TaskExExtensions.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

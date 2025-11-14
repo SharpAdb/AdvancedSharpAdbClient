@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Processes command line output of a <c>adb</c> shell command.
     /// </summary>
-    [DebuggerDisplay($"{nameof(InfoOutputReceiver)} \\{{ {nameof(Properties)} = {{{nameof(Properties)}}}, {nameof(PropertyParsers)} = {{{nameof(PropertyParsers)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Properties)} = {{{nameof(Properties)}}}, {nameof(PropertyParsers)} = {{{nameof(PropertyParsers)}}} }}")]
     public class InfoOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

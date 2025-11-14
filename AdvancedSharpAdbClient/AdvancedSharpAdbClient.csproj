@@ -1,36 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <CheckNotRecommendedTargetFramework>False</CheckNotRecommendedTargetFramework>
     <FullTargets>True</FullTargets>
     <ImportAsync>True</ImportAsync>
     <Nullable>Enable</Nullable>
     <PackageIcon>Icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <SuppressTfmSupportBuildWarnings>False</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
-  <Choose>
-    <When Condition="'$(IsStandard)' == 'True'">
-      <PropertyGroup>
-        <PackageId>$(AssemblyName).Standard</PackageId>
-        <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0;net4.5</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <When Condition="'$(FullTargets)' == 'True'">
-      <PropertyGroup>
-        <NoWarn>$(NoWarn);NU1603;NU1605;NU1902;NU1903</NoWarn>
-        <TargetFrameworks>net6.0;net8.0;net9.0;netcoreapp2.1;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0;net3.5-client;net4.0-client;net4.5;net4.6.1;net4.8;net8.0-windows10.0.17763.0;net9.0-windows10.0.17763.0</TargetFrameworks>
-        <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);netcore5.0;uap10.0;uap10.0.15138.0</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <TargetFrameworks>net8.0;netcoreapp3.1;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
-        <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0;net3.5-client;net4.5;net4.8;net8.0-windows10.0.17763.0</TargetFrameworks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+    <TargetFrameworks>net8.0;net10.0;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net2.0;net3.5-client;net4.5;net4.8;net8.0-windows10.0.17763.0;net10.0-windows10.0.17763.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(FullTargets)' == 'True'">
+    <NoWarn>$(NoWarn);NU1603;NU1605;NU1902</NoWarn>
+    <TargetFrameworks>$(TargetFrameworks);net6.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IsWindows)' == 'True'">$(TargetFrameworks);net4.0-client;net4.6.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(GITHUB_ACTIONS)' != 'True' and '$(IsWindows)' == 'True'">$(TargetFrameworks);netcore5.0;uap10.0;uap10.0.15138.0</TargetFrameworks>
+  </PropertyGroup>
 
   <PropertyGroup>
     <PolySharpIncludeGeneratedTypes>
@@ -61,6 +52,7 @@
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0-windows10.0.17763.0'))">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -115,8 +107,16 @@
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
   </ItemGroup>
 
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0'))">
+    <DefineConstants>$(DefineConstants);COMP_NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.1'))">
     <DefineConstants>$(DefineConstants);COMP_NETSTANDARD2_1</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp3.0'))">
+    <IsTrimmable>True</IsTrimmable>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
@@ -150,7 +150,7 @@
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net4.7'))
                          or $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netcoreapp1.0'))
-                         or (!($([MSBuild]::GetTargetFrameworkIdentifier('$(TargetFramework)')) == '.NETFramework')
+                         or (!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net1.1'))
                          and $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'netstandard2.0')))">
     <DefineConstants>$(DefineConstants);HAS_VALUETUPLE</DefineConstants>
   </PropertyGroup>

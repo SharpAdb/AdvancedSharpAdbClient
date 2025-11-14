@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -10,7 +11,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// <summary>
     /// Parses the output of a <c>cat /proc/[pid]/stat</c> command.
     /// </summary>
-    [DebuggerDisplay($"{nameof(ProcessOutputReceiver)} \\{{ {nameof(Processes)} = {{{nameof(Processes)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Processes)} = {{{nameof(Processes)}}} }}")]
     public class ProcessOutputReceiver : ShellOutputReceiver
     {
         /// <summary>

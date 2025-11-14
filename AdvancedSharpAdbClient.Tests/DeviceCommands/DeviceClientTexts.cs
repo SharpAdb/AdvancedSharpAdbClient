@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.Equal(doc, xml);
         }
 
-#if WINDOWS10_0_18362_0_OR_GREATER
+#if WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
         /// Tests the <see cref="DeviceClient.DumpScreenWinRT()"/> method.
         /// </summary>

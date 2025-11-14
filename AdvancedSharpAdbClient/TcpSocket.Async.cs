@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient
         [MemberNotNull(nameof(EndPoint))]
         public async Task ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(endPoint);
+            ArgumentNullException.ThrowIfNull(endPoint);
 
             if (endPoint is not (IPEndPoint or DnsEndPoint))
             {
@@ -25,11 +25,7 @@ namespace AdvancedSharpAdbClient
             }
 
             EndPoint = endPoint;
-#if NET6_0_OR_GREATER
             await Socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
-#else
-            await Task.Factory.StartNew(() => Socket.Connect(endPoint), cancellationToken, TaskCreationOptions.None, TaskScheduler.Default).ConfigureAwait(false);
-#endif
             Socket.Blocking = true;
         }
 
@@ -45,7 +41,7 @@ namespace AdvancedSharpAdbClient
             else
             {
                 // Already connected - nothing to do.
-                return TaskExExtensions.CompletedTask;
+                return Task.CompletedTask;
             }
         }
 

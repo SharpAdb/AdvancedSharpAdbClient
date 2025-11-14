@@ -1,5 +1,6 @@
 ﻿using NSubstitute;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -164,7 +165,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 {
                     Assert.Equal(remotePath, x.ArgAt<string>(0));
                     Assert.Equal(default, x.ArgAt<CancellationToken>(1));
-                    return stats.AsEnumerableAsync(x.ArgAt<CancellationToken>(1));
+                    return stats.ToAsyncEnumerable(x.ArgAt<CancellationToken>(1));
                 });
 
             Factories.SyncServiceFactory = (c, d) =>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Xunit;
 
@@ -267,6 +268,17 @@ namespace AdvancedSharpAdbClient.Tests
                 "0004Test"u8.ToArray());
 
         /// <summary>
+        /// Tests the <see cref="AdbSocket.SendAdbRequest(DefaultInterpolatedStringHandler)"/> method.
+        /// </summary>
+        [Fact]
+        public void SendAdbRequestSpanTest()
+        {
+            RunTest(
+                socket => socket.SendAdbRequest((DefaultInterpolatedStringHandler)$"Test"),
+                "0004Test"u8.ToArray());
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbSocket.GetShellStream"/> method.
         /// </summary>
         [Fact]
@@ -295,6 +307,17 @@ namespace AdvancedSharpAdbClient.Tests
             using AdbSocket socket = adbSocket.Clone();
             Assert.NotEqual(adbSocket.Socket, socket.Socket);
             Assert.Equal(adbSocket.Connected, socket.Connected);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="AdbSocket.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket adbSocket = new(tcpSocket);
+            Assert.Equal($"{typeof(AdbSocket)} {{ {nameof(AdbSocket.Socket)} = {tcpSocket} }}", adbSocket.ToString());
         }
 
         private static void RunTest(Action<IAdbSocket> test, byte[] expectedDataSent)

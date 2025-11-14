@@ -2,7 +2,6 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using Xunit;
 
 namespace AdvancedSharpAdbClient.Tests
@@ -263,12 +262,21 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbServer.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            Assert.Equal($"The {typeof(AdbServer)} communicate with adb at '127.0.0.1:5037'.", adbServer.ToString());
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbServer(EndPoint, Func{EndPoint, IAdbSocket}, Func{string, IAdbCommandLineClient})"/> method.
         /// </summary>
         [Fact]
         public void ConstructorAdbClientNullTest() =>
             _ = Assert.Throws<ArgumentNullException>(() => new AdbServer((EndPoint)null, adbSocketFactory, adbCommandLineClientFactory));
 
-        private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
+        private static string ServerName => OperatingSystem.IsWindows() ? "adb.exe" : "adb";
     }
 }

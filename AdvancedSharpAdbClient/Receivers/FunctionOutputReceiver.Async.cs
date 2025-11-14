@@ -11,11 +11,11 @@ namespace AdvancedSharpAdbClient.Receivers
     {
         /// <inheritdoc/>
         public Task<bool> AddOutputAsync(string line, CancellationToken cancellationToken = default) =>
-            TaskExExtensions.FromResult(predicate(line));
+            Task.FromResult(predicate(line));
 
         /// <inheritdoc/>
         public Task FlushAsync(CancellationToken cancellationToken = default) =>
-            TaskExExtensions.CompletedTask;
+            Task.CompletedTask;
     }
 }
 #endif

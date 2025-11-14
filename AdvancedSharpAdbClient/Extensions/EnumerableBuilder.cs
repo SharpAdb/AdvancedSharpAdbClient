@@ -52,7 +52,7 @@ namespace AdvancedSharpAdbClient
             {
                 FileMode = (UnixFileStatus)ReadInt32(values),
                 Size = ReadInt32(values),
-                Time = DateTimeExtensions.FromUnixTimeSeconds(ReadInt32(values))
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(values))
             };
             int ReadInt32(in ReadOnlySpan<byte> data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
         }
@@ -151,7 +151,7 @@ namespace AdvancedSharpAdbClient
                 return null;
             }
 
-            DateTimeOffset timestamp = DateTimeExtensions.FromUnixTimeSeconds(sec);
+            DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds(sec);
 
             switch (id)
             {

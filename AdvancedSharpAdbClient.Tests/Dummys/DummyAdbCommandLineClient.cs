@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,20 +27,19 @@ namespace AdvancedSharpAdbClient.Tests
 
                 standardOutput?.Add(null);
 
-                if (command == "start-server")
+                switch (command)
                 {
-                    ServerStarted = true;
-                }
-                else if (command == "version")
-                {
-                    if (standardOutput != null && Version != default)
-                    {
-                        standardOutput.AddRange([.. Version]);
-                    }
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(command));
+                    case "start-server":
+                        ServerStarted = true;
+                        break;
+                    case "version":
+                        if (standardOutput != null && Version != default)
+                        {
+                            standardOutput.AddRange([.. Version]);
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(command));
                 }
             }
 
@@ -54,6 +52,6 @@ namespace AdvancedSharpAdbClient.Tests
             return RunProcess(filename, command, errorOutput, standardOutput, Timeout.Infinite);
         }
 
-        private static string ServerName => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "adb.exe" : "adb";
+        private static string ServerName => OperatingSystem.IsWindows() ? "adb.exe" : "adb";
     }
 }

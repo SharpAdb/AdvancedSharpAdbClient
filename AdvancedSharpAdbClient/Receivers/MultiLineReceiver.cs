@@ -2,6 +2,7 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -10,7 +11,7 @@ namespace AdvancedSharpAdbClient.Receivers
     /// <summary>
     /// A multiline receiver to receive and process shell output with multi lines.
     /// </summary>
-    [DebuggerDisplay($"{nameof(MultiLineReceiver)} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(TrimLines)} = {{{nameof(TrimLines)}}}, {nameof(ParsesErrors)} = {{{nameof(ParsesErrors)}}}, {nameof(Lines)} = {{{nameof(Lines)}}} }}")]
     public abstract partial class MultiLineReceiver : ShellOutputReceiver
     {
         /// <summary>
@@ -22,7 +23,7 @@ namespace AdvancedSharpAdbClient.Receivers
         /// Gets or sets a value indicating whether [trim lines].
         /// </summary>
         /// <value><see langword="true"/> if [trim lines]; otherwise, <see langword="false"/>.</value>
-        public bool TrimLines { get; set; } = false;
+        public bool TrimLines { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the receiver parses error messages.

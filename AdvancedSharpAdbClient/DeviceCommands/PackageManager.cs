@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.DeviceCommands
 {
@@ -64,7 +64,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public PackageManager(IAdbClient client, DeviceData device, Func<IAdbClient, DeviceData, ISyncService>? syncServiceFactory = null, bool skipInit = false, ILogger<PackageManager>? logger = null, params string[] arguments)
         {
             AdbClient = client ?? throw new ArgumentNullException(nameof(client));
-            Device = DeviceData.EnsureDevice(ref device);
+            Device = DeviceData.EnsureDevice(device);
             Packages = [];
             Arguments = arguments;
 
@@ -131,17 +131,19 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new(ListFull);
+            DefaultInterpolatedStringHandler requestBuilder = new(19, Arguments?.Length ?? 0);
+            requestBuilder.AppendLiteral(ListFull);
 
             if (Arguments != null)
             {
                 foreach (string argument in Arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendLiteral(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             PackageManagerReceiver pmr = new(this);
             AdbClient.ExecuteShellCommand(Device, cmd, pmr);
         }
@@ -153,9 +155,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallPackage(string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -189,19 +188,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
 
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(" \"").Append(remoteFilePath).Append('"');
+            requestBuilder.AppendLiteral(" \"");
+            requestBuilder.AppendLiteral(remoteFilePath);
+            requestBuilder.AppendFormatted('"');
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
@@ -219,9 +222,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -284,9 +284,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
         {
             callback?.Invoke(new InstallProgressEventArgs(PackageInstallProgressState.Preparing));
@@ -421,9 +418,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallPackage(packageFilePath, progress.AsAction(), arguments);
 
@@ -445,9 +439,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), arguments);
 
@@ -459,9 +450,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(splitPackageFilePaths, packageName, progress.AsAction(), arguments);
 
@@ -497,19 +485,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm uninstall");
+            DefaultInterpolatedStringHandler requestBuilder = new(13, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm uninstall");
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            _ = requestBuilder.Append(' ').Append(packageName);
+            requestBuilder.AppendFormatted(' ');
+            requestBuilder.AppendLiteral(packageName);
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
             if (!string.IsNullOrEmpty(receiver.ErrorMessage))
@@ -533,18 +524,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(PackageManager))
-                .Append(" { ")
-                .Append(nameof(Device))
-                .Append(" = ")
-                .Append(Device)
-                .Append(", ")
-                .Append(nameof(AdbClient))
-                .Append(" = ")
-                .Append(AdbClient)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Device)} = {Device}, {nameof(AdbClient)} = {AdbClient} }}";
 
         /// <summary>
         /// Like "install", but starts an install session.
@@ -556,22 +536,25 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             ValidateDevice();
 
-            StringBuilder requestBuilder = new("pm install-create");
+            DefaultInterpolatedStringHandler requestBuilder = new(21, (arguments?.Length ?? 0) + 1);
+            requestBuilder.AppendLiteral("pm install-create");
 
-            if (!StringExtensions.IsNullOrWhiteSpace(packageName))
+            if (!string.IsNullOrWhiteSpace(packageName))
             {
-                _ = requestBuilder.Append(" -p ").Append(packageName);
+                requestBuilder.AppendLiteral(" -p ");
+                requestBuilder.AppendLiteral(packageName!);
             }
 
             if (arguments != null)
             {
                 foreach (string argument in arguments)
                 {
-                    _ = requestBuilder.Append(' ').Append(argument);
+                    requestBuilder.AppendFormatted(' ');
+                    requestBuilder.AppendFormatted(argument);
                 }
             }
 
-            string cmd = requestBuilder.ToString();
+            string cmd = requestBuilder.ToStringAndClear();
             InstallOutputReceiver receiver = new();
             AdbClient.ExecuteShellCommand(Device, cmd, receiver);
 
@@ -611,9 +594,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="path">The file to be opened for reading.</param>
         /// <returns>A read-only <see cref="Stream"/> on the specified path.</returns>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual Stream GetFileStream(string path) =>
 #if HAS_WINRT
             StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(path)).AwaitByTaskCompleteSource().OpenStreamForReadAsync().AwaitByTaskCompleteSource();
@@ -628,9 +608,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.</param>
         /// <returns>Destination path on device for file.</returns>
         /// <exception cref="IOException">If fatal error occurred when pushing file.</exception>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         protected virtual string SyncPackageToDevice(string localFilePath, Action<string?, SyncProgressChangedEventArgs>? callback)
         {
             callback?.Invoke(localFilePath, new SyncProgressChangedEventArgs(0, 100));

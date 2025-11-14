@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public async Task SendSyncRequestAsync(SyncCommand command, string path, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(path);
             byte[] pathBytes = AdbClient.Encoding.GetBytes(path);
             await SendSyncRequestAsync(command, pathBytes.Length, cancellationToken).ConfigureAwait(false);
             _ = await WriteAsync(pathBytes, cancellationToken).ConfigureAwait(false);
@@ -124,28 +124,20 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public virtual Task<int> ReadAsync(byte[] data, CancellationToken cancellationToken = default) =>
-#if HAS_BUFFERS
-            ReadAsync(data.AsMemory(), cancellationToken).AsTask();
-#else
             ReadAsync(data, 0, data.Length, cancellationToken);
-#endif
 
         /// <inheritdoc/>
         public virtual Task<int> ReadAsync(byte[] data, int length, CancellationToken cancellationToken = default) =>
-#if HAS_BUFFERS
-            ReadAsync(data.AsMemory(0, length), cancellationToken).AsTask();
-#else
             ReadAsync(data, 0, length, cancellationToken);
-#endif
 
         /// <inheritdoc/>
         public virtual async Task<int> ReadAsync(byte[] data, int offset, int length, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-            ExceptionExtensions.ThrowIfNegative(offset);
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentOutOfRangeException.ThrowIfNegative<int>(offset);
 
             length = length != -1 ? length : data.Length;
-            ExceptionExtensions.ThrowIfLessThan(data.Length, length, nameof(data));
+            ArgumentOutOfRangeException.ThrowIfLessThan(data.Length, length, nameof(data));
 
             int count = -1;
             int totalRead = offset;
@@ -260,7 +252,7 @@ namespace AdvancedSharpAdbClient
         {
             // if the device is not null, then we first tell adb we're looking to talk
             // to a specific device
-            if (device != null)
+            if (!device.IsEmpty)
             {
                 await (uint.TryParse(device.TransportId, out uint tid)
                     ? SendAdbRequestAsync($"host:transport-id:{tid}", cancellationToken).ConfigureAwait(false)
@@ -284,7 +276,7 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <inheritdoc/>
         public virtual async ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
         {
@@ -306,8 +298,6 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(data);
-
             int count = -1;
             int totalRead = 0;
             int length = data.Length;
@@ -369,7 +359,7 @@ namespace AdvancedSharpAdbClient
             return true;
         }
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously write until all data in "data" is written or the connection fails or times out.
         /// </summary>

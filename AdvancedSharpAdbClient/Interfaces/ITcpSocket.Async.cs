@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
         Task<int> ReceiveAsync(byte[] buffer, int offset, int size, SocketFlags socketFlags, CancellationToken cancellationToken);
 
-#if HAS_BUFFERS
+#if COMP_NETSTANDARD2_1
         /// <summary>
         /// Asynchronously sends the specified number of bytes of data to a connected
         /// <see cref="ITcpSocket"/> using the specified <paramref name="socketFlags"/>.
@@ -109,10 +109,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="ValueTask{Int32}"/> which returns the number of bytes sent to the Socket.</returns>
         public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
-#if COMP_NETSTANDARD2_1
-            => new(ReceiveAsync(buffer.ToArray(), socketFlags, cancellationToken))
-#endif
-            ;
+            => new(ReceiveAsync(buffer.ToArray(), buffer.Length, socketFlags, cancellationToken));
 
         /// <summary>
         /// Asynchronously receives the specified number of bytes from a bound <see cref="ITcpSocket"/>
@@ -124,22 +121,14 @@ namespace AdvancedSharpAdbClient
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="ValueTask{Int32}"/> which returns the number of bytes received.</returns>
         public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
-#if COMP_NETSTANDARD2_1
         {
             byte[] bytes = new byte[buffer.Length];
-            return new(ReceiveAsync(bytes, socketFlags, cancellationToken).ContinueWith(x =>
+            return new(ReceiveAsync(bytes, bytes.Length, socketFlags, cancellationToken).ContinueWith(x =>
             {
-                int length = x.Result;
-                for (int i = 0; i < length; i++)
-                {
-                    buffer.Span[i] = bytes[i];
-                }
-                return length;
+                bytes.CopyTo(buffer);
+                return x.Result;
             }));
         }
-#else
-            ;
-#endif
 #endif
     }
 }

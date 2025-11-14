@@ -11,7 +11,11 @@ namespace System.Collections.Generic
     /// </summary>
     /// <typeparam name="T">The type of the elements.</typeparam>
     [EditorBrowsable(EditorBrowsableState.Never)]
+#if NET40_OR_GREATER
+    internal interface IReadOnlyCollection<out T> : IEnumerable<T>
+#else
     internal interface IReadOnlyCollection<T> : IEnumerable<T>
+#endif
     {
         /// <summary>
         /// Gets the number of elements in the collection.

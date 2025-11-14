@@ -41,10 +41,12 @@ namespace AdvancedSharpAdbClient.Tests
                     return value;
                 });
 
+            Assert.Equal("/fstab.donatello", value.Path);
             Assert.Equal(UnixFileStatus.Regular, value.FileMode.GetFileType());
             Assert.Equal((UnixFileStatus)416, value.FileMode.GetPermissions());
             Assert.Equal(597, value.Size);
             Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.Time);
+            Assert.Equal($"-rw-r-----\t597\t{value.Time}\t/fstab.donatello", value.ToString());
         }
 
         /// <summary>
@@ -69,7 +71,7 @@ namespace AdvancedSharpAdbClient.Tests
                 () =>
                 {
                     using SyncService service = new(Socket, Device);
-                    FileStatistics[] value = service.GetDirectoryListing("/storage").ToArray();
+                    FileStatistics[] value = [.. service.GetDirectoryListing("/storage")];
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
                     return value;
@@ -84,24 +86,28 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal((UnixFileStatus)16873, dir.FileMode);
             Assert.Equal(0, dir.Size);
             Assert.Equal(time, dir.Time);
+            Assert.Equal($"drwxr-x--x\t0\t{dir.Time}\t.", dir.ToString());
 
             FileStatistics parentDir = value[1];
             Assert.Equal("..", parentDir.Path);
             Assert.Equal((UnixFileStatus)16877, parentDir.FileMode);
             Assert.Equal(0, parentDir.Size);
             Assert.Equal(time, parentDir.Time);
+            Assert.Equal($"drwxr-xr-x\t0\t{dir.Time}\t..", parentDir.ToString());
 
             FileStatistics sdcard0 = value[2];
             Assert.Equal("sdcard0", sdcard0.Path);
             Assert.Equal((UnixFileStatus)41471, sdcard0.FileMode);
             Assert.Equal(24, sdcard0.Size);
             Assert.Equal(time, sdcard0.Time);
+            Assert.Equal($"lrwxrwxrwx\t24\t{dir.Time}\tsdcard0", sdcard0.ToString());
 
             FileStatistics emulated = value[3];
             Assert.Equal("emulated", emulated.Path);
             Assert.Equal((UnixFileStatus)16749, emulated.FileMode);
             Assert.Equal(0, emulated.Size);
             Assert.Equal(time, emulated.Time);
+            Assert.Equal($"dr-xr-xr-x\t0\t{dir.Time}\temulated", emulated.ToString());
         }
 
         /// <summary>
@@ -233,12 +239,36 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             using SyncService syncService = new(socket, Device);
             Assert.True(syncService is ICloneable<ISyncService>);
-#if WINDOWS10_0_18362_0_OR_GREATER
+#if WINDOWS10_0_17763_0_OR_GREATER
             Assert.True(syncService is ICloneable<ISyncService.IWinRT>);
 #endif
             using SyncService service = syncService.Clone();
             Assert.NotEqual(syncService.Socket, service.Socket);
             Assert.Equal(syncService.Device, service.Device);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="SyncService.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            DummyAdbSocket socket = new()
+            {
+                Requests =
+                {
+                    "host:transport:169.254.109.177:5555",
+                    "sync:",
+                    "host:transport:169.254.109.177:5555",
+                    "sync:"
+                }
+            };
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            socket.Responses.Enqueue(AdbResponse.OK);
+            using SyncService service = new(socket, Device);
+            Assert.Equal($"{typeof(SyncService)} {{ {nameof(SyncService.Socket)} = {socket}, {nameof(SyncService.Device)} = {Device} }}", service.ToString());
         }
     }
 }

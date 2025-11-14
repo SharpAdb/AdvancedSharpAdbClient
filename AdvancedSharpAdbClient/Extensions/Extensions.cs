@@ -4,11 +4,12 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -113,6 +114,19 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/> to release.</param>
         public static void Close(this TextReader reader) => reader.Dispose();
+#else
+#if HAS_TASK && !NET5_0_OR_GREATER
+        /// <summary>
+        /// Instructs the Process component to wait for the associated process to exit, or
+        /// for the <paramref name="cancellationToken"/> to be canceled.
+        /// </summary>
+        /// <param name="process">The <see cref="Process"/> to wait for.</param>
+        /// <param name="cancellationToken">An optional token to cancel the asynchronous operation.</param>
+        /// <returns>A task that will complete when the process has exited, cancellation has been requested,
+        /// or an error occurs.</returns>
+        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default) =>
+            Task.Run(process.WaitForExit, cancellationToken);
+#endif
 #endif
 
 #if NETFRAMEWORK && !NET40_OR_GREATER
@@ -163,42 +177,12 @@ namespace AdvancedSharpAdbClient
                 : Path.GetFullPath(path);
 #endif
 
-#if NET
-        [SupportedOSPlatformGuard("Windows")]
-#endif
-        public static bool IsWindowsPlatform() =>
-#if NETCORE && !UAP10_0_15138_0
-            true;
-#elif !NETFRAMEWORK || NET48_OR_GREATER
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-#else
-            Environment.OSVersion.Platform
-                is PlatformID.Win32S
-                or PlatformID.Win32Windows
-                or PlatformID.Win32NT
-                or PlatformID.WinCE
-                or PlatformID.Xbox;
-#endif
-
-#if NET
-        [SupportedOSPlatformGuard("Linux")]
-        [SupportedOSPlatformGuard("OSX")]
-        [SupportedOSPlatformGuard("FreeBSD")]
-#endif
-        public static bool IsUnixPlatform() =>
-#if NETCORE && !UAP10_0_15138_0
-            false;
-#elif !NETFRAMEWORK || NET48_OR_GREATER
-            RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-            || RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-#if NETCOREAPP3_0_OR_GREATER
-            || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
-#endif
-            ;
-#else
-            Environment.OSVersion.Platform
-                is PlatformID.Unix
-                or PlatformID.MacOSX;
-#endif
+        /// <summary>
+        /// Sends a request to the Android Debug Bridge.To read the response, call
+        /// <see cref="IAdbSocket.ReadAdbResponse()"/>.
+        /// </summary>
+        /// <param name="socket">The socket to use.</param>
+        /// <param name="request">The request to send.</param>
+        public static void SendAdbRequest(this IAdbSocket socket, scoped in DefaultInterpolatedStringHandler request) => socket.SendAdbRequest(request.ToString());
     }
 }

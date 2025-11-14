@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -14,7 +14,7 @@ namespace AdvancedSharpAdbClient.Models
     /// Represents the state of apk installation.
     /// </summary>
     /// <param name="state">The state of the installation.</param>
-    [DebuggerDisplay($"{nameof(SyncProgressChangedEventArgs)} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(State)} = {{{nameof(State)}}}, {nameof(PackageFinished)} = {{{nameof(PackageFinished)}}}, {nameof(PackageRequired)} = {{{nameof(PackageRequired)}}}, {nameof(UploadProgress)} = {{{nameof(UploadProgress)}}} }}")]
     public sealed class InstallProgressEventArgs(PackageInstallProgressState state) : EventArgs
     {
         /// <summary>
@@ -88,24 +88,31 @@ namespace AdvancedSharpAdbClient.Models
                 split.Add(c);
             }
 
-            StringBuilder builder =
+            DefaultInterpolatedStringHandler builder = new(4, 4);
 #if NET
-                new StringBuilder().Append(CollectionsMarshal.AsSpan(split));
+            builder.AppendFormatted(CollectionsMarshal.AsSpan(split));
+#elif HAS_BUFFERS
+            builder.AppendFormatted([.. split]);
 #else
-                new(new string(split.ToArray()));
+            builder.AppendLiteral(new string([.. split]));
 #endif
 
             if (PackageRequired > 0)
             {
-                _ = builder.Append(' ').Append(PackageFinished).Append('/').Append(PackageRequired);
+                builder.AppendFormatted(' ');
+                builder.AppendFormatted(PackageFinished);
+                builder.AppendFormatted('/');
+                builder.AppendFormatted(PackageRequired);
             }
 
             if (UploadProgress > 0)
             {
-                _ = builder.Append(' ').Append(UploadProgress).Append('%');
+                builder.AppendFormatted(' ');
+                builder.AppendFormatted(UploadProgress);
+                builder.AppendFormatted('%');
             }
 
-            return builder.ToString();
+            return builder.ToStringAndClear();
         }
     }
 }

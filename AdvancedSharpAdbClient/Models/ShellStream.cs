@@ -5,7 +5,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Models
@@ -34,7 +33,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="closeStream"><see langword="true"/> if the <see cref="ShellStream"/> should close the <paramref name="inner"/> stream when closed; otherwise, <see langword="false"/>.</param>
         public ShellStream(Stream inner, bool closeStream = false)
         {
-            ExceptionExtensions.ThrowIfNull(inner);
+            ArgumentNullException.ThrowIfNull(inner);
 
             if (!inner.CanRead)
             {
@@ -472,14 +471,7 @@ namespace AdvancedSharpAdbClient.Models
         public override void Write(byte[] buffer, int offset, int count) => Inner.Write(buffer, offset, count);
 
         /// <inheritdoc/>
-        public override string ToString() =>
-            new StringBuilder(nameof(ShellStream))
-                .Append(" { ")
-                .Append(nameof(Inner))
-                .Append(" = ")
-                .Append(Inner)
-                .Append(" }")
-                .ToString();
+        public override string ToString() => $"{GetType()} {{ {nameof(Inner)} = {Inner} }}";
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)

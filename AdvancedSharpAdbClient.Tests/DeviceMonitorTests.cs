@@ -83,6 +83,8 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ListChangedEvents);
             Assert.Single(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.DisconnectedEvents[0].Device.Serial);
+            Assert.False(sink.DisconnectedEvents[0].IsConnect);
+            Assert.Equal("Device disconnected: 169.254.109.177:5555", sink.DisconnectedEvents[0].ToString());
         }
 
         [Fact]
@@ -131,6 +133,8 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+            Assert.True(sink.ConnectedEvents[0].IsConnect);
+            Assert.Equal("Device connected: 169.254.109.177:5555", sink.ConnectedEvents[0].ToString());
         }
 
         /// <summary>
@@ -156,6 +160,8 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal("169.254.109.177:5555", monitor.Devices[0].Serial);
             Assert.Single(sink.ConnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.ConnectedEvents[0].Device.Serial);
+            Assert.True(sink.ConnectedEvents[0].IsConnect);
+            Assert.Equal("Device connected: 169.254.109.177:5555", sink.ConnectedEvents[0].ToString());
             Assert.Empty(sink.ChangedEvents);
             Assert.Single(sink.NotifiedEvents);
             Assert.Single(sink.ListChangedEvents);
@@ -210,6 +216,9 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Single(sink.ListChangedEvents);
             Assert.Empty(sink.DisconnectedEvents);
             Assert.Equal("169.254.109.177:5555", sink.ChangedEvents[0].Device.Serial);
+            Assert.Equal(DeviceState.Offline, sink.ChangedEvents[0].OldState);
+            Assert.Equal(DeviceState.Online, sink.ChangedEvents[0].NewState);
+            Assert.Equal("Device state changed: 169.254.109.177:5555 Offline -> Online", sink.ChangedEvents[0].ToString());
         }
 
         [Fact]
@@ -294,6 +303,16 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.True(deviceMonitor is ICloneable<IDeviceMonitor>);
             using DeviceMonitor monitor = deviceMonitor.Clone();
             Assert.NotEqual(deviceMonitor.Socket, monitor.Socket);
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceMonitor.ToString()"/> method.
+        /// </summary>
+        [Fact]
+        public void ToStringTest()
+        {
+            using DeviceMonitor deviceMonitor = new(Socket);
+            Assert.Equal($"{typeof(DeviceMonitor)} {{ {nameof(DeviceMonitor.Socket)} = {Socket}, {nameof(DeviceMonitor.IsRunning)} = False }}", deviceMonitor.ToString());
         }
     }
 }

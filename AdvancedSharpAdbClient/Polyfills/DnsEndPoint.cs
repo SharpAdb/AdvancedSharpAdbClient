@@ -33,7 +33,7 @@ namespace System.Net
         /// <exception cref="ArgumentException">The <paramref name="host"/> parameter contains an empty string.<para>-or-</para><paramref name="addressFamily"/> is Unknown.</exception>
         public DnsEndPoint(string host, int port, AddressFamily addressFamily)
         {
-            ExceptionExtensions.ThrowIfNull(host);
+            ArgumentNullException.ThrowIfNull(host);
 
             if (port is < IPEndPoint.MinPort or > IPEndPoint.MaxPort)
             {

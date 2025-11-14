@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 #if HAS_WUXC
 using System.Threading;
@@ -274,7 +273,7 @@ namespace AdvancedSharpAdbClient.Models
 #endif
         public Bitmap? ToImage(byte[] buffer)
         {
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -308,7 +307,7 @@ namespace AdvancedSharpAdbClient.Models
         private PixelFormat StandardizePixelFormat(ref byte[] buffer)
         {
             // Initial parameter validation.
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -413,12 +412,9 @@ namespace AdvancedSharpAdbClient.Models
         /// Gets is <see cref="DispatcherQueue.HasThreadAccess"/> supported.
         /// </summary>
 #if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
         [SupportedOSPlatformGuard("Windows10.0.18362.0")]
 #endif
-#pragma warning disable CA1416
         public static bool IsHasThreadAccessSupported { get; } = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess");
-#pragma warning restore CA1416
 
         /// <summary>
         /// Converts a <see cref="byte"/> array containing the raw frame buffer data to a <see cref="WriteableBitmap"/>.
@@ -428,9 +424,6 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CoreDispatcher dispatcher, CancellationToken cancellationToken = default)
         {
             if (dispatcher.HasThreadAccess)
@@ -505,12 +498,9 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="WriteableBitmap"/> that represents the image contained in the frame buffer, or <see langword="null"/>
         /// if the framebuffer does not contain any data. This can happen when DRM is enabled on the device.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public async Task<WriteableBitmap?> ToBitmapAsync(byte[] buffer, CancellationToken cancellationToken = default)
         {
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             // This happens, for example, when DRM is enabled. In that scenario, no screenshot is taken on the device and an empty
             // framebuffer is returned; we'll just return null.
@@ -541,13 +531,10 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="buffer">A byte array in which the images are stored according to this <see cref="FramebufferHeader"/>.</param>
         /// <param name="alphaMode">A <see cref="BitmapAlphaMode"/> which describes how the alpha channel is stored.</param>
         /// <returns>A <see cref="BitmapPixelFormat"/> that describes how the image data is represented in this <paramref name="buffer"/>.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         private BitmapPixelFormat StandardizePixelFormat(byte[] buffer, out BitmapAlphaMode alphaMode)
         {
             // Initial parameter validation.
-            ExceptionExtensions.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(buffer);
 
             if (buffer.Length < Width * Height * (Bpp / 8))
             {
@@ -589,57 +576,35 @@ namespace AdvancedSharpAdbClient.Models
         /// <inheritdoc/>
         public override string ToString()
         {
-            StringBuilder builder =
-                new StringBuilder(nameof(FramebufferHeader))
-                    .Append(" { ")
-                    .Append(nameof(Version))
-                    .Append(" = ")
-                    .Append(Version)
-                    .Append(", ")
-                    .Append(nameof(Bpp))
-                    .Append(" = ")
-                    .Append(Bpp);
+            DefaultInterpolatedStringHandler handler = new(121, 10);
+            handler.AppendFormatted(GetType());
+            handler.AppendLiteral($" {{ {nameof(Version)} = ");
+            handler.AppendFormatted(Version);
+            handler.AppendLiteral($", {nameof(Bpp)} = ");
+            handler.AppendFormatted(Bpp);
 
             if (Version >= 2)
             {
-                _ = builder
-                    .Append(", ")
-                    .Append(nameof(ColorSpace))
-                    .Append(" = ")
-                    .Append(ColorSpace);
+                handler.AppendLiteral($", {nameof(ColorSpace)} = ");
+                handler.AppendFormatted(ColorSpace);
             }
 
-            return builder
-                .Append(", ")
-                .Append(nameof(Size))
-                .Append(" = ")
-                .Append(Size)
-                .Append(", ")
-                .Append(nameof(Width))
-                .Append(" = ")
-                .Append(Width)
-                .Append(", ")
-                .Append(nameof(Height))
-                .Append(" = ")
-                .Append(Height)
-                .Append(", ")
-                .Append(nameof(Red))
-                .Append(" = ")
-                .Append(Red)
-                .Append(", ")
-                .Append(nameof(Blue))
-                .Append(" = ")
-                .Append(Blue)
-                .Append(", ")
-                .Append(nameof(Green))
-                .Append(" = ")
-                .Append(Green)
-                .Append(", ")
-                .Append(nameof(Alpha))
-                .Append(" = ")
-                .Append(Alpha)
-                .Append(" }")
-                .ToString();
+            handler.AppendLiteral($", {nameof(Size)} = ");
+            handler.AppendFormatted(Size);
+            handler.AppendLiteral($", {nameof(Width)} = ");
+            handler.AppendFormatted(Width);
+            handler.AppendLiteral($", {nameof(Height)} = ");
+            handler.AppendFormatted(Height);
+            handler.AppendLiteral($", {nameof(Red)} = ");
+            handler.AppendFormatted(Red);
+            handler.AppendLiteral($", {nameof(Blue)} = ");
+            handler.AppendFormatted(Blue);
+            handler.AppendLiteral($", {nameof(Green)} = ");
+            handler.AppendFormatted(Green);
+            handler.AppendLiteral($", {nameof(Alpha)} = ");
+            handler.AppendFormatted(Alpha);
+            handler.AppendLiteral(" }");
+            return handler.ToStringAndClear();
         }
 
         /// <inheritdoc/>

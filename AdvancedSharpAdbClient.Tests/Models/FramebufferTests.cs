@@ -14,12 +14,12 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void ConstructorNullTest()
         {
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new Framebuffer(default, (AdbClient)null));
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new Framebuffer(default, (EndPoint)null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(default, (AdbClient)null));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(default, (EndPoint)null));
             _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(new DeviceData { Serial = "169.254.109.177:5555" }, (AdbClient)null));
             _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(new DeviceData { Serial = "169.254.109.177:5555" }, (EndPoint)null));
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new Framebuffer(default, new AdbClient()));
-            _ = Assert.Throws<ArgumentOutOfRangeException>(() => new Framebuffer(default, AdbClient.DefaultEndPoint));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(default, new AdbClient()));
+            _ = Assert.Throws<ArgumentNullException>(() => new Framebuffer(default, AdbClient.DefaultEndPoint));
         }
 
         [Fact]

@@ -10,14 +10,15 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [Fact]
         public void SpecTest()
         {
-            ForwardData data = new()
-            {
-                Local = "tcp:1234",
-                Remote = "tcp:4321"
-            };
+            ForwardData data = new(
+                serialNumber: "emulator-5554",
+                local: "tcp:1234",
+                remote: "tcp:4321"
+            );
 
             Assert.Equal("tcp:1234", data.LocalSpec.ToString());
             Assert.Equal("tcp:4321", data.RemoteSpec.ToString());
+            Assert.Equal("emulator-5554 tcp:1234 tcp:4321", data.ToString());
         }
     }
 }

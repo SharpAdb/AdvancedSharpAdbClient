@@ -19,7 +19,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// Because <c>stat</c> does not contain the full process name, this can be useful.</param>
         public AndroidProcess(string line, bool cmdLinePrefix = false)
         {
-            ExceptionExtensions.ThrowIfNull(line);
+            ArgumentNullException.ThrowIfNull(line);
 
             // See http://man7.org/linux/man-pages/man5/proc.5.html,
             // section /proc/[pid]/stat, for more information about the file format

@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '9.0.x' # The .NET SDK version to use
+  DOTNET_VERSION: '10.0.x' # The .NET SDK version to use
 
 jobs:
   build-and-test:
@@ -45,7 +45,7 @@ jobs:
         run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
 
   pack-and-publish:
-    name: pack-and-publish
+    if: github.event_name == 'push'
     needs: build-and-test
     runs-on: windows-latest
     env:

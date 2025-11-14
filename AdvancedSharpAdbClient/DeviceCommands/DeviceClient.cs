@@ -22,32 +22,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands
     public partial record class DeviceClient(IAdbClient AdbClient, DeviceData Device) : ICloneable<DeviceClient>, ICloneable
     {
         /// <summary>
-        /// The <see cref="IAdbClient"/> to use when communicating with the device.
-        /// </summary>
-        private IAdbClient adbClient = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
-
-        /// <summary>
-        /// The device on which to process command.
-        /// </summary>
-        private DeviceData device = DeviceData.EnsureDevice(ref Device);
-
-        /// <summary>
         /// Gets the <see cref="IAdbClient"/> to use when communicating with the device.
         /// </summary>
         public IAdbClient AdbClient
         {
-            get => adbClient;
-            init => adbClient = value ?? throw new ArgumentNullException(nameof(AdbClient));
-        }
+            get;
+            init => field = value ?? throw new ArgumentNullException(nameof(AdbClient));
+        } = AdbClient ?? throw new ArgumentNullException(nameof(AdbClient));
 
         /// <summary>
         /// Gets the device on which to process command.
         /// </summary>
         public DeviceData Device
         {
-            get => device;
-            init => device = DeviceData.EnsureDevice(ref value);
-        }
+            get;
+            init => field = DeviceData.EnsureDevice(value);
+        } = DeviceData.EnsureDevice(Device);
 
         /// <summary>
         /// Gets the current device screen snapshot.
@@ -95,9 +85,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// Gets the current device screen snapshot.
         /// </summary>
         /// <returns>A <see cref="Windows.Data.Xml.Dom.XmlDocument"/> containing current hierarchy.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public Windows.Data.Xml.Dom.XmlDocument? DumpScreenWinRT()
         {
             Windows.Data.Xml.Dom.XmlDocument doc = new();
@@ -409,7 +396,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public void ClearInput(int charCount)
         {
             SendKeyEvent("KEYCODE_MOVE_END");
-            SendKeyEvent(StringExtensions.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
+            SendKeyEvent(string.Join(" ", Enumerable.Repeat<string?>("KEYCODE_DEL", charCount)));
         }
 
         /// <summary>
@@ -451,14 +438,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <inheritdoc/>
         object ICloneable.Clone() => ((ICloneable<DeviceClient>)this).Clone();
 
-#if !NET40_OR_GREATER && !NETCOREAPP2_0_OR_GREATER && !NETSTANDARD2_0_OR_GREATER && !UAP10_0_15138_0
+#if !NET40_OR_GREATER && !COMP_NETSTANDARD2_0
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(EqualityContract, AdbClient, Device);
 
         /// <inheritdoc/>
         public virtual bool Equals(DeviceClient? other) =>
-            (object?)this == other ||
-                (other != (object?)null
+            (object)this == other ||
+                (other is not null
                 && EqualityComparer<Type>.Default.Equals(EqualityContract, other.EqualityContract)
                 && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
                 && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));

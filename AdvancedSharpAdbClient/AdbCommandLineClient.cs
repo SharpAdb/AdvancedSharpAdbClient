@@ -15,7 +15,7 @@ namespace AdvancedSharpAdbClient
     /// <summary>
     /// Provides methods for interacting with the <c>adb.exe</c> command line client.
     /// </summary>
-    [DebuggerDisplay($"{nameof(AdbCommandLineClient)} \\{{ {nameof(AdbPath)} = {{{nameof(AdbPath)}}} }}")]
+    [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(AdbPath)} = {{{nameof(AdbPath)}}} }}")]
     public partial class AdbCommandLineClient : IAdbCommandLineClient
     {
 #if HAS_PROCESS
@@ -36,12 +36,9 @@ namespace AdvancedSharpAdbClient
         /// <param name="adbPath">The path to the <c>adb.exe</c> executable.</param>
         /// <param name="isForce">Doesn't check adb file when <see langword="true"/>.</param>
         /// <param name="logger">The logger to use when logging.</param>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public AdbCommandLineClient(string adbPath, bool isForce = false, ILogger<AdbCommandLineClient>? logger = null)
         {
-            if (StringExtensions.IsNullOrWhiteSpace(adbPath))
+            if (string.IsNullOrWhiteSpace(adbPath))
             {
                 throw new ArgumentNullException(nameof(adbPath));
             }
@@ -114,7 +111,7 @@ namespace AdvancedSharpAdbClient
             int status = RunAdbProcessInner(command, errorOutput, standardOutput, timeout);
             if (errorOutput.Count > 0)
             {
-                string error = StringExtensions.Join(Environment.NewLine, errorOutput!);
+                string error = string.Join(Environment.NewLine, errorOutput!);
                 throw new AdbException($"The adb process returned error code {status} when running command {command} with error output:{Environment.NewLine}{error}", error);
             }
             else
@@ -126,9 +123,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-#if HAS_WINRT && NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public virtual bool CheckAdbFileExists(string adbPath) => adbPath == "adb" ||
 #if HAS_WINRT
             (StorageFile.GetFileFromPathAsync(Extensions.GetFullPath(adbPath)).AwaitByTaskCompleteSource() is StorageFile file && file.IsOfType(StorageItemTypes.File));
@@ -137,27 +131,30 @@ namespace AdvancedSharpAdbClient
 #endif
 
         /// <inheritdoc/>
-        public override string ToString() => $"The {nameof(AdbCommandLineClient)} process with adb command line at {AdbPath}";
+        public override string ToString() => $"The {GetType()} process with adb command line at '{AdbPath}'.";
 
         /// <summary>
         /// Throws an error if the path does not point to a valid instance of <c>adb.exe</c>.
         /// </summary>
         /// <param name="adbPath">The path to validate.</param>
+#if NET
+        [SupportedOSPlatformGuard("Windows")]
+        [SupportedOSPlatformGuard("Linux")]
+        [SupportedOSPlatformGuard("OSX")]
+        [SupportedOSPlatformGuard("FreeBSD")]
+#endif
         protected virtual void EnsureIsValidAdbFile(string adbPath)
         {
             if (adbPath == "adb") { return; }
 
-            bool isWindows = Extensions.IsWindowsPlatform();
-            bool isUnix = Extensions.IsUnixPlatform();
-
-            if (isWindows)
+            if (OperatingSystem.IsWindows())
             {
                 if (!string.Equals(Path.GetFileName(adbPath), "adb.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     throw new ArgumentOutOfRangeException(nameof(adbPath), $"{adbPath} does not seem to be a valid adb.exe executable. The path must end with `adb.exe`");
                 }
             }
-            else if (isUnix)
+            else if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS() || OperatingSystem.IsFreeBSD())
             {
                 if (!string.Equals(Path.GetFileName(adbPath), "adb", StringComparison.OrdinalIgnoreCase))
                 {
@@ -166,7 +163,7 @@ namespace AdvancedSharpAdbClient
             }
             else
             {
-                throw new NotSupportedException("SharpAdbClient only supports launching adb.exe on Windows, Mac OS and Linux");
+                throw new NotSupportedException("SharpAdbClient only supports launching adb on Windows, Mac OS and Linux");
             }
         }
 
@@ -204,7 +201,7 @@ namespace AdvancedSharpAdbClient
         /// <c>adb version</c>. This operation times out after 5 seconds in default.</remarks>
         protected int RunAdbProcessInner(string command, ICollection<string>? errorOutput, ICollection<string>? standardOutput, int timeout = 5000)
         {
-            ExceptionExtensions.ThrowIfNull(command);
+            ArgumentNullException.ThrowIfNull(command);
             return RunProcess(AdbPath, command, errorOutput, standardOutput, timeout);
         }
 
@@ -265,8 +262,8 @@ namespace AdvancedSharpAdbClient
                 CreateNoWindow = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = errorOutput != null,
+                RedirectStandardOutput = standardOutput != null
             };
 
             using Process process = Process.Start(psi) ?? throw new AdbException($"The adb process could not be started. The process returned null when starting {filename} {command}");
@@ -277,11 +274,17 @@ namespace AdvancedSharpAdbClient
                 process.Kill();
             }
 
-            string standardErrorString = process.StandardError.ReadToEnd();
-            string standardOutputString = process.StandardOutput.ReadToEnd();
+            if (errorOutput != null)
+            {
+                string standardErrorString = process.StandardError.ReadToEnd();
+                errorOutput.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            }
 
-            errorOutput?.AddRange(standardErrorString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
-            standardOutput?.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            if (standardOutput != null)
+            {
+                string standardOutputString = process.StandardOutput.ReadToEnd();
+                standardOutput.AddRange(standardOutputString.Split(separator, StringSplitOptions.RemoveEmptyEntries));
+            }
 
             return process.ExitCode;
 #else

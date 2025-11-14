@@ -70,9 +70,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// </summary>
         /// <param name="version">The <see cref="PackageVersion"/> object.</param>
         /// <returns><see langword="true"/> if the <see cref="VersionName"/> was successfully parsed; otherwise, <see langword="false"/>.</returns>
-#if NET
-        [SupportedOSPlatform("Windows10.0.10240.0")]
-#endif
         public readonly bool TryAsPackageVersion(out PackageVersion version)
         {
             ushort[] numbs = GetVersionNumbers(VersionName).Split('.', StringSplitOptions.RemoveEmptyEntries).Select(ushort.Parse).Take(4).ToArray();
