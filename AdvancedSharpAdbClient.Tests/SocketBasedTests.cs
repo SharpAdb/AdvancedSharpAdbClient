@@ -12,7 +12,7 @@ namespace AdvancedSharpAdbClient.Tests
     {
         protected SocketBasedTests(bool integrationTest, bool doDispose)
         {
-            Func<EndPoint, IAdbSocket> AdbSocketFactory;
+            Func<EndPoint, IDummyAdbSocket> AdbSocketFactory;
 
             // this.EndPoint = AdbClient.Instance.EndPoint;
 #if DEBUG
@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Tests
             AdbSocketFactory = endPoint => socket;
             IntegrationTest = false;
 #endif
-            Socket = (IDummyAdbSocket)AdbSocketFactory(EndPoint);
+            Socket = AdbSocketFactory(EndPoint);
 
             TestClient = new AdbClient(AdbSocketFactory);
         }

@@ -67,11 +67,8 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: Setup NuGet.exe
-        uses: NuGet/setup-nuget@v2
-        
       - name: Install Dependencies
-        run: msbuild $env:Solution_Name /t:Restore /p:FullTargets=true /p:GITHUB_ACTIONS=false
+        run: msbuild $env:Solution_Name /t:Restore /p:FullTargets=true
 
       - name: Pack
         run: msbuild $env:Solution_Name /t:Pack /p:FullTargets=true /p:Configuration=Release /p:PackageOutputPath=../nugets /p:VersionSuffix=build.${{ github.run_number }}.${{ github.run_attempt }}
