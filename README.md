@@ -26,6 +26,7 @@ Added important features.
 - .NET Core App 3.1
 - .NET 6.0
 - .NET 8.0
+- .NET 10.0
 
 ## Installation
 To install AdvancedSharpAdbClient install the [AdvancedSharpAdbClient NuGetPackage](https://www.nuget.org/packages/AdvancedSharpAdbClient). If you're
