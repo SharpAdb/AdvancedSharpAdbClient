@@ -130,6 +130,28 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadString"/> method.
+        /// </summary>
+        [Fact]
+        public void ReadFailStringTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
+            {
+                writer.Write(Encoding.UTF8.GetBytes(nameof(SyncCommand.FAIL)));
+                writer.Write(Encoding.UTF8.GetBytes(5.ToString("X4")));
+                writer.Write("Hello"u8);
+                writer.Flush();
+            }
+
+            tcpSocket.InputStream.Position = 0;
+
+            Assert.Equal("Hello", socket.ReadString());
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbSocket.ReadSyncString"/> method.
         /// </summary>
         [Fact]

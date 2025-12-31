@@ -179,6 +179,7 @@ namespace AdvancedSharpAdbClient
         /// <inheritdoc/>
         public virtual async Task<string> ReadStringAsync(CancellationToken cancellationToken = default)
         {
+        start:
             // The first 4 bytes contain the length of the string
             byte[] reply = new byte[4];
             int read = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
@@ -191,14 +192,19 @@ namespace AdvancedSharpAdbClient
 
             // Convert the bytes to a hex string
             string lenHex = AdbClient.Encoding.GetString(reply);
-            int len = int.Parse(lenHex, NumberStyles.HexNumber);
+            if (int.TryParse(lenHex, NumberStyles.HexNumber, null, out int len))
+            {
+                // And get the string
+                reply = new byte[len];
+                _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-            // And get the string
-            reply = new byte[len];
-            _ = await ReadAsync(reply, cancellationToken).ConfigureAwait(false);
-
-            string value = AdbClient.Encoding.GetString(reply);
-            return value;
+                string value = AdbClient.Encoding.GetString(reply);
+                return value;
+            }
+            else
+            {
+                goto start;
+            }
         }
 
         /// <inheritdoc/>

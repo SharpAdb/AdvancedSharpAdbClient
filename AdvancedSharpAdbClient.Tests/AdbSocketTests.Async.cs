@@ -85,6 +85,28 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="AdbSocket.ReadStringAsync(CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async Task ReadFailStringAsyncTest()
+        {
+            using DummyTcpSocket tcpSocket = new();
+            using AdbSocket socket = new(tcpSocket);
+
+            await using (BinaryWriter writer = new(tcpSocket.InputStream, Encoding.UTF8, true))
+            {
+                writer.Write(Encoding.UTF8.GetBytes(nameof(SyncCommand.FAIL)));
+                writer.Write(Encoding.UTF8.GetBytes(5.ToString("X4")));
+                writer.Write("Hello"u8);
+                writer.Flush();
+            }
+
+            tcpSocket.InputStream.Position = 0;
+
+            Assert.Equal("Hello", await socket.ReadStringAsync());
+        }
+
+        /// <summary>
         /// Tests the <see cref="AdbSocket.ReadSyncStringAsync(CancellationToken)"/> method.
         /// </summary>
         [Fact]
