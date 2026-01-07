@@ -254,7 +254,7 @@ namespace AdvancedSharpAdbClient
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
             FileStatistics stat = Stat(remoteFilePath);
-            int totalBytesToProcess = stat.Size;
+            long totalBytesToProcess = stat.Size;
             long totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
@@ -439,11 +439,11 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileMode = (UnixFileStatus)ReadInt32(statResult),
-                Size = ReadInt32(statResult),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(statResult))
+                FileMode = (UnixFileStatus)ReadUInt32(statResult),
+                Size = ReadUInt32(statResult),
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(statResult))
             };
-            int ReadInt32(byte[] data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
+            uint ReadUInt32(byte[] data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
 #endif
         }
     }

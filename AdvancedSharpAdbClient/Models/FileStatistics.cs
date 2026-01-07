@@ -41,7 +41,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets or sets the total file size, in bytes.
         /// </summary>
-        public int Size { get; init; }
+        public uint Size { get; init; }
 
         /// <summary>
         /// Gets or sets the time of last modification.

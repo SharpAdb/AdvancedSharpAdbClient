@@ -50,11 +50,11 @@ namespace AdvancedSharpAdbClient
             int index = 0;
             return new FileStatistics
             {
-                FileMode = (UnixFileStatus)ReadInt32(values),
-                Size = ReadInt32(values),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadInt32(values))
+                FileMode = (UnixFileStatus)ReadUInt32(values),
+                Size = ReadUInt32(values),
+                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(values))
             };
-            int ReadInt32(in ReadOnlySpan<byte> data) => data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24);
+            uint ReadUInt32(in ReadOnlySpan<byte> data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
         }
 
         /// <summary>
