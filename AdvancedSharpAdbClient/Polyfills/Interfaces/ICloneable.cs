@@ -31,9 +31,6 @@ namespace AdvancedSharpAdbClient.Polyfills
     /// </summary>
     /// <typeparam name="T">The type of the class.</typeparam>
     public interface ICloneable<out T>
-#if NET9_0_OR_GREATER
-        where T : allows ref struct
-#endif
     {
         /// <summary>
         /// Creates a new <typeparamref name="T"/> object that is a copy of the current instance.
@@ -41,4 +38,10 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <returns>A new <typeparamref name="T"/> object that is a copy of this instance.</returns>
         T Clone();
     }
+
+    /// <summary>
+    /// Supports cloning, which creates a new instance of a class with the same value as an existing instance.
+    /// </summary>
+    /// <typeparam name="T">The type of the class.</typeparam>
+    internal interface IInternalCloneable<out T> : ICloneable<T>, System.ICloneable;
 }

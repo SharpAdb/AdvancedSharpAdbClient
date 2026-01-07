@@ -17,6 +17,9 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
     public sealed partial class DeviceData() : IEquatable<DeviceData>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<DeviceData, DeviceData, bool>
+#endif
     {
         /// <summary>
         /// A regular expression that can be used to parse the device information that is returned by the Android Debut Bridge.

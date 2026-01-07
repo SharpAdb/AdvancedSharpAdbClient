@@ -119,7 +119,7 @@ namespace AdvancedSharpAdbClient
         protected virtual async Task DeviceMonitorLoopAsync(CancellationToken cancellationToken = default)
         {
             IsRunning = true;
-            await this; // Switch to the background thread, so that the loop can continue to run.
+            await new ThreadSwitcher(); // Switch to the background thread, so that the loop can continue to run.
 
             // Set up the connection to track the list of devices.
             await InitializeSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -238,12 +238,6 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Gets an awaiter used to switch to background thread.
-        /// </summary>
-        /// <returns>An awaiter instance.</returns>
-        private ThreadSwitcher GetAwaiter() => new();
-
-        /// <summary>
         /// A helper type for switch thread by <see cref="Task"/>. This type is not intended to be used directly from your code.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -261,6 +255,12 @@ namespace AdvancedSharpAdbClient
 
             /// <inheritdoc/>
             public void OnCompleted(Action continuation) => _ = Task.Run(continuation, default);
+
+            /// <summary>
+            /// Gets an awaiter used to switch to background thread.
+            /// </summary>
+            /// <returns>An awaiter instance.</returns>
+            public ThreadSwitcher GetAwaiter() => new();
         }
     }
 }

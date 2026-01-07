@@ -25,6 +25,9 @@ namespace AdvancedSharpAdbClient.Models
 #endif
     [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public readonly record struct ColorData(uint Offset, uint Length) : IReadOnlyList<byte>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<ColorData, ColorData, bool>
+#endif
     {
         /// <summary>
         /// The length of <see cref="ColorData"/> in bytes.

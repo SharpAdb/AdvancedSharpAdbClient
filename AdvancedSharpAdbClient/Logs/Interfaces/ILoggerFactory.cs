@@ -21,10 +21,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         /// <typeparam name="T">The category name for messages produced by the logger.</typeparam>
         /// <returns>The <see cref="ILogger"/>.</returns>
-        ILogger<T> CreateLogger<T>()
-#if NET9_0_OR_GREATER
-            where T : allows ref struct
-#endif
-            ;
+        ILogger<T> CreateLogger<T>();
     }
 }

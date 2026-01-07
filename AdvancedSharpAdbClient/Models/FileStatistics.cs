@@ -19,6 +19,9 @@ namespace AdvancedSharpAdbClient.Models
 #endif
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileMode)} = {{{nameof(FileMode)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(Time)} = {{{nameof(Time)}}} }}")]
     public struct FileStatistics : IEquatable<FileStatistics>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<FileStatistics, FileStatistics, bool>
+#endif
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileStatistics"/> struct.

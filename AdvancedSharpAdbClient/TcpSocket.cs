@@ -16,7 +16,7 @@ namespace AdvancedSharpAdbClient
     /// Implements the <see cref="ITcpSocket"/> interface using the standard <see cref="System.Net.Sockets.Socket"/> class.
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Socket)} = {{{nameof(Socket)}}}, {nameof(Connected)} = {{{nameof(Connected)}}}, {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(ReceiveBufferSize)} = {{{nameof(ReceiveBufferSize)}}} }}")]
-    public sealed partial class TcpSocket : ITcpSocket, ICloneable<TcpSocket>, ICloneable
+    public sealed partial class TcpSocket : ITcpSocket, IInternalCloneable<TcpSocket>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TcpSocket"/> class.

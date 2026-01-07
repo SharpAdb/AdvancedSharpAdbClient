@@ -18,6 +18,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// <param name="VersionName">The version name of the application.</param>
     [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     public readonly record struct VersionInfo(int VersionCode, string VersionName) : IComparer, IComparer<VersionInfo>
+#if NET7_0_OR_GREATER
+        , IComparisonOperators<VersionInfo, VersionInfo, bool>
+#endif
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionInfo"/> struct.

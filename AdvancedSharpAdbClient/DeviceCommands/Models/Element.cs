@@ -18,6 +18,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Bounds)} = {{{nameof(Bounds)}}}, {nameof(Class)} = {{{nameof(Class)}}}, {nameof(Text)} = {{{nameof(Text)}}}, {nameof(Package)} = {{{nameof(Package)}}}, {nameof(Device)} = {{{nameof(Device)}}} }}")]
     public class Element : IEquatable<Element>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<Element, Element, bool>
+#endif
     {
         /// <summary>
         /// The <see cref="Array"/> of <see cref="char"/>s that separate the coordinates of the element.

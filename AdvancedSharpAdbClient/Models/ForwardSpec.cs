@@ -15,6 +15,9 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Protocol)} = {{{nameof(Protocol)}}}, {nameof(Port)} = {{{nameof(Port)}}}, {nameof(SocketName)} = {{{nameof(SocketName)}}}, {nameof(ProcessId)} = {{{nameof(ProcessId)}}} }}")]
     public readonly struct ForwardSpec : IEquatable<ForwardSpec>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<ForwardSpec, ForwardSpec, bool>
+#endif
     {
         /// <summary>
         /// Provides a mapping between a <see cref="string"/> and a <see cref="ForwardProtocol"/>

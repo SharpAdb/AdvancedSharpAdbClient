@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - main
-      - 'version/**'
-  pull_request:
-    branches:
-      - main
+      - version/**
     paths:
-      - '.github/workflows/build-and-test.yml'
-      - 'AdvancedSharpAdbClient**'
+      - .github/workflows/build-and-test.yml
+      - AdvancedSharpAdbClient**
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: '10.0.x' # The .NET SDK version to use
+  DOTNET_VERSION: 10.0.x # The .NET SDK version to use
 
 jobs:
   build-and-test:
@@ -26,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -45,7 +44,7 @@ jobs:
         run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
 
   pack-and-publish:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: build-and-test
     runs-on: windows-latest
     env:
@@ -53,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

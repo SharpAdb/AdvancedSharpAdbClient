@@ -19,6 +19,9 @@ namespace AdvancedSharpAdbClient.Models
 #endif
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(AdbVersion)} = {{{nameof(AdbVersion)}}}, {nameof(FileVersion)} = {{{nameof(FileVersion)}}}, {nameof(FilePath)} = {{{nameof(FilePath)}}} }}")]
     public readonly partial record struct AdbCommandLineStatus(Version? AdbVersion, string? FileVersion, string? FilePath)
+#if NET7_0_OR_GREATER
+        : IEqualityOperators<AdbCommandLineStatus, AdbCommandLineStatus, bool>
+#endif
     {
         /// <summary>
         /// The regex pattern for getting the adb version from the <c>adb version</c> command.

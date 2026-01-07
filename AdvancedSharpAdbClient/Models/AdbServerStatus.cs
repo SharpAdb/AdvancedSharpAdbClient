@@ -14,6 +14,9 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="Version">The version of the server when it is running.</param>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(IsRunning)} = {{{nameof(IsRunning)}}}, {nameof(Version)} = {{{nameof(Version)}}} }}")]
     public readonly record struct AdbServerStatus(bool IsRunning, Version? Version)
+#if NET7_0_OR_GREATER
+        : IEqualityOperators<AdbServerStatus, AdbServerStatus, bool>
+#endif
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AdbServerStatus"/> struct.

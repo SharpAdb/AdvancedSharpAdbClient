@@ -14,6 +14,9 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(SerialNumber)} = {{{nameof(SerialNumber)}}}, {nameof(LocalSpec)} = {{{nameof(LocalSpec)}}}, {nameof(RemoteSpec)} = {{{nameof(RemoteSpec)}}} }}")]
     public sealed class ForwardData : IEquatable<ForwardData>
+#if NET7_0_OR_GREATER
+        , IEqualityOperators<ForwardData, ForwardData, bool>
+#endif
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardData"/> class.

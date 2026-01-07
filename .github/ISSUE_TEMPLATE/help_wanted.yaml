@@ -1,6 +1,6 @@
 name: Help Wanted
 description: Want some helps
-title: "Help title"
+title: Help title
 labels: [help wanted]
 body:
   - type: textarea

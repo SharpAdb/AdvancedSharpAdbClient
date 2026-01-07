@@ -32,10 +32,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// </summary>
         /// <typeparam name="T">The type.</typeparam>
         /// <returns>The <see cref="ILogger"/> that was created</returns>
-        public static ILogger<T> CreateLogger<T>()
-#if NET9_0_OR_GREATER
-            where T : allows ref struct
-#endif
-            => _loggerFactory == null ? NullLogger<T>.Instance : _loggerFactory.CreateLogger<T>();
+        public static ILogger<T> CreateLogger<T>() => _loggerFactory == null ? NullLogger<T>.Instance : _loggerFactory.CreateLogger<T>();
     }
 }

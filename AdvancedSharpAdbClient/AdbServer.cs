@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
     /// between clients and devices.</para>
     /// </summary>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(EndPoint)} = {{{nameof(EndPoint)}}}, {nameof(CachedAdbPath)} = {{{nameof(CachedAdbPath)}}} }}")]
-    public partial class AdbServer : IAdbServer, ICloneable<AdbServer>, ICloneable
+    public partial class AdbServer : IAdbServer, IInternalCloneable<AdbServer>
     {
         /// <summary>
         /// The minimum version of <c>adb.exe</c> that is supported by this library.
