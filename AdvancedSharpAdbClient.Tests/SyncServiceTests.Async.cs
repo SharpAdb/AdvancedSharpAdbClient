@@ -164,7 +164,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, Stream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, Stream, Action{SyncProgressChangedEventArgs}?, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async Task PullAsyncTest()

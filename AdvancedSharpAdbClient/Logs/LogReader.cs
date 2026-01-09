@@ -234,7 +234,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected ushort? ReadUInt16()
         {
             byte[]? data = ReadBytesSafe(2);
-            return data == null ? null : (ushort)(data[0] | (data[1] << 8));
+            return data == null ? null : BitConverter.ToUInt16(data);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected uint? ReadUInt32()
         {
             byte[]? data = ReadBytesSafe(4);
-            return data == null ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+            return data == null ? null : BitConverter.ToUInt32(data);
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace AdvancedSharpAdbClient.Logs
         protected int? ReadInt32()
         {
             byte[]? data = ReadBytesSafe(4);
-            return data == null ? null : data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+            return data == null ? null : BitConverter.ToInt32(data);
         }
 
         /// <summary>

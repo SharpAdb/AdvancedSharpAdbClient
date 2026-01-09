@@ -181,14 +181,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>V2 need Android 8 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Pull(remotePath, stream, callback, in isCancelled);
+            service.Pull(remotePath, stream, callback, useV2, in isCancelled);
         }
 
         /// <summary>
@@ -226,6 +229,20 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Gets the file statistics of a given file (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>A <see cref="FileStatisticsV2"/> object that represents the file.</returns>
+        /// <remarks>Need Android 8 or above.</remarks>
+        public static FileStatisticsV2 StatV2(this IAdbClient client, DeviceData device, string path)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return service.StatV2(path);
+        }
+
+        /// <summary>
         /// Lists the contents of a directory on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
@@ -236,6 +253,23 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             foreach (FileStatistics fileStatistics in service.GetDirectoryListing(remotePath))
+            {
+                yield return fileStatistics;
+            }
+        }
+
+        /// <summary>
+        /// Lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <returns>For each child item of the directory, a <see cref="FileStatisticsV2"/> object with information of the item.</returns>
+        /// <remarks>Need Android 11 or above.</remarks>
+        public static IEnumerable<FileStatisticsV2> GetDirectoryListingV2(this IAdbClient client, DeviceData device, string remotePath)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            foreach (FileStatisticsV2 fileStatistics in service.GetDirectoryListingV2(remotePath))
             {
                 yield return fileStatistics;
             }
@@ -337,14 +371,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> if use <see cref="Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>V2 need Android 8 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             IProgress<SyncProgressChangedEventArgs>? progress = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Pull(remotePath, stream, progress.AsAction(), in isCancelled);
+            service.Pull(remotePath, stream, progress.AsAction(), useV2, in isCancelled);
         }
 
         /// <summary>

@@ -305,7 +305,7 @@ namespace AdvancedSharpAdbClient
             }
 
             // Get the length of the string
-            int len = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+            int len = BitConverter.ToInt32(reply);
 
             // And get the string
             reply = new byte[len];

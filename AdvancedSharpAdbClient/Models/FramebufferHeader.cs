@@ -21,6 +21,7 @@ namespace AdvancedSharpAdbClient.Models
     /// of the framebuffer, prefixed with a <see cref="FramebufferHeader"/> object that contains more
     /// information about the framebuffer.
     /// </summary>
+    /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FramebufferHeaderCreator))]
 #endif
@@ -28,66 +29,48 @@ namespace AdvancedSharpAdbClient.Models
     public readonly struct FramebufferHeader : IReadOnlyList<byte>
     {
         /// <summary>
+        /// The length of the head when <see cref="Version"/> is <see langword="1"/>.
+        /// </summary>
+        public const int MinLength = 52;
+
+        /// <summary>
         /// The length of the head when <see cref="Version"/> is <see langword="2"/>.
         /// </summary>
         public const int MaxLength = 56;
 
         /// <summary>
-        /// The length of the head when <see cref="Version"/> is <see langword="1"/>.
-        /// </summary>
-        public const int MiniLength = 52;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
-        /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
         public FramebufferHeader(byte[] data)
         {
-            if (data.Length is < MiniLength or > MaxLength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must between {MiniLength} and {MaxLength}.");
-            }
-
-            int index = 0;
-
-            Version = ReadUInt32(data);
-
-            if (Version > 2)
+            byte[] _data;
+            switch (data)
             {
                 // Technically, 0 is not a supported version either; we assume version 0 indicates
                 // an empty framebuffer.
-                throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
+                case { Length: < MinLength or > MaxLength }:
+                    throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must be {MinLength} or {MaxLength}.");
+                case [> 2, ..]:
+                    throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
+                case [2, ..]:
+                    _data = data;
+                    break;
+                case [< 2, ..]:
+                    _data = new byte[MaxLength];
+                    Array.Copy(data, 0, _data, 0, 2 * sizeof(uint));
+                    Array.Copy(data, 2 * sizeof(uint), _data, (2 * sizeof(uint)) + 4, MinLength - (2 * sizeof(uint)));
+                    break;
             }
 
-            Bpp = ReadUInt32(data);
-
-            if (Version >= 2)
+            unsafe
             {
-                ColorSpace = ReadUInt32(data);
+                fixed (byte* p = _data)
+                {
+                    FramebufferHeader* header = (FramebufferHeader*)p;
+                    this = *header;
+                }
             }
-
-            Size = ReadUInt32(data);
-            Width = ReadUInt32(data);
-            Height = ReadUInt32(data);
-
-            Red = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Blue = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Green = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Alpha = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            uint ReadUInt32(byte[] data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
 
 #if HAS_BUFFERS
@@ -95,53 +78,27 @@ namespace AdvancedSharpAdbClient.Models
         /// Initializes a new instance of the <see cref="FramebufferHeader"/> struct based on a byte array which contains the data.
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
-        /// <remarks>As defined in <see href="https://android.googlesource.com/platform/system/core/+/master/adb/framebuffer_service.cpp"/></remarks>
+        [OverloadResolutionPriority(1)]
         public FramebufferHeader(ReadOnlySpan<byte> data)
         {
-            if (data.Length is < MiniLength or > MaxLength)
+            ReadOnlySpan<byte> _data = data switch
             {
-                throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must between {MiniLength} and {MaxLength}.");
-            }
-
-            int index = 0;
-
-            Version = ReadUInt32(data);
-
-            if (Version > 2)
-            {
+                { Length: < MinLength or > MaxLength } => throw new ArgumentOutOfRangeException(nameof(data), $"The length of {nameof(data)} must be {MinLength} or {MaxLength}."),
                 // Technically, 0 is not a supported version either; we assume version 0 indicates
                 // an empty framebuffer.
-                throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
-            }
+                [> 2, ..] => throw new InvalidOperationException($"Framebuffer version {Version} is not supported"),
+                [2, ..] => data,
+                [< 2, ..] => [.. data[..(2 * sizeof(uint))], 0, 0, 0, 0, .. data[(2 * sizeof(uint))..]]
+            };
 
-            Bpp = ReadUInt32(data);
-
-            if (Version >= 2)
+            unsafe
             {
-                ColorSpace = ReadUInt32(data);
+                fixed (byte* p = _data)
+                {
+                    FramebufferHeader* header = (FramebufferHeader*)p;
+                    this = *header;
+                }
             }
-
-            Size = ReadUInt32(data);
-            Width = ReadUInt32(data);
-            Height = ReadUInt32(data);
-
-            Red = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Blue = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Green = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            Alpha = new ColorData(
-                ReadUInt32(data),
-                ReadUInt32(data));
-
-            uint ReadUInt32(in ReadOnlySpan<byte> data) => (uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24));
         }
 #endif
 
@@ -198,7 +155,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the length of the head in bytes.
         /// </summary>
-        public int Count => Version < 2 ? MiniLength : MaxLength;
+        public int Count => Version < 2 ? MinLength : MaxLength;
 
         /// <inheritdoc/>
         public byte this[int index]
@@ -258,6 +215,7 @@ namespace AdvancedSharpAdbClient.Models
         /// </summary>
         /// <param name="data">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new <see cref="FramebufferHeader"/> object.</returns>
+        [OverloadResolutionPriority(1)]
         public static FramebufferHeader Read(ReadOnlySpan<byte> data) => new(data);
 #endif
 

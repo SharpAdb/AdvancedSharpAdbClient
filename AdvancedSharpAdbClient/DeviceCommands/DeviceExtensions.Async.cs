@@ -220,15 +220,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <remarks>V2 need Android 8 or above.</remarks>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PullAsync(remotePath, stream, callback, cancellationToken).ConfigureAwait(false);
+            await service.PullAsync(remotePath, stream, callback, useV2, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -404,15 +407,18 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        /// <remarks>V2 need Android 8 or above.</remarks>
         public static async Task PullAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             IProgress<SyncProgressChangedEventArgs>? progress,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PullAsync(remotePath, stream, progress.AsAction(), cancellationToken).ConfigureAwait(false);
+            await service.PullAsync(remotePath, stream, progress.AsAction(), useV2, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>

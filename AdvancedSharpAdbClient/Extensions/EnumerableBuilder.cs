@@ -29,9 +29,14 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="ColorData"/> struct.</param>
         /// <returns>A new instance of <see cref="ColorData"/> struct.</returns>
-        public static ColorData ColorDataCreator(ReadOnlySpan<byte> values) =>
-            new((uint)(values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24)),
-                (uint)(values[4] | (values[5] << 8) | (values[6] << 16) | (values[7] << 24)));
+        public static unsafe ColorData ColorDataCreator(ReadOnlySpan<byte> values)
+        {
+            fixed (byte* p = values)
+            {
+                ColorData* data = (ColorData*)p;
+                return *data;
+            }
+        }
 
         /// <summary>
         /// Build a <see cref="FramebufferHeader"/> struct.
@@ -45,16 +50,41 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FileStatistics"/> struct.</param>
         /// <returns>A new instance of <see cref="FileStatistics"/> struct.</returns>
-        public static FileStatistics FileStatisticsCreator(ReadOnlySpan<byte> values)
+        public static FileStatistics FileStatisticsCreator(ReadOnlySpan<byte> values) => new(FileStatisticsDataCreator(values));
+
+        /// <summary>
+        /// Build a <see cref="FileStatisticsData"/> struct.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsData"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsData"/> struct.</returns>
+        public static unsafe FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values)
         {
-            int index = 0;
-            return new FileStatistics
+            fixed (byte* p = values)
             {
-                FileMode = (UnixFileStatus)ReadUInt32(values),
-                Size = ReadUInt32(values),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(values))
-            };
-            uint ReadUInt32(in ReadOnlySpan<byte> data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
+                FileStatisticsData* data = (FileStatisticsData*)p;
+                return *data;
+            }
+        }
+
+        /// <summary>
+        /// Build a <see cref="FileStatisticsV2"/> struct.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsV2"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsV2"/> struct.</returns>
+        public static FileStatisticsV2 FileStatisticsV2Creator(ReadOnlySpan<byte> values) => new(FileStatisticsDataV2Creator(values));
+
+        /// <summary>
+        /// Build a <see cref="FileStatisticsDataV2"/> struct.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsDataV2"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsDataV2"/> struct.</returns>
+        public static unsafe FileStatisticsDataV2 FileStatisticsDataV2Creator(ReadOnlySpan<byte> values)
+        {
+            fixed (byte* p = values)
+            {
+                FileStatisticsDataV2* data = (FileStatisticsDataV2*)p;
+                return *data;
+            }
         }
 
         /// <summary>
@@ -62,8 +92,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="UnixFileStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="UnixFileStatus"/> struct.</returns>
-        public static UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) =>
-            (UnixFileStatus)(values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24));
+        public static unsafe UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) => (UnixFileStatus)BitConverter.ToUInt32(values);
 
         /// <summary>
         /// Build a <see cref="LogEntry"/> class.
@@ -276,19 +305,19 @@ namespace AdvancedSharpAdbClient
             ushort? ReadUInt16(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 2);
-                return data.IsEmpty ? null : (ushort)(data[0] | (data[1] << 8));
+                return data.IsEmpty ? null : BitConverter.ToUInt16(data);
             }
 
             uint? ReadUInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data.IsEmpty ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+                return data.IsEmpty ? null : BitConverter.ToUInt32(data);
             }
 
             int? ReadInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data.Length != 4 ? null : data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+                return data.Length != 4 ? null : BitConverter.ToInt32(data);
             }
 
             ReadOnlySpan<byte> ReadBytesSafe(in ReadOnlySpan<byte> bytes, int count)

@@ -62,11 +62,34 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Stat a file v2.
         /// </summary>
+        /// <remarks>Need Android 8 or above.</remarks>
         STA2,
 
         /// <summary>
         /// Stat a list v2.
         /// </summary>
-        LST2
+        /// <remarks>Need Android 8 or above.</remarks>
+        LST2,
+
+        /// <summary>
+        /// List the files in a folder v2.
+        /// </summary>
+        /// <remarks>Need Android 11 or above.</remarks>
+        LIS2,
+
+        /// <summary>
+        /// Retrieve a file from device v2.
+        /// </summary>
+        SND2,
+
+        /// <summary>
+        /// Retrieve a file from device v2.
+        /// </summary>
+        RCV2,
+
+        /// <summary>
+        /// A directory entry v2.
+        /// </summary>
+        DNT2
     }
 }

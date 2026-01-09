@@ -111,7 +111,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.Pull(string, Stream, Action{SyncProgressChangedEventArgs}?, in bool)"/> method.
+        /// Tests the <see cref="SyncService.Pull(string, Stream, Action{SyncProgressChangedEventArgs}?, bool, in bool)"/> method.
         /// </summary>
         [Fact]
         public void PullTest()

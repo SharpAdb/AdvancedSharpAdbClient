@@ -33,9 +33,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        public static void Pull(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, in bool isCancelled = false) =>
-            service.Pull(remotePath, stream, progress.AsAction(), isCancelled);
+        /// <remarks>V2 need Android 8 or above.</remarks>
+        public static void Pull(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, in bool isCancelled = false) =>
+            service.Pull(remotePath, stream, progress.AsAction(), useV2, isCancelled);
 
 #if NET7_0_OR_GREATER
         /// <summary>
