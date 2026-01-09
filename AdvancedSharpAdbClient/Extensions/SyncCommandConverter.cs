@@ -22,23 +22,7 @@ namespace AdvancedSharpAdbClient.Models
             /// Gets the byte array that represents the <see cref="SyncCommand"/>.
             /// </summary>
             /// <returns>A byte array that represents the <see cref="SyncCommand"/>.</returns>
-            public byte[] GetBytes()
-            {
-                if (command == 0)
-                {
-                    return [0, 0, 0, 0];
-                }
-
-                if (command is < SyncCommand.STAT or > SyncCommand.DNT2)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(command), $"{command} is not a valid sync command");
-                }
-
-                string commandText = command.ToString();
-                byte[] commandBytes = AdbClient.Encoding.GetBytes(commandText);
-
-                return commandBytes;
-            }
+            public byte[] GetBytes() => BitConverter.GetBytes((int)command);
 
             /// <summary>
             /// Returns an enumerator that iterates through the <see cref="GetBytes(SyncCommand)"/>.
@@ -60,8 +44,7 @@ namespace AdvancedSharpAdbClient.Models
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
-                string commandText = AdbClient.Encoding.GetString(value);
-                return commandText == "\0\0\0\0" ? 0 : Enum.TryParse(commandText, true, out SyncCommand result) ? result : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
+                return (SyncCommand)BitConverter.ToInt32(value);
             }
 
 #if HAS_BUFFERS
@@ -77,8 +60,7 @@ namespace AdvancedSharpAdbClient.Models
                     throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
-                string commandText = AdbClient.Encoding.GetString(value);
-                return commandText == "\0\0\0\0" ? 0 : Enum.TryParse(commandText, true, out SyncCommand result) ? result : throw new ArgumentOutOfRangeException(nameof(value), $"{commandText} is not a valid sync command");
+                return (SyncCommand)BitConverter.ToInt32(value);
             }
 #endif
         }
