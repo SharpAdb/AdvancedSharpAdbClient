@@ -17,7 +17,7 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="Mode">The mode of the file.</param>
     /// <param name="Size">The total file size, in bytes.</param>
     /// <param name="Time">The time of last modification.</param>
-    /// <remarks><see href="https://android.googlesource.com/platform/system/adb/+/refs/heads/main/file_sync_service.h"/></remarks>
+    /// <remarks><see href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/file_sync_protocol.h"/></remarks>
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsDataCreator))]
 #endif

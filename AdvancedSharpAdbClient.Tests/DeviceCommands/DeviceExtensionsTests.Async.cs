@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task StatAsyncTest()
         {
             const string remotePath = "/test";
-            FileStatistics stats = new();
+            FileStatistics stats = new(default);
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task GetDirectoryListingAsyncTest()
         {
             const string remotePath = "/test";
-            List<FileStatistics> stats = [new()];
+            List<FileStatistics> stats = [new(default)];
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -156,7 +156,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task GetDirectoryAsyncListingTest()
         {
             const string remotePath = "/test";
-            List<FileStatistics> stats = [new()];
+            List<FileStatistics> stats = [new(default)];
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();

@@ -67,22 +67,22 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <summary>
-        /// Build a <see cref="FileStatisticsV2"/> struct.
+        /// Build a <see cref="FileStatisticsEx"/> struct.
         /// </summary>
-        /// <param name="values">The data that feeds the <see cref="FileStatisticsV2"/> struct.</param>
-        /// <returns>A new instance of <see cref="FileStatisticsV2"/> struct.</returns>
-        public static FileStatisticsV2 FileStatisticsV2Creator(ReadOnlySpan<byte> values) => new(FileStatisticsDataV2Creator(values));
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsEx"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsEx"/> struct.</returns>
+        public static FileStatisticsEx FileStatisticsV2Creator(ReadOnlySpan<byte> values) => new(FileStatisticsDataV2Creator(values));
 
         /// <summary>
-        /// Build a <see cref="FileStatisticsDataV2"/> struct.
+        /// Build a <see cref="FileStatisticsDataEx"/> struct.
         /// </summary>
-        /// <param name="values">The data that feeds the <see cref="FileStatisticsDataV2"/> struct.</param>
-        /// <returns>A new instance of <see cref="FileStatisticsDataV2"/> struct.</returns>
-        public static unsafe FileStatisticsDataV2 FileStatisticsDataV2Creator(ReadOnlySpan<byte> values)
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsDataEx"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsDataEx"/> struct.</returns>
+        public static unsafe FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values)
         {
             fixed (byte* p = values)
             {
-                FileStatisticsDataV2* data = (FileStatisticsDataV2*)p;
+                FileStatisticsDataEx* data = (FileStatisticsDataEx*)p;
                 return *data;
             }
         }

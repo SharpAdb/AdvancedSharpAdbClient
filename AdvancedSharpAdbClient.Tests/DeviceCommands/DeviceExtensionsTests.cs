@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void StatTest()
         {
             const string remotePath = "/test";
-            FileStatistics stats = new();
+            FileStatistics stats = new(default);
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -126,7 +126,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public void GetDirectoryListingTest()
         {
             const string remotePath = "/test";
-            IEnumerable<FileStatistics> stats = [new()];
+            IEnumerable<FileStatistics> stats = [new(default)];
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();

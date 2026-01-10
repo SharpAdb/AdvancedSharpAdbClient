@@ -42,6 +42,57 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="SyncService.StatExAsync(string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async Task StatExAsyncTest()
+        {
+            FileStatisticsEx value = await RunTestAsync(
+                OkResponses(2),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [(SyncCommand.STA2, "/fstab.donatello")],
+                [SyncCommand.STA2],
+                [[
+                    0, 0, 0, 0,
+                    167, 0, 0, 0, 0, 0, 0, 0,
+                    38, 240, 15, 0, 0, 0, 0, 0,
+                    160, 129, 0, 0,
+                    1, 0, 0, 0,
+                    146, 39, 0, 0,
+                    255, 3, 0, 0,
+                    85, 2, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0
+                ]],
+                null,
+                async () =>
+                {
+                    using SyncService service = new(Socket, Device);
+                    FileStatisticsEx value = await service.StatExAsync("/fstab.donatello");
+                    Assert.False(service.IsProcessing);
+                    Assert.False(service.IsOutdate);
+                    return value;
+                });
+
+            Assert.Equal("/fstab.donatello", value.Path);
+            Assert.Equal(UnixErrorCode.Default, value.Error);
+            Assert.Equal(167u, value.Device);
+            Assert.Equal(1044518u, value.IndexNode);
+            Assert.Equal(UnixFileStatus.Regular, value.FileMode.GetFileType());
+            Assert.Equal((UnixFileStatus)416, value.FileMode.GetPermissions());
+            Assert.Equal(1u, value.LinkCount);
+            Assert.Equal(597u, value.Size);
+            Assert.Equal(10130u, value.UserId);
+            Assert.Equal(1023u, value.GroupId);
+            Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.AccessTime);
+            Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.ModifiedTime);
+            Assert.Equal(DateTimeExtensions.Epoch.ToLocalTime(), value.ChangedTime);
+            Assert.Equal($"-rw-r-----\t597\t{value.ModifiedTime}\t/fstab.donatello", value.ToString());
+        }
+
+        /// <summary>
         /// Tests the <see cref="SyncService.GetDirectoryListingAsync(string, CancellationToken)"/> method.
         /// </summary>
         [Fact]
@@ -201,7 +252,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PushAsync(Stream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PushAsync(Stream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async Task PushAsyncTest()

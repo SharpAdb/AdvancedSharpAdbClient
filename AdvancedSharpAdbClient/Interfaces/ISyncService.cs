@@ -29,8 +29,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="permissions">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        void Push(Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, in bool isCancelled);
+        /// <remarks>V2 need Android 11 or above.</remarks>
+        void Push(Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, bool useV2, in bool isCancelled);
 
         /// <summary>
         /// Pulls (downloads) a file from the remote device.
@@ -38,7 +40,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
-        /// <param name="useV2"><see langword="true"/> if use <see cref="Stat"/>; <see langword="true"/> use <see cref="StatV2"/>.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>V2 need Android 8 or above.</remarks>
         void Pull(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback, bool useV2, in bool isCancelled);
@@ -54,9 +56,9 @@ namespace AdvancedSharpAdbClient
         /// Returns information about a file on the device (v2).
         /// </summary>
         /// <param name="remotePath">The path of the file on the device.</param>
-        /// <returns>A <see cref="FileStatisticsV2"/> object that contains information about the file.</returns>
+        /// <returns>A <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
         /// <remarks>Need Android 8 or above.</remarks>
-        FileStatisticsV2 StatV2(string remotePath);
+        FileStatisticsEx StatEx(string remotePath);
 
         /// <summary>
         /// Lists the contents of a directory on the device.
@@ -66,12 +68,12 @@ namespace AdvancedSharpAdbClient
         IEnumerable<FileStatistics> GetDirectoryListing(string remotePath);
 
         /// <summary>
-        /// Lists the contents of a directory on the device.
+        /// Lists the contents of a directory on the device (v2).
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
-        /// <returns>For each child item of the directory, a <see cref="FileStatisticsV2"/> object with information of the item.</returns>
+        /// <returns>For each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
         /// <remarks>Need Android 11 or above.</remarks>
-        IEnumerable<FileStatisticsV2> GetDirectoryListingV2(string remotePath);
+        IEnumerable<FileStatisticsEx> GetDirectoryListingEx(string remotePath);
 
         /// <summary>
         /// Opens this connection.

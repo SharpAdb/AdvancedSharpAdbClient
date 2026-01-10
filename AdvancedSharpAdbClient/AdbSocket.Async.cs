@@ -79,6 +79,25 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public async Task SendSyncRequestAsync(SyncCommand command, UnixFileStatus permissions, SyncFlags flags, CancellationToken cancellationToken = default)
+        {
+            byte[] commandBytes = command.GetBytes();
+            byte[] modeBytes = BitConverter.GetBytes((uint)permissions.GetPermissions());
+            byte[] flagsBytes = BitConverter.GetBytes((int)flags);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert from big endian to little endian
+                Array.Reverse(modeBytes);
+                Array.Reverse(flagsBytes);
+            }
+
+            _ = await WriteAsync(commandBytes, cancellationToken).ConfigureAwait(false);
+            _ = await WriteAsync(modeBytes, cancellationToken).ConfigureAwait(false);
+            _ = await WriteAsync(flagsBytes, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
         public Task SendSyncRequestAsync(SyncCommand command, string path, UnixFileStatus permissions, CancellationToken cancellationToken = default) =>
             SendSyncRequestAsync(command, $"{path},{(int)permissions.GetPermissions()}", cancellationToken);
 
@@ -92,7 +111,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public async Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken = default)
+        public async Task SendSyncRequestAsync(SyncCommand command, int value, CancellationToken cancellationToken = default)
         {
             // The message structure is:
             // First four bytes: command
@@ -100,7 +119,7 @@ namespace AdvancedSharpAdbClient
             // Final bytes: path
             byte[] commandBytes = command.GetBytes();
 
-            byte[] lengthBytes = BitConverter.GetBytes(length);
+            byte[] lengthBytes = BitConverter.GetBytes(value);
 
             if (!BitConverter.IsLittleEndian)
             {

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Security;
 
 namespace AdvancedSharpAdbClient
 {
@@ -145,7 +146,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, in bool isCancelled = false)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -161,8 +162,17 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    Socket.SendSyncRequest(SyncCommand.SND2, remotePath);
+                    IsProcessing = true;
+                    Socket.SendSyncRequest(SyncCommand.SND2, permission, SyncFlags.None);
+                }
+                else
+                {
+                    Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
+                    IsProcessing = true;
+                }
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -242,8 +252,6 @@ namespace AdvancedSharpAdbClient
             }
         }
 
-        private ulong GetFileSize(string remoteFilePath, bool useV2 = false) => useV2 ? StatV2(remoteFilePath).Size : Stat(remoteFilePath).Size;
-
         /// <inheritdoc/>
         public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, in bool isCancelled = false)
         {
@@ -255,15 +263,24 @@ namespace AdvancedSharpAdbClient
             if (IsOutdate) { Reopen(); }
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
-            ulong totalBytesToProcess = GetFileSize(remoteFilePath, useV2);
+            ulong totalBytesToProcess = this.Stat(remoteFilePath, useV2).Size;
             ulong totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
             try
             {
-                Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    Socket.SendSyncRequest(SyncCommand.RCV2, remoteFilePath);
+                    IsProcessing = true;
+                    Socket.SendSyncRequest(SyncCommand.RCV2, (int)SyncFlags.None);
+                }
+                else
+                {
+                    Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
+                    IsProcessing = true;
+                }
 
                 while (!isCancelled)
                 {
@@ -338,7 +355,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public FileStatisticsV2 StatV2(string remotePath)
+        public FileStatisticsEx StatEx(string remotePath)
         {
             // create the stat request message.
             Socket.SendSyncRequest(SyncCommand.STA2, remotePath);
@@ -349,7 +366,7 @@ namespace AdvancedSharpAdbClient
                 throw new AdbException($"The server returned an invalid sync response {response}.");
             }
 
-            FileStatisticsV2 value = ReadStatisticsV2();
+            FileStatisticsEx value = ReadStatisticsV2();
             value.Path = remotePath;
 
             return value;
@@ -405,7 +422,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public IEnumerable<FileStatisticsV2> GetDirectoryListingV2(string remotePath)
+        public IEnumerable<FileStatisticsEx> GetDirectoryListingEx(string remotePath)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
             if (IsOutdate) { Reopen(); }
@@ -436,7 +453,7 @@ namespace AdvancedSharpAdbClient
                             throw new AdbException($"The server returned an invalid sync response {response}.");
                     }
 
-                    FileStatisticsV2 entry = ReadStatisticsV2();
+                    FileStatisticsEx entry = ReadStatisticsV2();
                     entry.Path = Socket.ReadSyncString();
 
                     yield return entry;
@@ -518,22 +535,22 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Reads the statistics of a file from the socket (v2).
         /// </summary>
-        /// <returns>A <see cref="FileStatisticsV2"/> object that contains information about the file.</returns>
-        protected FileStatisticsV2 ReadStatisticsV2()
+        /// <returns>A <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
+        protected FileStatisticsEx ReadStatisticsV2()
         {
 #if COMP_NETSTANDARD2_1
-            Span<byte> statResult = stackalloc byte[FileStatisticsDataV2.Length];
+            Span<byte> statResult = stackalloc byte[FileStatisticsDataEx.Length];
             _ = Socket.Read(statResult);
             return EnumerableBuilder.FileStatisticsV2Creator(statResult);
 #else
-            byte[] statResult = new byte[FileStatisticsDataV2.Length];
+            byte[] statResult = new byte[FileStatisticsDataEx.Length];
             _ = Socket.Read(statResult);
             unsafe
             {
                 fixed (byte* p = statResult)
                 {
-                    FileStatisticsDataV2* data = (FileStatisticsDataV2*)p;
-                    return new FileStatisticsV2(*data);
+                    FileStatisticsDataEx* data = (FileStatisticsDataEx*)p;
+                    return new FileStatisticsEx(*data);
                 }
             }
 #endif

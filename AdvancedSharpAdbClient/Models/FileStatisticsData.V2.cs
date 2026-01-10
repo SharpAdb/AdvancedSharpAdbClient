@@ -23,19 +23,19 @@ namespace AdvancedSharpAdbClient.Models
     /// <param name="AccessTime">The last access time, in Unix timestamp format, for the associated resource.</param>
     /// <param name="ModifiedTime">The timestamp indicating when the item was last modified.</param>
     /// <param name="ChangedTime">The timestamp indicating when the last change occurred.</param>
-    /// <remarks><see href="https://android.googlesource.com/platform/system/adb/+/refs/heads/main/file_sync_service.h"/></remarks>
+    /// <remarks><see href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/file_sync_protocol.h"/></remarks>
 #if HAS_BUFFERS
     [CollectionBuilder(typeof(EnumerableBuilder), nameof(EnumerableBuilder.FileStatisticsDataV2Creator))]
 #endif
     [DebuggerDisplay($"{{{nameof(ToString)}(),nq}}")]
     [StructLayout(LayoutKind.Explicit)]
-    public readonly record struct FileStatisticsDataV2(uint Error, ulong Device, ulong IndexNode, uint Mode, uint LinkCount, uint UserId, uint GroupId, ulong Size, long AccessTime, long ModifiedTime, long ChangedTime)
+    public readonly record struct FileStatisticsDataEx(uint Error, ulong Device, ulong IndexNode, uint Mode, uint LinkCount, uint UserId, uint GroupId, ulong Size, long AccessTime, long ModifiedTime, long ChangedTime)
 #if NET7_0_OR_GREATER
-        : IEqualityOperators<FileStatisticsDataV2, FileStatisticsDataV2, bool>
+        : IEqualityOperators<FileStatisticsDataEx, FileStatisticsDataEx, bool>
 #endif
     {
         /// <summary>
-        /// The length of <see cref="FileStatisticsDataV2"/> in bytes.
+        /// The length of <see cref="FileStatisticsDataEx"/> in bytes.
         /// </summary>
         public const int Length = 5 * sizeof(uint) + 3 * sizeof(ulong) + 3 * sizeof(long);
 
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.Models
         public unsafe byte[] ToArray()
         {
             byte[] array = new byte[Length];
-            fixed (FileStatisticsDataV2* pData = &this)
+            fixed (FileStatisticsDataEx* pData = &this)
             {
                 Marshal.Copy((nint)pData, array, 0, Length);
                 return array;
@@ -127,7 +127,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <returns>A <see cref="ReadOnlySpan{Byte}"/> that provides a read-only view of the bytes in this instance.</returns>
         public unsafe ReadOnlySpan<byte> AsSpan()
         {
-            fixed (FileStatisticsDataV2* pData = &this)
+            fixed (FileStatisticsDataEx* pData = &this)
             {
                 return new ReadOnlySpan<byte>(pData, Length);
             }

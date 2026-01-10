@@ -728,7 +728,7 @@ namespace AdvancedSharpAdbClient
                 Encoding.GetString(buffer, 0, read);
 #endif
 
-            // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/master/daemon/restart_service.cpp
+            // see https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/daemon/restart_service.cpp
             // for possible return strings
             if (!responseMessage.Contains("restarting", StringComparison.OrdinalIgnoreCase))
             {

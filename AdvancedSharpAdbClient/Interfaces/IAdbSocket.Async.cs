@@ -52,6 +52,16 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously sends a sync request to the device.
         /// </summary>
         /// <param name="command" >The command to send.</param>
+        /// <param name="permissions">If the command is a <see cref="SyncCommand.SND2"/> command, the permissions to assign to the newly created file.</param>
+        /// <param name="flags">If the command is a <see cref="SyncCommand.SND2"/>, the compression type to use.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        Task SendSyncRequestAsync(SyncCommand command, UnixFileStatus permissions, SyncFlags flags, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Asynchronously sends a sync request to the device.
+        /// </summary>
+        /// <param name="command" >The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
         /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
@@ -71,10 +81,10 @@ namespace AdvancedSharpAdbClient
         /// Asynchronously sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
-        /// <param name="length">The length of the data packet that follows.</param>
+        /// <param name="value">A <see cref="int"/> data or the length of the data packet that follows.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task SendSyncRequestAsync(SyncCommand command, int length, CancellationToken cancellationToken);
+        Task SendSyncRequestAsync(SyncCommand command, int value, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously sends a request to the Android Debug Bridge.To read the response, call

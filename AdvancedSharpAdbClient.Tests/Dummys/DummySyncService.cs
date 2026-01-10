@@ -42,7 +42,7 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, in bool isCancelled = false)
+        public void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, bool useV2 = false, in bool isCancelled = false)
         {
             for (uint i = 0; i <= 100; i++)
             {
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.Tests
             }
         }
 
-        public async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, CancellationToken cancellationToken = default)
+        public async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs> callback = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {
             for (uint i = 0; i <= 100; i++)
             {
@@ -79,23 +79,23 @@ namespace AdvancedSharpAdbClient.Tests
 
         IAsyncEnumerable<FileStatistics> ISyncService.GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        IAsyncEnumerable<FileStatisticsV2> ISyncService.GetDirectoryAsyncListingV2(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        IAsyncEnumerable<FileStatisticsEx> ISyncService.GetDirectoryAsyncListingEx(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         IEnumerable<FileStatistics> ISyncService.GetDirectoryListing(string remotePath) => throw new NotImplementedException();
 
         Task<List<FileStatistics>> ISyncService.GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        IEnumerable<FileStatisticsV2> ISyncService.GetDirectoryListingV2(string remotePath) => throw new NotImplementedException();
+        IEnumerable<FileStatisticsEx> ISyncService.GetDirectoryListingEx(string remotePath) => throw new NotImplementedException();
 
-        Task<List<FileStatisticsV2>> ISyncService.GetDirectoryListingV2Async(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task<List<FileStatisticsEx>> ISyncService.GetDirectoryListingExAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         FileStatistics ISyncService.Stat(string remotePath) => throw new NotImplementedException();
 
         Task<FileStatistics> ISyncService.StatAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-        FileStatisticsV2 ISyncService.StatV2(string remotePath) => throw new NotImplementedException();
+        FileStatisticsEx ISyncService.StatEx(string remotePath) => throw new NotImplementedException();
 
-        Task<FileStatisticsV2> ISyncService.StatV2Async(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
+        Task<FileStatisticsEx> ISyncService.StatExAsync(string remotePath, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         #endregion
     }

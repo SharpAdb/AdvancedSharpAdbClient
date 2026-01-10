@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
     /// Bridge exposes, use the <see cref="AdbClient"/>.</para>
     /// <para>For more information about the protocol that is implemented here, see chapter
     /// II Protocol Details, section 1. Client &lt;-&gt;Server protocol at
-    /// <see href="https://android.googlesource.com/platform/system/core/+/master/adb/OVERVIEW.TXT"/>.</para>
+    /// <see href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/docs/dev/overview.md"/>.</para>
     /// </summary>
     /// <param name="socket">The <see cref="ITcpSocket"/> at which the Android Debug Bridge is listening for clients.</param>
     /// <param name="logger">The logger to use when logging.</param>
@@ -155,6 +155,25 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public void SendSyncRequest(SyncCommand command, UnixFileStatus permissions, SyncFlags flags)
+        {
+            byte[] commandBytes = command.GetBytes();
+            byte[] modeBytes = BitConverter.GetBytes((uint)permissions.GetPermissions());
+            byte[] flagsBytes = BitConverter.GetBytes((int)flags);
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert from big endian to little endian
+                Array.Reverse(modeBytes);
+                Array.Reverse(flagsBytes);
+            }
+
+            _ = Write(commandBytes);
+            _ = Write(modeBytes);
+            _ = Write(flagsBytes);
+        }
+
+        /// <inheritdoc/>
         public void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permissions) =>
             SendSyncRequest(command, $"{path},{(int)permissions.GetPermissions()}");
 
@@ -168,7 +187,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public void SendSyncRequest(SyncCommand command, int length)
+        public void SendSyncRequest(SyncCommand command, int value)
         {
             // The message structure is:
             // First four bytes: command
@@ -176,7 +195,7 @@ namespace AdvancedSharpAdbClient
             // Final bytes: path
             byte[] commandBytes = command.GetBytes();
 
-            byte[] lengthBytes = BitConverter.GetBytes(length);
+            byte[] lengthBytes = BitConverter.GetBytes(value);
 
             if (!BitConverter.IsLittleEndian)
             {

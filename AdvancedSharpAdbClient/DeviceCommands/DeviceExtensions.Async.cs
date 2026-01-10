@@ -220,7 +220,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <remarks>V2 need Android 8 or above.</remarks>
@@ -244,15 +244,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileStatus permission, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PushAsync(stream, remotePath, permission, timestamp, callback, cancellationToken).ConfigureAwait(false);
+            await service.PushAsync(stream, remotePath, permission, timestamp, callback, useV2, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -270,6 +272,32 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         }
 
         /// <summary>
+        /// Asynchronously gets the file statistics of a given file (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{FileStatistics}"/> which returns a <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
+        public static async Task<FileStatisticsEx> StatExAsync(this IAdbClient client, DeviceData device, string path, CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return await service.StatExAsync(path, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously gets the file statistics of a given file.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="StatAsync(IAdbClient, DeviceData, string, CancellationToken)"/>; otherwise, use <see cref="StatExAsync"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{IFileStatistics}"/> which returns a <see cref="IFileStatistics"/> object that contains information about the file.</returns>
+        public static Task<IFileStatistics> StatAsync(this IAdbClient client, DeviceData device, string path, bool useV2, CancellationToken cancellationToken = default) =>
+            useV2 ? client.StatExAsync(device, path, cancellationToken).ContinueWith(x => x.Result as IFileStatistics) : client.StatAsync(device, path, cancellationToken).ContinueWith(x => x.Result as IFileStatistics);
+
+        /// <summary>
         /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
@@ -282,6 +310,36 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             return await service.GetDirectoryListingAsync(remotePath, cancellationToken).ConfigureAwait(false);
         }
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
+        public static async Task<List<FileStatisticsEx>> GetDirectoryListingExAsync(this IAdbClient client, DeviceData device, string remotePath, CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return await service.GetDirectoryListingExAsync(remotePath, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="GetDirectoryListingAsync(IAdbClient, DeviceData, string, CancellationToken)"/>; otherwise, use <see cref="GetDirectoryListingExAsync"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{IEnumerable}"/> which returns for each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
+        public static Task<IEnumerable<IFileStatistics>> GetDirectoryListingAsync(this IAdbClient client, DeviceData device, string remotePath, bool useV2, CancellationToken cancellationToken = default) =>
+#if NETFRAMEWORK && !NET40_OR_GREATER
+            useV2 ? client.GetDirectoryListingExAsync(device, remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>()) : client.GetDirectoryListingAsync(device, remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>());
+#else
+            useV2 ? client.GetDirectoryListingExAsync(device, remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<IFileStatistics>) : client.GetDirectoryListingAsync(device, remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<IFileStatistics>);
+#endif
 
 #if COMP_NETSTANDARD2_1
         /// <summary>
@@ -300,6 +358,35 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 yield return file;
             }
         }
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="IAsyncEnumerable{FileStatisticsEx}"/> which returns for each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
+        public static async IAsyncEnumerable<FileStatisticsEx> GetDirectoryAsyncListingEx(this IAdbClient client, DeviceData device, string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            await foreach (FileStatisticsEx file in service.GetDirectoryAsyncListingEx(remotePath, cancellationToken).ConfigureAwait(false))
+            {
+                yield return file;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="GetDirectoryListingAsync(IAdbClient, DeviceData, string, CancellationToken)"/>; otherwise, use <see cref="GetDirectoryListingExAsync"/>.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="IAsyncEnumerable{IFileStatistics}"/> which returns for each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
+        public static IAsyncEnumerable<IFileStatistics> GetDirectoryAsyncListing(this IAdbClient client, DeviceData device, string remotePath, bool useV2, CancellationToken cancellationToken = default) =>
+            useV2 ? client.GetDirectoryAsyncListingEx(device, remotePath, cancellationToken) : client.GetDirectoryAsyncListing(device, remotePath, cancellationToken);
 #endif
 
         /// <summary>
@@ -407,7 +494,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
-        /// <param name="useV2"><see langword="true"/> if use <see cref="ISyncService.Stat"/>; <see langword="true"/> use <see cref="ISyncService.StatV2"/>.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <remarks>V2 need Android 8 or above.</remarks>
@@ -431,15 +518,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileStatus permission, DateTimeOffset timestamp,
             IProgress<SyncProgressChangedEventArgs>? progress,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PushAsync(stream, remotePath, permission, timestamp, progress.AsAction(), cancellationToken).ConfigureAwait(false);
+            await service.PushAsync(stream, remotePath, permission, timestamp, progress.AsAction(), useV2, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -506,15 +595,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PushAsync(stream, remotePath, (UnixFileStatus)permission, timestamp, callback, cancellationToken).ConfigureAwait(false);
+            await service.PushAsync(stream, remotePath, (UnixFileStatus)permission, timestamp, callback, useV2, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -527,15 +618,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         public static async Task PushAsync(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
             IProgress<SyncProgressChangedEventArgs>? progress,
+            bool useV2 = false,
             CancellationToken cancellationToken = default)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            await service.PushAsync(stream, remotePath, (UnixFileStatus)permission, timestamp, progress.AsAction(), cancellationToken).ConfigureAwait(false);
+            await service.PushAsync(stream, remotePath, (UnixFileStatus)permission, timestamp, progress.AsAction(), useV2, cancellationToken).ConfigureAwait(false);
         }
 #endif
 #endif
