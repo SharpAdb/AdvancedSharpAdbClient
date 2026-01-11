@@ -24,14 +24,15 @@ namespace AdvancedSharpAdbClient.Tests
                 [SyncCommand.STAT],
                 [[160, 129, 0, 0, 85, 2, 0, 0, 0, 0, 0, 0]],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    FileStatistics value = await service.StatAsync("/fstab.donatello");
+                    FileStatistics value = await service.StatAsync("/fstab.donatello", ctx);
                     Assert.False(service.IsProcessing);
                     Assert.False(service.IsOutdate);
                     return value;
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             Assert.Equal("/fstab.donatello", value.Path);
             Assert.Equal(UnixFileStatus.Regular, value.FileMode.GetFileType());
@@ -67,14 +68,15 @@ namespace AdvancedSharpAdbClient.Tests
                     0, 0, 0, 0, 0, 0, 0, 0
                 ]],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    FileStatisticsEx value = await service.StatExAsync("/fstab.donatello");
+                    FileStatisticsEx value = await service.StatExAsync("/fstab.donatello", ctx);
                     Assert.False(service.IsProcessing);
                     Assert.False(service.IsOutdate);
                     return value;
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             Assert.Equal("/fstab.donatello", value.Path);
             Assert.Equal(UnixErrorCode.Default, value.Error);
@@ -111,14 +113,15 @@ namespace AdvancedSharpAdbClient.Tests
                     [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
                 ],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    List<FileStatistics> value = await service.GetDirectoryListingAsync("/storage");
+                    List<FileStatistics> value = await service.GetDirectoryListingAsync("/storage", ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
                     return value;
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(4, value.Count);
 
@@ -172,14 +175,15 @@ namespace AdvancedSharpAdbClient.Tests
                     [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
                 ],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    List<FileStatistics> value = await service.GetDirectoryAsyncListing("/storage").ToListAsync();
+                    List<FileStatistics> value = await service.GetDirectoryAsyncListing("/storage", ctx).ToListAsync();
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
                     return value;
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(4, value.Count);
 
@@ -221,7 +225,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async Task PullAsyncTest()
         {
             await using MemoryStream stream = new();
-            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin", TestContext.Current.CancellationToken);
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             await RunTestAsync(
@@ -239,13 +243,14 @@ namespace AdvancedSharpAdbClient.Tests
                     content
                 ],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PullAsync("/fstab.donatello", stream, null);
+                    await service.PullAsync("/fstab.donatello", stream, null, cancellationToken: ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             // Make sure the data that has been sent to the stream is the expected data
             Assert.Equal(content, stream.ToArray());
@@ -258,7 +263,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async Task PushAsyncTest()
         {
             FileStream stream = File.OpenRead("Assets/Fstab.bin");
-            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin", TestContext.Current.CancellationToken);
             byte[] contentMessage =
             [
                 .. SyncCommand.DATA.GetBytes(),
@@ -277,13 +282,14 @@ namespace AdvancedSharpAdbClient.Tests
                 [SyncCommand.OKAY],
                 null,
                 [contentMessage],
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PushAsync(stream, "/sdcard/test", UnixFileStatus.StickyBit | UnixFileStatus.UserWrite | UnixFileStatus.OtherRead, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null);
+                    await service.PushAsync(stream, "/sdcard/test", UnixFileStatus.StickyBit | UnixFileStatus.UserWrite | UnixFileStatus.OtherRead, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, cancellationToken: ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
-                });
+                },
+                TestContext.Current.CancellationToken);
         }
 
         /// <summary>
@@ -305,30 +311,31 @@ namespace AdvancedSharpAdbClient.Tests
                     [109, 65, 0, 0, 0, 0, 0, 0, 152, 130, 56, 86]
                 ],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await foreach (FileStatistics stat in service.GetDirectoryAsyncListing("/storage"))
+                    await foreach (FileStatistics stat in service.GetDirectoryAsyncListing("/storage", ctx))
                     {
                         Assert.False(service.IsOutdate);
                         Assert.True(service.IsProcessing);
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((Stream)null, null, default, default));
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (Stream)null));
-#if WINDOWS10_0_18362_0_OR_GREATER
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((IInputStream)null, null, default, default));
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (IOutputStream)null));
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((Stream)null, null, default, default, cancellationToken: ctx));
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (Stream)null, cancellationToken: ctx));
+#if WINDOWS10_0_17763_0_OR_GREATER
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PushAsync((IInputStream)null, null, default, default, cancellationToken: ctx));
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.PullAsync(null, (IOutputStream)null, cancellationToken: ctx));
 #endif
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetDirectoryListingAsync(null));
-                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetDirectoryAsyncListing(null).ToListAsync().AsTask());
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetDirectoryListingAsync(null, ctx));
+                        _ = await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetDirectoryAsyncListing(null, ctx).ToListAsync(cancellationToken: ctx).AsTask());
                     }
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
-                });
+                },
+                TestContext.Current.CancellationToken);
         }
 
-#if WINDOWS10_0_18362_0_OR_GREATER
+#if WINDOWS10_0_17763_0_OR_GREATER
         /// <summary>
-        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PullAsync(string, IOutputStream, Action{SyncProgressChangedEventArgs}?, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async Task PullWinRTAsyncTest()
@@ -336,7 +343,7 @@ namespace AdvancedSharpAdbClient.Tests
             if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
 
             using InMemoryRandomAccessStream stream = new();
-            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin", TestContext.Current.CancellationToken);
             byte[] contentLength = BitConverter.GetBytes(content.Length);
 
             await RunTestAsync(
@@ -354,13 +361,14 @@ namespace AdvancedSharpAdbClient.Tests
                     content
                 ],
                 null,
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PullAsync("/fstab.donatello", stream, null);
+                    await service.PullAsync("/fstab.donatello", stream, null, cancellationToken: ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
-                });
+                },
+                TestContext.Current.CancellationToken);
 
             IBuffer buffer = await stream.GetInputStreamAt(0).ReadAsync(new byte[(int)stream.Size].AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
             // Make sure the data that has been sent to the stream is the expected data
@@ -368,7 +376,7 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="SyncService.PushAsync(IInputStream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, CancellationToken)"/> method.
+        /// Tests the <see cref="SyncService.PushAsync(IInputStream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, bool, CancellationToken)"/> method.
         /// </summary>
         [Fact]
         public async Task PushWinRTAsyncTest()
@@ -377,7 +385,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             StorageFile storageFile = await StorageFile.GetFileFromPathAsync(Path.GetFullPath("Assets/Fstab.bin"));
             using IRandomAccessStreamWithContentType stream = await storageFile.OpenReadAsync();
-            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin");
+            byte[] content = await File.ReadAllBytesAsync("Assets/Fstab.bin", TestContext.Current.CancellationToken);
             byte[] contentMessage =
             [
                 .. SyncCommand.DATA.GetBytes(),
@@ -396,13 +404,14 @@ namespace AdvancedSharpAdbClient.Tests
                 [SyncCommand.OKAY],
                 null,
                 [contentMessage],
-                async () =>
+                async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PushAsync(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null);
+                    await service.PushAsync(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), null, cancellationToken: ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
-                });
+                },
+                TestContext.Current.CancellationToken);
         }
 #endif
     }

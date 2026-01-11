@@ -13,7 +13,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <remarks><see href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/file_sync_protocol.h"/></remarks>
     [DebuggerDisplay($"{{{nameof(GetType)}().{nameof(Type.ToString)}(),nq}} \\{{ {nameof(Path)} = {{{nameof(Path)}}}, {nameof(FileMode)} = {{{nameof(FileMode)}}}, {nameof(Size)} = {{{nameof(Size)}}}, {nameof(ModifiedTime)} = {{{nameof(ModifiedTime)}}} }}")]
-    public class FileStatisticsEx(FileStatisticsDataEx data) : FileStatisticsBase<FileStatisticsDataEx, FileStatisticsEx>(data), IFileStatistics
+    public class FileStatisticsEx(in FileStatisticsDataEx data) : FileStatisticsBase<FileStatisticsDataEx, FileStatisticsEx>(data), IFileStatistics
 #if NET7_0_OR_GREATER
         , IEqualityOperators<FileStatisticsEx, FileStatisticsEx, bool>
 #endif

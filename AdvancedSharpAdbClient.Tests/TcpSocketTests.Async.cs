@@ -16,15 +16,14 @@ namespace AdvancedSharpAdbClient.Tests
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
 
-            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80));
+            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80), TestContext.Current.CancellationToken);
             Assert.True(socket.Connected);
 
             byte[] data = "GET / HTTP/1.1\n\n"u8.ToArray();
-            await socket.SendAsync(data, data.Length, SocketFlags.None);
+            await socket.SendAsync(data, data.Length, SocketFlags.None, TestContext.Current.CancellationToken);
 
             byte[] responseData = new byte[128];
-            await socket.ReceiveAsync(responseData, responseData.Length, SocketFlags.None);
-
+            await socket.ReceiveAsync(responseData, responseData.Length, SocketFlags.None, TestContext.Current.CancellationToken);
             _ = Encoding.ASCII.GetString(responseData);
         }
 
@@ -34,14 +33,13 @@ namespace AdvancedSharpAdbClient.Tests
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
 
-            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80));
+            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80), TestContext.Current.CancellationToken);
             Assert.True(socket.Connected);
 
             ReadOnlyMemory<byte> data = "GET / HTTP/1.1\n\n"u8.ToArray();
-            await socket.SendAsync(data, SocketFlags.None);
-
+            await socket.SendAsync(data, SocketFlags.None, TestContext.Current.CancellationToken);
             byte[] responseData = new byte[128];
-            await socket.ReceiveAsync(responseData.AsMemory(), SocketFlags.None);
+            await socket.ReceiveAsync(responseData.AsMemory(), SocketFlags.None, TestContext.Current.CancellationToken);
 
             _ = Encoding.ASCII.GetString(responseData);
         }
@@ -55,13 +53,13 @@ namespace AdvancedSharpAdbClient.Tests
             using TcpSocket socket = new();
             Assert.False(socket.Connected);
 
-            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80));
+            await socket.ConnectAsync(new DnsEndPoint("www.bing.com", 80), TestContext.Current.CancellationToken);
             Assert.True(socket.Connected);
 
             socket.Dispose();
             Assert.False(socket.Connected);
 
-            await socket.ReconnectAsync();
+            await socket.ReconnectAsync(TestContext.Current.CancellationToken);
             Assert.True(socket.Connected);
         }
 
@@ -72,7 +70,7 @@ namespace AdvancedSharpAdbClient.Tests
         public async Task CreateUnsupportedSocketAsyncTest()
         {
             using TcpSocket socket = new();
-            _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint()));
+            _ = await Assert.ThrowsAsync<NotSupportedException>(() => socket.ConnectAsync(new CustomEndPoint(), TestContext.Current.CancellationToken));
         }
     }
 }

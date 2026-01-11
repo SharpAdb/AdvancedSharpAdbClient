@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             AdbServer adbServer = new(endPoint => adbSocketMock, adbCommandLineClientFactory);
 
-            AdbServerStatus status = await adbServer.GetStatusAsync();
+            AdbServerStatus status = await adbServer.GetStatusAsync(TestContext.Current.CancellationToken);
             Assert.False(status.IsRunning);
             Assert.Null(status.Version);
         }
@@ -35,7 +35,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0020");
 
-            AdbServerStatus status = await adbServer.GetStatusAsync();
+            AdbServerStatus status = await adbServer.GetStatusAsync(TestContext.Current.CancellationToken);
 
             Assert.Empty(socket.Responses);
             Assert.Empty(socket.ResponseMessages);
@@ -56,7 +56,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
-            _ = await Assert.ThrowsAsync<SocketException>(async () => await adbServer.GetStatusAsync());
+            _ = await Assert.ThrowsAsync<SocketException>(() => adbServer.GetStatusAsync(TestContext.Current.CancellationToken));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
-            _ = await Assert.ThrowsAsync<Exception>(async () => await adbServer.GetStatusAsync());
+            _ = await Assert.ThrowsAsync<Exception>(() => adbServer.GetStatusAsync(TestContext.Current.CancellationToken));
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0020");
 
-            StartServerResult result = await adbServer.StartServerAsync(null, false);
+            StartServerResult result = await adbServer.StartServerAsync(null, false, TestContext.Current.CancellationToken);
 
             Assert.Equal(StartServerResult.AlreadyRunning, result);
 
@@ -99,7 +99,7 @@ namespace AdvancedSharpAdbClient.Tests
             socket.Responses.Enqueue(AdbResponse.OK);
             socket.ResponseMessages.Enqueue("0010");
 
-            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(async () => await adbServer.StartServerAsync(null, false));
+            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(() => adbServer.StartServerAsync(null, false, TestContext.Current.CancellationToken));
             Assert.IsType<AdbException>(exception.InnerException);
         }
 
@@ -113,7 +113,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             adbServer = new AdbServer(adbSocketFactory, adbCommandLineClientFactory);
 
-            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(async () => await adbServer.StartServerAsync(null, false));
+            AggregateException exception = await Assert.ThrowsAsync<AggregateException>(() => adbServer.StartServerAsync(null, false, TestContext.Current.CancellationToken));
             Assert.IsType<AdbException>(exception.InnerException);
         }
 
@@ -129,7 +129,7 @@ namespace AdvancedSharpAdbClient.Tests
             commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
-            _ = await adbServer.StartServerAsync(ServerName, false);
+            _ = await adbServer.StartServerAsync(ServerName, false, TestContext.Current.CancellationToken);
 
             Assert.True(commandLineClient.ServerStarted);
 
@@ -152,7 +152,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             Assert.False(commandLineClient.ServerStarted);
 
-            StartServerResult result = await adbServer.StartServerAsync(ServerName, false);
+            StartServerResult result = await adbServer.StartServerAsync(ServerName, false, TestContext.Current.CancellationToken);
 
             Assert.True(commandLineClient.ServerStarted);
         }
@@ -169,7 +169,7 @@ namespace AdvancedSharpAdbClient.Tests
             commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
-            _ = await adbServer.StartServerAsync(ServerName, true);
+            _ = await adbServer.StartServerAsync(ServerName, true, TestContext.Current.CancellationToken);
 
             Assert.True(commandLineClient.ServerStarted);
 
@@ -190,7 +190,7 @@ namespace AdvancedSharpAdbClient.Tests
             commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
-            _ = await adbServer.StartServerAsync(ServerName, false);
+            _ = await adbServer.StartServerAsync(ServerName, false, TestContext.Current.CancellationToken);
 
             Assert.False(commandLineClient.ServerStarted);
 
@@ -210,7 +210,7 @@ namespace AdvancedSharpAdbClient.Tests
             commandLineClient.Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.32"]);
 
             Assert.False(commandLineClient.ServerStarted);
-            _ = await adbServer.RestartServerAsync(ServerName);
+            _ = await adbServer.RestartServerAsync(ServerName, TestContext.Current.CancellationToken);
 
             Assert.True(commandLineClient.ServerStarted);
 
@@ -225,7 +225,7 @@ namespace AdvancedSharpAdbClient.Tests
         [Fact]
         public async Task StopServerAsyncTest()
         {
-            await adbServer.StopServerAsync();
+            await adbServer.StopServerAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(socket.Requests);
             Assert.Equal("host:kill", socket.Requests[0]);

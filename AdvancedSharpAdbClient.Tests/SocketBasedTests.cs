@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -663,13 +664,15 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Func<Task> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test);
+            Func<CancellationToken, Task> test,
+            CancellationToken cancellationToken = default) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test, cancellationToken);
 
         /// <summary>
         /// <para>
@@ -693,14 +696,16 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="requests">The requests the client should send.</param>
         /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
             IEnumerable<Stream> shellStreams,
-            Func<Task> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
+            Func<CancellationToken, Task> test,
+            CancellationToken cancellationToken = default) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test, cancellationToken);
 
         /// <summary>
         /// <para>
@@ -727,6 +732,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
@@ -736,7 +742,8 @@ namespace AdvancedSharpAdbClient.Tests
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Func<Task> test) =>
+            Func<CancellationToken, Task> test,
+            CancellationToken cancellationToken = default) =>
             RunTestAsync(
                 responses,
                 responseMessages,
@@ -746,7 +753,8 @@ namespace AdvancedSharpAdbClient.Tests
                 syncDataReceived,
                 syncDataSent,
                 null,
-                test);
+                test,
+                cancellationToken);
 
         /// <summary>
         /// <para>
@@ -774,6 +782,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
         /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         protected async Task RunTestAsync(
             IEnumerable<AdbResponse> responses,
@@ -784,7 +793,8 @@ namespace AdvancedSharpAdbClient.Tests
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
             IEnumerable<Stream> shellStreams,
-            Func<Task> test)
+            Func<CancellationToken, Task> test,
+            CancellationToken cancellationToken = default)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
@@ -829,7 +839,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             try
             {
-                await test();
+                await test(cancellationToken);
             }
             catch (AggregateException ex)
             {
@@ -959,13 +969,15 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="responseMessages">The messages that should follow the <paramref name="responses"/>.</param>
         /// <param name="requests">The requests the client should send.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
         protected Task<TResult> RunTestAsync<TResult>(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
-            Func<Task<TResult>> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test);
+            Func<CancellationToken, Task<TResult>> test,
+            CancellationToken cancellationToken = default) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, null, test, cancellationToken);
 
         /// <summary>
         /// <para>
@@ -989,14 +1001,16 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="requests">The requests the client should send.</param>
         /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
         protected Task<TResult> RunTestAsync<TResult>(
             IEnumerable<AdbResponse> responses,
             IEnumerable<string> responseMessages,
             IEnumerable<string> requests,
             IEnumerable<Stream> shellStreams,
-            Func<Task<TResult>> test) =>
-            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test);
+            Func<CancellationToken, Task<TResult>> test,
+            CancellationToken cancellationToken = default) =>
+            RunTestAsync(responses, responseMessages, requests, null, null, null, null, shellStreams, test, cancellationToken);
 
         /// <summary>
         /// <para>
@@ -1023,6 +1037,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="syncDataReceived">The <see cref="Array"/> of <see cref="byte"/> data which the ADB sever should send.</param>
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
         protected Task<TResult> RunTestAsync<TResult>(
             IEnumerable<AdbResponse> responses,
@@ -1032,7 +1047,8 @@ namespace AdvancedSharpAdbClient.Tests
             IEnumerable<SyncCommand> syncResponses,
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
-            Func<Task<TResult>> test) =>
+            Func<CancellationToken, Task<TResult>> test,
+            CancellationToken cancellationToken = default) =>
             RunTestAsync(
                 responses,
                 responseMessages,
@@ -1042,7 +1058,8 @@ namespace AdvancedSharpAdbClient.Tests
                 syncDataReceived,
                 syncDataSent,
                 null,
-                test);
+                test,
+                cancellationToken);
 
         /// <summary>
         /// <para>
@@ -1070,6 +1087,7 @@ namespace AdvancedSharpAdbClient.Tests
         /// <param name="syncDataSent">The <see cref="Array"/> of <see cref="byte"/> data which the client should send.</param>
         /// <param name="shellStreams">The <see cref="Array"/> of <see cref="Stream"/> which the <see cref="IAdbSocket.GetShellStream"/> should use.</param>
         /// <param name="test">The test to run.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which return the result of <paramref name="test"/>.</returns>
         protected async Task<TResult> RunTestAsync<TResult>(
             IEnumerable<AdbResponse> responses,
@@ -1080,7 +1098,8 @@ namespace AdvancedSharpAdbClient.Tests
             IEnumerable<byte[]> syncDataReceived,
             IEnumerable<byte[]> syncDataSent,
             IEnumerable<Stream> shellStreams,
-            Func<Task<TResult>> test)
+            Func<CancellationToken, Task<TResult>> test,
+            CancellationToken cancellationToken = default)
         {
             // If we are running unit tests, we need to mock all the responses
             // that are sent by the device. Do that now.
@@ -1126,7 +1145,7 @@ namespace AdvancedSharpAdbClient.Tests
 
             try
             {
-                result = await test();
+                result = await test(cancellationToken);
             }
             catch (AggregateException ex)
             {

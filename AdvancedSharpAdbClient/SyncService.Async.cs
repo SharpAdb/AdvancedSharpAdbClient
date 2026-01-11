@@ -679,18 +679,13 @@ namespace AdvancedSharpAdbClient
 #if COMP_NETSTANDARD2_1
             Memory<byte> statResult = new byte[FileStatisticsData.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            return EnumerableBuilder.FileStatisticsCreator(statResult.Span);
+            FileStatisticsData data = EnumerableBuilder.FileStatisticsDataCreator(statResult.Span);
+            return new FileStatistics(data);
 #else
             byte[] statResult = new byte[FileStatisticsData.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            unsafe
-            {
-                fixed (byte* p = statResult)
-                {
-                    FileStatisticsData* data = (FileStatisticsData*)p;
-                    return new FileStatistics(*data);
-                }
-            }
+            ref FileStatisticsData data = ref Unsafe.As<byte, FileStatisticsData>(ref statResult[0]);
+            return new FileStatistics(data);
 #endif
         }
 
@@ -704,18 +699,13 @@ namespace AdvancedSharpAdbClient
 #if COMP_NETSTANDARD2_1
             Memory<byte> statResult = new byte[FileStatisticsDataEx.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            return EnumerableBuilder.FileStatisticsV2Creator(statResult.Span);
+            FileStatisticsDataEx data = EnumerableBuilder.FileStatisticsDataV2Creator(statResult.Span);
+            return new FileStatisticsEx(data);
 #else
             byte[] statResult = new byte[FileStatisticsDataEx.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            unsafe
-            {
-                fixed (byte* p = statResult)
-                {
-                    FileStatisticsDataEx* data = (FileStatisticsDataEx*)p;
-                    return new FileStatisticsEx(*data);
-                }
-            }
+            ref FileStatisticsDataEx data = ref Unsafe.As<byte, FileStatisticsDataEx>(ref statResult[0]);
+            return new FileStatisticsEx(data);
 #endif
         }
     }

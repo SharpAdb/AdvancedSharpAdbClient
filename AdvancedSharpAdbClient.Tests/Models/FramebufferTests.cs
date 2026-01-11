@@ -102,12 +102,12 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.Requests.Add("host:transport:169.254.109.177:5555");
             socket.Requests.Add("framebuffer:");
 
-            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin"));
-            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/Framebuffer.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin", TestContext.Current.CancellationToken));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/Framebuffer.bin", TestContext.Current.CancellationToken));
 
             using Framebuffer framebuffer = new(device, endPoint => socket);
 
-            await framebuffer.RefreshAsync();
+            await framebuffer.RefreshAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);

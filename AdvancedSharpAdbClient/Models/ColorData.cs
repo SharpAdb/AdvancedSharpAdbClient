@@ -123,17 +123,7 @@ namespace AdvancedSharpAdbClient.Models
         /// Returns a read-only span of bytes representing the contents of this instance.
         /// </summary>
         /// <returns>A <see cref="ReadOnlySpan{Byte}"/> that provides a read-only view of the bytes in this instance.</returns>
-        public ReadOnlySpan<byte> AsSpan()
-        {
-            ref readonly ColorData data = ref this;
-            unsafe
-            {
-                fixed (ColorData* pData = &data)
-                {
-                    return new ReadOnlySpan<byte>(pData, Size);
-                }
-            }
-        }
+        public ReadOnlySpan<byte> AsSpan() => MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ColorData, byte>(ref Unsafe.AsRef(in this)), Size);
 #endif
     }
 }

@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -29,14 +31,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="ColorData"/> struct.</param>
         /// <returns>A new instance of <see cref="ColorData"/> struct.</returns>
-        public static unsafe ColorData ColorDataCreator(ReadOnlySpan<byte> values)
-        {
-            fixed (byte* p = values)
-            {
-                ColorData* data = (ColorData*)p;
-                return *data;
-            }
-        }
+        public static unsafe ColorData ColorDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, ColorData>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="FramebufferHeader"/> struct.
@@ -46,46 +41,18 @@ namespace AdvancedSharpAdbClient
         public static FramebufferHeader FramebufferHeaderCreator(ReadOnlySpan<byte> values) => new(values);
 
         /// <summary>
-        /// Build a <see cref="FileStatistics"/> struct.
-        /// </summary>
-        /// <param name="values">The data that feeds the <see cref="FileStatistics"/> struct.</param>
-        /// <returns>A new instance of <see cref="FileStatistics"/> struct.</returns>
-        public static FileStatistics FileStatisticsCreator(ReadOnlySpan<byte> values) => new(FileStatisticsDataCreator(values));
-
-        /// <summary>
         /// Build a <see cref="FileStatisticsData"/> struct.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FileStatisticsData"/> struct.</param>
         /// <returns>A new instance of <see cref="FileStatisticsData"/> struct.</returns>
-        public static unsafe FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values)
-        {
-            fixed (byte* p = values)
-            {
-                FileStatisticsData* data = (FileStatisticsData*)p;
-                return *data;
-            }
-        }
-
-        /// <summary>
-        /// Build a <see cref="FileStatisticsEx"/> struct.
-        /// </summary>
-        /// <param name="values">The data that feeds the <see cref="FileStatisticsEx"/> struct.</param>
-        /// <returns>A new instance of <see cref="FileStatisticsEx"/> struct.</returns>
-        public static FileStatisticsEx FileStatisticsV2Creator(ReadOnlySpan<byte> values) => new(FileStatisticsDataV2Creator(values));
+        public static unsafe FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsData>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="FileStatisticsDataEx"/> struct.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FileStatisticsDataEx"/> struct.</param>
         /// <returns>A new instance of <see cref="FileStatisticsDataEx"/> struct.</returns>
-        public static unsafe FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values)
-        {
-            fixed (byte* p = values)
-            {
-                FileStatisticsDataEx* data = (FileStatisticsDataEx*)p;
-                return *data;
-            }
-        }
+        public static unsafe FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsDataEx>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="UnixFileStatus"/> enum.

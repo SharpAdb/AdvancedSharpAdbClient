@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Security;
 
 namespace AdvancedSharpAdbClient
@@ -517,18 +518,13 @@ namespace AdvancedSharpAdbClient
 #if COMP_NETSTANDARD2_1
             Span<byte> statResult = stackalloc byte[FileStatisticsData.Length];
             _ = Socket.Read(statResult);
-            return EnumerableBuilder.FileStatisticsCreator(statResult);
+            FileStatisticsData data = EnumerableBuilder.FileStatisticsDataCreator(statResult);
+            return new FileStatistics(data);
 #else
             byte[] statResult = new byte[FileStatisticsData.Length];
             _ = Socket.Read(statResult);
-            unsafe
-            {
-                fixed (byte* p = statResult)
-                {
-                    FileStatisticsData* data = (FileStatisticsData*)p;
-                    return new FileStatistics(*data);
-                }
-            }
+            ref FileStatisticsData data = ref Unsafe.As<byte, FileStatisticsData>(ref statResult[0]);
+            return new FileStatistics(data);
 #endif
         }
 
@@ -541,18 +537,13 @@ namespace AdvancedSharpAdbClient
 #if COMP_NETSTANDARD2_1
             Span<byte> statResult = stackalloc byte[FileStatisticsDataEx.Length];
             _ = Socket.Read(statResult);
-            return EnumerableBuilder.FileStatisticsV2Creator(statResult);
+            FileStatisticsDataEx data = EnumerableBuilder.FileStatisticsDataV2Creator(statResult);
+            return new FileStatisticsEx(data);
 #else
             byte[] statResult = new byte[FileStatisticsDataEx.Length];
             _ = Socket.Read(statResult);
-            unsafe
-            {
-                fixed (byte* p = statResult)
-                {
-                    FileStatisticsDataEx* data = (FileStatisticsDataEx*)p;
-                    return new FileStatisticsEx(*data);
-                }
-            }
+            ref FileStatisticsDataEx data = ref Unsafe.As<byte, FileStatisticsDataEx>(ref statResult[0]);
+            return new FileStatisticsEx(data);
 #endif
         }
     }

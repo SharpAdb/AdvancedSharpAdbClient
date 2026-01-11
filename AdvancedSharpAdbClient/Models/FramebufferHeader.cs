@@ -54,23 +54,18 @@ namespace AdvancedSharpAdbClient.Models
                 case [> 2, ..]:
                     throw new InvalidOperationException($"Framebuffer version {Version} is not supported");
                 case [2, ..]:
-                    _data = data;
-                    break;
+                    goto default;
                 case [< 2, ..]:
                     _data = new byte[MaxLength];
                     Array.Copy(data, 0, _data, 0, 2 * sizeof(uint));
                     Array.Copy(data, 2 * sizeof(uint), _data, (2 * sizeof(uint)) + 4, MinLength - (2 * sizeof(uint)));
                     break;
+                default:
+                    _data = data;
+                    break;
             }
 
-            unsafe
-            {
-                fixed (byte* p = _data)
-                {
-                    FramebufferHeader* header = (FramebufferHeader*)p;
-                    this = *header;
-                }
-            }
+            this = Unsafe.As<byte, FramebufferHeader>(ref _data[0]);
         }
 
 #if HAS_BUFFERS
@@ -91,14 +86,7 @@ namespace AdvancedSharpAdbClient.Models
                 [< 2, ..] => [.. data[..(2 * sizeof(uint))], 0, 0, 0, 0, .. data[(2 * sizeof(uint))..]]
             };
 
-            unsafe
-            {
-                fixed (byte* p = _data)
-                {
-                    FramebufferHeader* header = (FramebufferHeader*)p;
-                    this = *header;
-                }
-            }
+            this = Unsafe.As<byte, FramebufferHeader>(ref MemoryMarshal.GetReference(_data));
         }
 #endif
 
