@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -32,7 +33,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The length of <see cref="ColorData"/> in bytes.
         /// </summary>
-        private const int count = 8;
+        public const int Size = 2 * sizeof(uint);
 
         /// <summary>
         /// Gets or sets the offset, in bits, within the byte array for a pixel, at which the
@@ -48,11 +49,11 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the length of <see cref="ColorData"/> in bytes.
         /// </summary>
-        public readonly int Count => count;
+        readonly int IReadOnlyCollection<byte>.Count => Size;
 
         /// <inheritdoc/>
         public readonly byte this[int index] =>
-            index is < 0 or >= count
+            index is < 0 or >= Size
                 ? throw new IndexOutOfRangeException("Index was out of range. Must be non-negative and less than the size of the collection.")
                 : index switch
                 {
@@ -97,5 +98,32 @@ namespace AdvancedSharpAdbClient.Models
 
         /// <inheritdoc/>
         readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Returns a byte array containing the binary representation of this instance.
+        /// </summary>
+        /// <returns>A byte array that represents the contents of this instance. The length of the array is
+        /// equal to the size of the structure in bytes.</returns>
+        public byte[] ToArray()
+        {
+            ref readonly ColorData data = ref this;
+            unsafe
+            {
+                byte[] array = new byte[Size];
+                fixed (ColorData* pData = &data)
+                {
+                    Marshal.Copy((nint)pData, array, 0, Size);
+                    return array;
+                }
+            }
+        }
+
+#if HAS_BUFFERS
+        /// <summary>
+        /// Returns a read-only span of bytes representing the contents of this instance.
+        /// </summary>
+        /// <returns>A <see cref="ReadOnlySpan{Byte}"/> that provides a read-only view of the bytes in this instance.</returns>
+        public ReadOnlySpan<byte> AsSpan() => MemoryMarshal.CreateReadOnlySpan(ref Unsafe.As<ColorData, byte>(ref Unsafe.AsRef(in this)), Size);
+#endif
     }
 }

@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -29,9 +31,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="ColorData"/> struct.</param>
         /// <returns>A new instance of <see cref="ColorData"/> struct.</returns>
-        public static ColorData ColorDataCreator(ReadOnlySpan<byte> values) =>
-            new((uint)(values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24)),
-                (uint)(values[4] | (values[5] << 8) | (values[6] << 16) | (values[7] << 24)));
+        public static unsafe ColorData ColorDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, ColorData>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="FramebufferHeader"/> struct.
@@ -41,29 +41,25 @@ namespace AdvancedSharpAdbClient
         public static FramebufferHeader FramebufferHeaderCreator(ReadOnlySpan<byte> values) => new(values);
 
         /// <summary>
-        /// Build a <see cref="FileStatistics"/> struct.
+        /// Build a <see cref="FileStatisticsData"/> struct.
         /// </summary>
-        /// <param name="values">The data that feeds the <see cref="FileStatistics"/> struct.</param>
-        /// <returns>A new instance of <see cref="FileStatistics"/> struct.</returns>
-        public static FileStatistics FileStatisticsCreator(ReadOnlySpan<byte> values)
-        {
-            int index = 0;
-            return new FileStatistics
-            {
-                FileMode = (UnixFileStatus)ReadUInt32(values),
-                Size = ReadUInt32(values),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(values))
-            };
-            uint ReadUInt32(in ReadOnlySpan<byte> data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
-        }
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsData"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsData"/> struct.</returns>
+        public static unsafe FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsData>(ref MemoryMarshal.GetReference(values));
+
+        /// <summary>
+        /// Build a <see cref="FileStatisticsDataEx"/> struct.
+        /// </summary>
+        /// <param name="values">The data that feeds the <see cref="FileStatisticsDataEx"/> struct.</param>
+        /// <returns>A new instance of <see cref="FileStatisticsDataEx"/> struct.</returns>
+        public static unsafe FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsDataEx>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="UnixFileStatus"/> enum.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="UnixFileStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="UnixFileStatus"/> struct.</returns>
-        public static UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) =>
-            (UnixFileStatus)(values[0] | (values[1] << 8) | (values[2] << 16) | (values[3] << 24));
+        public static unsafe UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) => (UnixFileStatus)BitConverter.ToUInt32(values);
 
         /// <summary>
         /// Build a <see cref="LogEntry"/> class.
@@ -276,19 +272,19 @@ namespace AdvancedSharpAdbClient
             ushort? ReadUInt16(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 2);
-                return data.IsEmpty ? null : (ushort)(data[0] | (data[1] << 8));
+                return data.IsEmpty ? null : BitConverter.ToUInt16(data);
             }
 
             uint? ReadUInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data.IsEmpty ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+                return data.IsEmpty ? null : BitConverter.ToUInt32(data);
             }
 
             int? ReadInt32(in ReadOnlySpan<byte> bytes)
             {
                 ReadOnlySpan<byte> data = ReadBytesSafe(bytes, 4);
-                return data.Length != 4 ? null : data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+                return data.Length != 4 ? null : BitConverter.ToInt32(data);
             }
 
             ReadOnlySpan<byte> ReadBytesSafe(in ReadOnlySpan<byte> bytes, int count)

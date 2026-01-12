@@ -55,7 +55,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Task<int> SendAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-#if NET6_0_OR_GREATER
+#if HAS_BUFFERS
             Socket.SendAsync(buffer, socketFlags, cancellationToken).AsTask();
 #else
             Socket.SendAsync(buffer, socketFlags, cancellationToken);
@@ -71,7 +71,7 @@ namespace AdvancedSharpAdbClient
 
         /// <inheritdoc/>
         public Task<int> ReceiveAsync(byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
-#if NET6_0_OR_GREATER
+#if HAS_BUFFERS
             Socket.ReceiveAsync(buffer, socketFlags, cancellationToken).AsTask();
 #else
             Socket.ReceiveAsync(buffer, socketFlags, cancellationToken);

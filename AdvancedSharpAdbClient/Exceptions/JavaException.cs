@@ -119,7 +119,6 @@ namespace AdvancedSharpAdbClient.Exceptions
                         if (m.Success)
                         {
                             exception = m.Groups[1].Value;
-
                             message = m.Groups[2].Value;
                             message = string.IsNullOrWhiteSpace(message) ? UnknownError : message;
                         }

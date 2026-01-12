@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Polyfills.Tests
             int[] numbs = [6, 7, 8, 9, 10];
 
             List<int> list = [1, 2, 3, 4, 5];
-            list.AddRange(numbs);
+            EnumerableExtensions.AddRange(list, numbs);
             Assert.Equal(10, list.Count);
             Assert.Equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], list);
 
@@ -36,16 +36,16 @@ namespace AdvancedSharpAdbClient.Polyfills.Tests
         }
 
         /// <summary>
-        /// Tests the <see cref="EnumerableExtensions.ToArrayAsync{TSource}(IEnumerable{Task{TSource}})"/> method.
+        /// Tests the <see cref="AdvancedSharpAdbClient.Tests.EnumerableExtensions.ToArrayAsync{TSource}(IEnumerable{Task{TSource}})"/> method.
         /// </summary>
         [Fact]
         public async Task TaskToArrayTest()
         {
             int[] array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            Task<IEnumerable<int>> arrayTask = Task.Delay(10).ContinueWith(_ => array.Select(x => x));
-            IEnumerable<Task<int>> taskArray = array.Select(x => Task.Delay(x).ContinueWith(_ => x));
+            Task<IEnumerable<int>> arrayTask = Task.Delay(10, TestContext.Current.CancellationToken).ContinueWith(_ => array.Select(x => x));
+            IEnumerable<Task<int>> taskArray = array.Select(x => Task.Delay(x, TestContext.Current.CancellationToken).ContinueWith(_ => x));
             Assert.Equal(array, await taskArray.ToArrayAsync());
-            Assert.Equal(array, await arrayTask.ToArrayAsync());
+            Assert.Equal(array, await arrayTask.ToListAsync());
         }
     }
 }

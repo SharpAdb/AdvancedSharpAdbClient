@@ -64,6 +64,8 @@ namespace AdvancedSharpAdbClient.Tests
 
         public void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permission) => SyncRequests.Add((command, $"{path},{(int)permission}"));
 
+        public void SendSyncRequest(SyncCommand command, UnixFileStatus permission, SyncFlags flag) => SyncRequests.Add((command, $"{(int)permission}{(int)flag}"));
+
         public void SendAdbRequest(string request) => Requests.Add(request);
 
         public void SendAdbRequest(DefaultInterpolatedStringHandler request) => Requests.Add(request.ToString());
@@ -200,6 +202,12 @@ namespace AdvancedSharpAdbClient.Tests
         {
             await Task.Yield();
             Send(data.Span);
+        }
+
+        public async Task SendSyncRequestAsync(SyncCommand command, UnixFileStatus permission, SyncFlags flags, CancellationToken cancellationToken = default)
+        {
+            await Task.Yield();
+            SendSyncRequest(command, permission, flags);
         }
 
         public async Task SendSyncRequestAsync(SyncCommand command, string path, UnixFileStatus permission, CancellationToken cancellationToken = default)

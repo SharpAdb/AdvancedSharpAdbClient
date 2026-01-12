@@ -17,14 +17,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             PackageManager manager = new(adbClient, Device);
 
-            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing));
+            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing), TestContext.Current.CancellationToken);
 
             Assert.Equal(2, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install \"/data/base.apk\"", adbClient.ReceivedCommands[1]);
 
             adbClient.ReceivedCommands.Clear();
 
-            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing), default, "-r", "-t");
+            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing), TestContext.Current.CancellationToken, new string[] { "-r", "-t" });
 
             Assert.Single(adbClient.ReceivedCommands);
             Assert.Equal("shell:pm install -r -t \"/data/base.apk\"", adbClient.ReceivedCommands[0]);
@@ -49,7 +49,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     PackageInstallProgressState.Uploading,
                     PackageInstallProgressState.Installing,
                     PackageInstallProgressState.PostInstall,
-                    PackageInstallProgressState.Finished));
+                    PackageInstallProgressState.Finished),
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(3, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install \"/data/local/tmp/base.apk\"", adbClient.ReceivedCommands[1]);
@@ -80,7 +81,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 new InstallProgress(
                     PackageInstallProgressState.CreateSession,
                     PackageInstallProgressState.WriteSession,
-                    PackageInstallProgressState.Installing));
+                    PackageInstallProgressState.Installing),
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create", adbClient.ReceivedCommands[1]);
@@ -95,7 +97,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 new InstallProgress(
                     PackageInstallProgressState.CreateSession,
                     PackageInstallProgressState.WriteSession,
-                    PackageInstallProgressState.Installing), default, "-r", "-t");
+                    PackageInstallProgressState.Installing), TestContext.Current.CancellationToken, "-r", "-t");
 
             Assert.Equal(5, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -r -t", adbClient.ReceivedCommands[0]);
@@ -110,7 +112,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 new InstallProgress(
                     PackageInstallProgressState.CreateSession,
                     PackageInstallProgressState.WriteSession,
-                    PackageInstallProgressState.Installing));
+                    PackageInstallProgressState.Installing),
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(4, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[0]);
@@ -124,7 +127,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 new InstallProgress(
                     PackageInstallProgressState.CreateSession,
                     PackageInstallProgressState.WriteSession,
-                    PackageInstallProgressState.Installing), default, "-r", "-t");
+                    PackageInstallProgressState.Installing), TestContext.Current.CancellationToken, "-r", "-t");
 
             Assert.Equal(4, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms -r -t", adbClient.ReceivedCommands[0]);
@@ -161,7 +164,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     PackageInstallProgressState.WriteSession,
                     PackageInstallProgressState.Installing,
                     PackageInstallProgressState.PostInstall,
-                    PackageInstallProgressState.Finished));
+                    PackageInstallProgressState.Finished),
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create", adbClient.ReceivedCommands[1]);
@@ -189,7 +193,8 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     PackageInstallProgressState.WriteSession,
                     PackageInstallProgressState.Installing,
                     PackageInstallProgressState.PostInstall,
-                    PackageInstallProgressState.Finished));
+                    PackageInstallProgressState.Finished),
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:pm install-create -p com.google.android.gms", adbClient.ReceivedCommands[0]);
@@ -214,7 +219,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             // Command should execute correctly; if the wrong command is passed an exception
             // would be thrown.
-            await manager.UninstallPackageAsync("com.android.gallery3d");
+            await manager.UninstallPackageAsync("com.android.gallery3d", TestContext.Current.CancellationToken);
         }
 
         [Fact]
@@ -224,7 +229,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             client.Commands["shell:dumpsys package com.google.android.gms"] = File.ReadAllText("Assets/DumpSys.GApps.txt");
             PackageManager manager = new(client, Device, skipInit: true);
 
-            VersionInfo versionInfo = await manager.GetVersionInfoAsync("com.google.android.gms");
+            VersionInfo versionInfo = await manager.GetVersionInfoAsync("com.google.android.gms", TestContext.Current.CancellationToken);
             Assert.Equal(11062448, versionInfo.VersionCode);
             Assert.Equal("11.0.62 (448-160311229)", versionInfo.VersionName);
         }

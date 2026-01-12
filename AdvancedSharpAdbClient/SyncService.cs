@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -145,7 +146,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
+        public virtual void Push(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, in bool isCancelled = false)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -161,8 +162,17 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    Socket.SendSyncRequest(SyncCommand.SND2, remotePath);
+                    IsProcessing = true;
+                    Socket.SendSyncRequest(SyncCommand.SND2, permission, SyncFlags.None);
+                }
+                else
+                {
+                    Socket.SendSyncRequest(SyncCommand.SEND, remotePath, permission);
+                    IsProcessing = true;
+                }
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -215,7 +225,7 @@ namespace AdvancedSharpAdbClient
                     Socket.Send(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length);
 #endif
                     // Let the caller know about our progress, if requested
-                    callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                    callback?.Invoke(new SyncProgressChangedEventArgs((ulong)totalBytesRead, (ulong)totalBytesToProcess));
                 }
 
                 // create the DONE message
@@ -243,7 +253,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, in bool isCancelled = false)
+        public virtual void Pull(string remoteFilePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, in bool isCancelled = false)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -253,16 +263,24 @@ namespace AdvancedSharpAdbClient
             if (IsOutdate) { Reopen(); }
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = Stat(remoteFilePath);
-            long totalBytesToProcess = stat.Size;
-            long totalBytesRead = 0;
+            ulong totalBytesToProcess = this.Stat(remoteFilePath, useV2).Size;
+            ulong totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
             try
             {
-                Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    Socket.SendSyncRequest(SyncCommand.RCV2, remoteFilePath);
+                    IsProcessing = true;
+                    Socket.SendSyncRequest(SyncCommand.RCV2, (int)SyncFlags.None);
+                }
+                else
+                {
+                    Socket.SendSyncRequest(SyncCommand.RECV, remoteFilePath);
+                    IsProcessing = true;
+                }
 
                 while (!isCancelled)
                 {
@@ -283,7 +301,7 @@ namespace AdvancedSharpAdbClient
                     byte[] reply = new byte[4];
                     _ = Socket.Read(reply);
 
-                    int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+                    int size = BitConverter.ToInt32(reply);
 
                     if (size > MaxBufferSize)
                     {
@@ -301,7 +319,7 @@ namespace AdvancedSharpAdbClient
 #else
                     stream.Write(buffer, 0, size);
 #endif
-                    totalBytesRead += size;
+                    totalBytesRead += (uint)size;
 
                     // Let the caller know about our progress, if requested
                     callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
@@ -331,6 +349,24 @@ namespace AdvancedSharpAdbClient
             // read the result, in a byte array containing 3 int
             // (mode, size, time)
             FileStatistics value = ReadStatistics();
+            value.Path = remotePath;
+
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public FileStatisticsEx StatEx(string remotePath)
+        {
+            // create the stat request message.
+            Socket.SendSyncRequest(SyncCommand.STA2, remotePath);
+
+            SyncCommand response = Socket.ReadSyncResponse();
+            if (response != SyncCommand.STA2)
+            {
+                throw new AdbException($"The server returned an invalid sync response {response}.");
+            }
+
+            FileStatisticsEx value = ReadStatisticsV2();
             value.Path = remotePath;
 
             return value;
@@ -369,6 +405,55 @@ namespace AdvancedSharpAdbClient
                     }
 
                     FileStatistics entry = ReadStatistics();
+                    entry.Path = Socket.ReadSyncString();
+
+                    yield return entry;
+                    isLocked = true;
+                }
+
+            finish:
+                yield break;
+            }
+            finally
+            {
+                IsOutdate = true;
+                IsProcessing = false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<FileStatisticsEx> GetDirectoryListingEx(string remotePath)
+        {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+            if (IsOutdate) { Reopen(); }
+            bool isLocked = false;
+
+            try
+            {
+            start:
+                // create the stat request message.
+                Socket.SendSyncRequest(SyncCommand.LIS2, remotePath);
+                IsProcessing = true;
+
+                while (true)
+                {
+                    SyncCommand response = Socket.ReadSyncResponse();
+
+                    switch (response)
+                    {
+                        case 0 when isLocked:
+                            throw new AdbException("The server returned an empty sync response.");
+                        case 0:
+                            Reopen();
+                            isLocked = true;
+                            goto start;
+                        case SyncCommand.DONE:
+                            goto finish;
+                        case not SyncCommand.DNT2:
+                            throw new AdbException($"The server returned an invalid sync response {response}.");
+                    }
+
+                    FileStatisticsEx entry = ReadStatisticsV2();
                     entry.Path = Socket.ReadSyncString();
 
                     yield return entry;
@@ -430,20 +515,34 @@ namespace AdvancedSharpAdbClient
         protected FileStatistics ReadStatistics()
         {
 #if COMP_NETSTANDARD2_1
-            Span<byte> statResult = stackalloc byte[12];
+            Span<byte> statResult = stackalloc byte[FileStatisticsData.Length];
             _ = Socket.Read(statResult);
-            return EnumerableBuilder.FileStatisticsCreator(statResult);
+            FileStatisticsData data = EnumerableBuilder.FileStatisticsDataCreator(statResult);
+            return new FileStatistics(data);
 #else
-            byte[] statResult = new byte[12];
+            byte[] statResult = new byte[FileStatisticsData.Length];
             _ = Socket.Read(statResult);
-            int index = 0;
-            return new FileStatistics
-            {
-                FileMode = (UnixFileStatus)ReadUInt32(statResult),
-                Size = ReadUInt32(statResult),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(statResult))
-            };
-            uint ReadUInt32(byte[] data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
+            ref FileStatisticsData data = ref Unsafe.As<byte, FileStatisticsData>(ref statResult[0]);
+            return new FileStatistics(data);
+#endif
+        }
+
+        /// <summary>
+        /// Reads the statistics of a file from the socket (v2).
+        /// </summary>
+        /// <returns>A <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
+        protected FileStatisticsEx ReadStatisticsV2()
+        {
+#if COMP_NETSTANDARD2_1
+            Span<byte> statResult = stackalloc byte[FileStatisticsDataEx.Length];
+            _ = Socket.Read(statResult);
+            FileStatisticsDataEx data = EnumerableBuilder.FileStatisticsDataV2Creator(statResult);
+            return new FileStatisticsEx(data);
+#else
+            byte[] statResult = new byte[FileStatisticsDataEx.Length];
+            _ = Socket.Read(statResult);
+            ref FileStatisticsDataEx data = ref Unsafe.As<byte, FileStatisticsDataEx>(ref statResult[0]);
+            return new FileStatisticsEx(data);
 #endif
         }
     }

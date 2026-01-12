@@ -52,20 +52,20 @@ namespace AdvancedSharpAdbClient.Models.Tests
 
             FramebufferHeader header = framebuffer.Header;
 
-            Assert.Equal(8u, header.Alpha.Length);
-            Assert.Equal(24u, header.Alpha.Offset);
-            Assert.Equal(8u, header.Green.Length);
-            Assert.Equal(8u, header.Green.Offset);
-            Assert.Equal(8u, header.Red.Length);
-            Assert.Equal(0u, header.Red.Offset);
-            Assert.Equal(8u, header.Blue.Length);
-            Assert.Equal(16u, header.Blue.Offset);
-            Assert.Equal(32u, header.Bpp);
-            Assert.Equal(4u, header.Size);
-            Assert.Equal(1u, header.Height);
-            Assert.Equal(1u, header.Width);
             Assert.Equal(1u, header.Version);
+            Assert.Equal(32u, header.Bpp);
             Assert.Equal(0u, header.ColorSpace);
+            Assert.Equal(4u, header.Size);
+            Assert.Equal(1u, header.Width);
+            Assert.Equal(1u, header.Height);
+            Assert.Equal(0u, header.Red.Offset);
+            Assert.Equal(8u, header.Red.Length);
+            Assert.Equal(16u, header.Blue.Offset);
+            Assert.Equal(8u, header.Blue.Length);
+            Assert.Equal(8u, header.Green.Offset);
+            Assert.Equal(8u, header.Green.Length);
+            Assert.Equal(24u, header.Alpha.Offset);
+            Assert.Equal(8u, header.Alpha.Length);
 
 #if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }
@@ -102,12 +102,12 @@ namespace AdvancedSharpAdbClient.Models.Tests
             socket.Requests.Add("host:transport:169.254.109.177:5555");
             socket.Requests.Add("framebuffer:");
 
-            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin"));
-            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/Framebuffer.bin"));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/FramebufferHeader.bin", TestContext.Current.CancellationToken));
+            socket.SyncDataReceived.Enqueue(await File.ReadAllBytesAsync("Assets/Framebuffer.bin", TestContext.Current.CancellationToken));
 
             using Framebuffer framebuffer = new(device, endPoint => socket);
 
-            await framebuffer.RefreshAsync();
+            await framebuffer.RefreshAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.NotNull(framebuffer);
             Assert.Equal(device, framebuffer.Device);
@@ -115,20 +115,20 @@ namespace AdvancedSharpAdbClient.Models.Tests
 
             FramebufferHeader header = framebuffer.Header;
 
-            Assert.Equal(8u, header.Alpha.Length);
-            Assert.Equal(24u, header.Alpha.Offset);
-            Assert.Equal(8u, header.Green.Length);
-            Assert.Equal(8u, header.Green.Offset);
-            Assert.Equal(8u, header.Red.Length);
-            Assert.Equal(0u, header.Red.Offset);
-            Assert.Equal(8u, header.Blue.Length);
-            Assert.Equal(16u, header.Blue.Offset);
-            Assert.Equal(32u, header.Bpp);
-            Assert.Equal(4u, header.Size);
-            Assert.Equal(1u, header.Height);
-            Assert.Equal(1u, header.Width);
             Assert.Equal(1u, header.Version);
+            Assert.Equal(32u, header.Bpp);
             Assert.Equal(0u, header.ColorSpace);
+            Assert.Equal(4u, header.Size);
+            Assert.Equal(1u, header.Width);
+            Assert.Equal(1u, header.Height);
+            Assert.Equal(0u, header.Red.Offset);
+            Assert.Equal(8u, header.Red.Length);
+            Assert.Equal(16u, header.Blue.Offset);
+            Assert.Equal(8u, header.Blue.Length);
+            Assert.Equal(8u, header.Green.Offset);
+            Assert.Equal(8u, header.Green.Length);
+            Assert.Equal(24u, header.Alpha.Offset);
+            Assert.Equal(8u, header.Alpha.Length);
 
 #if HAS_IMAGING
             if (!OperatingSystem.IsWindows()) { return; }

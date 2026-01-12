@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <CheckNotRecommendedTargetFramework>False</CheckNotRecommendedTargetFramework>
     <NoWarn>$(NoWarn);NU1902;NU1903</NoWarn>
     <TargetFrameworks>net8.0;net10.0;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
@@ -38,7 +39,8 @@
       System.Range;
       System.Runtime.CompilerServices.CallerArgumentExpressionAttribute;
       System.Runtime.CompilerServices.IsExternalInit;
-      System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute
+      System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute;
+      System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute
     </PolySharpIncludeGeneratedTypes>
   </PropertyGroup>
 
@@ -51,7 +53,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0-windows10.0.17763.0'))">
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
   </PropertyGroup>
 

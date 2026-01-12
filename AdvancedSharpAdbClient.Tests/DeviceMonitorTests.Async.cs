@@ -22,7 +22,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 ["169.254.109.177:5555\tdevice\n"],
                 ["host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Single(sink.ConnectedEvents);
@@ -44,7 +45,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponses,
                 [string.Empty],
                 NoRequests,
-                () => Task.Run(() => eventWaiter.WaitOne(1000)));
+                ctx => Task.Run(() => eventWaiter.WaitOne(1000), ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Empty(monitor.Devices);
             Assert.Empty(sink.ConnectedEvents);
@@ -72,7 +74,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 [string.Empty],
                 ["host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Empty(monitor.Devices);
             Assert.Empty(sink.ConnectedEvents);
@@ -94,7 +97,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => Task.Run(() => eventWaiter.WaitOne(1000)));
+                ctx => Task.Run(() => eventWaiter.WaitOne(1000), ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Single(sink.ConnectedEvents);
@@ -124,7 +128,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 ["169.254.109.177:5555\tdevice\n"],
                 ["host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Equal("169.254.109.177:5555", monitor.Devices[0].Serial);
@@ -153,7 +158,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 ["169.254.109.177:5555\toffline\n"],
                 ["host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Offline, monitor.Devices[0].State);
@@ -176,7 +182,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponses,
                 ["169.254.109.177:5555\tdevice\n"],
                 NoRequests,
-                () => Task.Run(() => eventWaiter.WaitOne(1000)));
+                ctx => Task.Run(() => eventWaiter.WaitOne(1000), ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Online, monitor.Devices[0].State);
@@ -206,7 +213,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponse,
                 ["169.254.109.177:5555\toffline\n"],
                 ["host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
@@ -229,7 +237,8 @@ namespace AdvancedSharpAdbClient.Tests
                 NoResponses,
                 ["169.254.109.177:5555\toffline\n"],
                 NoRequests,
-                () => Task.Run(() => eventWaiter.WaitOne(1000)));
+                ctx => Task.Run(() => eventWaiter.WaitOne(1000), ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.Single(monitor.Devices);
             Assert.Equal(DeviceState.Offline, monitor.Devices.ElementAt(0).State);
@@ -257,7 +266,8 @@ namespace AdvancedSharpAdbClient.Tests
                 OkResponses(2),
                 [DummyAdbSocket.ServerDisconnected, string.Empty],
                 ["host:track-devices", "host:track-devices"],
-                () => monitor.StartAsync());
+                ctx => monitor.StartAsync(ctx),
+                TestContext.Current.CancellationToken);
 
             Assert.True(Socket.DidReconnect);
             Assert.True(dummyAdbServer.WasRestarted);

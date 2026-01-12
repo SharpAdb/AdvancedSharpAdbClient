@@ -10,8 +10,8 @@ namespace AdvancedSharpAdbClient.Models
     /// Defines the state of an Android device connected to the Android Debug Bridge.
     /// </summary>
     /// <remarks>
-    /// <para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/adb.h"/></para>
-    /// <para><seealso href="https://android.googlesource.com/platform/system/core/+/master/adb/transport.cpp"/></para>
+    /// <para><seealso href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/adb.h"/></para>
+    /// <para><seealso href="https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/transport.cpp"/></para>
     /// </remarks>
     [Flags]
     public enum DeviceState

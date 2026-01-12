@@ -29,7 +29,7 @@ namespace AdvancedSharpAdbClient
         EndPoint EndPoint { get; }
 
         // The individual services are listed in the same order as
-        // https://android.googlesource.com/platform/system/core/+/master/adb/SERVICES.TXT
+        // https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/docs/dev/services.md
 
         /// <summary>
         /// Ask the ADB server for its internal version number.

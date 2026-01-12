@@ -53,6 +53,14 @@ namespace AdvancedSharpAdbClient
         /// Sends a sync request to the device.
         /// </summary>
         /// <param name="command" >The command to send.</param>
+        /// <param name="permissions">If the command is a <see cref="SyncCommand.SND2"/> command, the permissions to assign to the newly created file.</param>
+        /// <param name="flags">If the command is a <see cref="SyncCommand.SND2"/>, the compression type to use.</param>
+        void SendSyncRequest(SyncCommand command, UnixFileStatus permissions, SyncFlags flags);
+
+        /// <summary>
+        /// Sends a sync request to the device.
+        /// </summary>
+        /// <param name="command" >The command to send.</param>
         /// <param name="path">The path of the file on which the command should operate.</param>
         /// <param name="permissions">If the command is a <see cref="SyncCommand.SEND"/> command, the permissions to assign to the newly created file.</param>
         void SendSyncRequest(SyncCommand command, string path, UnixFileStatus permissions);
@@ -68,8 +76,8 @@ namespace AdvancedSharpAdbClient
         /// Sends a sync request to the device.
         /// </summary>
         /// <param name="command">The command to send.</param>
-        /// <param name="length">The length of the data packet that follows.</param>
-        void SendSyncRequest(SyncCommand command, int length);
+        /// <param name="value">A <see cref="int"/> data or the length of the data packet that follows.</param>
+        void SendSyncRequest(SyncCommand command, int value);
 
         /// <summary>
         /// Sends a request to the Android Debug Bridge.To read the response, call
