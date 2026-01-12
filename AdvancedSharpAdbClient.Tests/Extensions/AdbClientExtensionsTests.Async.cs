@@ -51,7 +51,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(command, x.ArgAt<string>(1));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(2));
                     Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(3));
-                    return result.ToAsyncEnumerable(x.ArgAt<CancellationToken>(3));
+                    return result.ToAsyncEnumerable();
                 });
             _ = client.ExecuteServerEnumerableAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IAdbSocket>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
                 .Returns(x =>
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(socket, x.ArgAt<IAdbSocket>(2));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(3));
                     Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(4));
-                    return result.ToAsyncEnumerable(x.ArgAt<CancellationToken>(4));
+                    return result.ToAsyncEnumerable();
                 });
 
             await client.ExecuteServerCommandAsync(target, command, receiver, cancellationToken: TestContext.Current.CancellationToken);
@@ -102,7 +102,7 @@ namespace AdvancedSharpAdbClient.Tests
                     Assert.Equal(device, x.ArgAt<DeviceData>(1));
                     Assert.Equal(encoding, x.ArgAt<Encoding>(2));
                     Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(3));
-                    return result.ToAsyncEnumerable(x.ArgAt<CancellationToken>(3));
+                    return result.ToAsyncEnumerable();
                 });
 
             await client.ExecuteRemoteCommandAsync(command, device, receiver, cancellationToken: TestContext.Current.CancellationToken);

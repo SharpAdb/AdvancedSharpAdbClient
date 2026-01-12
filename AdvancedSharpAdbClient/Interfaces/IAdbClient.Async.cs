@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -238,7 +239,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
         IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerEnumerable(target, command, encoding).ToAsyncEnumerable(cancellationToken);
+            ExecuteServerEnumerable(target, command, encoding).ToAsyncEnumerable();
 
         /// <summary>
         /// Asynchronously executes a command on the adb server and returns the <see cref="IAsyncEnumerable{String}"/> output.
@@ -251,7 +252,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
         IAsyncEnumerable<string> ExecuteServerEnumerableAsync(string target, string command, IAdbSocket socket, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteServerEnumerable(target, command, socket, encoding).ToAsyncEnumerable(cancellationToken);
+            ExecuteServerEnumerable(target, command, socket, encoding).ToAsyncEnumerable();
 
         /// <summary>
         /// Asynchronously executes a command on the device and returns the <see cref="IAsyncEnumerable{String}"/> output.
@@ -262,7 +263,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
         IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(string command, DeviceData device, Encoding encoding, CancellationToken cancellationToken) =>
-            ExecuteRemoteEnumerable(command, device, encoding).ToAsyncEnumerable(cancellationToken);
+            ExecuteRemoteEnumerable(command, device, encoding).ToAsyncEnumerable();
 
         /// <summary>
         /// Asynchronously runs the event log service on a device and returns it.
@@ -272,7 +273,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="IAsyncEnumerable{LogEntry}"/> which contains the log entries.</returns>
         IAsyncEnumerable<LogEntry> RunLogServiceAsync(DeviceData device, CancellationToken cancellationToken, params LogId[] logNames) =>
-            RunLogService(device, logNames).ToAsyncEnumerable(cancellationToken);
+            RunLogService(device, logNames).ToAsyncEnumerable();
 #endif
 
         /// <summary>

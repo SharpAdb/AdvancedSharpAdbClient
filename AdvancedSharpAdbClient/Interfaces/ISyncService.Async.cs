@@ -79,7 +79,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) =>
-            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).ToAsyncEnumerable(cancellationToken);
+            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).ToAsyncEnumerable();
 
         /// <summary>
         /// Asynchronously lists the contents of a directory on the device (v2).
@@ -89,7 +89,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
         /// <remarks>Need Android 11 or above.</remarks>
         IAsyncEnumerable<FileStatisticsEx> GetDirectoryAsyncListingEx(string remotePath, CancellationToken cancellationToken) =>
-            GetDirectoryListingExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatisticsEx>).ToAsyncEnumerable(cancellationToken);
+            GetDirectoryListingExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatisticsEx>).ToAsyncEnumerable();
 #endif
 
         /// <summary>

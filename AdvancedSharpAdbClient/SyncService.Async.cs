@@ -144,7 +144,7 @@ namespace AdvancedSharpAdbClient
                 IsProcessing = false;
             }
         }
-        
+
         /// <inheritdoc/>
         public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {

@@ -387,13 +387,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
-            Element[] elements = await new DeviceClient(client, Device).FindElementsAsync(cancellationToken: TestContext.Current.CancellationToken).ToArrayAsync();
+            List<Element> elements = await new DeviceClient(client, Device).FindElementsAsync(cancellationToken: TestContext.Current.CancellationToken).ToListAsync();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            int childCount = elements.Length;
-            Array.ForEach(elements, x => childCount += x.GetChildCount());
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);

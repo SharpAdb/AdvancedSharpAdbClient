@@ -219,7 +219,7 @@ namespace AdvancedSharpAdbClient
         }
 #endif
 
-            /// <inheritdoc/>
+        /// <inheritdoc/>
         public int GetAdbVersion()
         {
             using IAdbSocket socket = CreateAdbSocket();

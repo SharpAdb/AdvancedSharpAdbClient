@@ -39,12 +39,7 @@ namespace AdvancedSharpAdbClient.Models
             {
                 ArgumentNullException.ThrowIfNull(value);
 
-                if (value.Length != 4)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
-
-                return (SyncCommand)BitConverter.ToInt32(value);
+                return value.Length != 4 ? throw new ArgumentOutOfRangeException(nameof(value)) : (SyncCommand)BitConverter.ToInt32(value);
             }
 
 #if HAS_BUFFERS
@@ -55,12 +50,7 @@ namespace AdvancedSharpAdbClient.Models
             /// <returns>The corresponding <see cref="SyncCommand"/>.</returns>
             public static SyncCommand GetCommand(ReadOnlySpan<byte> value)
             {
-                if (value.Length != 4)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
-
-                return (SyncCommand)BitConverter.ToInt32(value);
+                return value.Length != 4 ? throw new ArgumentOutOfRangeException(nameof(value)) : (SyncCommand)BitConverter.ToInt32(value);
             }
 #endif
         }

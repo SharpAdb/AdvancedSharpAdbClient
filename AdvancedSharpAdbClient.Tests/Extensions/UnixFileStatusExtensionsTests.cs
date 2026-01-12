@@ -165,7 +165,7 @@ namespace AdvancedSharpAdbClient.Models.Tests
         [InlineData("s-w--w--w-", (UnixFileStatus)0xC092)]
         [InlineData("?--x--x--x", (UnixFileStatus)0x0049)]
         [InlineData("7777", (UnixFileStatus)0x0FFF)]
-        public void FromPermissionCodeTest(string code, UnixFileStatus mode) => Assert.Equal(mode, UnixFileStatusExtensions.FromPermissionCode(code));
+        public void FromPermissionCodeTest(string code, UnixFileStatus mode) => Assert.Equal(mode, UnixFileStatus.FromPermissionCode(code));
 
         [Theory]
         [InlineData((UnixFileStatus)0x0FFF, "\0rwsrwsrwt")]

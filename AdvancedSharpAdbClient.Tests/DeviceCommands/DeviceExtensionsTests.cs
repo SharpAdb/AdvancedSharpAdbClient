@@ -111,12 +111,44 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             Factories.SyncServiceFactory = (c, d) =>
             {
-                Factories.Reset();
                 Assert.Equal(d, Device);
                 return mock;
             };
 
             Assert.Equal(stats, client.Stat(Device, remotePath));
+            Assert.Equal(stats, client.Stat(Device, remotePath, false));
+
+            Factories.Reset();
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.StatEx(IAdbClient, DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void StatExTest()
+        {
+            const string remotePath = "/test";
+            FileStatisticsEx stats = new(default);
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.StatEx(Arg.Any<string>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    return stats;
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, client.StatEx(Device, remotePath));
+            Assert.Equal(stats, client.Stat(Device, remotePath, true));
+
+            Factories.Reset();
         }
 
         /// <summary>
@@ -139,12 +171,44 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             Factories.SyncServiceFactory = (c, d) =>
             {
-                Factories.Reset();
                 Assert.Equal(d, Device);
                 return mock;
             };
 
             Assert.Equal(stats, client.GetDirectoryListing(Device, remotePath));
+            Assert.Equal(stats, client.GetDirectoryListing(Device, remotePath, false));
+
+            Factories.Reset();
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetDirectoryListingEx(IAdbClient, DeviceData, string)"/> method.
+        /// </summary>
+        [Fact]
+        public void GetDirectoryListingExTest()
+        {
+            const string remotePath = "/test";
+            IEnumerable<FileStatisticsEx> stats = [new(default)];
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.GetDirectoryListingEx(Arg.Any<string>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    return stats;
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, client.GetDirectoryListingEx(Device, remotePath));
+            Assert.Equal(stats, client.GetDirectoryListing(Device, remotePath, true));
+
+            Factories.Reset();
         }
 
         /// <summary>

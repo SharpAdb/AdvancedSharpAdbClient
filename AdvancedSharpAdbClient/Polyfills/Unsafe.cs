@@ -20,7 +20,7 @@ namespace System.Runtime.CompilerServices
         /// <param name="source">The managed pointer to reinterpret.</param>
         /// <returns>A managed pointer to a value of type <typeparamref name="TTo"/>.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
-        public unsafe static ref TTo As<TFrom, TTo>(ref TFrom source)
+        public static unsafe ref TTo As<TFrom, TTo>(ref TFrom source)
             where TFrom : unmanaged
             where TTo : unmanaged
         {
@@ -39,7 +39,7 @@ namespace System.Runtime.CompilerServices
         /// <returns>A mutable reference to a value of type <typeparamref name="T"/>.</returns>
         /// <remarks>The lifetime of the reference will not be validated when using this API.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe static ref T AsRef<T>(scoped ref readonly T source) where T : unmanaged
+        public static unsafe ref T AsRef<T>(scoped ref readonly T source) where T : unmanaged
         {
             fixed (T* ptr = &source)
             {

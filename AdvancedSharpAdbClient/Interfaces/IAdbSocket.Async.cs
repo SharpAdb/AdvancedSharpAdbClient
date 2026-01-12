@@ -151,7 +151,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="data">A <see cref="byte"/> array that acts as a buffer, containing the data to send.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="ValueTask"/> that represents the asynchronous operation.</returns>
-        public ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default) => new(SendAsync(data.ToArray(), data.Length, cancellationToken));
+        ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default) => new(SendAsync(data.ToArray(), data.Length, cancellationToken));
 
         /// <summary>
         /// Asynchronously receives data from a <see cref="IAdbSocket"/> into a receive buffer.
@@ -160,7 +160,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="ValueTask{Int32}"/> that represents the asynchronous operation. The result value of the task contains the number of bytes received.</returns>
-        public ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
+        ValueTask<int> ReadAsync(Memory<byte> data, CancellationToken cancellationToken)
         {
             byte[] bytes = new byte[data.Length];
             return new(ReadAsync(bytes, bytes.Length, cancellationToken).ContinueWith(x =>

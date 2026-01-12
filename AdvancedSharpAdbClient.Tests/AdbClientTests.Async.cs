@@ -58,11 +58,11 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555   device product:VS Emulator 5\" KitKat (4.4) XXHDPI Phone model:5__KitKat__4_4__XXHDPI_Phone device:donatello\n"];
             string[] requests = ["host:devices-l"];
 
-            DeviceData[] devices = await RunTestAsync(
+            List<DeviceData> devices = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                ctx => TestClient.GetDevicesAsync(ctx).ToArrayAsync(),
+                ctx => TestClient.GetDevicesAsync(ctx).ToListAsync(),
                 TestContext.Current.CancellationToken);
 
             // Make sure and the correct value is returned.
@@ -216,15 +216,15 @@ namespace AdvancedSharpAdbClient.Tests
             string[] responseMessages = ["169.254.109.177:5555 tcp:1 tcp:2\n169.254.109.177:5555 tcp:3 tcp:4\n169.254.109.177:5555 tcp:5 local:/socket/1\n"];
             string[] requests = ["host-serial:169.254.109.177:5555:list-forward"];
 
-            ForwardData[] forwards = await RunTestAsync(
+            List<ForwardData> forwards = await RunTestAsync(
                 OkResponse,
                 responseMessages,
                 requests,
-                ctx => TestClient.ListForwardAsync(Device, ctx).ToArrayAsync(),
+                ctx => TestClient.ListForwardAsync(Device, ctx).ToListAsync(),
                 TestContext.Current.CancellationToken);
 
             Assert.NotNull(forwards);
-            Assert.Equal(3, forwards.Length);
+            Assert.Equal(3, forwards.Count);
             Assert.Equal("169.254.109.177:5555", forwards[0].SerialNumber);
             Assert.Equal("tcp:1", forwards[0].Local);
             Assert.Equal("tcp:2", forwards[0].Remote);
@@ -244,15 +244,15 @@ namespace AdvancedSharpAdbClient.Tests
                 "reverse:list-forward"
             ];
 
-            ForwardData[] forwards = await RunTestAsync(
+            List<ForwardData> forwards = await RunTestAsync(
                 OkResponses(2),
                 responseMessages,
                 requests,
-                ctx => TestClient.ListReverseForwardAsync(Device, ctx).ToArrayAsync(),
+                ctx => TestClient.ListReverseForwardAsync(Device, ctx).ToListAsync(),
                 TestContext.Current.CancellationToken);
 
             Assert.NotNull(forwards);
-            Assert.Equal(3, forwards.Length);
+            Assert.Equal(3, forwards.Count);
             Assert.Equal("(reverse)", forwards[0].SerialNumber);
             Assert.Equal("localabstract:scrcpy", forwards[0].Local);
             Assert.Equal("tcp:100", forwards[0].Remote);
@@ -1258,14 +1258,14 @@ namespace AdvancedSharpAdbClient.Tests
             string[] requests = ["host-serial:169.254.109.177:5555:features"];
             string[] responses = ["sendrecv_v2_brotli,remount_shell,sendrecv_v2,abb_exec,fixed_push_mkdir,fixed_push_symlink_timestamp,abb,shell_v2,cmd,ls_v2,apex,stat_v2\r\n"];
 
-            string[] features = await RunTestAsync(
+            List<string> features = await RunTestAsync(
                 OkResponse,
                 responses,
                 requests,
-                ctx => TestClient.GetFeatureSetAsync(Device, ctx).ToArrayAsync(),
+                ctx => TestClient.GetFeatureSetAsync(Device, ctx).ToListAsync(),
                 TestContext.Current.CancellationToken);
 
-            Assert.Equal(12, features.Length);
+            Assert.Equal(12, features.Count);
             Assert.Equal("sendrecv_v2_brotli", features.FirstOrDefault());
             Assert.Equal("stat_v2", features.LastOrDefault());
         }

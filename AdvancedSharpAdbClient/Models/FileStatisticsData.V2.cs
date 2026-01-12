@@ -37,7 +37,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// The length of <see cref="FileStatisticsDataEx"/> in bytes.
         /// </summary>
-        public const int Length = 5 * sizeof(uint) + 3 * sizeof(ulong) + 3 * sizeof(long);
+        public const int Length = (5 * sizeof(uint)) + (3 * sizeof(ulong)) + (3 * sizeof(long));
 
         /// <summary>
         /// Gets the error code associated with the current operation.
@@ -60,49 +60,49 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the file mode value represented as an unsigned integer.
         /// </summary>
-        [field: FieldOffset(sizeof(uint) + 2 * sizeof(ulong))]
+        [field: FieldOffset(sizeof(uint) + (2 * sizeof(ulong)))]
         public uint Mode { get; init; } = Mode;
 
         /// <summary>
         /// Gets the number of hard links to the file or directory.
         /// </summary>
-        [field: FieldOffset(2 * sizeof(uint) + 2 * sizeof(ulong))]
+        [field: FieldOffset((2 * sizeof(uint)) + (2 * sizeof(ulong)))]
         public uint LinkCount { get; init; } = LinkCount;
 
         /// <summary>
         /// Gets the unique identifier of the user associated with this instance.
         /// </summary>
-        [field: FieldOffset(3 * sizeof(uint) + 2 * sizeof(ulong))]
+        [field: FieldOffset((3 * sizeof(uint)) + (2 * sizeof(ulong)))]
         public uint UserId { get; init; } = UserId;
 
         /// <summary>
         /// Gets the unique identifier for the group.
         /// </summary>
-        [field: FieldOffset(4 * sizeof(uint) + 2 * sizeof(ulong))]
+        [field: FieldOffset((4 * sizeof(uint)) + (2 * sizeof(ulong)))]
         public uint GroupId { get; init; } = GroupId;
 
         /// <summary>
         /// Gets the size, in bytes.
         /// </summary>
-        [field: FieldOffset(5 * sizeof(uint) + 2 * sizeof(ulong))]
+        [field: FieldOffset((5 * sizeof(uint)) + (2 * sizeof(ulong)))]
         public ulong Size { get; init; } = Size;
 
         /// <summary>
         /// Gets the last access time, in Unix timestamp format.
         /// </summary>
-        [field: FieldOffset(5 * sizeof(uint) + 3 * sizeof(ulong))]
+        [field: FieldOffset((5 * sizeof(uint)) + (3 * sizeof(ulong)))]
         public long AccessTime { get; init; } = AccessTime;
 
         /// <summary>
         /// Gets the timestamp indicating when the item was last modified.
         /// </summary>
-        [field: FieldOffset(5 * sizeof(uint) + 2 * sizeof(ulong) + sizeof(ulong))]
+        [field: FieldOffset((5 * sizeof(uint)) + (2 * sizeof(ulong)) + sizeof(ulong))]
         public long ModifiedTime { get; init; } = ModifiedTime;
 
         /// <summary>
         /// Gets the timestamp indicating when the last change occurred.
         /// </summary>
-        [field: FieldOffset(5 * sizeof(uint) + 2 * sizeof(ulong) + 2 * sizeof(ulong))]
+        [field: FieldOffset((5 * sizeof(uint)) + (2 * sizeof(ulong)) + (2 * sizeof(ulong)))]
         public long ChangedTime { get; init; } = ChangedTime;
 
         /// <summary>
