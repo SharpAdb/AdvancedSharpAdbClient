@@ -108,7 +108,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socketFlags">A bitwise combination of the SocketFlags values.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <returns>A <see cref="ValueTask{Int32}"/> which returns the number of bytes sent to the Socket.</returns>
-        public ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
+        ValueTask<int> SendAsync(ReadOnlyMemory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
             => new(ReceiveAsync(buffer.ToArray(), buffer.Length, socketFlags, cancellationToken));
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="ValueTask{Int32}"/> which returns the number of bytes received.</returns>
-        public ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
+        ValueTask<int> ReceiveAsync(Memory<byte> buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
         {
             byte[] bytes = new byte[buffer.Length];
             return new(ReceiveAsync(bytes, bytes.Length, socketFlags, cancellationToken).ContinueWith(x =>

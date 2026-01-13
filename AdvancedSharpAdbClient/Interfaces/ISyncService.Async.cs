@@ -20,9 +20,10 @@ namespace AdvancedSharpAdbClient
         /// <param name="permissions">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task PushAsync(Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
+        Task PushAsync(Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously pulls (downloads) a file from the remote device.
@@ -30,9 +31,11 @@ namespace AdvancedSharpAdbClient
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
 
         /// <summary>
         /// Asynchronously returns information about a file on the device.
@@ -43,12 +46,30 @@ namespace AdvancedSharpAdbClient
         Task<FileStatistics> StatAsync(string remotePath, CancellationToken cancellationToken);
 
         /// <summary>
+        /// Asynchronously returns information about a file on the device (v2).
+        /// </summary>
+        /// <param name="remotePath">The path of the file on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{FileStatisticsV2}"/> which returns a <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
+        /// <remarks>Need Android 8 or above.</remarks>
+        Task<FileStatisticsEx> StatExAsync(string remotePath, CancellationToken cancellationToken);
+
+        /// <summary>
         /// Asynchronously lists the contents of a directory on the device.
         /// </summary>
         /// <param name="remotePath">The path to the directory on the device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device (v2).
+        /// </summary>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{List}"/> which returns for each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
+        /// <remarks>Need Android 11 or above.</remarks>
+        Task<List<FileStatisticsEx>> GetDirectoryListingExAsync(string remotePath, CancellationToken cancellationToken);
 
 #if COMP_NETSTANDARD2_1
         /// <summary>
@@ -58,7 +79,17 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         IAsyncEnumerable<FileStatistics> GetDirectoryAsyncListing(string remotePath, CancellationToken cancellationToken) =>
-            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).ToAsyncEnumerable(cancellationToken);
+            GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatistics>).ToAsyncEnumerable();
+
+        /// <summary>
+        /// Asynchronously lists the contents of a directory on the device (v2).
+        /// </summary>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>An <see cref="IAsyncEnumerable{FileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
+        /// <remarks>Need Android 11 or above.</remarks>
+        IAsyncEnumerable<FileStatisticsEx> GetDirectoryAsyncListingEx(string remotePath, CancellationToken cancellationToken) =>
+            GetDirectoryListingExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IEnumerable<FileStatisticsEx>).ToAsyncEnumerable();
 #endif
 
         /// <summary>
@@ -89,9 +120,10 @@ namespace AdvancedSharpAdbClient
             /// <param name="permissions">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
             /// <param name="timestamp">The time at which the file was last modified.</param>
             /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+            /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
+            Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
 
             /// <summary>
             /// Asynchronously pulls (downloads) a file from the remote device.
@@ -99,9 +131,11 @@ namespace AdvancedSharpAdbClient
             /// <param name="remotePath">The path, on the device, of the file to pull.</param>
             /// <param name="stream">A <see cref="IOutputStream"/> that will receive the contents of the file.</param>
             /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as <see cref="SyncProgressChangedEventArgs"/>, representing the state of the file which has been transferred.</param>
+            /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? callback, CancellationToken cancellationToken);
+            /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+            Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
         }
 #endif
     }

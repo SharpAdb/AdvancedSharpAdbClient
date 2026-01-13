@@ -191,7 +191,7 @@ namespace AdvancedSharpAdbClient.Logs
         private async Task<ushort?> ReadUInt16Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(2, cancellationToken).ConfigureAwait(false);
-            return data == null ? null : (ushort)(data[0] | (data[1] << 8));
+            return data == null ? null : BitConverter.ToUInt16(data);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace AdvancedSharpAdbClient.Logs
         private async Task<uint?> ReadUInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-            return data == null ? null : (uint)(data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+            return data == null ? null : BitConverter.ToUInt32(data);
         }
 
         /// <summary>
@@ -213,7 +213,7 @@ namespace AdvancedSharpAdbClient.Logs
         private async Task<int?> ReadInt32Async(CancellationToken cancellationToken = default)
         {
             byte[]? data = await ReadBytesSafeAsync(4, cancellationToken).ConfigureAwait(false);
-            return data == null ? null : data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
+            return data == null ? null : BitConverter.ToInt32(data);
         }
 
         /// <summary>

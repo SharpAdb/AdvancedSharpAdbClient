@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(Stream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -52,8 +52,17 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.SND2, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                    await Socket.SendSyncRequestAsync(SyncCommand.SND2, permission, SyncFlags.None, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                }
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -106,7 +115,7 @@ namespace AdvancedSharpAdbClient
                     await Socket.SendAsync(buffer, startPosition, read + dataBytes.Length + lengthBytes.Length, cancellationToken).ConfigureAwait(false);
 #endif
                     // Let the caller know about our progress, if requested
-                    callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
+                    callback?.Invoke(new SyncProgressChangedEventArgs((ulong)totalBytesRead, (ulong)totalBytesToProcess));
 
                     // check if we're canceled
                     cancellationToken.ThrowIfCancellationRequested();
@@ -137,7 +146,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -147,16 +156,24 @@ namespace AdvancedSharpAdbClient
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = await StatAsync(remotePath, cancellationToken).ConfigureAwait(false);
-            long totalBytesToProcess = stat.Size;
-            long totalBytesRead = 0;
+            ulong totalBytesToProcess = await this.StatAsync(remotePath, useV2, cancellationToken).ContinueWith(x => x.Result.Size).ConfigureAwait(false);
+            ulong totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.RCV2, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                    await Socket.SendSyncRequestAsync(SyncCommand.RCV2, (int)SyncFlags.None, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                }
 
                 while (true)
                 {
@@ -177,7 +194,7 @@ namespace AdvancedSharpAdbClient
                     byte[] reply = new byte[4];
                     _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-                    int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+                    int size = BitConverter.ToInt32(reply);
 
                     if (size > MaxBufferSize)
                     {
@@ -195,7 +212,7 @@ namespace AdvancedSharpAdbClient
 #else
                     await stream.WriteAsync(buffer, 0, size, cancellationToken).ConfigureAwait(false);
 #endif
-                    totalBytesRead += size;
+                    totalBytesRead += (uint)size;
 
                     // Let the caller know about our progress, if requested
                     callback?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
@@ -215,7 +232,7 @@ namespace AdvancedSharpAdbClient
 
 #if HAS_WINRT
         /// <inheritdoc/>
-        public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PushAsync(IInputStream stream, string remotePath, UnixFileStatus permission, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -231,8 +248,17 @@ namespace AdvancedSharpAdbClient
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.SND2, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                    await Socket.SendSyncRequestAsync(SyncCommand.SND2, permission, SyncFlags.None, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.SEND, remotePath, permission, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                }
 
                 // create the buffer used to read.
                 // we read max SYNC_DATA_MAX.
@@ -293,7 +319,7 @@ namespace AdvancedSharpAdbClient
                     await Socket.SendAsync(buffer, startPosition, (int)(read + dataBytes.Length + lengthBytes.Length), cancellationToken).ConfigureAwait(false);
 #endif
                     // Let the caller know about our progress, if requested
-                    progress?.Invoke(new SyncProgressChangedEventArgs((long)totalBytesRead, (long)totalBytesToProcess));
+                    progress?.Invoke(new SyncProgressChangedEventArgs(totalBytesRead, totalBytesToProcess));
 
                     // check if we're canceled
                     cancellationToken.ThrowIfCancellationRequested();
@@ -324,7 +350,7 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
-        public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, CancellationToken cancellationToken = default)
+        public virtual async Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
 
@@ -334,16 +360,24 @@ namespace AdvancedSharpAdbClient
             if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
 
             // Gets file information, including the file size, used to calculate the total amount of bytes to receive.
-            FileStatistics stat = await StatAsync(remotePath, cancellationToken).ConfigureAwait(false);
-            long totalBytesToProcess = stat.Size;
-            long totalBytesRead = 0;
+            ulong totalBytesToProcess = await this.StatAsync(remotePath, useV2, cancellationToken).ContinueWith(x => x.Result.Size).ConfigureAwait(false);
+            ulong totalBytesRead = 0;
 
             byte[] buffer = new byte[MaxBufferSize];
 
             try
             {
-                await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
-                IsProcessing = true;
+                if (useV2)
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.RCV2, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                    await Socket.SendSyncRequestAsync(SyncCommand.RCV2, (int)SyncFlags.None, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Socket.SendSyncRequestAsync(SyncCommand.RECV, remotePath, cancellationToken).ConfigureAwait(false);
+                    IsProcessing = true;
+                }
 
                 while (true)
                 {
@@ -364,7 +398,7 @@ namespace AdvancedSharpAdbClient
                     byte[] reply = new byte[4];
                     _ = await Socket.ReadAsync(reply, cancellationToken).ConfigureAwait(false);
 
-                    int size = reply[0] | (reply[1] << 8) | (reply[2] << 16) | (reply[3] << 24);
+                    int size = BitConverter.ToInt32(reply);
 
                     if (size > MaxBufferSize)
                     {
@@ -418,6 +452,24 @@ namespace AdvancedSharpAdbClient
         }
 
         /// <inheritdoc/>
+        public async Task<FileStatisticsEx> StatExAsync(string remotePath, CancellationToken cancellationToken = default)
+        {
+            // create the stat request message.
+            await Socket.SendSyncRequestAsync(SyncCommand.STA2, remotePath, cancellationToken).ConfigureAwait(false);
+
+            SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+            if (response != SyncCommand.STA2)
+            {
+                throw new AdbException($"The server returned an invalid sync response {response}.");
+            }
+
+            FileStatisticsEx value = await ReadStatisticsV2Async(cancellationToken).ConfigureAwait(false);
+            value.Path = remotePath;
+
+            return value;
+        }
+
+        /// <inheritdoc/>
         public async Task<List<FileStatistics>> GetDirectoryListingAsync(string remotePath, CancellationToken cancellationToken = default)
         {
             if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
@@ -452,6 +504,56 @@ namespace AdvancedSharpAdbClient
                     }
 
                     FileStatistics entry = await ReadStatisticsAsync(cancellationToken).ConfigureAwait(false);
+                    entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
+
+                    value.Add(entry);
+                }
+
+            finish:
+                return value;
+            }
+            finally
+            {
+                IsOutdate = true;
+                IsProcessing = false;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<FileStatisticsEx>> GetDirectoryListingExAsync(string remotePath, CancellationToken cancellationToken = default)
+        {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+            if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
+            bool isLocked = false;
+
+        start:
+            List<FileStatisticsEx> value = [];
+
+            try
+            {
+                // create the stat request message.
+                await Socket.SendSyncRequestAsync(SyncCommand.LIS2, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
+
+                while (true)
+                {
+                    SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+
+                    switch (response)
+                    {
+                        case 0 when isLocked:
+                            throw new AdbException("The server returned an empty sync response.");
+                        case 0:
+                            Reopen();
+                            isLocked = true;
+                            goto start;
+                        case SyncCommand.DONE:
+                            goto finish;
+                        case not SyncCommand.DNT2:
+                            throw new AdbException($"The server returned an invalid sync response {response}.");
+                    }
+
+                    FileStatisticsEx entry = await ReadStatisticsV2Async(cancellationToken).ConfigureAwait(false);
                     entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
 
                     value.Add(entry);
@@ -516,6 +618,55 @@ namespace AdvancedSharpAdbClient
                 IsProcessing = false;
             }
         }
+
+        /// <inheritdoc/>
+        public async IAsyncEnumerable<FileStatisticsEx> GetDirectoryAsyncListingEx(string remotePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            if (IsProcessing) { throw new InvalidOperationException($"The {nameof(SyncService)} is currently processing a request. Please {nameof(Clone)} a new {nameof(ISyncService)} or wait until the process is finished."); }
+            if (IsOutdate) { await ReopenAsync(cancellationToken).ConfigureAwait(false); }
+            bool isLocked = false;
+
+            try
+            {
+            start:
+                // create the stat request message.
+                await Socket.SendSyncRequestAsync(SyncCommand.LIS2, remotePath, cancellationToken).ConfigureAwait(false);
+                IsProcessing = true;
+
+                while (true)
+                {
+                    SyncCommand response = await Socket.ReadSyncResponseAsync(cancellationToken).ConfigureAwait(false);
+
+                    switch (response)
+                    {
+                        case 0 when isLocked:
+                            throw new AdbException("The server returned an empty sync response.");
+                        case 0:
+                            Reopen();
+                            isLocked = true;
+                            goto start;
+                        case SyncCommand.DONE:
+                            goto finish;
+                        case not SyncCommand.DNT2:
+                            throw new AdbException($"The server returned an invalid sync response {response}.");
+                    }
+
+                    FileStatisticsEx entry = await ReadStatisticsV2Async(cancellationToken).ConfigureAwait(false);
+                    entry.Path = await Socket.ReadSyncStringAsync(cancellationToken).ConfigureAwait(false);
+
+                    yield return entry;
+                    isLocked = true;
+                }
+
+            finish:
+                yield break;
+            }
+            finally
+            {
+                IsOutdate = true;
+                IsProcessing = false;
+            }
+        }
 #endif
 
         /// <summary>
@@ -526,20 +677,35 @@ namespace AdvancedSharpAdbClient
         protected async Task<FileStatistics> ReadStatisticsAsync(CancellationToken cancellationToken = default)
         {
 #if COMP_NETSTANDARD2_1
-            Memory<byte> statResult = new byte[12];
+            Memory<byte> statResult = new byte[FileStatisticsData.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            return EnumerableBuilder.FileStatisticsCreator(statResult.Span);
+            FileStatisticsData data = EnumerableBuilder.FileStatisticsDataCreator(statResult.Span);
+            return new FileStatistics(data);
 #else
-            byte[] statResult = new byte[12];
+            byte[] statResult = new byte[FileStatisticsData.Length];
             _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
-            int index = 0;
-            return new FileStatistics
-            {
-                FileMode = (UnixFileStatus)ReadUInt32(statResult),
-                Size = ReadUInt32(statResult),
-                Time = DateTimeOffset.FromUnixTimeSeconds(ReadUInt32(statResult))
-            };
-            uint ReadUInt32(byte[] data) => unchecked((uint)(data[index++] | (data[index++] << 8) | (data[index++] << 16) | (data[index++] << 24)));
+            ref FileStatisticsData data = ref Unsafe.As<byte, FileStatisticsData>(ref statResult[0]);
+            return new FileStatistics(data);
+#endif
+        }
+
+        /// <summary>
+        /// Asynchronously reads the statistics of a file from the socket.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
+        /// <returns>A <see cref="Task{FileStatisticsV2}"/> which returns a <see cref="FileStatisticsEx"/> object that contains information about the file.</returns>
+        protected async Task<FileStatisticsEx> ReadStatisticsV2Async(CancellationToken cancellationToken = default)
+        {
+#if COMP_NETSTANDARD2_1
+            Memory<byte> statResult = new byte[FileStatisticsDataEx.Length];
+            _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
+            FileStatisticsDataEx data = EnumerableBuilder.FileStatisticsDataV2Creator(statResult.Span);
+            return new FileStatisticsEx(data);
+#else
+            byte[] statResult = new byte[FileStatisticsDataEx.Length];
+            _ = await Socket.ReadAsync(statResult, cancellationToken).ConfigureAwait(false);
+            ref FileStatisticsDataEx data = ref Unsafe.As<byte, FileStatisticsDataEx>(ref statResult[0]);
+            return new FileStatisticsEx(data);
 #endif
         }
     }

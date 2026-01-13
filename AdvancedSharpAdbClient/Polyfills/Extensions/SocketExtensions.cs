@@ -29,6 +29,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             Task.Run(() => socket.Connect(remoteEP), cancellationToken);
 #endif
 
+#if !HAS_BUFFERS
         /// <summary>
         /// Asynchronously receives data from a connected socket.
         /// </summary>
@@ -40,6 +41,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
+#endif
 
         /// <summary>
         /// Asynchronously receives data from a connected socket.
@@ -70,7 +72,6 @@ namespace AdvancedSharpAdbClient.Polyfills
 #if HAS_BUFFERS
             return socket.ReceiveAsync(buffer.AsMemory(offset, size), socketFlags, cancellationToken).AsTask();
 #elif HAS_PROCESS
-
             // Register a callback so that when a cancellation is requested, the socket is closed.
             // This will cause an ObjectDisposedException to bubble up via TrySetResult, which we can catch
             // and convert to a TaskCancelledException - which is the exception we expect.
@@ -107,6 +108,7 @@ namespace AdvancedSharpAdbClient.Polyfills
 #endif
         }
 
+#if !HAS_BUFFERS
         /// <summary>
         /// Asynchronously sends data to a connected socket.
         /// </summary>
@@ -118,6 +120,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.SendAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
+#endif
 
         /// <summary>
         /// Asynchronously sends data to a connected socket.

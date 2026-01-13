@@ -11,7 +11,7 @@ namespace AdvancedSharpAdbClient.Models
     /// </summary>
     /// <remarks><see href="https://github.com/openbsd/src/blob/master/sys/sys/stat.h"/></remarks>
     [Flags]
-    public enum UnixFileStatus
+    public enum UnixFileStatus : uint
     {
         /// <summary>
         /// Empty property.

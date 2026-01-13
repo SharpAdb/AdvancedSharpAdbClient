@@ -217,7 +217,7 @@ namespace AdvancedSharpAdbClient.Models
             builder.AppendLiteral(Serial);
             builder.AppendFormatted('\t');
 
-            switch(State)
+            switch (State)
             {
                 case DeviceState.Online:
                     builder.AppendLiteral("device");
@@ -299,11 +299,9 @@ namespace AdvancedSharpAdbClient.Models
         public static DeviceData EnsureDevice([NotNull] DeviceData? device, [CallerArgumentExpression(nameof(device))] string? paramName = "device")
         {
             ArgumentNullException.ThrowIfNull(device, paramName);
-            if (device.IsEmpty)
-            {
-                throw new ArgumentOutOfRangeException(paramName, "You must specific a transport ID or serial number for the device");
-            }
-            return device;
+            return device.IsEmpty
+                ? throw new ArgumentOutOfRangeException(paramName, "You must specific a transport ID or serial number for the device")
+                : device;
         }
 
         /// <summary>

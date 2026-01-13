@@ -181,14 +181,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Pull(remotePath, stream, callback, in isCancelled);
+            service.Pull(remotePath, stream, callback, useV2, in isCancelled);
         }
 
         /// <summary>
@@ -201,15 +204,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>The <paramref name="permission"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileStatus permission, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Push(stream, remotePath, permission, timestamp, callback, in isCancelled);
+            service.Push(stream, remotePath, permission, timestamp, callback, useV2, in isCancelled);
         }
 
         /// <summary>
@@ -219,11 +224,38 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to look for the file.</param>
         /// <param name="path">The path to the file.</param>
         /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
+        /// <remarks>The file size will be cut off at 4 GiB due to the use of a 32-bit unsigned integer.</remarks>
         public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
             return service.Stat(path);
         }
+
+        /// <summary>
+        /// Gets the file statistics of a given file (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <returns>A <see cref="FileStatisticsEx"/> object that represents the file.</returns>
+        /// <remarks>Need Android 8 or above.</remarks>
+        public static FileStatisticsEx StatEx(this IAdbClient client, DeviceData device, string path)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            return service.StatEx(path);
+        }
+
+        /// <summary>
+        /// Gets the file statistics of a given file.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to look for the file.</param>
+        /// <param name="path">The path to the file.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="Stat(IAdbClient, DeviceData, string)"/>; otherwise, use <see cref="StatEx"/>.</param>
+        /// <returns>A <see cref="IFileStatistics"/> object that represents the file.</returns>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
+        public static IFileStatistics Stat(this IAdbClient client, DeviceData device, string path, bool useV2) =>
+            useV2 ? client.StatEx(device, path) : client.Stat(device, path);
 
         /// <summary>
         /// Lists the contents of a directory on the device.
@@ -240,6 +272,39 @@ namespace AdvancedSharpAdbClient.DeviceCommands
                 yield return fileStatistics;
             }
         }
+
+        /// <summary>
+        /// Lists the contents of a directory on the device (v2).
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <returns>For each child item of the directory, a <see cref="FileStatisticsEx"/> object with information of the item.</returns>
+        /// <remarks>Need Android 11 or above.</remarks>
+        public static IEnumerable<FileStatisticsEx> GetDirectoryListingEx(this IAdbClient client, DeviceData device, string remotePath)
+        {
+            using ISyncService service = Factories.SyncServiceFactory(client, device);
+            foreach (FileStatisticsEx fileStatistics in service.GetDirectoryListingEx(remotePath))
+            {
+                yield return fileStatistics;
+            }
+        }
+
+        /// <summary>
+        /// Lists the contents of a directory on the device.
+        /// </summary>
+        /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
+        /// <param name="device">The device on which to list the directory.</param>
+        /// <param name="remotePath">The path to the directory on the device.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="GetDirectoryListing(IAdbClient, DeviceData, string)"/>; otherwise, use <see cref="GetDirectoryListingEx"/>.</param>
+        /// <returns>For each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
+        /// <remarks>V2 need Android 11 or above.</remarks>
+        public static IEnumerable<IFileStatistics> GetDirectoryListing(this IAdbClient client, DeviceData device, string remotePath, bool useV2) =>
+#if NETFRAMEWORK && !NET40_OR_GREATER
+            useV2 ? client.GetDirectoryListingEx(device, remotePath).OfType<IFileStatistics>() : client.GetDirectoryListing(device, remotePath).OfType<IFileStatistics>();
+#else
+            useV2 ? client.GetDirectoryListingEx(device, remotePath) : client.GetDirectoryListing(device, remotePath);
+#endif
 
         /// <summary>
         /// Gets the property of a device.
@@ -337,14 +402,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="remotePath">The path, on the device, of the file to pull.</param>
         /// <param name="stream">A <see cref="Stream"/> that will receive the contents of the file.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             IProgress<SyncProgressChangedEventArgs>? progress = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Pull(remotePath, stream, progress.AsAction(), in isCancelled);
+            service.Pull(remotePath, stream, progress.AsAction(), useV2, in isCancelled);
         }
 
         /// <summary>
@@ -357,15 +425,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileStatus"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>The <paramref name="permission"/> should coverts to a decimal number. For example, <c>644</c> should be <c>420</c> in decimal, <c>&amp;O644</c> in VB.NET and <c>0o644</c> in F# and Python.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileStatus permission, DateTimeOffset timestamp,
             IProgress<SyncProgressChangedEventArgs>? progress = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Push(stream, remotePath, permission, timestamp, progress.AsAction(), in isCancelled);
+            service.Push(stream, remotePath, permission, timestamp, progress.AsAction(), useV2, in isCancelled);
         }
 
         /// <summary>
@@ -426,14 +496,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>V2 need Android 11 or above.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
             Action<SyncProgressChangedEventArgs>? callback = null,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Push(stream, remotePath, (UnixFileStatus)permission, timestamp, callback, in isCancelled);
+            service.Push(stream, remotePath, (UnixFileStatus)permission, timestamp, callback, useV2, in isCancelled);
         }
 
         /// <summary>
@@ -446,14 +519,17 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="permission">The <see cref="UnixFileMode"/> that contains the permissions of the newly created file on the device.</param>
         /// <param name="timestamp">The time at which the file was last modified.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
+        /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
+        /// <remarks>V2 need Android 11 or above.</remarks>
         public static void Push(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream, UnixFileMode permission, DateTimeOffset timestamp,
             IProgress<SyncProgressChangedEventArgs>? progress,
+            bool useV2 = false,
             in bool isCancelled = false)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
-            service.Push(stream, remotePath, (UnixFileStatus)permission, timestamp, progress.AsAction(), in isCancelled);
+            service.Push(stream, remotePath, (UnixFileStatus)permission, timestamp, progress.AsAction(), useV2, in isCancelled);
         }
 #endif
 #endif

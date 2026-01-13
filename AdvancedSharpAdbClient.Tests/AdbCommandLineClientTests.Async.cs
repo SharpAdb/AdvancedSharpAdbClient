@@ -20,7 +20,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = new AdbCommandLineStatus(adbVersion, fileVersion, filePath)
             };
-            AdbCommandLineStatus status = await commandLine.GetVersionAsync();
+            AdbCommandLineStatus status = await commandLine.GetVersionAsync(TestContext.Current.CancellationToken);
             Assert.Equal(adbVersion, status.AdbVersion);
             Assert.Equal(fileVersion, status.FileVersion);
             Assert.Equal(filePath, status.FilePath);
@@ -36,7 +36,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = default
             };
-            _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync());
+            _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync(TestContext.Current.CancellationToken));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace AdvancedSharpAdbClient.Tests
             {
                 Version = AdbCommandLineStatus.GetVersionFromOutput(["Android Debug Bridge version 1.0.1"])
             };
-            _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync());
+            _ = await Assert.ThrowsAsync<AdbException>(() => commandLine.GetVersionAsync(TestContext.Current.CancellationToken));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AdvancedSharpAdbClient.Tests
         {
             DummyAdbCommandLineClient commandLine = new();
             Assert.False(commandLine.ServerStarted);
-            await commandLine.StartServerAsync();
+            await commandLine.StartServerAsync(TestContext.Current.CancellationToken);
             Assert.True(commandLine.ServerStarted);
         }
     }

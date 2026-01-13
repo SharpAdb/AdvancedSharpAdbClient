@@ -18,13 +18,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async Task DumpScreenStringAsyncTest()
         {
-            string dump = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
+            string dump = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt", TestContext.Current.CancellationToken);
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml", TestContext.Current.CancellationToken);
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = dump;
 
-            string xml = await new DeviceClient(client, Device).DumpScreenStringAsync();
+            string xml = await new DeviceClient(client, Device).DumpScreenStringAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -38,13 +38,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         [Fact]
         public async Task DumpScreenStringMIUIAsyncTest()
         {
-            string miuidump = await File.ReadAllTextAsync(@"Assets/DumpScreen.MIUI.txt");
-            string cleanMIUIDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
+            string miuidump = await File.ReadAllTextAsync(@"Assets/DumpScreen.MIUI.txt", TestContext.Current.CancellationToken);
+            string cleanMIUIDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml", TestContext.Current.CancellationToken);
 
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = miuidump;
 
-            string miuiXml = await new DeviceClient(client, Device).DumpScreenStringAsync();
+            string miuiXml = await new DeviceClient(client, Device).DumpScreenStringAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -61,7 +61,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = string.Empty;
 
-            string emptyXml = await new DeviceClient(client, Device).DumpScreenStringAsync();
+            string emptyXml = await new DeviceClient(client, Device).DumpScreenStringAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -76,9 +76,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task DumpScreenStringErrorAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.Error.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.Error.txt", TestContext.Current.CancellationToken);
 
-            _ = await Assert.ThrowsAsync<XmlException>(() => new DeviceClient(client, Device).DumpScreenStringAsync());
+            _ = await Assert.ThrowsAsync<XmlException>(() => new DeviceClient(client, Device).DumpScreenStringAsync(TestContext.Current.CancellationToken));
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -91,14 +91,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task DumpScreenAsyncTest()
         {
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt", TestContext.Current.CancellationToken);
 
-            XmlDocument xml = await new DeviceClient(client, Device).DumpScreenAsync();
+            XmlDocument xml = await new DeviceClient(client, Device).DumpScreenAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml", TestContext.Current.CancellationToken);
             XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -115,14 +115,14 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             if (!OperatingSystem.IsWindowsVersionAtLeast(10)) { return; }
 
             DummyAdbClient client = new();
-            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt");
+            client.Commands["shell:uiautomator dump /dev/tty"] = await File.ReadAllTextAsync(@"Assets/DumpScreen.txt", TestContext.Current.CancellationToken);
 
-            Windows.Data.Xml.Dom.XmlDocument xml = await new DeviceClient(client, Device).DumpScreenWinRTAsync();
+            Windows.Data.Xml.Dom.XmlDocument xml = await new DeviceClient(client, Device).DumpScreenWinRTAsync(TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml");
+            string cleanDump = await File.ReadAllTextAsync(@"Assets/DumpScreen.Clean.xml", TestContext.Current.CancellationToken);
             Windows.Data.Xml.Dom.XmlDocument doc = new();
             doc.LoadXml(cleanDump);
 
@@ -164,7 +164,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                         at android.os.Binder.execTransact(Binder.java:1134)
                 """;
 
-            JavaException exception = await Assert.ThrowsAsync<JavaException>(() => new DeviceClient(client, Device).ClickAsync(100, 100));
+            JavaException exception = await Assert.ThrowsAsync<JavaException>(() => new DeviceClient(client, Device).ClickAsync(100, 100, TestContext.Current.CancellationToken));
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input tap 100 100", client.ReceivedCommands[0]);
@@ -206,7 +206,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input tap 100 100"] = "Error: Injecting to another application requires INJECT_EVENTS permission\r\n";
 
-            _ = await Assert.ThrowsAsync<ElementNotFoundException>(() => new DeviceClient(client, Device).ClickAsync(new Point(100, 100)));
+            _ = await Assert.ThrowsAsync<ElementNotFoundException>(() => new DeviceClient(client, Device).ClickAsync(new Point(100, 100), TestContext.Current.CancellationToken));
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input tap 100 100", client.ReceivedCommands[0]);
@@ -221,7 +221,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
 
-            await new DeviceClient(client, Device).SwipeAsync(100, 200, 300, 400, 500);
+            await new DeviceClient(client, Device).SwipeAsync(100, 200, 300, 400, 500, TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input swipe 100 200 300 400 500", client.ReceivedCommands[0]);
@@ -236,7 +236,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
 
-            await new DeviceClient(client, Device).SwipeAsync(new Point(100, 200), new Point(300, 400), 500);
+            await new DeviceClient(client, Device).SwipeAsync(new Point(100, 200), new Point(300, 400), 500, TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input swipe 100 200 300 400 500", client.ReceivedCommands[0]);
@@ -251,7 +251,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input swipe 100 200 300 400 500"] = string.Empty;
 
-            await new DeviceClient(client, Device).SwipeAsync(new Element(client, Device, new Rectangle(0, 0, 200, 400)), new Element(client, Device, new Rectangle(0, 0, 600, 800)), 500);
+            await new DeviceClient(client, Device).SwipeAsync(new Element(client, Device, new Rectangle(0, 0, 200, 400)), new Element(client, Device, new Rectangle(0, 0, 600, 800)), 500, TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input swipe 100 200 300 400 500", client.ReceivedCommands[0]);
@@ -273,7 +273,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:pidof com.google.android.gms"] = response;
 
-            bool result = await new DeviceClient(client, Device).IsAppRunningAsync("com.google.android.gms");
+            bool result = await new DeviceClient(client, Device).IsAppRunningAsync("com.google.android.gms", TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:pidof com.google.android.gms", client.ReceivedCommands[0]);
@@ -297,7 +297,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}
                 """;
 
-            bool result = await new DeviceClient(client, Device).IsAppInForegroundAsync(packageName);
+            bool result = await new DeviceClient(client, Device).IsAppInForegroundAsync(packageName, TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:dumpsys activity activities | grep mResumedActivity", client.ReceivedCommands[0]);
@@ -321,7 +321,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 """;
             client.Commands[$"shell:pidof {packageName}"] = response;
 
-            AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName);
+            AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName, TestContext.Current.CancellationToken);
 
             Assert.Equal(2, client.ReceivedCommands.Count);
             Assert.Equal("shell:dumpsys activity activities | grep mResumedActivity", client.ReceivedCommands[0]);
@@ -345,7 +345,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     mResumedActivity: ActivityRecord{896cc3 u0 app.lawnchair/.LawnchairLauncher t5}
                 """;
 
-            AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName);
+            AppStatus result = await new DeviceClient(client, Device).GetAppStatusAsync(packageName, TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:dumpsys activity activities | grep mResumedActivity", client.ReceivedCommands[0]);
@@ -362,7 +362,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
-            Element element = await new DeviceClient(client, Device).FindElementAsync();
+            Element element = await new DeviceClient(client, Device).FindElementAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -387,13 +387,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
-            Element[] elements = (await new DeviceClient(client, Device).FindElementsAsync()).ToArray();
+            List<Element> elements = await new DeviceClient(client, Device).FindElementsAsync(cancellationToken: TestContext.Current.CancellationToken).ToListAsync();
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
 
-            int childCount = elements.Length;
-            Array.ForEach(elements, x => childCount += x.GetChildCount());
+            int childCount = elements.Count;
+            elements.ForEach(x => childCount += x.GetChildCount());
             Assert.Equal(145, childCount);
             Element element = elements[0][0][0][0][0][0][0][0][0][2][1][0][0];
             Assert.Equal("where-where", element.Text);
@@ -409,7 +409,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:uiautomator dump /dev/tty"] = File.ReadAllText(@"Assets/DumpScreen.txt");
 
-            List<Element> elements = await new DeviceClient(client, Device).FindAsyncElements().ToListAsync();
+            List<Element> elements = await new DeviceClient(client, Device).FindAsyncElements(cancellationToken: TestContext.Current.CancellationToken).ToListAsync(cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:uiautomator dump /dev/tty", client.ReceivedCommands[0]);
@@ -431,7 +431,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
 
-            await new DeviceClient(client, Device).SendKeyEventAsync("KEYCODE_MOVE_END");
+            await new DeviceClient(client, Device).SendKeyEventAsync("KEYCODE_MOVE_END", TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input keyevent KEYCODE_MOVE_END", client.ReceivedCommands[0]);
@@ -446,7 +446,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input text Hello, World"] = string.Empty;
 
-            await new DeviceClient(client, Device).SendTextAsync("Hello, World");
+            await new DeviceClient(client, Device).SendTextAsync("Hello, World", TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input text Hello, World", client.ReceivedCommands[0]);
@@ -460,7 +460,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient client = new();
 
-            await new DeviceClient(client, Device).StartAppAsync("com.android.settings");
+            await new DeviceClient(client, Device).StartAppAsync("com.android.settings", TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:monkey -p com.android.settings 1", client.ReceivedCommands[0]);
@@ -474,7 +474,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         {
             DummyAdbClient client = new();
 
-            await new DeviceClient(client, Device).StopAppAsync("com.android.settings");
+            await new DeviceClient(client, Device).StopAppAsync("com.android.settings", TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:am force-stop com.android.settings", client.ReceivedCommands[0]);

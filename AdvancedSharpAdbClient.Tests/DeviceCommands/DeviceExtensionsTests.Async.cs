@@ -25,7 +25,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 {
                     Assert.Equal(command, x.ArgAt<string>(0));
                     Assert.Equal(Device, x.ArgAt<DeviceData>(1));
-                    Assert.Equal(default, x.ArgAt<CancellationToken>(2));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(2));
                     return Task.CompletedTask;
                 });
             _ = client.ExecuteRemoteCommandAsync(Arg.Any<string>(), Device, Arg.Any<IShellOutputReceiver>(), Arg.Any<Encoding>(), Arg.Any<CancellationToken>())
@@ -35,13 +35,13 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                     Assert.Equal(Device, x.ArgAt<DeviceData>(1));
                     Assert.Equal(receiver, x.ArgAt<IShellOutputReceiver>(2));
                     Assert.Equal(AdbClient.Encoding, x.ArgAt<Encoding>(3));
-                    Assert.Equal(default, x.ArgAt<CancellationToken>(4));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(4));
                     return Task.CompletedTask;
                 });
 
-            await client.ExecuteShellCommandAsync(Device, command);
-            await client.ExecuteShellCommandAsync(Device, command, receiver);
-            await client.ExecuteShellCommandAsync(Device, command, predicate);
+            await client.ExecuteShellCommandAsync(Device, command, cancellationToken: TestContext.Current.CancellationToken);
+            await client.ExecuteShellCommandAsync(Device, command, receiver, cancellationToken: TestContext.Current.CancellationToken);
+            await client.ExecuteShellCommandAsync(Device, command, predicate, cancellationToken: TestContext.Current.CancellationToken);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             client.Commands["shell:input keyevent KEYCODE_MOVE_END"] = string.Empty;
             client.Commands["shell:input keyevent KEYCODE_DEL KEYCODE_DEL KEYCODE_DEL"] = string.Empty;
 
-            await client.ClearInputAsync(Device, 3);
+            await client.ClearInputAsync(Device, 3, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(2, client.ReceivedCommands.Count);
             Assert.Equal("shell:input keyevent KEYCODE_MOVE_END", client.ReceivedCommands[0]);
@@ -70,7 +70,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_BACK"] = string.Empty;
 
-            await client.ClickBackButtonAsync(Device);
+            await client.ClickBackButtonAsync(Device, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input keyevent KEYCODE_BACK", client.ReceivedCommands[0]);
@@ -85,7 +85,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             DummyAdbClient client = new();
             client.Commands["shell:input keyevent KEYCODE_HOME"] = string.Empty;
 
-            await client.ClickHomeButtonAsync(Device);
+            await client.ClickHomeButtonAsync(Device, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Single(client.ReceivedCommands);
             Assert.Equal("shell:input keyevent KEYCODE_HOME", client.ReceivedCommands[0]);
@@ -98,7 +98,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task StatAsyncTest()
         {
             const string remotePath = "/test";
-            FileStatistics stats = new();
+            FileStatistics stats = new(default);
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -106,18 +106,51 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 .Returns(x =>
                 {
                     Assert.Equal(remotePath, x.ArgAt<string>(0));
-                    Assert.Equal(default, x.ArgAt<CancellationToken>(1));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
                     return stats;
                 });
 
             Factories.SyncServiceFactory = (c, d) =>
             {
-                Factories.Reset();
                 Assert.Equal(d, Device);
                 return mock;
             };
 
-            Assert.Equal(stats, await client.StatAsync(Device, remotePath));
+            Assert.Equal(stats, await client.StatAsync(Device, remotePath, TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.StatAsync(Device, remotePath, false, TestContext.Current.CancellationToken));
+
+            Factories.Reset();
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.StatExAsync(IAdbClient, DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async Task StatExAsyncTest()
+        {
+            const string remotePath = "/test";
+            FileStatisticsEx stats = new(default);
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.StatExAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
+                    return stats;
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, await client.StatExAsync(Device, remotePath, TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.StatAsync(Device, remotePath, true, TestContext.Current.CancellationToken));
+
+            Factories.Reset();
         }
 
         /// <summary>
@@ -127,7 +160,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task GetDirectoryListingAsyncTest()
         {
             const string remotePath = "/test";
-            List<FileStatistics> stats = [new()];
+            List<FileStatistics> stats = [new(default)];
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -135,18 +168,51 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 .Returns(x =>
                 {
                     Assert.Equal(remotePath, x.ArgAt<string>(0));
-                    Assert.Equal(default, x.ArgAt<CancellationToken>(1));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
                     return stats;
                 });
 
             Factories.SyncServiceFactory = (c, d) =>
             {
-                Factories.Reset();
                 Assert.Equal(d, Device);
                 return mock;
             };
 
-            Assert.Equal(stats, await client.GetDirectoryListingAsync(Device, remotePath));
+            Assert.Equal(stats, await client.GetDirectoryListingAsync(Device, remotePath, TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.GetDirectoryListingAsync(Device, remotePath, false, TestContext.Current.CancellationToken));
+
+            Factories.Reset();
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetDirectoryListingExAsync(IAdbClient, DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async Task GetDirectoryListingExAsyncTest()
+        {
+            const string remotePath = "/test";
+            List<FileStatisticsEx> stats = [new(default)];
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.GetDirectoryListingExAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
+                    return stats;
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, await client.GetDirectoryListingExAsync(Device, remotePath, TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.GetDirectoryListingAsync(Device, remotePath, true, TestContext.Current.CancellationToken));
+
+            Factories.Reset();
         }
 
         /// <summary>
@@ -156,7 +222,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
         public async Task GetDirectoryAsyncListingTest()
         {
             const string remotePath = "/test";
-            List<FileStatistics> stats = [new()];
+            List<FileStatistics> stats = [new(default)];
 
             IAdbClient client = Substitute.For<IAdbClient>();
             ISyncService mock = Substitute.For<ISyncService>();
@@ -164,18 +230,51 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 .Returns(x =>
                 {
                     Assert.Equal(remotePath, x.ArgAt<string>(0));
-                    Assert.Equal(default, x.ArgAt<CancellationToken>(1));
-                    return stats.ToAsyncEnumerable(x.ArgAt<CancellationToken>(1));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
+                    return stats.ToAsyncEnumerable();
                 });
 
             Factories.SyncServiceFactory = (c, d) =>
             {
-                Factories.Reset();
                 Assert.Equal(d, Device);
                 return mock;
             };
 
-            Assert.Equal(stats, await client.GetDirectoryAsyncListing(Device, remotePath).ToListAsync());
+            Assert.Equal(stats, await client.GetDirectoryAsyncListing(Device, remotePath, TestContext.Current.CancellationToken).ToListAsync(cancellationToken: TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.GetDirectoryAsyncListing(Device, remotePath, false, TestContext.Current.CancellationToken).ToListAsync(cancellationToken: TestContext.Current.CancellationToken));
+
+            Factories.Reset();
+        }
+
+        /// <summary>
+        /// Tests the <see cref="DeviceExtensions.GetDirectoryAsyncListingEx(IAdbClient, DeviceData, string, CancellationToken)"/> method.
+        /// </summary>
+        [Fact]
+        public async Task GetDirectoryAsyncListingExTest()
+        {
+            const string remotePath = "/test";
+            List<FileStatisticsEx> stats = [new(default)];
+
+            IAdbClient client = Substitute.For<IAdbClient>();
+            ISyncService mock = Substitute.For<ISyncService>();
+            mock.GetDirectoryAsyncListingEx(Arg.Any<string>(), Arg.Any<CancellationToken>())
+                .Returns(x =>
+                {
+                    Assert.Equal(remotePath, x.ArgAt<string>(0));
+                    Assert.Equal(TestContext.Current.CancellationToken, x.ArgAt<CancellationToken>(1));
+                    return stats.ToAsyncEnumerable();
+                });
+
+            Factories.SyncServiceFactory = (c, d) =>
+            {
+                Assert.Equal(d, Device);
+                return mock;
+            };
+
+            Assert.Equal(stats, await client.GetDirectoryAsyncListingEx(Device, remotePath, TestContext.Current.CancellationToken).ToListAsync(cancellationToken: TestContext.Current.CancellationToken));
+            Assert.Equal(stats, await client.GetDirectoryAsyncListing(Device, remotePath, true, TestContext.Current.CancellationToken).ToListAsync(cancellationToken: TestContext.Current.CancellationToken));
+
+            Factories.Reset();
         }
 
         /// <summary>
@@ -188,7 +287,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.Commands[$"shell:{EnvironmentVariablesReceiver.PrintEnvCommand}"] = "a=b";
 
-            Dictionary<string, string> variables = await adbClient.GetEnvironmentVariablesAsync(Device);
+            Dictionary<string, string> variables = await adbClient.GetEnvironmentVariablesAsync(Device, cancellationToken: TestContext.Current.CancellationToken);
             Assert.NotNull(variables);
             Assert.Single(variables.Keys);
             Assert.True(variables.ContainsKey("a"));
@@ -456,7 +555,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.Commands[$"shell:dumpsys package {packageName}"] = command;
 
-            VersionInfo version = await adbClient.GetPackageVersionAsync(Device, packageName);
+            VersionInfo version = await adbClient.GetPackageVersionAsync(Device, packageName, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(versionCode, version.VersionCode);
             Assert.Equal(versionName, version.VersionName);
@@ -496,7 +595,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
                 3 (ksoftirqd/0) S 2 0 0 0 -1 69238848 0 0 0 0 0 23 0 0 20 0 1 0 7 0 0 18446744073709551615 0 0 0 0 0 0 0 2147483647 0 18446744071579284070 0 0 17 0 0 0 0 0 0 0 0 0 0 0 0 0 0
                 """;
 
-            List<AndroidProcess> processes = await adbClient.ListProcessesAsync(Device);
+            List<AndroidProcess> processes = await adbClient.ListProcessesAsync(Device, cancellationToken: TestContext.Current.CancellationToken);
 
             Assert.Equal(3, processes.Count);
             Assert.Equal("init", processes[0].Name);
