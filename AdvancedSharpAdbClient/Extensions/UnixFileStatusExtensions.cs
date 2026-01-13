@@ -2,6 +2,9 @@
 // Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.
 // </copyright>
 
+#pragma warning disable IDE0079
+#pragma warning disable CS1734
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
