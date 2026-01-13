@@ -21,7 +21,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="ISyncService.StatAsync"/>; otherwise, use <see cref="ISyncService.StatExAsync"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{IFileStatistics}"/> which returns a <see cref="IFileStatistics"/> object that contains information about the file.</returns>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
         public static Task<IFileStatistics> StatAsync(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
             useV2 ? service.StatExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IFileStatistics) : service.StatAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IFileStatistics);
 
@@ -33,6 +33,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="ISyncService.GetDirectoryListingAsync"/>; otherwise, use <see cref="ISyncService.GetDirectoryListingExAsync"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns for each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static Task<IEnumerable<IFileStatistics>> GetDirectoryListingAsync(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
 #if NETFRAMEWORK && !NET40_OR_GREATER
             useV2 ? service.GetDirectoryListingExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>()) : service.GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>());
@@ -49,6 +50,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="ISyncService.GetDirectoryListingAsync"/>; otherwise, use <see cref="ISyncService.GetDirectoryListingExAsync"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{IFileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static IAsyncEnumerable<IFileStatistics> GetDirectoryAsyncListing(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
             useV2 ? service.GetDirectoryAsyncListingEx(remotePath, cancellationToken) : service.GetDirectoryAsyncListing(remotePath, cancellationToken);
 #endif
@@ -79,7 +81,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static Task PullAsync(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), useV2, cancellationToken);
 
@@ -109,7 +111,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static Task PullAsync(this ISyncService.IWinRT service, string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), useV2, cancellationToken);
 #endif

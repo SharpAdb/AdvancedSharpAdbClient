@@ -40,6 +40,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the total file size, in bytes.
         /// </summary>
+        /// <remarks>The size will be cut off at 4 GiB due to the use of a 32-bit unsigned integer.</remarks>
         public uint Size { get; init; } = Size;
 
         /// <summary>

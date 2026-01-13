@@ -34,7 +34,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         Task PullAsync(string remotePath, Stream stream, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient
             /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
             /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
             /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
-            /// <remarks>V2 need Android 8 or above.</remarks>
+            /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
             Task PullAsync(string remotePath, IOutputStream stream, Action<SyncProgressChangedEventArgs>? callback, bool useV2, CancellationToken cancellationToken);
         }
 #endif

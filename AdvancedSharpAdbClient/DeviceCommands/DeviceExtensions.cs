@@ -183,7 +183,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             Action<SyncProgressChangedEventArgs>? callback = null,
@@ -224,6 +224,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to look for the file.</param>
         /// <param name="path">The path to the file.</param>
         /// <returns>A <see cref="FileStatistics"/> object that represents the file.</returns>
+        /// <remarks>The file size will be cut off at 4 GiB due to the use of a 32-bit unsigned integer.</remarks>
         public static FileStatistics Stat(this IAdbClient client, DeviceData device, string path)
         {
             using ISyncService service = Factories.SyncServiceFactory(client, device);
@@ -252,7 +253,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="path">The path to the file.</param>
         /// <param name="useV2"><see langword="true"/> to use <see cref="Stat(IAdbClient, DeviceData, string)"/>; otherwise, use <see cref="StatEx"/>.</param>
         /// <returns>A <see cref="IFileStatistics"/> object that represents the file.</returns>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
         public static IFileStatistics Stat(this IAdbClient client, DeviceData device, string path, bool useV2) =>
             useV2 ? client.StatEx(device, path) : client.Stat(device, path);
 
@@ -403,7 +404,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications. The progress is reported as a value between 0 and 100, representing the percentage of the file which has been transferred.</param>
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
-        /// <remarks>V2 need Android 8 or above.</remarks>
+        /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
         public static void Pull(this IAdbClient client, DeviceData device,
             string remotePath, Stream stream,
             IProgress<SyncProgressChangedEventArgs>? progress = null,
