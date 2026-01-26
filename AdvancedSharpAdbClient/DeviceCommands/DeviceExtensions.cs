@@ -24,6 +24,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The <see cref="IAdbClient"/> to use when executing the command.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command) =>
             client.ExecuteRemoteCommand(command, device);
 
@@ -34,6 +35,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, IShellOutputReceiver? receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
@@ -44,6 +46,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteShellCommand(this IAdbClient client, DeviceData device, string command, Func<string, bool>? predicate) =>
             client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
 
@@ -53,6 +56,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <returns>A <see cref="XmlDocument"/> containing current hierarchy.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static XmlDocument? DumpScreen(this IAdbClient client, DeviceData device) =>
             new DeviceClient(client, device).DumpScreen();
 
@@ -62,6 +66,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="point">The <see cref="Point"/> to click.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Click(this IAdbClient client, DeviceData device, Point point) =>
             new DeviceClient(client, device).Click(point);
 
@@ -73,6 +78,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="first">The start <see cref="Point"/>.</param>
         /// <param name="second">The end <see cref="Point"/>.</param>
         /// <param name="speed">The time spent in swiping.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Swipe(this IAdbClient client, DeviceData device, Point first, Point second, long speed) =>
             new DeviceClient(client, device).Swipe(first, second, speed);
 
@@ -83,6 +89,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="packageName">The package name of the app to check.</param>
         /// <returns>The <see cref="AppStatus"/> of the app. Foreground, stopped or running in background.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static AppStatus GetAppStatus(this IAdbClient client, DeviceData device, string packageName) =>
             new DeviceClient(client, device).GetAppStatus(packageName);
 
@@ -96,6 +103,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timeout">The timeout for waiting the element.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="Element"/> of <paramref name="xpath"/>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Element? FindElement(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default) =>
             new DeviceClient(client, device).FindElement(xpath, timeout);
 
@@ -108,6 +116,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="timeout">The timeout for waiting the elements.
         /// Only check once if <see langword="default"/> or <see cref="TimeSpan.Zero"/>.</param>
         /// <returns>The <see cref="IEnumerable{Element}"/> of <see cref="Element"/> has got.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<Element> FindElements(this IAdbClient client, DeviceData device, string xpath = "hierarchy/node", TimeSpan timeout = default) =>
             new DeviceClient(client, device).FindElements(xpath, timeout);
 #endif
@@ -118,6 +127,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="key">The key event to send.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void SendKeyEvent(this IAdbClient client, DeviceData device, string key) =>
             new DeviceClient(client, device).SendKeyEvent(key);
 
@@ -127,6 +137,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="text">The text to send.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void SendText(this IAdbClient client, DeviceData device, string text) =>
             new DeviceClient(client, device).SendText(text);
 
@@ -136,6 +147,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to clear the input text.</param>
         /// <param name="charCount">The length of text to clear.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ClearInput(this IAdbClient client, DeviceData device, int charCount) =>
             new DeviceClient(client, device).ClearInput(charCount);
 
@@ -144,6 +156,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click BACK button.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ClickBackButton(this IAdbClient client, DeviceData device) =>
             new DeviceClient(client, device).ClickBackButton();
 
@@ -152,6 +165,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ClickHomeButton(this IAdbClient client, DeviceData device) =>
             new DeviceClient(client, device).ClickHomeButton();
 
@@ -161,6 +175,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
         /// <param name="packageName">The package name of the application to start.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void StartApp(this IAdbClient client, DeviceData device, string packageName) =>
             client.ExecuteShellCommand(device, $"monkey -p {packageName} 1");
 
@@ -170,6 +185,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to click HOME button.</param>
         /// <param name="packageName">The package name of the application to stop.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void StopApp(this IAdbClient client, DeviceData device, string packageName) =>
             client.ExecuteShellCommand(device, $"am force-stop {packageName}");
 
@@ -254,6 +270,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="useV2"><see langword="true"/> to use <see cref="Stat(IAdbClient, DeviceData, string)"/>; otherwise, use <see cref="StatEx"/>.</param>
         /// <returns>A <see cref="IFileStatistics"/> object that represents the file.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IFileStatistics Stat(this IAdbClient client, DeviceData device, string path, bool useV2) =>
             useV2 ? client.StatEx(device, path) : client.Stat(device, path);
 
@@ -299,6 +316,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="useV2"><see langword="true"/> to use <see cref="GetDirectoryListing(IAdbClient, DeviceData, string)"/>; otherwise, use <see cref="GetDirectoryListingEx"/>.</param>
         /// <returns>For each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
         /// <remarks>V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<IFileStatistics> GetDirectoryListing(this IAdbClient client, DeviceData device, string remotePath, bool useV2) =>
 #if NETFRAMEWORK && !NET40_OR_GREATER
             useV2 ? client.GetDirectoryListingEx(device, remotePath).OfType<IFileStatistics>() : client.GetDirectoryListing(device, remotePath).OfType<IFileStatistics>();
@@ -355,11 +373,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallPackage(packageFilePath, callback, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, Action<InstallProgressEventArgs>? callback = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallPackage(packageFilePath, callback, arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -371,11 +387,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, callback, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, Action<InstallProgressEventArgs>? callback = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, callback, arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -387,11 +401,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="callback">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallMultiplePackage(splitPackageFilePaths, packageName, callback, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, Action<InstallProgressEventArgs>? callback = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallMultiplePackage(splitPackageFilePaths, packageName, callback, arguments);
 
 #if !NETFRAMEWORK || NET40_OR_GREATER
         /// <summary>
@@ -447,11 +459,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
-        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallPackage(packageFilePath, progress, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallPackage(this IAdbClient client, DeviceData device, string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallPackage(packageFilePath, progress, arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -463,11 +473,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress, arguments);
 
         /// <summary>
         /// Installs Android multiple application on device.
@@ -479,11 +487,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
-        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void InstallMultiplePackage(this IAdbClient client, DeviceData device, IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).InstallMultiplePackage(splitPackageFilePaths, packageName, progress, arguments);
 
 #if NET7_0_OR_GREATER
         /// <summary>
@@ -541,11 +547,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="arguments">The arguments to pass to <c>pm uninstall</c>.</param>
-        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName, params string[] arguments)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            manager.UninstallPackage(packageName, arguments);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static void UninstallPackage(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
+            new PackageManager(client, device, skipInit: true).UninstallPackage(packageName, arguments);
 
         /// <summary>
         /// Requests the version information from the device.
@@ -553,11 +557,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="client">The connection to the adb server.</param>
         /// <param name="device">The device on which to uninstall the package.</param>
         /// <param name="packageName">The name of the package from which to get the application version.</param>
-        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName)
-        {
-            PackageManager manager = new(client, device, skipInit: true);
-            return manager.GetVersionInfo(packageName);
-        }
+        [MethodImpl((MethodImplOptions)0x100)]
+        public static VersionInfo GetPackageVersion(this IAdbClient client, DeviceData device, string packageName) =>
+            new PackageManager(client, device, skipInit: true).GetVersionInfo(packageName);
 
         /// <summary>
         /// Lists all processes running on the device.

@@ -418,6 +418,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallPackage(string packageFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallPackage(packageFilePath, progress.AsAction(), arguments);
 
@@ -428,6 +429,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallRemotePackage(string remoteFilePath, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallRemotePackage(remoteFilePath, progress.AsAction(), arguments);
 
@@ -439,6 +441,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallMultiplePackage(string basePackageFilePath, IEnumerable<string> splitPackageFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(basePackageFilePath, splitPackageFilePaths, progress.AsAction(), arguments);
 
@@ -450,6 +453,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallMultiplePackage(IEnumerable<string> splitPackageFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultiplePackage(splitPackageFilePaths, packageName, progress.AsAction(), arguments);
 
@@ -461,6 +465,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallMultipleRemotePackage(string baseRemoteFilePath, IEnumerable<string> splitRemoteFilePaths, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultipleRemotePackage(baseRemoteFilePath, splitRemoteFilePaths, progress.AsAction(), arguments);
 
@@ -472,6 +477,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>pm install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public void InstallMultipleRemotePackage(IEnumerable<string> splitRemoteFilePaths, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             InstallMultipleRemotePackage(splitRemoteFilePaths, packageName, progress.AsAction(), arguments);
 #endif

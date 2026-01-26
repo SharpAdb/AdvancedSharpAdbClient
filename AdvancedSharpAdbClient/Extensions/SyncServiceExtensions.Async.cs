@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient
@@ -22,6 +23,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{IFileStatistics}"/> which returns a <see cref="IFileStatistics"/> object that contains information about the file.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<IFileStatistics> StatAsync(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
             useV2 ? service.StatExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IFileStatistics) : service.StatAsync(remotePath, cancellationToken).ContinueWith(x => x.Result as IFileStatistics);
 
@@ -34,6 +36,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task{IEnumerable}"/> which returns for each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<IEnumerable<IFileStatistics>> GetDirectoryListingAsync(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
 #if NETFRAMEWORK && !NET40_OR_GREATER
             useV2 ? service.GetDirectoryListingExAsync(remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>()) : service.GetDirectoryListingAsync(remotePath, cancellationToken).ContinueWith(x => x.Result.OfType<IFileStatistics>());
@@ -51,6 +54,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>An <see cref="IAsyncEnumerable{IFileStatistics}"/> which returns for each child item of the directory, a <see cref="FileStatistics"/> object with information of the item.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IAsyncEnumerable<IFileStatistics> GetDirectoryAsyncListing(this ISyncService service, string remotePath, bool useV2 = false, CancellationToken cancellationToken = default) =>
             useV2 ? service.GetDirectoryAsyncListingEx(remotePath, cancellationToken) : service.GetDirectoryAsyncListing(remotePath, cancellationToken);
 #endif
@@ -68,6 +72,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService service, Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), useV2, cancellationToken);
 
@@ -82,6 +87,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PullAsync(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), useV2, cancellationToken);
 
@@ -98,6 +104,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService.IWinRT service, IInputStream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, permissions, timestamp, progress.AsAction(), useV2, cancellationToken);
 
@@ -112,6 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PullAsync(this ISyncService.IWinRT service, string remotePath, IOutputStream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PullAsync(remotePath, stream, progress.AsAction(), useV2, cancellationToken);
 #endif
@@ -129,6 +137,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService service, Stream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, (UnixFileStatus)permissions, timestamp, callback, useV2, cancellationToken);
 
@@ -144,6 +153,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService service, Stream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, (UnixFileStatus)permissions, timestamp, progress.AsAction(), useV2, cancellationToken);
 
@@ -160,6 +170,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService.IWinRT service, IInputStream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, (UnixFileStatus)permissions, timestamp, callback, useV2, cancellationToken);
 
@@ -175,6 +186,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the task.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task PushAsync(this ISyncService.IWinRT service, IInputStream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress, bool useV2 = false, CancellationToken cancellationToken = default) =>
             service.PushAsync(stream, remotePath, (UnixFileStatus)permissions, timestamp, progress.AsAction(), useV2, cancellationToken);
 #endif

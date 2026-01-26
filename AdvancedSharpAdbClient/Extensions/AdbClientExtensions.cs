@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient
@@ -27,6 +28,7 @@ namespace AdvancedSharpAdbClient
         /// connection from <paramref name="local"/>.</param>
         /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static int CreateForward(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind) =>
             client.CreateForward(device, local.ToString(), remote.ToString(), allowRebind);
 
@@ -40,6 +42,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, int remotePort) =>
             client.CreateForward(device, $"tcp:{localPort}", $"tcp:{remotePort}", true);
 
@@ -54,6 +57,7 @@ namespace AdvancedSharpAdbClient
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
         /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static int CreateForward(this IAdbClient client, DeviceData device, int localPort, string remoteSocket) =>
             client.CreateForward(device, $"tcp:{localPort}", $"local:{remoteSocket}", true);
 
@@ -69,6 +73,7 @@ namespace AdvancedSharpAdbClient
         /// is already bound through a previous reverse command.</param>
         /// <returns>If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static int CreateReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind) =>
             client.CreateReverseForward(device, remote.ToString(), local.ToString(), allowRebind);
 
@@ -78,6 +83,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to remove the reverse port forwarding</param>
         /// <param name="remote">Specification of the remote that was forwarded</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void RemoveReverseForward(this IAdbClient client, DeviceData device, ForwardSpec remote) =>
             client.RemoveReverseForward(device, remote.ToString());
 
@@ -89,6 +95,7 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IShellOutputReceiver? receiver) =>
             client.ExecuteServerCommand(target, command, receiver, AdbClient.Encoding);
 
@@ -101,6 +108,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver) =>
             client.ExecuteServerCommand(target, command, socket, receiver, AdbClient.Encoding);
 
@@ -111,6 +119,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver? receiver) =>
             client.ExecuteRemoteCommand(command, device, receiver, AdbClient.Encoding);
 
@@ -122,6 +131,7 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, Func<string, bool>? predicate) =>
             client.ExecuteServerCommand(target, command, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
 
@@ -134,6 +144,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate) =>
             client.ExecuteServerCommand(target, command, socket, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
 
@@ -144,6 +155,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate) =>
             client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding);
 
@@ -156,6 +168,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, Func<string, bool>? predicate, Encoding encoding) =>
             client.ExecuteServerCommand(target, command, predicate.AsShellOutputReceiver(), encoding);
 
@@ -169,6 +182,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteServerCommand(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate, Encoding encoding) =>
             client.ExecuteServerCommand(target, command, socket, predicate.AsShellOutputReceiver(), encoding);
 
@@ -180,6 +194,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void ExecuteRemoteCommand(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate, Encoding encoding) =>
             client.ExecuteRemoteCommand(command, device, predicate.AsShellOutputReceiver(), encoding);
 
@@ -191,6 +206,7 @@ namespace AdvancedSharpAdbClient
         /// <c>localreserved</c>, <c>localabstract</c>, <c>jdwp</c>, <c>track-jdwp</c>, <c>sync</c>, <c>reverse</c> and so on.</param>
         /// <param name="command">The command to execute.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<string> ExecuteServerEnumerable(this IAdbClient client, string target, string command) =>
             client.ExecuteServerEnumerable(target, command, AdbClient.Encoding);
 
@@ -203,6 +219,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<string> ExecuteServerEnumerable(this IAdbClient client, string target, string command, IAdbSocket socket) =>
             client.ExecuteServerEnumerable(target, command, socket, AdbClient.Encoding);
 
@@ -213,6 +230,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="device">The device on which to run the command.</param>
         /// <returns>A <see cref="IEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<string> ExecuteRemoteEnumerable(this IAdbClient client, string command, DeviceData device) =>
             client.ExecuteRemoteEnumerable(command, device, AdbClient.Encoding);
 
@@ -223,6 +241,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the event log service.</param>
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void RunLogService(this IAdbClient client, DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
             client.RunLogService(device, messageSink, false, logNames);
 
@@ -231,6 +250,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Reboot(this IAdbClient client, DeviceData device) => client.Reboot(string.Empty, device);
 
         /// <summary>
@@ -240,6 +260,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="address">The IP address of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Pair(this IAdbClient client, IPAddress address, string code) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -252,6 +273,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Pair(this IAdbClient client, IPEndPoint endpoint, string code) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -264,6 +286,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Pair(this IAdbClient client, string host, string code) =>
             client.Pair(host, AdbClient.DefaultPort, code);
 
@@ -273,6 +296,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Connect(this IAdbClient client, IPAddress address) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -284,6 +308,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Connect(this IAdbClient client, IPEndPoint endpoint) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -295,6 +320,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Connect(this IAdbClient client, string host) =>
             client.Connect(host, AdbClient.DefaultPort);
 
@@ -304,6 +330,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="address">The IP address of the remote device.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Disconnect(this IAdbClient client, IPAddress address) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -315,6 +342,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Disconnect(this IAdbClient client, IPEndPoint endpoint) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -326,6 +354,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="host">The host address of the remote device.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Disconnect(this IAdbClient client, string host) =>
             client.Disconnect(host, AdbClient.DefaultPort);
 
@@ -335,6 +364,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="device">The device on which to process command.</param>
         /// <returns>A new instance of the <see cref="DeviceClient"/> class.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static DeviceClient CreateDeviceClient(this IAdbClient client, DeviceData device) => new(client, device);
 
         /// <summary>
@@ -344,6 +374,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to look for packages.</param>
         /// <param name="arguments">The arguments to pass to <c>pm list packages</c>.</param>
         /// <returns>A new instance of the <see cref="PackageManager"/> class.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static PackageManager CreatePackageManager(this IAdbClient client, DeviceData device, params string[] arguments) => new(client, device, arguments);
 
 #if !NETFRAMEWORK || NET40_OR_GREATER
@@ -354,6 +385,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the event log service.</param>
         /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, params LogId[] logNames) =>
             client.RunLogService(device, progress, false, logNames);
 
@@ -365,6 +397,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void RunLogService(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, in bool isCancelled, params LogId[] logNames) =>
             client.RunLogService(device, progress.Report, isCancelled, logNames);
 
@@ -377,6 +410,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Install(this IAdbClient client, DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             client.Install(device, apk, progress.AsAction(), arguments);
 
@@ -390,6 +424,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void InstallMultiple(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             client.InstallMultiple(device, baseAPK, splitAPKs, progress.AsAction(), arguments);
 
@@ -403,6 +438,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as <see cref="InstallProgressEventArgs"/>, representing the state of installation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void InstallMultiple(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, params string[] arguments) =>
             client.InstallMultiple(device, splitAPKs, packageName, progress.AsAction(), arguments);
 
@@ -416,6 +452,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="session">The session ID of the install session.</param>
         /// <param name="progress">An optional parameter which, when specified, returns progress notifications.
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void InstallWrite(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress) =>
             client.InstallWrite(device, apk, apkName, session, progress.AsAction());
 
@@ -426,6 +463,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="code">The pairing code.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Pair(this IAdbClient client, DnsEndPoint endpoint, string code) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -437,6 +475,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Connect(this IAdbClient client, DnsEndPoint endpoint) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -448,6 +487,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="client">An instance of a class that implements the <see cref="IAdbClient"/> interface.</param>
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static string Disconnect(this IAdbClient client, DnsEndPoint endpoint) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))

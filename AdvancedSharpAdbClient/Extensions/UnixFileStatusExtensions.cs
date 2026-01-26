@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Models
 {
@@ -26,24 +27,28 @@ namespace AdvancedSharpAdbClient.Models
             /// Gets the type of the given file status.
             /// </summary>
             /// <returns>The type of the file status.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public UnixFileStatus GetFileType() => mode & UnixFileStatus.TypeMask;
 
             /// <summary>
             /// Gets the permissions of the given file status.
             /// </summary>
             /// <returns>The permissions of the given file status.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public UnixFileStatus GetPermissions() => mode & UnixFileStatus.AllPermissions;
 
             /// <summary>
             /// Gets the access permissions of the given file status.
             /// </summary>
             /// <returns>The access permissions of the given file status.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public UnixFileStatus GetAccessPermissions() => mode & UnixFileStatus.AccessPermissions;
 
             /// <summary>
             /// Checks if the given file status corresponds to a directory, as if determined by <see cref="UnixFileStatus.Directory"/>.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a directory, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsDirectory() => mode.GetFileType() == UnixFileStatus.Directory;
 
             /// <summary>
@@ -51,6 +56,7 @@ namespace AdvancedSharpAdbClient.Models
             /// Examples of character special files are character devices such as <c>/dev/null</c>, <c>/dev/tty</c>, <c>/dev/audio</c>, or <c>/dev/nvram</c> on Linux.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a character device, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsCharacterFile() => mode.GetFileType() == UnixFileStatus.Character;
 
             /// <summary>
@@ -58,42 +64,49 @@ namespace AdvancedSharpAdbClient.Models
             /// Examples of block special files are block devices such as <c>/dev/sda</c> or <c>/dev/loop0</c> on Linux.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a block device, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsBlockFile() => mode.GetFileType() == UnixFileStatus.Block;
 
             /// <summary>
             /// Checks if the given file status corresponds to a regular file, as if determined by <see cref="UnixFileStatus.Regular"/>.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated by <paramref name="mode"/> refers to a regular file, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsRegularFile() => mode.GetFileType() == UnixFileStatus.Regular;
 
             /// <summary>
             /// Checks if the given file status corresponds to a FIFO or pipe file as if determined by <see cref="UnixFileStatus.FIFO"/>.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a FIFO pipe, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsFIFO() => mode.GetFileType() == UnixFileStatus.FIFO;
 
             /// <summary>
             /// Checks if the given file status corresponds to a symbolic link, as if determined by <see cref="UnixFileStatus.SymbolicLink"/>.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a symbolic link, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsSymbolicLink() => mode.GetFileType() == UnixFileStatus.SymbolicLink;
 
             /// <summary>
             /// Checks if the given file status or path corresponds to a named IPC socket, as if determined by <see cref="UnixFileStatus.Socket"/>.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a named socket, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsSocket() => mode.GetFileType() == UnixFileStatus.Socket;
 
             /// <summary>
             /// Checks if the given file status corresponds to a file of type other type. That is, the file exists, but is neither regular file, nor directory nor a symlink.
             /// </summary>
             /// <returns><see langword="true"/> if the type indicated <paramref name="mode"/> refers to a file that is not regular file, directory, or a symlink, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsOther() => mode.GetFileType() is not (UnixFileStatus.Regular or UnixFileStatus.Directory or UnixFileStatus.SymbolicLink);
 
             /// <summary>
             /// Checks if the given file type is known, equivalent to <c>mode.GetFileType() != <see cref="UnixFileStatus.None"/></c>.
             /// </summary>
             /// <returns><see langword="true"/> if the given file type is a known file type, otherwise <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool IsTypeKnown() => mode.GetFileType() != UnixFileStatus.None;
 
             /// <summary>

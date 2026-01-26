@@ -4,6 +4,7 @@
 // </copyright>
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient.Polyfills
 {
@@ -22,6 +23,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// </summary>
             /// <param name="value">An array of bytes that includes the four bytes to convert.</param>
             /// <returns>A 32-bit signed integer representing the converted bytes.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static int ToInt32(byte[] value) => BitConverter.ToInt32(value, 0);
 
             /// <summary>
@@ -29,6 +31,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// </summary>
             /// <param name="value">The array of bytes that includes the two bytes to convert.</param>
             /// <returns>An 16-bit unsigned integer representing the converted bytes.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static ushort ToUInt16(byte[] value) => BitConverter.ToUInt16(value, 0);
 
             /// <summary>
@@ -36,6 +39,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// </summary>
             /// <param name="value">An array of bytes.</param>
             /// <returns>A 32-bit unsigned integer representing the converted bytes.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static uint ToUInt32(byte[] value) => BitConverter.ToUInt32(value, 0);
         }
     }

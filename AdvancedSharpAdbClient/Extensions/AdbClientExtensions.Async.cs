@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 
@@ -28,6 +29,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec local, ForwardSpec remote, bool allowRebind, CancellationToken cancellationToken = default) =>
             client.CreateForwardAsync(device, local.ToString(), remote.ToString(), allowRebind, cancellationToken);
 
@@ -43,6 +45,7 @@ namespace AdvancedSharpAdbClient
         /// If your requested to start forwarding to local port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">Failed to submit the forward command. Or Device rejected command:  + resp.Message.</exception>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, int localPort, int remotePort, CancellationToken cancellationToken = default) =>
             client.CreateForwardAsync(device, $"tcp:{localPort}", $"tcp:{remotePort}", true, cancellationToken);
 
@@ -59,6 +62,7 @@ namespace AdvancedSharpAdbClient
         /// which has been opened. In all other cases, <c>0</c>.</returns>
         /// <exception cref="AdbException">The client failed to submit the forward command.</exception>
         /// <exception cref="AdbException">The device rejected command. The error message will include the error message provided by the device.</exception>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> CreateForwardAsync(this IAdbClient client, DeviceData device, int localPort, string remoteSocket, CancellationToken cancellationToken = default) =>
             client.CreateForwardAsync(device, $"tcp:{localPort}", $"local:{remoteSocket}", true, cancellationToken);
 
@@ -76,6 +80,7 @@ namespace AdvancedSharpAdbClient
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.
         /// If your requested to start reverse to remote port TCP:0, the port number of the TCP port
         /// which has been opened. In all other cases, <c>0</c>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> CreateReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, ForwardSpec local, bool allowRebind, CancellationToken cancellationToken = default) =>
             client.CreateReverseForwardAsync(device, remote.ToString(), local.ToString(), allowRebind, cancellationToken);
 
@@ -87,6 +92,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="remote">Specification of the remote that was forwarded</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task RemoveReverseForwardAsync(this IAdbClient client, DeviceData device, ForwardSpec remote, CancellationToken cancellationToken = default) =>
             client.RemoveReverseForwardAsync(device, remote.ToString(), cancellationToken);
 
@@ -100,6 +106,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IShellOutputReceiver? receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, receiver, AdbClient.Encoding, cancellationToken);
 
@@ -114,6 +121,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, IShellOutputReceiver? receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, socket, receiver, AdbClient.Encoding, cancellationToken);
 
@@ -126,6 +134,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="receiver">Optionally, a <see cref="IShellOutputReceiver"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, IShellOutputReceiver? receiver, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, receiver, AdbClient.Encoding, cancellationToken);
 
@@ -139,6 +148,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, Func<string, bool>? predicate, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, predicate.AsShellOutputReceiver(), AdbClient.Encoding, cancellationToken);
 
@@ -153,6 +163,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, socket, predicate.AsShellOutputReceiver(), AdbClient.Encoding, cancellationToken);
 
@@ -165,6 +176,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="predicate">Optionally, a <see cref="Func{String, Boolean}"/> that processes the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, predicate.AsShellOutputReceiver(), AdbClient.Encoding, cancellationToken);
 
@@ -179,6 +191,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, Func<string, bool>? predicate, Encoding encoding, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, predicate.AsShellOutputReceiver(), encoding, cancellationToken);
 
@@ -194,6 +207,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteServerCommandAsync(this IAdbClient client, string target, string command, IAdbSocket socket, Func<string, bool>? predicate, Encoding encoding, CancellationToken cancellationToken = default) =>
             client.ExecuteServerCommandAsync(target, command, socket, predicate.AsShellOutputReceiver(), encoding, cancellationToken);
 
@@ -207,6 +221,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="encoding">The encoding to use when parsing the command output.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ExecuteRemoteCommandAsync(this IAdbClient client, string command, DeviceData device, Func<string, bool>? predicate, Encoding encoding, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteCommandAsync(command, device, predicate.AsShellOutputReceiver(), encoding, cancellationToken);
 
@@ -220,6 +235,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="command">The command to execute.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IAsyncEnumerable<string> ExecuteServerEnumerableAsync(this IAdbClient client, string target, string command, CancellationToken cancellationToken = default) =>
             client.ExecuteServerEnumerableAsync(target, command, AdbClient.Encoding, cancellationToken);
 
@@ -233,6 +249,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="socket">The <see cref="IAdbSocket"/> to send command.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IAsyncEnumerable<string> ExecuteServerEnumerableAsync(this IAdbClient client, string target, string command, IAdbSocket socket, CancellationToken cancellationToken = default) =>
             client.ExecuteServerEnumerableAsync(target, command, socket, AdbClient.Encoding, cancellationToken);
 
@@ -244,6 +261,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the command.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="IAsyncEnumerable{String}"/> of strings, each representing a line of output from the command.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IAsyncEnumerable<string> ExecuteRemoteEnumerableAsync(this IAdbClient client, string command, DeviceData device, CancellationToken cancellationToken = default) =>
             client.ExecuteRemoteEnumerableAsync(command, device, AdbClient.Encoding, cancellationToken);
 
@@ -254,6 +272,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to run the event log service.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="IAsyncEnumerable{LogEntry}"/> which contains the log entries.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IAsyncEnumerable<LogEntry> RunLogServiceAsync(this IAdbClient client, DeviceData device, params LogId[] logNames) =>
             client.RunLogServiceAsync(device, default, logNames);
 #endif
@@ -266,6 +285,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="messageSink">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, Action<LogEntry> messageSink, params LogId[] logNames) =>
             client.RunLogServiceAsync(device, messageSink, default, logNames);
 
@@ -276,6 +296,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task RebootAsync(this IAdbClient client, DeviceData device, CancellationToken cancellationToken = default) => client.RebootAsync(string.Empty, device, cancellationToken);
 
         /// <summary>
@@ -286,6 +307,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> PairAsync(this IAdbClient client, IPAddress address, string code, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -299,6 +321,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> PairAsync(this IAdbClient client, IPEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -312,6 +335,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> PairAsync(this IAdbClient client, string host, string code, CancellationToken cancellationToken = default) =>
             client.PairAsync(host, AdbClient.DefaultPort, code, cancellationToken);
 
@@ -322,6 +346,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="address">The IP address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> ConnectAsync(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -334,6 +359,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> ConnectAsync(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -346,6 +372,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> ConnectAsync(this IAdbClient client, string host, CancellationToken cancellationToken = default) =>
             client.ConnectAsync(host, AdbClient.DefaultPort, cancellationToken);
 
@@ -356,6 +383,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="address">The IP address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> DisconnectAsync(this IAdbClient client, IPAddress address, CancellationToken cancellationToken = default) =>
             address == null
                 ? throw new ArgumentNullException(nameof(address))
@@ -368,6 +396,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The IP endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> DisconnectAsync(this IAdbClient client, IPEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -380,6 +409,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="host">The host address of the remote device.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> DisconnectAsync(this IAdbClient client, string host, CancellationToken cancellationToken = default) =>
             client.DisconnectAsync(host, AdbClient.DefaultPort, cancellationToken);
 
@@ -392,6 +422,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="progress">A callback which will receive the event log messages as they are received.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, params LogId[] logNames) =>
             client.RunLogServiceAsync(device, progress.Report, default, logNames);
 
@@ -404,6 +435,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="logNames">Optionally, the names of the logs to receive.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task RunLogServiceAsync(this IAdbClient client, DeviceData device, IProgress<LogEntry> progress, CancellationToken cancellationToken, params LogId[] logNames) =>
             client.RunLogServiceAsync(device, progress.Report, cancellationToken, logNames);
 
@@ -418,6 +450,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallAsync(this IAdbClient client, DeviceData device, Stream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallAsync(device, apk, progress.AsAction(), cancellationToken, arguments);
 
@@ -433,6 +466,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, Stream baseAPK, IEnumerable<Stream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, baseAPK, splitAPKs, progress.AsAction(), cancellationToken, arguments);
 
@@ -448,6 +482,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallMultipleAsync(this IAdbClient client, DeviceData device, IEnumerable<Stream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, splitAPKs, packageName, progress.AsAction(), cancellationToken, arguments);
 
@@ -463,6 +498,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallWriteAsync(this IAdbClient client, DeviceData device, Stream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
             client.InstallWriteAsync(device, apk, apkName, session, progress.AsAction(), cancellationToken);
 
@@ -474,6 +510,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="code">The pairing code.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>The results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> PairAsync(this IAdbClient client, DnsEndPoint endpoint, string code, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -486,6 +523,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> ConnectAsync(this IAdbClient client, DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -498,6 +536,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="endpoint">The DNS endpoint at which the <c>adb</c> server on the device is running.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the results from adb.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> DisconnectAsync(this IAdbClient client, DnsEndPoint endpoint, CancellationToken cancellationToken = default) =>
             endpoint == null
                 ? throw new ArgumentNullException(nameof(endpoint))
@@ -515,6 +554,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallAsync(device, apk, progress.AsAction(), cancellationToken, arguments);
 
@@ -530,6 +570,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream baseAPK, IEnumerable<IRandomAccessStream> splitAPKs, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, baseAPK, splitAPKs, progress.AsAction(), cancellationToken, arguments);
 
@@ -545,6 +586,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallMultipleAsync(this IAdbClient.IWinRT client, DeviceData device, IEnumerable<IRandomAccessStream> splitAPKs, string packageName, IProgress<InstallProgressEventArgs>? progress = null, CancellationToken cancellationToken = default, params string[] arguments) =>
             client.InstallMultipleAsync(device, splitAPKs, packageName, progress.AsAction(), cancellationToken, arguments);
 
@@ -560,6 +602,7 @@ namespace AdvancedSharpAdbClient
         /// The progress is reported as a value between 0 and 100, representing the percentage of the apk which has been transferred.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous operation.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task InstallWriteAsync(this IAdbClient.IWinRT client, DeviceData device, IRandomAccessStream apk, string apkName, string session, IProgress<double>? progress = null, CancellationToken cancellationToken = default) =>
             client.InstallWriteAsync(device, apk, apkName, session, progress.AsAction(), cancellationToken);
 #endif
@@ -573,6 +616,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="device">The device on which to install the application.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, params string[] arguments) =>
             client.InstallCreateAsync(device, default, arguments);
 
@@ -585,6 +629,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The package name of the baseAPK to install.</param>
         /// <param name="arguments">The arguments to pass to <c>adb install-create</c>.</param>
         /// <returns>A <see cref="Task{String}"/> which returns the session ID</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<string> InstallCreateAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
             client.InstallCreateAsync(device, packageName, default, arguments);
 
@@ -596,6 +641,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="packageName">The name of the package to uninstall.</param>
         /// <param name="arguments">The arguments to pass to <c>adb uninstall</c>.</param>
         /// <returns>A <see cref="Task"/> which represents the asynchronous operation.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task UninstallAsync(this IAdbClient client, DeviceData device, string packageName, params string[] arguments) =>
             client.UninstallAsync(device, packageName, default, arguments);
     }

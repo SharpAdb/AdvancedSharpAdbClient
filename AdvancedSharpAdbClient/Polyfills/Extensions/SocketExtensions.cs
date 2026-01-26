@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -25,6 +26,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="remoteEP">The endpoint to connect to.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the asynchronous operation.</param>
         /// <returns>An asynchronous task that completes when the connection is established.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task ConnectAsync(this Socket socket, EndPoint remoteEP, CancellationToken cancellationToken) =>
             Task.Run(() => socket.Connect(remoteEP), cancellationToken);
 #endif
@@ -39,6 +41,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
 #endif
@@ -53,6 +56,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes received.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> ReceiveAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.ReceiveAsync(buffer, 0, size, socketFlags, cancellationToken);
 
@@ -118,6 +122,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.SendAsync(buffer, 0, buffer.Length, socketFlags, cancellationToken);
 #endif
@@ -132,6 +137,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> which can be used to cancel the asynchronous task.</param>
         /// <remarks>Cancelling the task will also close the socket.</remarks>
         /// <returns>A <see cref="Task{Int32}"/> which returns the number of bytes sent.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<int> SendAsync(this Socket socket, byte[] buffer, int size, SocketFlags socketFlags, CancellationToken cancellationToken = default) =>
             socket.SendAsync(buffer, 0, size, socketFlags, cancellationToken);
 

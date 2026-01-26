@@ -23,6 +23,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="AdbCommandLineStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="AdbCommandLineStatus"/> struct.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AdbCommandLineStatus AdbCommandLineStatusCreator(params ReadOnlySpan<string> values) =>
             AdbCommandLineStatus.GetVersionFromOutput(values);
 
@@ -31,13 +32,15 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="ColorData"/> struct.</param>
         /// <returns>A new instance of <see cref="ColorData"/> struct.</returns>
-        public static unsafe ColorData ColorDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, ColorData>(ref MemoryMarshal.GetReference(values));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ColorData ColorDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, ColorData>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="FramebufferHeader"/> struct.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FramebufferHeader"/> struct.</param>
         /// <returns>A new instance of <see cref="FramebufferHeader"/> struct.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FramebufferHeader FramebufferHeaderCreator(ReadOnlySpan<byte> values) => new(values);
 
         /// <summary>
@@ -45,21 +48,24 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FileStatisticsData"/> struct.</param>
         /// <returns>A new instance of <see cref="FileStatisticsData"/> struct.</returns>
-        public static unsafe FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsData>(ref MemoryMarshal.GetReference(values));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FileStatisticsData FileStatisticsDataCreator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsData>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="FileStatisticsDataEx"/> struct.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="FileStatisticsDataEx"/> struct.</param>
         /// <returns>A new instance of <see cref="FileStatisticsDataEx"/> struct.</returns>
-        public static unsafe FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsDataEx>(ref MemoryMarshal.GetReference(values));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FileStatisticsDataEx FileStatisticsDataV2Creator(ReadOnlySpan<byte> values) => Unsafe.As<byte, FileStatisticsDataEx>(ref MemoryMarshal.GetReference(values));
 
         /// <summary>
         /// Build a <see cref="UnixFileStatus"/> enum.
         /// </summary>
         /// <param name="values">The data that feeds the <see cref="UnixFileStatus"/> struct.</param>
         /// <returns>A new instance of <see cref="UnixFileStatus"/> struct.</returns>
-        public static unsafe UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) => (UnixFileStatus)BitConverter.ToUInt32(values);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static UnixFileStatus UnixFileStatusCreator(ReadOnlySpan<byte> values) => (UnixFileStatus)BitConverter.ToUInt32(values);
 
         /// <summary>
         /// Build a <see cref="LogEntry"/> class.

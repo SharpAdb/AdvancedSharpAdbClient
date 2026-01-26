@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace AdvancedSharpAdbClient
 {
@@ -22,6 +23,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="ISyncService.Stat"/>; otherwise, use <see cref="ISyncService.StatEx"/>.</param>
         /// <returns>A <see cref="IFileStatistics"/> object that contains information about the file.</returns>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 8 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IFileStatistics Stat(this ISyncService service, string remotePath, bool useV2 = false) =>
             useV2 ? service.StatEx(remotePath) : service.Stat(remotePath);
 
@@ -33,6 +35,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="ISyncService.GetDirectoryListing"/>; otherwise, <see langword="false"/> use <see cref="ISyncService.GetDirectoryListingEx"/>.</param>
         /// <returns>For each child item of the directory, a <see cref="IFileStatistics"/> object with information of the item.</returns>
         /// <remarks>V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<IFileStatistics> GetDirectoryListing(this ISyncService service, string remotePath, bool useV2 = false) =>
 #if NETFRAMEWORK && !NET40_OR_GREATER
             useV2 ? service.GetDirectoryListingEx(remotePath).OfType<IFileStatistics>() : service.GetDirectoryListing(remotePath).OfType<IFileStatistics>();
@@ -53,6 +56,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Push(this ISyncService service, Stream stream, string remotePath, UnixFileStatus permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, in bool isCancelled = false) =>
             service.Push(stream, remotePath, permissions, timestamp, progress.AsAction(), useV2, isCancelled);
 
@@ -66,6 +70,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.RCV2"/> and <see cref="SyncCommand.STA2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.RECV"/> and <see cref="SyncCommand.STAT"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>File size bigger than 4GB need V2, and V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Pull(this ISyncService service, string remotePath, Stream stream, IProgress<SyncProgressChangedEventArgs>? progress = null, bool useV2 = false, in bool isCancelled = false) =>
             service.Pull(remotePath, stream, progress.AsAction(), useV2, isCancelled);
 
@@ -82,6 +87,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Push(this ISyncService service, Stream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, Action<SyncProgressChangedEventArgs>? callback = null, bool useV2 = false, in bool isCancelled = false) =>
             service.Push(stream, remotePath, (UnixFileStatus)permissions, timestamp, callback, useV2, isCancelled);
 
@@ -97,6 +103,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="useV2"><see langword="true"/> to use <see cref="SyncCommand.SND2"/>; otherwise, <see langword="false"/> use <see cref="SyncCommand.SEND"/>.</param>
         /// <param name="isCancelled">A <see cref="bool"/> that can be used to cancel the task.</param>
         /// <remarks>V2 need Android 11 or above.</remarks>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Push(this ISyncService service, Stream stream, string remotePath, UnixFileMode permissions, DateTimeOffset timestamp, IProgress<SyncProgressChangedEventArgs>? progress, bool useV2 = false, in bool isCancelled = false) =>
             service.Push(stream, remotePath, (UnixFileStatus)permissions, timestamp, progress.AsAction(), useV2, isCancelled);
 #endif

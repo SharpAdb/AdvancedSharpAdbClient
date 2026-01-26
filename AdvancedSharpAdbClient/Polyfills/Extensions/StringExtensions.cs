@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -56,6 +57,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <param name="comparisonType">One of the enumeration values that specifies the rules to use in the comparison.</param>
             /// <returns><see langword="true"/> if the <paramref name="value"/> parameter occurs within this string,
             /// or if <paramref name="value"/> is the empty string (""); otherwise, <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool Contains(string value, StringComparison comparisonType) => text.IndexOf(value, comparisonType) >= 0;
 
             /// <summary>
@@ -64,6 +66,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <param name="separator">A character that delimits the substrings in this string.</param>
             /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
             /// <returns>An array whose elements contain the substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public string[] Split(char separator, StringSplitOptions options = StringSplitOptions.None) => text.Split([separator], options);
 
             /// <summary>
@@ -76,6 +79,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <param name="count">The maximum number of elements expected in the array.</param>
             /// <param name="options">A bitwise combination of the enumeration values that specifies whether to trim substrings and include empty substrings.</param>
             /// <returns>An array that contains at most count substrings from this instance that are delimited by <paramref name="separator"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public string[] Split(char separator, int count, StringSplitOptions options = StringSplitOptions.None) => text.Split([separator], count, options);
 
             /// <summary>
@@ -83,6 +87,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// </summary>
             /// <param name="value">The character to compare.</param>
             /// <returns><see langword="true"/> if <paramref name="value"/> matches the beginning of this string; otherwise, <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool StartsWith(char value) => text.StartsWith(new string([value]));
 
             /// <summary>
@@ -90,6 +95,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// </summary>
             /// <param name="value">The character to compare to the character at the end of this instance.</param>
             /// <returns><see langword="true"/> if <paramref name="value"/> matches the end of this instance; otherwise, <see langword="false"/>.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public bool EndsWith(char value) => text.EndsWith(new string([value]));
             
             /// <summary>

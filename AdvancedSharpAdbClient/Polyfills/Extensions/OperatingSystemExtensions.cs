@@ -5,6 +5,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace AdvancedSharpAdbClient.Polyfills
@@ -23,6 +24,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <summary>
             /// Indicates whether the current application is running on Windows.
             /// </summary>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static bool IsWindows() =>
 #if NETCORE && !UAP10_0_15138_0
                 true;
@@ -40,6 +42,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <summary>
             /// Indicates whether the current application is running on Linux.
             /// </summary>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static bool IsLinux() =>
 #if NETCORE && !UAP10_0_15138_0
                 false;
@@ -52,6 +55,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <summary>
             /// Indicates whether the current application is running on macOS.
             /// </summary>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static bool IsMacOS() =>
 #if NETCORE && !UAP10_0_15138_0
                 false;
@@ -63,6 +67,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <summary>
             /// Indicates whether the current application is running on FreeBSD.
             /// </summary>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static bool IsFreeBSD() =>
 #if NETCOREAPP3_0_OR_GREATER
                 RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD);

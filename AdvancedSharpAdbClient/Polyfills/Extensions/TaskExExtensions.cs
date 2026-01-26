@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 #if NET40
@@ -54,6 +55,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <returns>A Task that represents the work queued to execute in the ThreadPool.</returns>
             /// <exception cref="ArgumentNullException">The <paramref name="action"/> parameter was null.</exception>
             /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static Task Run(Action action, CancellationToken cancellationToken) => TaskEx.Run(action, cancellationToken);
 
             /// <summary>
@@ -62,6 +64,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <param name="function">The work to execute asynchronously</param>
             /// <returns>A <see cref="Task{TResult}"/> that represents the work queued to execute in the ThreadPool.</returns>
             /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was null.</exception>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static Task<TResult> Run<TResult>(Func<TResult> function) => TaskEx.Run(function);
 
             /// <summary>
@@ -72,6 +75,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <returns>A <see cref="Task{TResult}"/> that represents the work queued to execute in the ThreadPool.</returns>
             /// <exception cref="ArgumentNullException">The <paramref name="function"/> parameter was null.</exception>
             /// <exception cref="ObjectDisposedException">The <see cref="CancellationTokenSource"/> associated with <paramref name="cancellationToken"/> was disposed.</exception>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static Task<TResult> Run<TResult>(Func<TResult> function, CancellationToken cancellationToken) => TaskEx.Run(function, cancellationToken);
 
             /// <summary>
@@ -81,6 +85,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
             /// <returns>A task that represents the time delay.</returns>
             /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> argument is less than -1.</exception>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static Task Delay(int dueTime, CancellationToken cancellationToken = default) => TaskEx.Delay(dueTime, cancellationToken);
 
             /// <summary>
@@ -89,6 +94,7 @@ namespace AdvancedSharpAdbClient.Polyfills
             /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
             /// <param name="result">The result to store into the completed task.</param>
             /// <returns>The successfully completed task.</returns>
+            [MethodImpl((MethodImplOptions)0x100)]
             public static Task<TResult> FromResult<TResult>(TResult result) => TaskEx.FromResult(result);
 #endif
         }
@@ -99,6 +105,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// </summary>
         /// <param name="tasks">The tasks to wait on for completion.</param>
         /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task WhenAll(this IEnumerable<Task> tasks) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx
@@ -113,6 +120,7 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <typeparam name="TResult">The type of the completed task.</typeparam>
         /// <param name="tasks">The tasks to wait on for completion.</param>
         /// <returns>A task that represents the completion of all of the supplied tasks.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task<TResult[]> WhenAll<TResult>(this IEnumerable<Task<TResult>> tasks) =>
 #if NETFRAMEWORK && !NET45_OR_GREATER
             TaskEx

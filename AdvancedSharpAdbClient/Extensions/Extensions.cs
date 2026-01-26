@@ -50,9 +50,10 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="predicate">The function to call for each line of output</param>
         /// <returns>The <see cref="IShellOutputReceiver"/> created from the specified function.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         [return: NotNullIfNotNull(nameof(predicate))]
         public static IShellOutputReceiver? AsShellOutputReceiver(this Func<string, bool>? predicate) =>
-            predicate == null ? null! : new FunctionOutputReceiver(predicate);
+            predicate == null ? null : new FunctionOutputReceiver(predicate);
 
 #if HAS_TASK
 #if !NET7_0_OR_GREATER
@@ -107,12 +108,14 @@ namespace AdvancedSharpAdbClient
         /// Closes the <see cref="Socket"/> connection and releases all associated resources.
         /// </summary>
         /// <param name="socket">The <see cref="Socket"/> to release.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Close(this Socket socket) => socket.Dispose();
 
         /// <summary>
         /// Closes the <see cref="TextReader"/> and releases any system resources associated with the <see cref="TextReader"/>.
         /// </summary>
         /// <param name="reader">The <see cref="TextReader"/> to release.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void Close(this TextReader reader) => reader.Dispose();
 #else
 #if HAS_TASK && !NET5_0_OR_GREATER
@@ -124,6 +127,7 @@ namespace AdvancedSharpAdbClient
         /// <param name="cancellationToken">An optional token to cancel the asynchronous operation.</param>
         /// <returns>A task that will complete when the process has exited, cancellation has been requested,
         /// or an error occurs.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default) =>
             Task.Run(process.WaitForExit, cancellationToken);
 #endif
@@ -156,9 +160,9 @@ namespace AdvancedSharpAdbClient
         /// <typeparam name="T">The type of progress update value.</typeparam>
         /// <param name="progress">The <see cref="IProgress{T}"/> to convert.</param>
         /// <returns>The <see cref="Action{T}"/> created from the specified <see cref="IProgress{T}"/>.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         [return: NotNullIfNotNull(nameof(progress))]
-        public static Action<T>? AsAction<T>(this IProgress<T>? progress) =>
-            progress == null ? null : progress.Report;
+        public static Action<T>? AsAction<T>(this IProgress<T>? progress) => progress == null ? null : progress.Report;
 #endif
 
 #if HAS_WINRT
@@ -183,6 +187,7 @@ namespace AdvancedSharpAdbClient
         /// </summary>
         /// <param name="socket">The socket to use.</param>
         /// <param name="request">The request to send.</param>
+        [MethodImpl((MethodImplOptions)0x100)]
         public static void SendAdbRequest(this IAdbSocket socket, scoped in DefaultInterpolatedStringHandler request) => socket.SendAdbRequest(request.ToString());
     }
 }
