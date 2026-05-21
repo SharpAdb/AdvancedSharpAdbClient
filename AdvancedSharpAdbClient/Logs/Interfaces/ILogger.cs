@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Logs
 {
@@ -19,7 +20,7 @@ namespace AdvancedSharpAdbClient.Logs
         /// <param name="exception">The exception to log.</param>
         /// <param name="message">Format string of the log message.</param>
         /// <param name="args">An object array that contains zero or more objects to format.</param>
-        void Log(LogLevel logLevel, Exception? exception, string? message, params object?[] args);
+        void Log(LogLevel logLevel, Exception? exception, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message, params object?[] args);
     }
 
     /// <summary>

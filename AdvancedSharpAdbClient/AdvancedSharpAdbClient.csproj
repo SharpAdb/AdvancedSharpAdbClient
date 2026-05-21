@@ -34,6 +34,7 @@
       System.Diagnostics.CodeAnalysis.NotNullAttribute;
       System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute;
       System.Diagnostics.CodeAnalysis.NotNullWhenAttribute;
+      System.Diagnostics.CodeAnalysis.StringSyntaxAttribute;
       System.Diagnostics.StackTraceHiddenAttribute;
       System.Index;
       System.Range;

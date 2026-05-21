@@ -213,7 +213,7 @@ namespace AdvancedSharpAdbClient
             scoped DefaultInterpolatedStringHandler request = address.IsEmpty ? (DefaultInterpolatedStringHandler)$"tcp:{port}" : $"tcp:{port}:{address}";
             return FormAdbRequest(request.Text);
 #else
-            string request = address == null ? $"tcp:{port}" : $"tcp:{port}:{address}";
+            string request = address.Length > 0 ? $"tcp:{port}:{address}" : $"tcp:{port}";
             return FormAdbRequest(request);
 #endif
         }

@@ -149,7 +149,11 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// Gets or sets the default instance of the <see cref="IAdbServer"/> interface.
         /// </summary>
-        public static IAdbServer Instance { get; set; } = new AdbServer();
+        public static IAdbServer Instance
+        {
+            get => field ??= new AdbServer();
+            set;
+        }
 
         /// <summary>
         /// <see langword="true"/> if is starting adb server; otherwise, <see langword="false"/>.
