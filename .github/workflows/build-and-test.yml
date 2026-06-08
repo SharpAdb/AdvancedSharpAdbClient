@@ -67,10 +67,10 @@ jobs:
           msbuild-architecture: x64
 
       - name: Install Dependencies
-        run: msbuild $env:Solution_Name /t:Restore /p:FullTargets=true
+        run: msbuild $env:Solution_Name /m /t:Restore /p:FullTargets=true
 
       - name: Pack
-        run: msbuild $env:Solution_Name /t:Pack /p:FullTargets=true /p:Configuration=Release /p:PackageOutputPath=../nugets /p:VersionSuffix=build.${{ github.run_number }}.${{ github.run_attempt }}
+        run: msbuild $env:Solution_Name /m /t:Pack /p:FullTargets=true /p:Configuration=Release /p:PackageOutputPath=../nugets /p:VersionSuffix=build.${{ github.run_number }}.${{ github.run_attempt }}
 
       - name: Publish
         if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
@@ -82,5 +82,5 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v6
         with:
-          name: Nuget Package
+          name: NuGet Package
           path: nugets/**
