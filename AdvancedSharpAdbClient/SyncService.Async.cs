@@ -281,7 +281,7 @@ namespace AdvancedSharpAdbClient
                 {
                     if (stream is IRandomAccessStream random)
                     {
-                        totalBytesRead = random.Size;
+                        totalBytesToProcess = random.Size;
                     }
                 }
                 catch { }

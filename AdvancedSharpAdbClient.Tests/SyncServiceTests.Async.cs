@@ -857,6 +857,7 @@ namespace AdvancedSharpAdbClient.Tests
                 .. BitConverter.GetBytes(content.Length),
                 .. content,
             ];
+            SyncProgressChangedEventArgs progress = null;
 
             await RunTestAsync(
                 OkResponses(2),
@@ -872,11 +873,16 @@ namespace AdvancedSharpAdbClient.Tests
                 async (ctx) =>
                 {
                     using SyncService service = new(Socket, Device);
-                    await service.PushAsync(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), cancellationToken: ctx);
+                    await service.PushAsync(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc), args => progress = args, cancellationToken: ctx);
                     Assert.False(service.IsProcessing);
                     Assert.True(service.IsOutdate);
                 },
                 TestContext.Current.CancellationToken);
+
+            // A random access stream knows its size, so the progress has a total and ends on it
+            Assert.NotNull(progress);
+            Assert.Equal((ulong)content.Length, progress.ReceivedBytesSize);
+            Assert.Equal((ulong)content.Length, progress.TotalBytesToReceive);
         }
 
         /// <summary>
