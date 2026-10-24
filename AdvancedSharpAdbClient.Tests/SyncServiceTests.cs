@@ -463,6 +463,44 @@ namespace AdvancedSharpAdbClient.Tests
         }
 
         /// <summary>
+        /// Tests the <see cref="SyncService.Push(Stream, string, UnixFileStatus, DateTimeOffset, Action{SyncProgressChangedEventArgs}?, bool, in bool)"/> method
+        /// with a stream that returns a short read followed by full reads.
+        /// </summary>
+        [Fact]
+        public void PushShortReadTest()
+        {
+            // A 24 byte buffer leaves 16 bytes of data per message
+            byte[] content = [.. Enumerable.Range(0, 40).Select(x => (byte)x)];
+            DummyChunkedStream stream = new(content, 5, 16, 16);
+            byte[][] contentMessages =
+            [
+                [.. SyncCommand.DATA.GetBytes(), .. BitConverter.GetBytes(5), .. content[..5]],
+                [.. SyncCommand.DATA.GetBytes(), .. BitConverter.GetBytes(16), .. content[5..21]],
+                [.. SyncCommand.DATA.GetBytes(), .. BitConverter.GetBytes(16), .. content[21..37]],
+                [.. SyncCommand.DATA.GetBytes(), .. BitConverter.GetBytes(3), .. content[37..]],
+            ];
+
+            RunTest(
+                OkResponses(2),
+                NoResponseMessages,
+                ["host:transport:169.254.109.177:5555", "sync:"],
+                [
+                    (SyncCommand.SEND, "/sdcard/test,644"),
+                    (SyncCommand.DONE, "1446505200")
+                ],
+                [SyncCommand.OKAY],
+                null,
+                contentMessages,
+                () =>
+                {
+                    using SyncService service = new(Socket, Device) { MaxBufferSize = 24 };
+                    service.Push(stream, "/sdcard/test", (UnixFileStatus)644, new DateTime(2015, 11, 2, 23, 0, 0, DateTimeKind.Utc));
+                    Assert.False(service.IsProcessing);
+                    Assert.True(service.IsOutdate);
+                });
+        }
+
+        /// <summary>
         /// Tests the <see cref="SyncService.IsProcessing"/> field.
         /// </summary>
         [Fact]

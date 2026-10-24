@@ -206,12 +206,10 @@ namespace AdvancedSharpAdbClient
                     // read up to SYNC_DATA_MAX
                     totalBytesRead += read;
 
-                    if (read != maxDataSize)
-                    {
-                        // At the end of the line, so we need to recalculate the length of the header
-                        lengthBytes = BitConverter.GetBytes(read);
-                        headerSize = dataBytes.Length + lengthBytes.Length;
-                    }
+                    // A stream may return a short read before its end (pipes, network streams),
+                    // so the header must always carry the length of this read.
+                    lengthBytes = BitConverter.GetBytes(read);
+                    headerSize = dataBytes.Length + lengthBytes.Length;
 
                     int startPosition = reservedHeaderSize - headerSize;
 
