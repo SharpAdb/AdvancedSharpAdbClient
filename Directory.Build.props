@@ -3,23 +3,23 @@
   <PropertyGroup>
     <AssemblyTitle>.NET client for adb, the Android Debug Bridge (AdvancedSharpAdbClient)</AssemblyTitle>
     <Authors>The Android Open Source Project, Ryan Conrad, Quamotion and improved by yungd1plomat and wherewhere</Authors>
-    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <Copyright>Copyright © 2021 - 2026 SharpAdb. All Rights Reserved.</Copyright>
     <Description>AdvancedSharpAdbClient is a .NET library that allows .NET, Mono, Unity applications to communicate with Android devices. It's a improved version of SharpAdbClient.</Description>
-    <Deterministic>True</Deterministic>
-    <EmbedUntrackedSources>True</EmbedUntrackedSources>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <IncludeSymbols>True</IncludeSymbols>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
     <LangVersion>preview</LangVersion>
     <PackageIconUrl>https://raw.githubusercontent.com/SharpAdb/AdvancedSharpAdbClient/main/logo.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>https://github.com/SharpAdb/AdvancedSharpAdbClient/releases</PackageReleaseNotes>
     <PackageTags>Android;ADB;Communication;UWP;Xamarin;WinUI;MAUI;Mono;Unity;SharpAdbClient;AdvancedSharpAdbClient</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Product>AdvancedSharpAdbClient: A .NET client for the Android Debug Bridge (adb)</Product>
-    <PublishRepositoryUrl>True</PublishRepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryUrl>https://github.com/SharpAdb/AdvancedSharpAdbClient</RepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Title>.NET client for adb, Android Debug Bridge (AdvancedSharpAdbClient)</Title>
@@ -27,10 +27,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FullTargets Condition="'$(FullTargets)' == ''">False</FullTargets>
-    <ImportAsync Condition="'$(ImportAsync)' == ''">False</ImportAsync>
-    <IsWindows Condition="'$(IsWindows)' == ''">False</IsWindows>
-    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'True' OR '$(Platform)' == 'Windows NT'">True</IsWindows>
+    <FullTargets Condition="'$(FullTargets)' == ''">false</FullTargets>
+    <ImportAsync Condition="'$(ImportAsync)' == ''">false</ImportAsync>
+    <IsWindows Condition="'$(IsWindows)' == ''">false</IsWindows>
+    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true' OR '$(Platform)' == 'Windows NT'">true</IsWindows>
     <IsTestProject Condition="'$(IsTestProject)' == ''">$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
   </PropertyGroup>
 
@@ -48,7 +48,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'uap'))">
-    <CopyLocalLockFileAssemblies>False</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <DefaultLanguage>en-US</DefaultLanguage>
     <DefineConstants>$(DefineConstants);NETCORE;NETCORE_5_0;NETFX_CORE;WINDOWS_UWP;UAP10_0</DefineConstants>
     <LanguageTargets>$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets</LanguageTargets>

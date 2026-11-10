@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOTNET_VERSION: 10.0.x # The .NET SDK version to use
+  DOTNET_VERSION: 11.0.x # The .NET SDK version to use
 
 jobs:
   build-and-test:
@@ -25,12 +25,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET Core App
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -41,23 +41,25 @@ jobs:
         run: dotnet build --no-restore -p:FullTargets=false
 
       - name: Test
-        run: dotnet test --no-restore --blame-hang-timeout 1m -p:FullTargets=false
+        run: dotnet test --no-restore --timeout 1m -p:FullTargets=false
+        env:
+          DOTNET_TEST_RUNNER: Microsoft.Testing.Platform
 
   pack-and-publish:
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     needs: build-and-test
-    runs-on: windows-2025-vs2026
+    runs-on: windows-latest
     env:
       Solution_Name: AdvancedSharpAdbClient/AdvancedSharpAdbClient.csproj
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET Core App
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 

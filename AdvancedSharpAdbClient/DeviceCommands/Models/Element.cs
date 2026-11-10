@@ -431,15 +431,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         public bool Equals([NotNullWhen(true)] Element? other) =>
             (object?)this == other ||
                 (other is not null
-                && EqualityComparer<IAdbClient>.Default.Equals(Client, other.Client)
-                && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device)
-                && (Node == null
-                    ? Bounds == other.Bounds
-                        && other.Attributes == null
-                            ? Attributes == null
-                            : Attributes?.SequenceEqual(other.Attributes!) == true
-                    : other.Node != null
-                        && Node.OuterXml == other.Node.OuterXml));
+                    && Client == other.Client
+                    && Device == other.Device
+                    && (Node == null
+                        ? Bounds == other.Bounds
+                            && other.Attributes == null
+                                ? Attributes == null
+                                : Attributes?.SequenceEqual(other.Attributes!) == true
+                        : other.Node != null
+                            && Node.OuterXml == other.Node.OuterXml));
 
         /// <summary>
         /// Tests whether two <see cref='Element'/> objects are equally.

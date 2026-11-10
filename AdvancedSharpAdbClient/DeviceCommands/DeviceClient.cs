@@ -449,9 +449,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands
         public virtual bool Equals(DeviceClient? other) =>
             (object)this == other ||
                 (other is not null
-                && EqualityComparer<Type>.Default.Equals(EqualityContract, other.EqualityContract)
-                && EqualityComparer<IAdbClient>.Default.Equals(AdbClient, other.AdbClient)
-                && EqualityComparer<DeviceData>.Default.Equals(Device, other.Device));
+                    && EqualityContract == other.EqualityContract
+                    && AdbClient == other.AdbClient
+                    && Device == other.Device);
 #endif
 
 #if NET7_0_OR_GREATER

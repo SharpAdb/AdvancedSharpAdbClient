@@ -93,7 +93,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="left">The <see cref='ForwardData'/> class that is to the left of the equality operator.</param>
         /// <param name="right">The <see cref='ForwardData'/> class that is to the right of the equality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="ForwardData"/> class are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(ForwardData? left, ForwardData? right) => EqualityComparer<ForwardData?>.Default.Equals(left, right);
+        public static bool operator ==(ForwardData? left, ForwardData? right) => left?.Equals(right) ?? right is null;
 
         /// <summary>
         /// Tests whether two <see cref='ForwardData'/> objects are different.
