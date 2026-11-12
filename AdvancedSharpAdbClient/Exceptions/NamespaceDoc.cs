@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable IDE1006
 namespace AdvancedSharpAdbClient.Exceptions
 {
     /// <summary>
@@ -14,7 +15,7 @@ namespace AdvancedSharpAdbClient.Exceptions
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc
+    internal interface NamespaceDoc : AdvancedSharpAdbClient.NamespaceDoc
     {
         /// <summary>
         /// The name of the namespace <see cref="Exceptions"/>.

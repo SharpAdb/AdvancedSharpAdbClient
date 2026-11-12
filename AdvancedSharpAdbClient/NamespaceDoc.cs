@@ -43,7 +43,7 @@ namespace AdvancedSharpAdbClient
     /// </c>
     /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc
+    internal interface NamespaceDoc
     {
         /// <summary>
         /// The name of the namespace <see cref="AdvancedSharpAdbClient"/>.

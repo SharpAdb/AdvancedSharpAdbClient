@@ -5,6 +5,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable IDE1006
 namespace AdvancedSharpAdbClient.DeviceCommands.Models
 {
     /// <summary>
@@ -13,7 +14,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [CompilerGenerated]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.Models.NamespaceDoc
+    internal interface NamespaceDoc : DeviceCommands.NamespaceDoc, AdvancedSharpAdbClient.Models.NamespaceDoc
     {
         /// <summary>
         /// The name of the namespace <see cref="Models"/>.

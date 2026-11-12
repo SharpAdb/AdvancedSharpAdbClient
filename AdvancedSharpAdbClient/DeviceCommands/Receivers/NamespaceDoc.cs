@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 
+#pragma warning disable IDE1006
 namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
 {
     /// <summary>
@@ -11,7 +12,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Receivers
     /// </summary>
     /// <remarks><c>Copyright (c) The Android Open Source Project, Ryan Conrad, Quamotion, yungd1plomat, wherewhere. All rights reserved.</c></remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal abstract class NamespaceDoc : AdvancedSharpAdbClient.Receivers.NamespaceDoc
+    internal interface NamespaceDoc : DeviceCommands.NamespaceDoc, AdvancedSharpAdbClient.Receivers.NamespaceDoc
     {
         /// <summary>
         /// The name of the namespace <see cref="Receivers"/>.
