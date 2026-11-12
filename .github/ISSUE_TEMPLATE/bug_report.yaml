@@ -33,6 +33,7 @@ body:
       description: Specify the version of AdvancedSharpAdbClient you're using.
       options:
         - Latest Source
+        - 3.7.17
         - 3.6.16
         - 3.5.15
         - 3.4.14
@@ -78,6 +79,7 @@ body:
         - .NET 8
         - .NET 9
         - .NET 10
+        - .NET 11
         - Others
   - type: dropdown
     attributes:
