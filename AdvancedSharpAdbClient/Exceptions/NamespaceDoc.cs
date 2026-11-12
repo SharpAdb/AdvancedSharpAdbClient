@@ -20,6 +20,6 @@ namespace AdvancedSharpAdbClient.Exceptions
         /// <summary>
         /// The name of the namespace <see cref="Exceptions"/>.
         /// </summary>
-        public new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Exceptions)}";
+        new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Exceptions)}";
     }
 }

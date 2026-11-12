@@ -9,12 +9,12 @@
   <Choose>
     <When Condition="'$(IsWindows)' == 'true'">
       <PropertyGroup>
-        <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+        <TargetFramework>net11.0-windows10.0.26100.0</TargetFramework>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
       </PropertyGroup>
     </Otherwise>
   </Choose>
@@ -23,7 +23,7 @@
     <PackageReference Include="coverlet.msbuild" Version="10.1.0" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
     <PackageReference Include="NSubstitute" Version="6.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

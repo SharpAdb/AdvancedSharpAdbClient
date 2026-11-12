@@ -134,7 +134,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             string baseRemoteFilePath = await SyncPackageToDeviceAsync(basePackageFilePath, OnMainSyncProgressChanged, cancellationToken).ConfigureAwait(false);
 
             int progressCount = 1;
-            Dictionary<string, double> status = new(splitPackageFileCount);
+            Dictionary<string, double> status = [with(splitPackageFileCount)];
             void OnSplitSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args)
             {
                 lock (status)
@@ -204,7 +204,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             int splitPackageFileCount = splitPackageFilePaths.Count();
 
             int progressCount = 0;
-            Dictionary<string, double> status = new(splitPackageFileCount);
+            Dictionary<string, double> status = [with(splitPackageFileCount)];
             void OnSyncProgressChanged(string? sender, SyncProgressChangedEventArgs args)
             {
                 lock (status)

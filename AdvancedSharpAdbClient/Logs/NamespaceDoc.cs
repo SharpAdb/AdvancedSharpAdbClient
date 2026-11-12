@@ -17,6 +17,6 @@ namespace AdvancedSharpAdbClient.Logs
         /// <summary>
         /// The name of the namespace <see cref="Logs"/>.
         /// </summary>
-        public new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Logs)}";
+        new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Logs)}";
     }
 }

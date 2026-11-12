@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdvancedSharpAdbClient.Models
@@ -57,7 +56,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="left">The <typeparamref name="TSelf"/> structure that is to the left of the equality operator.</param>
         /// <param name="right">The <see cref="FileStatisticsBase{T, TSelf}"/> structure that is to the right of the equality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="FileStatisticsBase{T, TSelf}"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(TSelf? left, FileStatisticsBase<T, TSelf>? right) => left?.Equals(right) ?? right is null;
+        public static bool operator ==(TSelf? left, FileStatisticsBase<T, TSelf>? right) => left?.Equals(right) ?? (right is null);
 
         /// <summary>
         /// Tests whether two <see cref="FileStatisticsBase{T, TSelf}"/> objects are equally.
@@ -65,7 +64,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="left">The <see cref="FileStatisticsBase{T, TSelf}"/> structure that is to the left of the equality operator.</param>
         /// <param name="right">The <see cref="FileStatisticsBase{T, TSelf}"/> structure that is to the right of the equality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="FileStatisticsBase{T, TSelf}"/> structures are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(FileStatisticsBase<T, TSelf>? left, FileStatisticsBase<T, TSelf>? right) => left?.Equals(right) ?? right is null;
+        public static bool operator ==(FileStatisticsBase<T, TSelf>? left, FileStatisticsBase<T, TSelf>? right) => left?.Equals(right) ?? (right is null);
 
         /// <summary>
         /// Tests whether two <see cref="FileStatisticsBase{T, TSelf}"/> objects are different.

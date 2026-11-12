@@ -19,6 +19,6 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
         /// <summary>
         /// The name of the namespace <see cref="Models"/>.
         /// </summary>
-        public new const string Name = $"{DeviceCommands.NamespaceDoc.Name}.{nameof(Models)}";
+        new const string Name = $"{DeviceCommands.NamespaceDoc.Name}.{nameof(Models)}";
     }
 }

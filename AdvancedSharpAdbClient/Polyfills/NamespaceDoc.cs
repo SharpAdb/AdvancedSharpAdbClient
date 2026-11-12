@@ -19,6 +19,6 @@ namespace AdvancedSharpAdbClient.Polyfills
         /// <summary>
         /// The name of the namespace <see cref="Polyfills"/>.
         /// </summary>
-        public new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Polyfills)}";
+        new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Polyfills)}";
     }
 }

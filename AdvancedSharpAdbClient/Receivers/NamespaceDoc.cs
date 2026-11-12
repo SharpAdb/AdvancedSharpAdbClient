@@ -18,6 +18,6 @@ namespace AdvancedSharpAdbClient.Receivers
         /// <summary>
         /// The name of the namespace <see cref="Receivers"/>.
         /// </summary>
-        public new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Receivers)}";
+        new const string Name = $"{AdvancedSharpAdbClient.NamespaceDoc.Name}.{nameof(Receivers)}";
     }
 }

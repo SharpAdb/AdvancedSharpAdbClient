@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -179,7 +178,7 @@ namespace AdvancedSharpAdbClient.Models
         /// <param name="left">The <see cref='DeviceData'/> class that is to the left of the equality operator.</param>
         /// <param name="right">The <see cref='DeviceData'/> class that is to the right of the equality operator.</param>
         /// <returns>This operator returns <see langword="true"/> if the two <see cref="DeviceData"/> class are equally; otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(DeviceData? left, DeviceData? right) => left?.Equals(right) ?? right is null;
+        public static bool operator ==(DeviceData? left, DeviceData? right) => left?.Equals(right) ?? (right is null);
 
         /// <summary>
         /// Tests whether two <see cref='DeviceData'/> objects are different.

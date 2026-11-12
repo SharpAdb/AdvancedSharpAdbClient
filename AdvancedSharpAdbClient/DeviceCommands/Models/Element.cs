@@ -57,7 +57,7 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Models
             if (xmlNode?.Attributes != null)
             {
                 bool foundBounds = false;
-                Attributes = new(xmlNode.Attributes.Count);
+                Attributes = [with(xmlNode.Attributes.Count)];
                 foreach (XmlAttribute at in xmlNode.Attributes.OfType<XmlAttribute>())
                 {
                     if (!foundBounds && at.Name == "bounds" && at.Value is string bounds)

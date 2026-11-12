@@ -849,7 +849,7 @@ namespace AdvancedSharpAdbClient
             InstallWrite(device, baseAPK, nameof(baseAPK), session, OnMainSyncProgressChanged);
 
             int progressCount = 1;
-            Dictionary<string, double> status = new(splitAPKsCount);
+            Dictionary<string, double> status = [with(splitAPKsCount)];
             void OnSplitSyncProgressChanged(string? sender, double args)
             {
                 lock (status)
@@ -896,7 +896,7 @@ namespace AdvancedSharpAdbClient
 
             int progressCount = 0;
             int splitAPKsCount = splitAPKs.Count();
-            Dictionary<string, double> status = new(splitAPKsCount);
+            Dictionary<string, double> status = [with(splitAPKsCount)];
             void OnSyncProgressChanged(string? sender, double args)
             {
                 lock (status)

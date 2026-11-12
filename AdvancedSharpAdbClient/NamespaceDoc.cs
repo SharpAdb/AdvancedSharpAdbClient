@@ -48,6 +48,6 @@ namespace AdvancedSharpAdbClient
         /// <summary>
         /// The name of the namespace <see cref="AdvancedSharpAdbClient"/>.
         /// </summary>
-        public const string Name = nameof(AdvancedSharpAdbClient);
+        const string Name = nameof(AdvancedSharpAdbClient);
     }
 }
