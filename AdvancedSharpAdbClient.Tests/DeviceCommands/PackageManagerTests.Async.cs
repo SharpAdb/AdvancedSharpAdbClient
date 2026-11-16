@@ -209,6 +209,44 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             Assert.True(syncService.UploadedFiles.ContainsKey("/data/local/tmp/split_config.xxhdpi.apk"));
         }
 
+        /// <summary>
+        /// Tests the <see cref="PackageManager.InstallMultiplePackageAsync(string, System.Collections.Generic.IEnumerable{string}, System.Action{InstallProgressEventArgs}?, System.Threading.CancellationToken, string[])"/> method without a callback.
+        /// </summary>
+        [Fact]
+        public async Task InstallMultiplePackageWithoutCallbackAsyncTest()
+        {
+            DummySyncService syncService = new();
+
+            DummyAdbClient adbClient = new();
+
+            adbClient.Commands["shell:pm list packages -f"] = "package:/system/app/Gallery2/Gallery2.apk=com.android.gallery3d";
+            adbClient.Commands["shell:pm install-create"] = "Success: created install session [936013062]";
+            adbClient.Commands["shell:pm install-create -p com.google.android.gms"] = "Success: created install session [936013062]";
+            adbClient.Commands["shell:pm install-write 936013062 base.apk \"/data/local/tmp/base.apk\""] = "Success";
+            adbClient.Commands["shell:pm install-write 936013062 split0.apk \"/data/local/tmp/split_config.arm64_v8a.apk\""] = "Success";
+            adbClient.Commands["shell:pm install-write 936013062 split1.apk \"/data/local/tmp/split_config.xxhdpi.apk\""] = "Success";
+            adbClient.Commands["shell:pm install-commit 936013062"] = "Success";
+            adbClient.Commands["shell:rm \"/data/local/tmp/base.apk\""] = string.Empty;
+            adbClient.Commands["shell:rm \"/data/local/tmp/split_config.arm64_v8a.apk\""] = string.Empty;
+            adbClient.Commands["shell:rm \"/data/local/tmp/split_config.xxhdpi.apk\""] = string.Empty;
+
+            PackageManager manager = new(adbClient, Device, (c, d) => syncService);
+
+            // The split counts must not depend on a callback being there to report them
+            await manager.InstallMultiplePackageAsync("Assets/TestApp/base.apk", ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
+                (System.Action<InstallProgressEventArgs>?)null, TestContext.Current.CancellationToken);
+
+            Assert.Equal(9, adbClient.ReceivedCommands.Count);
+            Assert.Equal("shell:rm \"/data/local/tmp/base.apk\"", adbClient.ReceivedCommands[8]);
+
+            adbClient.ReceivedCommands.Clear();
+
+            await manager.InstallMultiplePackageAsync(["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"], "com.google.android.gms",
+                (System.Action<InstallProgressEventArgs>?)null, TestContext.Current.CancellationToken);
+
+            Assert.Equal(6, adbClient.ReceivedCommands.Count);
+        }
+
         [Fact]
         public async Task UninstallPackageAsyncTest()
         {
