@@ -385,7 +385,7 @@ static async void Main(string[] args)
 static void Main(string[] args)
 {
     ...
-    XmlDocument screen = deviceClient.DumpScreen();
+    XmlDocument screen = adbClient.DumpScreen(deviceData);
     ...
 }
 ```
