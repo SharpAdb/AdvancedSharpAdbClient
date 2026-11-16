@@ -185,9 +185,9 @@ namespace AdvancedSharpAdbClient.Tests
                         208, 7, 0, 0,
                         13, 39, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0,
+                        151, 130, 56, 86, 0, 0, 0, 0,
                         152, 130, 56, 86, 0, 0, 0, 0,
-                        152, 130, 56, 86, 0, 0, 0, 0,
-                        152, 130, 56, 86, 0, 0, 0, 0
+                        153, 130, 56, 86, 0, 0, 0, 0
                     ],
                     [
                         0, 0, 0, 0,
@@ -253,9 +253,10 @@ namespace AdvancedSharpAdbClient.Tests
             Assert.Equal(0u, dir.Size);
             Assert.Equal(2000u, dir.UserId);
             Assert.Equal(9997u, dir.GroupId);
-            Assert.Equal(time, dir.AccessTime);
+            // Distinct times, so a field read from another's offset fails
+            Assert.Equal(time.AddSeconds(-1), dir.AccessTime);
             Assert.Equal(time, dir.ModifiedTime);
-            Assert.Equal(time, dir.ChangedTime);
+            Assert.Equal(time.AddSeconds(1), dir.ChangedTime);
             Assert.Equal($"drwxr-x--x\t0\t{dir.ModifiedTime}\t.", dir.ToString());
 
             FileStatisticsEx parentDir = value[1];
