@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -24,10 +25,10 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             adbClient.ReceivedCommands.Clear();
 
-            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing), TestContext.Current.CancellationToken, new string[] { "-r", "-t" });
+            await manager.InstallRemotePackageAsync("/data/base.apk", new InstallProgress(PackageInstallProgressState.Installing), TestContext.Current.CancellationToken, ["-r", "-t"]);
 
-            Assert.Single(adbClient.ReceivedCommands);
-            Assert.Equal("shell:pm install -r -t \"/data/base.apk\"", adbClient.ReceivedCommands[0]);
+            string item = Assert.Single(adbClient.ReceivedCommands);
+            Assert.Equal("shell:pm install -r -t \"/data/base.apk\"", item);
         }
 
         [Fact]
@@ -156,7 +157,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
 
             PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
-            await manager.InstallMultiplePackageAsync("Assets/TestApp/base.apk", ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
+            await manager.InstallMultiplePackageAsync(
+                "Assets/TestApp/base.apk",
+                ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
                  new InstallProgress(
                     PackageInstallProgressState.Preparing,
                     PackageInstallProgressState.Uploading,
@@ -185,7 +188,9 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             syncService.UploadedFiles.Clear();
             adbClient.ReceivedCommands.Clear();
 
-            await manager.InstallMultiplePackageAsync(["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"], "com.google.android.gms",
+            await manager.InstallMultiplePackageAsync(
+                ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
+                "com.google.android.gms",
                 new InstallProgress(
                     PackageInstallProgressState.Preparing,
                     PackageInstallProgressState.Uploading,
@@ -233,16 +238,22 @@ namespace AdvancedSharpAdbClient.DeviceCommands.Tests
             PackageManager manager = new(adbClient, Device, (c, d) => syncService);
 
             // The split counts must not depend on a callback being there to report them
-            await manager.InstallMultiplePackageAsync("Assets/TestApp/base.apk", ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
-                (System.Action<InstallProgressEventArgs>?)null, TestContext.Current.CancellationToken);
+            await manager.InstallMultiplePackageAsync(
+                "Assets/TestApp/base.apk",
+                ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
+                callback: null,
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(9, adbClient.ReceivedCommands.Count);
             Assert.Equal("shell:rm \"/data/local/tmp/base.apk\"", adbClient.ReceivedCommands[8]);
 
             adbClient.ReceivedCommands.Clear();
 
-            await manager.InstallMultiplePackageAsync(["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"], "com.google.android.gms",
-                (System.Action<InstallProgressEventArgs>?)null, TestContext.Current.CancellationToken);
+            await manager.InstallMultiplePackageAsync(
+                ["Assets/TestApp/split_config.arm64_v8a.apk", "Assets/TestApp/split_config.xxhdpi.apk"],
+                "com.google.android.gms",
+                callback: null,
+                TestContext.Current.CancellationToken);
 
             Assert.Equal(6, adbClient.ReceivedCommands.Count);
         }
