@@ -167,11 +167,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             await InstallMultipleRemotePackageAsync(baseRemoteFilePath, splitRemoteFilePaths, callback, cancellationToken, arguments);
 
             int count = 0;
+            object locker = new();
             callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
             await splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
-                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
+                lock (locker)
+                {
+                    count++;
+                    callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFilePaths.Length + 1, PackageInstallProgressState.PostInstall));
+                }
             }).WhenAll().ConfigureAwait(false);
 
             if (count < splitRemoteFilePaths.Length)
@@ -237,11 +242,16 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             await InstallMultipleRemotePackageAsync(splitRemoteFilePaths, packageName, callback, cancellationToken, arguments);
 
             int count = 0;
+            object locker = new();
             callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
             await splitRemoteFilePaths.Select(async x =>
             {
                 await RemoveRemotePackageAsync(x, cancellationToken).ConfigureAwait(false);
-                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
+                lock (locker)
+                {
+                    count++;
+                    callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFilePaths.Length, PackageInstallProgressState.PostInstall));
+                }
             }).WhenAll().ConfigureAwait(false);
 
             if (count < splitRemoteFilePaths.Length)
@@ -279,10 +289,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             callback?.Invoke(new InstallProgressEventArgs(1, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
 
             int count = 0;
+            object locker = new();
             await splitRemoteFilePaths.Select(async (splitRemoteFilePath, index) =>
             {
                 await WriteInstallSessionAsync(session, $"split{index}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
-                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
+                lock (locker)
+                {
+                    count++;
+                    callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount + 1, PackageInstallProgressState.WriteSession));
+                }
             }).WhenAll().ConfigureAwait(false);
 
             if (count < splitRemoteFileCount)
@@ -324,10 +339,15 @@ namespace AdvancedSharpAdbClient.DeviceCommands
             callback?.Invoke(new InstallProgressEventArgs(0, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
 
             int count = 0;
+            object locker = new();
             await splitRemoteFilePaths.Select(async (splitRemoteFilePath, index) =>
             {
                 await WriteInstallSessionAsync(session, $"split{index}", splitRemoteFilePath, cancellationToken).ConfigureAwait(false);
-                callback?.Invoke(new InstallProgressEventArgs(++count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
+                lock (locker)
+                {
+                    count++;
+                    callback?.Invoke(new InstallProgressEventArgs(count, splitRemoteFileCount, PackageInstallProgressState.WriteSession));
+                }
             }).WhenAll().ConfigureAwait(false);
 
             if (count < splitRemoteFileCount)

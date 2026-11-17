@@ -96,13 +96,13 @@ namespace AdvancedSharpAdbClient.Models
         /// <summary>
         /// Gets the timestamp indicating when the item was last modified.
         /// </summary>
-        [field: FieldOffset((5 * sizeof(uint)) + (2 * sizeof(ulong)) + sizeof(ulong))]
+        [field: FieldOffset((5 * sizeof(uint)) + (3 * sizeof(ulong)) + sizeof(long))]
         public long ModifiedTime { get; init; } = ModifiedTime;
 
         /// <summary>
         /// Gets the timestamp indicating when the last change occurred.
         /// </summary>
-        [field: FieldOffset((5 * sizeof(uint)) + (2 * sizeof(ulong)) + (2 * sizeof(ulong)))]
+        [field: FieldOffset((5 * sizeof(uint)) + (3 * sizeof(ulong)) + (2 * sizeof(long)))]
         public long ChangedTime { get; init; } = ChangedTime;
 
         /// <summary>
